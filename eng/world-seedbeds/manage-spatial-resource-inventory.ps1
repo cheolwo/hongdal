@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidateSet("Write", "Check")]
     [string] $Mode = "Check",
@@ -78,7 +78,7 @@ $raw = [IO.File]::ReadAllText($resolvedInput, [Text.Encoding]::UTF8)
 $inventory = $raw | ConvertFrom-Json
 
 Require ([string] $inventory.schemaVersion -eq "simulation-world-spatial-resource-inventory.v1") "SchemaVersionInvalid"
-Require ([string] $inventory.revision -eq "simulation-world-spatial-resource-inventory.r9") "RevisionInvalid"
+Require ([string] $inventory.revision -eq "simulation-world-spatial-resource-inventory.r10") "RevisionInvalid"
 Require ([bool] $inventory.presentationOnly) "PresentationOnlyMustBeTrue"
 Require (-not [bool] $inventory.isOperationalState) "OperationalStateMustBeFalse"
 Require (-not ($raw -match '"(absoluteWorldPosition|worldEastingMeters|worldNorthingMeters|latitude|longitude|prefabPath|assetGuid|scenePath)"')) "AuthorityFieldForbidden"

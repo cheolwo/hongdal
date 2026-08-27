@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-seedbed-catalog.v1",
-  "revision": "simulation-world-interaction-spatial-seedbeds.r1",
-  "worldInteractionCatalogRevision": "simulation-world-interactions.r8",
+  "revision": "simulation-world-interaction-spatial-seedbeds.r7",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r27",
   "landscapeGrammarRevision": "pyeongchang-landscape-grammar.v1",
   "definitionRefs": [
     "definitions/farm-production.v1.json",
@@ -9,6 +9,7 @@
     "definitions/farm-loading-gate.v1.json",
     "definitions/farm-hub-corridor.v1.json",
     "definitions/hub-receiving-storage.v1.json",
+    "definitions/hub-outbound-staging.v1.json",
     "definitions/nature-survival-home.v1.json",
     "definitions/nature-survival-encounter.v1.json"
   ],

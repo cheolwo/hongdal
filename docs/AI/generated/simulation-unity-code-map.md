@@ -5,17 +5,21 @@
 ```text
 Simulation·Unity
 ├─ Simulation 세션 생명주기 [simulation-session-lifecycle]
+│  ├─ 010 contract.base-reflection-learning-material · Contract · Definition
 │  ├─ 010 contract.session-create · Contract · Definition
 │  ├─ 020 api.session-lifecycle · Api · Confirm
 │  ├─ 020 api.world-gameplay · Api · Confirm
+│  ├─ 020 domain.approved-learning-ledger · Domain · Persistence
 │  ├─ 030 application.session-lifecycle · Application · Confirm
 │  ├─ 030 application.world-gameplay · Application · Confirm
+│  ├─ 030 domain.base-reflection · Domain · Tick
 │  ├─ 040 domain.session-aggregate · Domain · Tick
 │  └─ 050 infrastructure.session-store · Infrastructure · Persistence
 ├─ 병렬 경영-전투 [simulation-parallel-battle]
 │  ├─ 010 contract.battle-preview · Contract · Definition
 │  ├─ 010 contract.local-combat-control-mode · Contract · Definition
 │  ├─ 011 contract.local-combat-action · Contract · Definition
+│  ├─ 012 contract.local-combat-observer-intervention · Contract · Definition
 │  ├─ 020 api.battle · Api · Confirm
 │  ├─ 030 application.battle · Application · Confirm
 │  ├─ 040 domain.battle-state · Domain · Tick
@@ -36,9 +40,24 @@ Simulation·Unity
 ├─ 공공데이터-파생 World [simulation-world-derivation]
 │  ├─ 010 domain.derived-world-ledger · Domain · Definition
 │  ├─ 016 contract.landscape-composition-tile · Contract · Definition
+│  ├─ 016 contract.world-map-composition · Contract · Definition
+│  ├─ 017 contract.environment-spawn-decision · Contract · Projection
 │  ├─ 017 contract.landscape-graph · Contract · Definition
+│  ├─ 018 contract.interior-layout-plan · Contract · Definition
+│  ├─ 019 contract.marketplace-grounded-interior-item · Contract · Definition
+│  ├─ 019 contract.world-asset-placement · Contract · Projection
+│  ├─ 019 domain.interior-layout-generate · Domain · Projection
 │  ├─ 020 application.pyeongchang-derivation · Application · Projection
+│  ├─ 020 domain.marketplace-grounded-item-effect-derive · Domain · Projection
+│  ├─ 027 domain.environment-spawn-decision · Domain · Projection
+│  ├─ 028 application.world-map-composition · Application · Projection
+│  ├─ 029 application.world-asset-placement · Application · Projection
+│  ├─ 030 adapter.lh-separated-cell-content · Application · Projection
+│  ├─ 030 application.nature-world-asset-placement-state · Application · Projection
+│  ├─ 030 application.separated-world-asset-placement · Application · Projection
 │  ├─ 030 infrastructure.derived-world-store · Infrastructure · Persistence
+│  ├─ 031 application.nature-world-cell-assembly · Application · Projection
+│  ├─ 041 unity.marketplace-grounded-item-detail · ViewModel · Presentation
 │  ├─ 042 domain.landscape-graph-assembler · Domain · Projection
 │  └─ 044 application.landscape-graph-job · Application · Projection
 ├─ 독립 Synty 경관 처리 [simulation-synty-landscape]
@@ -55,7 +74,9 @@ Simulation·Unity
 │  ├─ 030 application.area-set-handover-plan · Application · Preview
 │  ├─ 030 application.world-stream · Application · Projection
 │  ├─ 031 application.lh-world-preview · Application · Preview
-│  └─ 032 api.lh-world-preview · Api · Preview
+│  ├─ 032 api.lh-world-preview · Api · Preview
+│  ├─ 033 application.lh-interior-plan-handle · Application · Projection
+│  └─ 040 unity.interior-plan-presentation · ViewModel · Presentation
 ├─ Farm 감자 3원천 현실근거 [simulation-farm-reality-evidence]
 │  ├─ 010 contract.farm-reality-evidence · Contract · Definition
 │  ├─ 020 api.farm-reality-evidence · Api · Persistence
@@ -72,6 +93,11 @@ Simulation·Unity
 
 ## Simulation 세션 생명주기 (`simulation-session-lifecycle`)
 
+- **010 contract.base-reflection-learning-material** — [SimulationYouTube학습원문관측Snapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationBaseReflectionContracts.cs) · YouTube 원문 관측에서 사람 승인 학습자료까지의 3계층 계약을 정의한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: 시청 시간·재생 상태·API key·원문 전체는 Simulation 보상 계약에 포함하지 않는다.
 - **010 contract.session-create** — [경영SimulationSession생성Request](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/경영SimulationSessionContracts.cs) · Simulation 세션 생성 입력과 초기 World 문맥을 정의한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
@@ -87,6 +113,11 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 기존 route를 보존하며 운영 상태나 Unity 표현 상태를 직접 변경하지 않는다.
+- **020 domain.approved-learning-ledger** — [Simulation승인학습자료파생원장](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBaseReflection.cs) · 승인 학습자료를 멱등 동기화하고 Simulation 세션용 불변 사본을 만든다.
+  - 계층/단계: `Domain / Persistence`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: Provider를 호출하거나 운영 DB를 쓰지 않고 사람 승인 Publication만 Simulation 파생 원장에 보관한다.
 - **030 application.session-lifecycle** — [경영SimulationSession생명주기Service](../../../Ssalddel.Simulation.Application/RuntimeCore/경영SimulationSession생명주기Service.cs) · 세션 생성·조회·Tick·저장·복원을 조율한다.
   - 계층/단계: `Application / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`
@@ -97,6 +128,11 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 운영 상태를 변경하지 않으며 서버 세션의 권한·개정·원장을 통해서만 세계 게임플레이 상태를 변경한다.
+- **030 domain.base-reflection** — [Simulation거점성찰Engine](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBaseReflection.cs) · WI-REFLECT-01의 Preview, Confirm, 다음 활동 적용을 결정적으로 처리한다.
+  - 계층/단계: `Domain / Tick`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: 보상은 게임 안 성찰 선택에만 귀속하며 영상 재생·시청 시간·외부 Provider 결과를 읽지 않는다.
 - **040 domain.session-aggregate** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/경영SimulationSession.cs) · 결정적 세션 상태와 개정·Tick 상태 전이를 소유한다.
   - 계층/단계: `Domain / Tick`
   - 읽기/쓰기: `SimulationState → SimulationState`
@@ -127,12 +163,17 @@ Simulation·Unity
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: 클라이언트는 피해·명중·미터 좌표를 제출하지 않고 대상과 행동 의도만 보낸다.
+- **012 contract.local-combat-observer-intervention** — [SimulationLocalCombatObserverInterventionConfirmRequest](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs) · 관찰 운영 전투의 단일 전술 일시정지와 비상 카드 발동을 확정한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `None → None`
+  - 부수효과: `None`
+  - 경계: 클라이언트는 CardCopyStableId와 예상 전투 개정만 보내며 회복·피해·후퇴 결과를 계산하지 않는다.
 - **020 api.battle** — [SimulationBattlesController](../../../Ssalddel.Simulation.Server/Controllers/SimulationBattlesController.cs) · 병렬 전투 조회·Preview·Confirm·진행 HTTP 경계를 제공한다.
   - 계층/단계: `Api / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 클라이언트가 보낸 안정 ID와 예상 개정만 받아 서버 규칙으로 전투 상태를 확정한다.
-- **030 application.battle** — [SimulationBattleInstanceService](../../../Ssalddel.Simulation.Application/SimulationBattleInstanceService.cs) · 전투 Preview·Confirm·진행과 경영 World 합류를 조율한다.
+- **030 application.battle** — [SimulationBattleInstanceService](../../../Ssalddel.Simulation.Application/RuntimeCore/SimulationBattleInstanceService.cs) · 전투 Preview·Confirm·진행과 경영 World 합류를 조율한다.
   - 계층/단계: `Application / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
@@ -225,21 +266,96 @@ Simulation·Unity
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Prefab 경로·GUID·상품명은 노출하지 않으며, 응답은 표현 계획이지 운영 사실이나 실제 시설 존재의 확정이 아니다.
+- **016 contract.world-map-composition** — [ISimulation지도구성Engine](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs) · 지면·셀·H·연결구를 자산 선택 없는 지도구성 계획으로 만든다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 건물·환경·실내 VisualKey와 Spawn 확률을 선택하지 않는다.
+- **017 contract.environment-spawn-decision** — [ISimulation환경발생DecisionEngine](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs) · 결정적 환경 발생 후보와 선택 결과를 계산한다.
+  - 계층/단계: `Contract / Projection`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: SimulationEntity 결과는 WorldTick Confirm 없이 권위 상태가 되지 않는다.
 - **017 contract.landscape-graph** — [SimulationWorldLandscapeGraphResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLandscapeCompositionContracts.cs) · 여러 타일과 Area를 참조하는 하나의 경관 Graph를 Unity에 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Graph는 표현용 공간 구조이며 Unity의 로드 상태나 운영 업무 상태를 확정하지 않는다.
+- **018 contract.interior-layout-plan** — [I실내공간조립Engine](../../../Ssalddel.Interior.Contracts/UnityPackage/Runtime/InteriorLayoutContracts.cs) · H 의미와 건물 문맥을 결정적 InteriorPlacementPlan으로 만드는 엔진 계약이다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 새 H 단계, Simulation 상태, Prefab 경로, 재고·가격·소유권을 만들지 않는다.
+- **019 contract.marketplace-grounded-interior-item** — [I상품특성효과DerivationEngine](../../../Ssalddel.Interior.Contracts/UnityPackage/Runtime/상품근거ItemContracts.cs) · 승인 상품 Reference를 게임용 특성·효과 정의와 범주형 VisualKey로 결속하는 계약이다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 효과 정의만 만들며 WI Confirm·WorldTick·재고·소유권·운영 상품 성능을 확정하지 않는다.
+- **019 contract.world-asset-placement** — [ISimulation세계자산배치Engine](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs) · 지도와 권위 변화에서 환경·건물·실내 자산 배치 계획을 만든다.
+  - 계층/단계: `Contract / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: LH 상세도와 Unity Prefab은 결정하지 않으며 권위 Spawn을 직접 확정하지 않는다.
+- **019 domain.interior-layout-generate** — [DeterministicInteriorLayoutEngine](../../../Ssalddel.Interior.Domain/UnityPackage/Runtime/DeterministicInteriorLayoutEngine.cs) · Structure·Zone·Fixture·Surface·Slot과 승인 Reference를 결정적 실내 배치 계획으로 조립한다.
+  - 계층/단계: `Domain / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 같은 입력은 같은 hash를 만들며 WorldTick·재고·가격·소유권을 변경하지 않는다.
 - **020 application.pyeongchang-derivation** — [평창군공간파생Pipeline](../../../Ssalddel.Simulation.Persistence/PyeongchangWorldDerivationPipeline.cs) · 평창군 공공데이터를 읽어 대표 건물·공간 관계·Unity 타일 계획을 결정적으로 조립한다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `SharedPublicData → DerivedWorld`
   - 부수효과: `PersistentRead | PersistentWrite`
   - 경계: 공유 공공데이터는 읽기 전용이며 건물 도형이나 DEM이 없으면 임의 좌표를 생성하지 않는다.
+- **020 domain.marketplace-grounded-item-effect-derive** — [상품특성효과DerivationEngine](../../../Ssalddel.Interior.Domain/UnityPackage/Runtime/상품특성효과DerivationEngine.cs) · 승인된 상품 특성을 revision 고정 규칙으로 게임용 효과 정의에 결정적으로 변환한다.
+  - 계층/단계: `Domain / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 상품명 문자열이나 실시간 Marketplace 상태로 효과를 임의 생성하지 않고 Simulation 상태를 변경하지 않는다.
+- **027 domain.environment-spawn-decision** — [Simulation결정적환경발생DecisionEngine](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldAssetPlacement.cs) · 변화 Context가 적용된 환경 발생 가중치를 결정적으로 판정한다.
+  - 계층/단계: `Domain / Projection`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 결정은 후보이며 SimulationEntity는 WorldTick Effect가 별도로 확정해야 한다.
+- **028 application.world-map-composition** — [SimulationScenario지도구성Engine](../../../Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs) · 기존 LH 시나리오 지식에서 객체 선택 없는 지도구성 계획을 만든다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 환경·건물·실내 자산과 Prefab을 선택하지 않는다.
+- **029 application.world-asset-placement** — [Simulation결정적세계자산배치Engine](../../../Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs) · 지도·공간 변화·결정적 Spawn에서 환경·건물·실내 계획을 조립한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `SimulationState | DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 권위 Spawn과 건물 상태를 만들지 않고 LH 상세도와 Prefab을 결정하지 않는다.
+- **030 adapter.lh-separated-cell-content** — [SimulationSeparatedLhCellContentSource](../../../Ssalddel.Simulation.Application/SimulationSeparatedLhCellContentSource.cs) · 분리된 지도구성·세계자산배치 결과를 기존 LH 셀 계약으로 변환한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: LH는 배치 규칙을 소유하지 않고 이미 계산된 계획의 준비·활성·해제만 담당한다.
+- **030 application.nature-world-asset-placement-state** — [SimulationNature세계자산배치Service](../../../Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs) · Nature 권위 상태를 지도·공간 변화 뒤 실외·실내 계획으로 분리하고 호환 상태 사본으로 조립한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 플레이어 변화 정보를 읽어 표현 계획을 만들 뿐 Simulation 권위 상태를 변경하지 않는다.
+- **030 application.separated-world-asset-placement** — [Simulation분리세계자산배치Coordinator](../../../Ssalddel.Simulation.Application/SimulationSeparatedWorldAssetPlacement.cs) · 통합 세계자산 계획을 실외 배치와 실내 배치 계획으로 분리한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 기존 v26 계획과 hash를 변경하지 않고 파생 실행 계획만 만든다.
 - **030 infrastructure.derived-world-store** — [SimulationWorld파생원장Store](../../../Ssalddel.Simulation.Persistence/SimulationWorldDerivationPersistence.cs) · 파생 World 원장과 입력·출력 hash를 별도 DB에 멱등 저장한다.
   - 계층/단계: `Infrastructure / Persistence`
   - 읽기/쓰기: `DerivedWorld → DerivedWorld`
   - 부수효과: `PersistentRead | PersistentWrite`
   - 경계: SimulationWorldDerived DB만 변경하며 입력 fingerprint가 다른 같은 식별자는 충돌로 거부한다.
+- **031 application.nature-world-cell-assembly** — [SimulationNatureWorldCellAssemblyEngine](../../../Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureWorldCellAssemblyEngine.cs) · LH 셀과 Nature 상태에서 독립 실외·실내 배치 인계 자료를 조립한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `SimulationState | DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 지면·셀은 LH, Prefab 생명주기는 Unity 배치 Runtime이 소유하며 이 엔진은 권위 상태를 변경하지 않는다.
+- **041 unity.marketplace-grounded-item-detail** — [상품근거ItemDetailProjection](../../../Ssalddel.Unity/Runtime/Interiors/상품근거ItemDetailProjection.cs) · 상품 근거 Item 정의를 범주형 Synty 표현과 읽기 전용 특성·효과 상세로 투영한다.
+  - 계층/단계: `ViewModel / Presentation`
+  - 읽기/쓰기: `DerivedWorld → ClientPresentation`
+  - 부수효과: `UiStateMutation`
+  - 경계: Unity는 특성·효과를 재계산하거나 World 상태에 적용하지 않고 승인 근거와 정의를 표시만 한다.
 - **042 domain.landscape-graph-assembler** — [SimulationWorldLandscapeGraphAssembler](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldLandscapeAssembly.cs) · Macro·Meso 공간 골격을 156개 의미 모판의 연결·반복 문법으로 결정적으로 조립한다.
   - 계층/단계: `Domain / Projection`
   - 읽기/쓰기: `None → None`
@@ -325,6 +441,16 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 정확한 Transform을 받지 않고 양자화한 L3 Cell만 사용하며 Preview는 어떤 원장도 변경하지 않는다.
+- **033 application.lh-interior-plan-handle** — [SimulationLhInteriorPlanHandleService](../../../Ssalddel.Simulation.Application/SimulationLhInteriorPlanHandleService.cs) · LH 셀 상세도와 이미 고정된 실내 계획 handle을 연결한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: LH는 실내를 생성하거나 재배치하지 않고 준비 상세도만 선택한다.
+- **040 unity.interior-plan-presentation** — [InteriorPresentationProjection](../../../Ssalddel.Unity/Runtime/Interiors/InteriorPresentationProjection.cs) · 고정된 실내 계획을 LH Focus 상세도에 맞는 Unity VisualKey와 Reference 카드로 투영한다.
+  - 계층/단계: `ViewModel / Presentation`
+  - 읽기/쓰기: `DerivedWorld → ClientPresentation`
+  - 부수효과: `UiStateMutation`
+  - 경계: Pinned hash 불일치는 닫고 Unity는 Plan·상품 승인·Simulation 상태를 변경하지 않는다.
 
 ## Farm 감자 3원천 현실근거 (`simulation-farm-reality-evidence`)
 

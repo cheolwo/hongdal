@@ -1876,6 +1876,111 @@
       ]
     },
     {
+      "targetRef": "h2-candidate:hub-internal-warehouse",
+      "requiredChildRefs": [
+        "h1-stock:hub-receiving-storage",
+        "h1-stock:hub-outbound-staging"
+      ],
+      "childConnectorProfiles": [
+        {
+          "childRef": "h1-stock:hub-outbound-staging",
+          "connectors": [
+            {
+              "connectorStableId": "connector:h1:hub-outbound-staging:input",
+              "roleCode": "Input",
+              "directionCode": "Input",
+              "movementKindCodes": [
+                "PlayerTraversal",
+                "WorkTraversal",
+                "CargoLogistics"
+              ]
+            },
+            {
+              "connectorStableId": "connector:h1:hub-outbound-staging:output",
+              "roleCode": "Output",
+              "directionCode": "Output",
+              "movementKindCodes": [
+                "PlayerTraversal",
+                "WorkTraversal",
+                "CargoLogistics"
+              ]
+            }
+          ]
+        },
+        {
+          "childRef": "h1-stock:hub-receiving-storage",
+          "connectors": [
+            {
+              "connectorStableId": "connector:h1:hub-receiving-storage:input",
+              "roleCode": "Input",
+              "directionCode": "Input",
+              "movementKindCodes": [
+                "PlayerTraversal",
+                "WorkTraversal",
+                "CargoLogistics"
+              ]
+            },
+            {
+              "connectorStableId": "connector:h1:hub-receiving-storage:output",
+              "roleCode": "Output",
+              "directionCode": "Output",
+              "movementKindCodes": [
+                "PlayerTraversal",
+                "WorkTraversal",
+                "CargoLogistics"
+              ]
+            }
+          ]
+        }
+      ],
+      "relations": [
+        {
+          "relationCode": "h1-flow-1",
+          "fromRef": "h1-stock:hub-receiving-storage",
+          "fromConnectorRoleCode": "Output",
+          "toRef": "h1-stock:hub-outbound-staging",
+          "toConnectorRoleCode": "Input",
+          "relationKindCode": "CargoLogistics",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "exposedConnectors": [
+        {
+          "connectorStableId": "connector:h2:hub-internal-warehouse:ingress",
+          "roleCode": "Ingress",
+          "directionCode": "Input",
+          "movementKindCodes": [
+            "PlayerTraversal",
+            "WorkTraversal",
+            "CargoLogistics"
+          ],
+          "sourceChildRef": "h1-stock:hub-receiving-storage",
+          "sourceChildConnectorRoleCode": "Input"
+        },
+        {
+          "connectorStableId": "connector:h2:hub-internal-warehouse:egress",
+          "roleCode": "Egress",
+          "directionCode": "Output",
+          "movementKindCodes": [
+            "PlayerTraversal",
+            "WorkTraversal",
+            "CargoLogistics"
+          ],
+          "sourceChildRef": "h1-stock:hub-outbound-staging",
+          "sourceChildConnectorRoleCode": "Output"
+        }
+      ],
+      "flowRequirements": [
+        {
+          "flowRequirementStableId": "flow:h2:hub-internal-warehouse:ingress-egress",
+          "fromConnectorRoleCode": "Ingress",
+          "toConnectorRoleCode": "Egress",
+          "movementKindCode": "CargoLogistics"
+        }
+      ]
+    },
+    {
       "targetRef": "h2-candidate:hub-longterm-cold-storage",
       "requiredChildRefs": [
         "h1-stock:hub-long-term-storage",

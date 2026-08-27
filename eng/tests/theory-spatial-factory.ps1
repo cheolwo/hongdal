@@ -5,25 +5,25 @@ $manager = Join-Path $repositoryRoot "eng/world-seedbeds/manage-theory-spatial-f
 $output = Join-Path $repositoryRoot "eng/world-seedbeds/generated/theory-spatial-factory.v1.json"
 
 $write = & pwsh -NoProfile -File $manager -Mode Write
-if ($write -notmatch "TheorySpatialFactoryGenerated:H2=37;H3=20;E5=4;World=TheoryWorldQualified") { throw "TheoryFactoryWriteFailed" }
+if ($write -notmatch "TheorySpatialFactoryGenerated:H2=38;H3=20;E5=4;World=TheoryWorldQualified") { throw "TheoryFactoryWriteFailed" }
 $beforeHash = (Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash
 $beforeTicks = (Get-Item -LiteralPath $output).LastWriteTimeUtc.Ticks
 $check = & pwsh -NoProfile -File $manager -Mode Check
-if ($check -notmatch "TheorySpatialFactoryValid:H2=37;H3=20;E5=4;World=TheoryWorldQualified") { throw "TheoryFactoryCheckFailed" }
+if ($check -notmatch "TheorySpatialFactoryValid:H2=38;H3=20;E5=4;World=TheoryWorldQualified") { throw "TheoryFactoryCheckFailed" }
 $afterHash = (Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash
 $afterTicks = (Get-Item -LiteralPath $output).LastWriteTimeUtc.Ticks
 if ($beforeHash -ne $afterHash -or $beforeTicks -ne $afterTicks) { throw "TheoryFactoryNonDeterministic" }
 
 $result = Get-Content -LiteralPath $output -Raw -Encoding UTF8 | ConvertFrom-Json
 if ([string] $result.policyRevision -ne "simulation-world-theory-spatial-factory-policy.r4") { throw "TheoryFactoryPolicyRevisionInvalid" }
-if ([int] $result.counts.h2TheoryQualified -ne 37 -or [int] $result.counts.h3TheoryQualified -ne 20 -or [int] $result.counts.e5TheoryQualifiedAreaSets -ne 4) { throw "TheoryFactoryCountInvalid" }
+if ([int] $result.counts.h2TheoryQualified -ne 38 -or [int] $result.counts.h3TheoryQualified -ne 20 -or [int] $result.counts.e5TheoryQualifiedAreaSets -ne 4) { throw "TheoryFactoryCountInvalid" }
 if (@($result.h2Plans | Where-Object theoryStateCode -ne "TheoryQualified").Count -ne 0) { throw "TheoryFactoryH2StateInvalid" }
 if (@($result.h3Plans | Where-Object theoryStateCode -ne "TheoryQualified").Count -ne 0) { throw "TheoryFactoryH3StateInvalid" }
 if (@($result.e5AreaSetInstances | Where-Object { $_.evidenceStageCode -ne "E5" -or $_.e5QualificationCode -ne "E5TheoryQualified" -or $_.humanReviewed -or $_.publicDataBound -or $_.runtimeValidated }).Count -ne 0) { throw "TheoryFactoryE5BoundaryInvalid" }
 if ((@($result.e5AreaSetInstances.gamePlanCode | Sort-Object) -join ",") -ne "CityHubLogisticsResilience,FarmProductionSurvival,NatureHomeThreatRecovery,TownLivingMarketSafety") { throw "TheoryFactoryAreaSetCoverageInvalid" }
 if (@($result.h2Plans | Where-Object { @($_.connectors).Count -lt 2 -or @($_.edges).Count -lt (@($_.nodes).Count - 1) }).Count -ne 0) { throw "TheoryFactoryH2ClosureInvalid" }
 if (@($result.h3Plans | Where-Object { @($_.nodes).Count -lt 2 -or @($_.connectors).Count -lt 2 -or @($_.edges).Count -lt (@($_.nodes).Count - 1) }).Count -ne 0) { throw "TheoryFactoryH3ClosureInvalid" }
-if ([string] $result.patternNamingRevision -ne "simulation-world-h-pattern-naming.r8") { throw "TheoryFactoryPatternNamingRevisionInvalid" }
+if ([string] $result.patternNamingRevision -ne "simulation-world-h-pattern-naming.r9") { throw "TheoryFactoryPatternNamingRevisionInvalid" }
 if ([string] $result.semanticRelationRevision -ne "simulation-world-semantic-spatial-relations.r2") { throw "TheoryFactorySemanticRevisionInvalid" }
 if (@($result.h2Plans + $result.h3Plans | Where-Object { $_.structureQualificationCode -ne "StructureQualified" -or $_.closureStateCode -ne "Closed" -or @($_.unresolvedSemanticRelations).Count -ne 0 }).Count -ne 0) { throw "TheoryFactorySemanticClosureInvalid" }
 if (@($result.e5AreaSetInstances | Where-Object { $_.structureQualificationCode -ne "E5StructureQualified" -or $_.closureStateCode -ne "Closed" -or @($_.unresolvedSemanticRelations).Count -ne 0 }).Count -ne 0) { throw "TheoryFactoryAreaSetSemanticClosureInvalid" }
@@ -41,9 +41,9 @@ if (@($natureLoop.flowRequirements | Where-Object flowRequirementStableId -eq "f
 if (@($result.h2Plans + $result.h3Plans | Where-Object { [string] $_.displayNameKo -ne [string] $_.spatialDisplayNameKo -or [string] $_.spatialDisplayNameKo -eq [string] $_.gameplayProfileNameKo }).Count -ne 0) { throw "TheoryFactoryPrimarySpatialNameProjectionInvalid" }
 if (@($result.h3Plans.nodes | Where-Object { [string]::IsNullOrWhiteSpace($_.h2DisplayNameKo) }).Count -ne 0) { throw "TheoryFactoryH3ChildSpatialNameMissing" }
 if (@($result.e5AreaSetInstances.graphInstances | Where-Object { [string]::IsNullOrWhiteSpace($_.h3PatternCode) }).Count -ne 0) { throw "TheoryFactoryAreaSetPatternMissing" }
-if (@($result.h2Plans.patternCode + $result.h3Plans.patternCode | Sort-Object -Unique).Count -ne 57) { throw "TheoryFactoryPatternCodeUniquenessInvalid" }
+if (@($result.h2Plans.patternCode + $result.h3Plans.patternCode | Sort-Object -Unique).Count -ne 58) { throw "TheoryFactoryPatternCodeUniquenessInvalid" }
 if ([int] $result.counts.queuedExpansionOrRepairItems -ne 3 -or @($result.priorityExpansionQueue).Count -ne 3) { throw "TheoryFactoryExpansionQueueInvalid" }
 if ([int] $result.counts.semanticGapItems -ne 3 -or @($result.semanticGapQueue).Count -ne 3) { throw "TheoryFactorySemanticGapQueueInvalid" }
 if (@($result.productionPhases).Count -ne 5) { throw "TheoryFactoryProductionPhaseInvalid" }
 
-Write-Output "TheorySpatialFactoryTestsPassed:H2=37;H3=20;Patterns=57;E5=4;World=Qualified;Deterministic=True"
+Write-Output "TheorySpatialFactoryTestsPassed:H2=38;H3=20;Patterns=58;E5=4;World=Qualified;Deterministic=True"

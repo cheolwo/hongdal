@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidateSet("Write", "Check")]
     [string] $Mode = "Check",
@@ -37,8 +37,9 @@ Require ([bool] $ledger.principles.independentAreasPrecedeIntegrationRoutes) "In
 Require ([string] $ledger.deliveryModeCode -eq "SingleWorldInteractionVertical") "DeliveryModeInvalid"
 Require ([int] $ledger.workInProgressLimit -eq 1) "WorkInProgressLimitMustBeOne"
 Require ([string] $ledger.defaultIndividualTargetEvidenceStage -eq "E7") "DefaultTargetMustBeE7"
-Require (@($catalog.items).Count -eq 60) "WorldInteractionCountMustBe60"
-Require (@($ledger.items).Count -eq 60) "DeliveryItemCountMustBe60"
+$worldInteractionCount = @($catalog.items).Count
+Require ($worldInteractionCount -gt 0) "WorldInteractionCountInvalid"
+Require (@($ledger.items).Count -eq $worldInteractionCount) "DeliveryItemCountMismatch"
 Require (@($ledger.waves).Count -eq 6) "DeliveryWaveCountMustBe6"
 
 $catalogById = @{}
@@ -80,12 +81,14 @@ $missingIds = @($missing | ForEach-Object { [string] $_.id })
 Require ($missing.Count -eq 0) "WorldInteractionCoverageMissing:$($missingIds -join ',')"
 $activeId = [string] $ledger.activeWork.worldInteractionId
 Require ($assigned.ContainsKey($activeId)) "ActiveWorldInteractionUnknown:$activeId"
-Require ([string] $ledger.activeWork.workStateCode -eq "Active") "ActiveWorkStateInvalid"
+$activeWorkState = [string] $ledger.activeWork.workStateCode
+Require ($activeWorkState -in @("Active", "E7Closed")) "ActiveWorkStateInvalid"
 Require ([string] $ledger.activeWork.currentEvidenceStage -eq
     [string] $catalogById[$activeId].integration.currentStage) "ActiveEvidenceStageDrift:$activeId"
 Require ([string] $ledger.activeWork.targetEvidenceStage -eq "E7") "ActiveTargetMustBeE7"
 Require ([string] $assigned[$activeId].deliveryWaveCode -eq "D1" -and
-    [int] $assigned[$activeId].orderInWave -eq 1) "ActiveWorldInteractionMustBeFirst"
+    [string] $assigned[$activeId].completionRoleCode -ne "DeferredIntegration") `
+    "ActiveWorldInteractionMustBeNatureDeliveryWork"
 $stageReviews = @($ledger.activeWork.stageReviews)
 Require ($stageReviews.Count -eq 4) "ActiveStageReviewCountInvalid"
 Require ((@($stageReviews.stageCode) -join ",") -eq "E4,E5,E6,E7") `
@@ -98,11 +101,38 @@ foreach ($review in $stageReviews) {
     Require (@($review.evidenceRefs).Count -gt 0) `
         "ActiveStageReviewEvidenceMissing:$($review.stageCode)"
 }
-Require ((@($stageReviews | Where-Object resultCode -eq "Passed" |
-            ForEach-Object stageCode) -join ",") -eq "E4,E5,E6") `
-    "ActivePassedStageSequenceInvalid"
-Require ([string] ($stageReviews | Where-Object stageCode -eq "E7").resultCode `
-    -eq "Partial") "ActiveE7MustRemainPartial"
+$passedStageCodes = @($stageReviews | Where-Object resultCode -eq "Passed" |
+    ForEach-Object stageCode)
+if ($activeWorkState -eq "Active") {
+    $currentStageIndex = [Array]::IndexOf(@("E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"),
+        [string] $ledger.activeWork.currentEvidenceStage)
+    Require ($currentStageIndex -ge 1 -and $currentStageIndex -lt 7) `
+        "ActiveEvidenceStageInvalid"
+    $expectedPassedStageCodes = if ($currentStageIndex -lt 4) {
+        @()
+    }
+    else {
+        @($stageReviews | Where-Object {
+                [Array]::IndexOf(@("E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"),
+                    [string] $_.stageCode) -le $currentStageIndex
+            } | ForEach-Object stageCode)
+    }
+    Require (($passedStageCodes -join ",") -eq ($expectedPassedStageCodes -join ",")) `
+        "ActivePassedStageSequenceInvalid"
+    $firstOpenReviewIndex = $passedStageCodes.Count
+    for ($index = $firstOpenReviewIndex + 1; $index -lt $stageReviews.Count; $index++) {
+        Require ([string] $stageReviews[$index].resultCode -eq "Pending") `
+            "ActiveLaterStageMustRemainPending:$($stageReviews[$index].stageCode)"
+    }
+    Require ([string] ($stageReviews | Where-Object stageCode -eq "E7").resultCode `
+        -ne "Passed") "ActiveE7MustRemainOpen"
+}
+else {
+    Require ([string] $ledger.activeWork.currentEvidenceStage -eq "E7") `
+        "ClosedWorkMustBeE7"
+    Require (($passedStageCodes -join ",") -eq "E4,E5,E6,E7") `
+        "ClosedPassedStageSequenceInvalid"
+}
 Require ([string] $stageReviews[2].refinement.realityGroundingCode -eq "NotApplied") `
     "ActiveE6RealityBoundaryMissing"
 Require ([string] $stageReviews[2].refinement.authorityCode -eq "SimulationCore") `
@@ -182,7 +212,7 @@ foreach ($wave in @($ledger.waves | Sort-Object order)) {
         $wi = $catalogById[[string] $priority.worldInteractionId]
         $status = $statusById[[string] $priority.worldInteractionId]
         $loopsText = if (@($priority.playableLoopRefs).Count -eq 0) { "후속 정의" } else { @($priority.playableLoopRefs) -join "<br>" }
-        $workState = if ([string] $priority.worldInteractionId -eq $activeId) { "Active" }
+        $workState = if ([string] $priority.worldInteractionId -eq $activeId) { $activeWorkState }
             elseif ([string] $priority.completionRoleCode -eq "DeferredIntegration") { "Deferred" }
             else { "Queued" }
         $npcE8 = if ($requiredNpcE8 -contains [string] $priority.worldInteractionId) { "Required" }
@@ -249,7 +279,7 @@ foreach ($priority in @($ledger.items | Sort-Object { [int] $waveByCode[[string]
     else {
         "new[] { $loopArgs }"
     }
-    $workState = if ([string] $priority.worldInteractionId -eq $activeId) { "Active" }
+    $workState = if ([string] $priority.worldInteractionId -eq $activeId) { $activeWorkState }
         elseif ([string] $priority.completionRoleCode -eq "DeferredIntegration") { "Deferred" }
         else { "Queued" }
     $npcE8 = if ($requiredNpcE8 -contains [string] $priority.worldInteractionId) { "Required" }
@@ -293,4 +323,4 @@ else {
     Require ((ConvertTo-DeterministicText ([IO.File]::ReadAllText($resolvedContractOutput))) -ceq $contractContent) "GeneratedContractMismatch"
 }
 
-Write-Output "WorldInteractionDeliveryPrioritiesValid:60;Waves=6;Revision=$($ledger.revision)"
+Write-Output "WorldInteractionDeliveryPrioritiesValid:$worldInteractionCount;Waves=6;Revision=$($ledger.revision)"

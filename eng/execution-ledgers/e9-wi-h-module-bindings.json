@@ -1,14 +1,16 @@
 {
   "schemaVersion": "e9-wi-h-module-bindings.v1",
-  "revision": "e9-wi-h-module-bindings.r4",
-  "scopeCode": "NatureFarmCurrentPlayableSlice",
+  "revision": "e9-wi-h-module-bindings.r8",
+  "scopeCode": "NatureFarmCurrentPlayableClosureSlice",
   "sources": {
     "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
     "e9ModuleCatalogPath": "eng/execution-ledgers/e9-refactor-module-catalog.json",
     "gameplaySpatialCompletionPath": "eng/world-seedbeds/gameplay-spatial-completion.v1.json",
+    "actualE5SpatialPath": "eng/world-seedbeds/generated/actual-e5-spatial.v1.json",
     "hDefinitionRootPath": "eng/world-seedbeds/synty-bottom-up-inventory/definitions",
     "h1SeedbedRootPath": "eng/world-seedbeds/wi-spatial-seedbeds/definitions",
-    "natureSurvivalContractsSourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs"
+    "natureSurvivalContractsSourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+    "areaBuildingContractsSourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationAreaBuildingProgressionContracts.cs"
   },
   "principles": {
     "doesNotOwnWorldInteractions": true,
@@ -75,7 +77,14 @@
       "WI-NATURE-09": ["PreviewAsync", "ConfirmAsync"],
       "WI-NATURE-10": ["PreviewAsync", "ConfirmAsync"],
       "WI-NATURE-11": ["PreviewAsync", "ConfirmAsync"],
-      "WI-NATURE-12": ["PreviewAsync", "ConfirmAsync"]
+      "WI-NATURE-12": ["PreviewAsync", "ConfirmAsync"],
+      "WI-NATURE-13": ["PreviewAsync", "ConfirmAsync"],
+      "WI-NATURE-14": ["PreviewAsync", "ConfirmAsync"],
+      "WI-NATURE-15": ["PreviewAsync", "ConfirmAsync"],
+      "WI-NATURE-16": ["PreviewAsync", "ConfirmAsync"],
+      "WI-NATURE-17": ["GetNpcRoutineWorkAsync", "AdvanceRealtimeAsync"],
+      "WI-NATURE-18": ["PreviewAsync", "ConfirmAsync"],
+      "WI-CON-01": ["PreviewAsync", "ConfirmAsync"]
     }
   },
   "stageResponsibilities": [
@@ -90,115 +99,164 @@
     { "evidenceStage": "E1", "moduleTechnicalName": "E1핵심계약Module", "reads": ["WI 목적·권위·판본", "허용 발생원", "완료·차단 상태"], "produces": "변경되지 않는 핵심 계약" }
   ],
   "spatialEvidenceByWi": {
-    "Bound": ["WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12"],
+    "Bound": ["WI-FARM-04", "WI-FARM-05", "WI-FARM-06", "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-NATURE-16", "WI-NATURE-17", "WI-NATURE-18", "WI-CON-01"],
     "RequiredMissing": [],
     "NotApplicable": []
   },
   "bindings": [
     {
-      "bindingId": "e9-wi-h:wi-farm-04", "wiId": "WI-FARM-04", "wiTitle": "수확",
+      "bindingId": "e9-wi-h:wi-farm-04", "wiId": "WI-FARM-04", "wiTitle": "익은 농작물 수확",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E6/InProgress" },
       "hRefs": { "H1": ["h1-stock:farm-production", "h1-stock:farm-harvest-staging"], "H2": ["h2-candidate:highland-production", "h2-candidate:farm-wash-sort-pack"], "H3": ["h3-candidate:highland-farm", "h3-candidate:farm-processing-campus"], "H4": ["h4-blueprint:farm-production-processing-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingCapacityConcept", "unresolvedSpatialReservationKinds": ["WorkArea"], "proposedCapacityConceptCodes": ["HarvestWorkArea", "HarvestLotStaging"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "ManifestationPartial", "E4": "ContextPartiallyBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-farm-05", "wiId": "WI-FARM-05", "wiTitle": "수확물 집하",
+      "bindingId": "e9-wi-h:wi-farm-05", "wiId": "WI-FARM-05", "wiTitle": "수확물 집하장 모으기",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E6/InProgress" },
       "hRefs": { "H1": ["h1-stock:farm-harvest-staging", "h1-stock:farm-work-yard"], "H2": ["h2-candidate:farm-wash-sort-pack", "h2-candidate:farm-processing-shipping"], "H3": ["h3-candidate:farm-processing-campus"], "H4": ["h4-blueprint:farm-production-processing-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingCapacityConcept", "unresolvedSpatialReservationKinds": ["WorkArea"], "proposedCapacityConceptCodes": ["CollectionWorkArea", "HarvestLotStaging"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "ManifestationPartial", "E4": "ContextPartiallyBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-farm-06", "wiId": "WI-FARM-06", "wiTitle": "출하 준비·포장",
+      "bindingId": "e9-wi-h:wi-farm-06", "wiId": "WI-FARM-06", "wiTitle": "출하 물량 포장",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E6/InProgress" },
       "hRefs": { "H1": ["h1-stock:farm-work-yard", "h1-stock:farm-harvest-staging"], "H2": ["h2-candidate:farm-wash-sort-pack", "h2-candidate:farm-processing-shipping"], "H3": ["h3-candidate:farm-processing-campus"], "H4": ["h4-blueprint:farm-production-processing-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingCapacityConcept", "unresolvedSpatialReservationKinds": ["WorkArea"], "proposedCapacityConceptCodes": ["PackingWorkArea", "PackedLotStaging"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "ManifestationPartial", "E4": "ContextPartiallyBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-01", "wiId": "WI-NATURE-01", "wiTitle": "자연권 위협 관찰",
-      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
+      "bindingId": "e9-wi-h:wi-nature-01", "wiId": "WI-NATURE-01", "wiTitle": "자연 지역 위험 징후 확인",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E7/Done" },
       "hRefs": { "H1": ["h1-stock:nature-threat-watch", "h1-stock:nature-incident-trace"], "H2": ["h2-candidate:nature-threat-response"], "H3": ["h3-candidate:nature-threat-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextPartiallyBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-02", "wiId": "WI-NATURE-02", "wiTitle": "자연권 긴급 후퇴",
+      "bindingId": "e9-wi-h:wi-nature-02", "wiId": "WI-NATURE-02", "wiTitle": "안전 거점으로 긴급 후퇴",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
       "hRefs": { "H1": ["h1-stock:nature-emergency-retreat", "h1-stock:nature-safe-recovery-camp"], "H2": ["h2-candidate:nature-threat-response", "h2-candidate:nature-restoration-recovery"], "H3": ["h3-candidate:nature-threat-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextPartiallyBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-03", "wiId": "WI-NATURE-03", "wiTitle": "자연권 복원",
+      "bindingId": "e9-wi-h:wi-nature-03", "wiId": "WI-NATURE-03", "wiTitle": "훼손된 자연 경로 복원",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
       "hRefs": { "H1": ["h1-stock:nature-restoration-site", "h1-stock:farm-restoration-supply"], "H2": ["h2-candidate:nature-restoration-recovery", "h2-candidate:farm-loss-restoration-handoff"], "H3": ["h3-candidate:nature-threat-recovery", "h3-candidate:farm-incident-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region", "h4-blueprint:farm-production-processing-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextPartiallyBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-04", "wiId": "WI-NATURE-04", "wiTitle": "파티 회복",
+      "bindingId": "e9-wi-h:wi-nature-04", "wiId": "WI-NATURE-04", "wiTitle": "탐사대 안전 회복",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E1/NotSelected" },
       "hRefs": { "H1": ["h1-stock:nature-safe-recovery-camp"], "H2": ["h2-candidate:nature-restoration-recovery"], "H3": ["h3-candidate:nature-threat-recovery"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextPartiallyBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-05", "wiId": "WI-NATURE-05", "wiTitle": "도끼 획득",
-      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
+      "bindingId": "e9-wi-h:wi-nature-05", "wiId": "WI-NATURE-05", "wiTitle": "벌목 도끼 획득",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E6/InProgress" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-trailhead"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-06", "wiId": "WI-NATURE-06", "wiTitle": "벌목 시작",
+      "bindingId": "e9-wi-h:wi-nature-06", "wiId": "WI-NATURE-06", "wiTitle": "나무 벌목 작업 시작",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-encounter.v1"], "H2": ["h2-candidate:nature-encounter-route"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingRuntimeReservation", "unresolvedSpatialReservationKinds": ["Actor", "Tool", "ResourceNode", "WorkArea"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-07", "wiId": "WI-NATURE-07", "wiTitle": "오두막 위치 배치",
+      "bindingId": "e9-wi-h:wi-nature-07", "wiId": "WI-NATURE-07", "wiTitle": "오두막을 지을 터 선정",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingRuntimeReservation", "unresolvedSpatialReservationKinds": ["BuildingSite"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-08", "wiId": "WI-NATURE-08", "wiTitle": "오두막 건설 시작",
+      "bindingId": "e9-wi-h:wi-nature-08", "wiId": "WI-NATURE-08", "wiTitle": "오두막 건설 작업 시작",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingCancellationReturn", "unresolvedSpatialReservationKinds": ["Actor", "Material", "BuildingSite", "WorkArea"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-09", "wiId": "WI-NATURE-09", "wiTitle": "오두막 입장",
+      "bindingId": "e9-wi-h:wi-nature-09", "wiId": "WI-NATURE-09", "wiTitle": "오두막 안으로 들어가기",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingRuntimeCapacityCheck", "unresolvedSpatialReservationKinds": ["ShelterOccupancy"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-10", "wiId": "WI-NATURE-10", "wiTitle": "오두막 퇴장",
+      "bindingId": "e9-wi-h:wi-nature-10", "wiId": "WI-NATURE-10", "wiTitle": "오두막 밖으로 나가기",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingRuntimeCapacityRelease", "unresolvedSpatialReservationKinds": ["ShelterOccupancy"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-11", "wiId": "WI-NATURE-11", "wiTitle": "황혼 조우 대응",
-      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
+      "bindingId": "e9-wi-h:wi-nature-11", "wiId": "WI-NATURE-11", "wiTitle": "황혼 위협 대응 방식 확정",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E7/Done" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-encounter.v1"], "H2": ["h2-candidate:nature-encounter-route"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "MissingRuntimeReservation", "unresolvedSpatialReservationKinds": ["EncounterArea", "RetreatRoute"] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     },
     {
-      "bindingId": "e9-wi-h:wi-nature-12", "wiId": "WI-NATURE-12", "wiTitle": "진행 작업 취소",
+      "bindingId": "e9-wi-h:wi-nature-12", "wiId": "WI-NATURE-12", "wiTitle": "진행 중 작업 취소",
       "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
       "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "wi-spatial-seedbed:nature-survival-encounter.v1", "h1-stock:nature-shelter", "h1-stock:nature-exploration-buffer"], "H2": ["h2-candidate:nature-home-core", "h2-candidate:nature-water-buffer"], "H3": ["h3-candidate:nature-home-encounter-defense", "h3-candidate:nature-trail-network"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
       "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
       "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-13", "wiId": "WI-NATURE-13", "wiTitle": "획득 자원 거점 보관",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E7/Done" },
+      "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-14", "wiId": "WI-NATURE-14", "wiTitle": "오두막에서 수면·새벽 맞기",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E5/InProgress" },
+      "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-15", "wiId": "WI-NATURE-15", "wiTitle": "다음 날 거점 확장 계획 선택",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E7/Done" },
+      "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-16", "wiId": "WI-NATURE-16", "wiTitle": "현장 보급 꾸러미 제작",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
+      "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core", "h2-candidate:nature-encounter-route"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-17", "wiId": "WI-NATURE-17", "wiTitle": "현장 보급 제작 업무 위임",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E4/InProgress" },
+      "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1", "h1-stock:nature-shelter"], "H2": ["h2-candidate:nature-home-core", "h2-candidate:nature-encounter-route"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "Deferred", "E5": "ManifestationPartial", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-nature-18", "wiId": "WI-NATURE-18", "wiTitle": "벌목 통나무 줍기",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E7/Done" },
+      "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-encounter.v1", "h1-stock:nature-exploration-buffer"], "H2": ["h2-candidate:nature-encounter-route"], "H3": ["h3-candidate:nature-trail-network"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "unresolvedSpatialReservationKinds": [] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "Manifested", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
+    },
+    {
+      "bindingId": "e9-wi-h:wi-con-01", "wiId": "WI-CON-01", "wiTitle": "영역 건물 건설 확정",
+      "sourceEvidenceSnapshot": { "implementation": "E3/Done", "integration": "E7/Done" },
+      "hRefs": { "H1": ["wi-spatial-seedbed:nature-survival-home.v1"], "H2": ["h2-candidate:nature-home-core"], "H3": ["h3-candidate:nature-home-encounter-defense"], "H4": ["h4-blueprint:nature-home-exploration-region"] },
+      "e4Audit": { "capabilityCoverageCode": "Complete", "directH1WiClaimCode": "Present", "spatialReservationCoverageCode": "CapacityConceptPresent", "actualSpatialPlacementStateCode": "ApprovedH1InputOnly", "unresolvedSpatialReservationKinds": [] },
+      "stageStates": { "E9": "SkeletonNamed", "E8": "Deferred", "E7": "EvidenceMissing", "E6": "EvidenceRefsPresent", "E5": "Manifested", "E4": "ContextBound", "E3": "SourceEvidenceClaimed", "E2": "LocalRuntimePortImplemented", "E1": "SourceReferenced" }
     }
   ]
 }

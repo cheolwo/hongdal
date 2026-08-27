@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "world-interaction-polarity-quadrants.v1",
+  "revision": "world-interaction-polarity-quadrants.r4",
+  "lastVerifiedDate": "2026-08-27",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
+  "principles": {
+    "firstSignRepresentsActorActionPurpose": true,
+    "secondSignRepresentsActualActorBinding": true,
+    "signsDoNotRepresentGoodEvilRewardOrPenalty": true,
+    "quadrantBelongsToExecutionInstance": true,
+    "triggerSourceDoesNotDetermineActorSign": true,
+    "classificationDoesNotChangeSimulationEffects": true,
+    "pureAutomaticTransitionRemainsOutsideQuadrants": true,
+    "contextualPolarityUsesApprovedPlayableLoopBinding": true,
+    "classificationFreezesForInvocationLifetime": true,
+    "missingContextDoesNotBlockWorldInteraction": true
+  },
+  "polarityCodes": ["Yang", "Yin", "Contextual", "NotApplicable", "Unclassified"],
+  "actorCodes": ["PlayerActor", "NpcActor", "NotApplicable"],
+  "quadrants": [
+    { "code": "YangPlayer", "symbol": "++", "polarityCode": "Yang", "actorCode": "PlayerActor", "koreanName": "양·플레이어" },
+    { "code": "YangNpc", "symbol": "+-", "polarityCode": "Yang", "actorCode": "NpcActor", "koreanName": "양·NPC" },
+    { "code": "YinPlayer", "symbol": "-+", "polarityCode": "Yin", "actorCode": "PlayerActor", "koreanName": "음·플레이어" },
+    { "code": "YinNpc", "symbol": "--", "polarityCode": "Yin", "actorCode": "NpcActor", "koreanName": "음·NPC" }
+  ],
+  "classificationCodes": ["Fixed", "ExecutionContext", "NotApplicable"],
+  "fixedYangWorldInteractionIds": [
+    "WI-ACTOR-01",
+    "WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04", "WI-FARM-05", "WI-FARM-06",
+    "WI-002", "WI-HUB-04", "WI-HUB-05", "WI-HUB-06", "WI-LOG-01",
+    "WI-MARKET-01", "WI-MARKET-04", "WI-MARKET-05",
+    "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-18",
+    "WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-06", "WI-WORLD-05"
+  ],
+  "fixedYinWorldInteractionIds": [
+    "WI-ACTOR-02",
+    "WI-CARD-01", "WI-CITY-01", "WI-CITY-03", "WI-CITY-04",
+    "WI-001", "WI-HUB-03", "WI-MARKET-02", "WI-MARKET-03",
+    "WI-NATURE-04", "WI-NATURE-12", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-NATURE-17",
+    "WI-ORDER-01", "WI-ORDER-07", "WI-REFLECT-01",
+    "WI-WORLD-02", "WI-WORLD-03", "WI-WORLD-06", "WI-WORLD-07", "WI-WORLD-08"
+  ],
+  "contextualWorldInteractionIds": [
+    "WI-CON-01", "WI-NATURE-03", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-16", "WI-WORLD-04"
+  ],
+  "notApplicableWorldInteractionIds": [
+    "WI-CITY-02", "WI-LOG-02", "WI-LOG-03", "WI-LOG-04", "WI-LOG-05",
+    "WI-ORDER-02", "WI-ORDER-05", "WI-WORLD-01"
+  ],
+  "actorMigrationGatedWorldInteractionIds": [
+    "WI-HUB-04", "WI-HUB-05", "WI-ORDER-03", "WI-ORDER-04"
+  ],
+  "contextBindings": [
+    { "playableLoopStableId": "playable-loop:nature-shelter-foundation.v1", "worldInteractionId": "WI-NATURE-07", "polarityCode": "Yin" },
+    { "playableLoopStableId": "playable-loop:nature-shelter-foundation.v1", "worldInteractionId": "WI-NATURE-08", "polarityCode": "Yin" },
+    { "playableLoopStableId": "playable-loop:nature-twilight-return.v1", "worldInteractionId": "WI-NATURE-03", "polarityCode": "Yang" },
+    { "playableLoopStableId": "playable-loop:nature-building-learning.v1", "worldInteractionId": "WI-CON-01", "polarityCode": "Yin" },
+    { "playableLoopStableId": "playable-loop:nature-field-supply-return.v1", "worldInteractionId": "WI-NATURE-16", "polarityCode": "Yin" }
+  ],
+  "notes": [
+    "WI-HUB-04~05와 WI-ORDER-03~04는 의미상 Yang이지만 Actor 책임 migration 전 WorldDerived 실행에는 사분면을 만들지 않는다.",
+    "WI-WORLD-04는 승인 PlayableLoop 문맥이 아직 없어 실행 분류가 필요할 때까지 Unclassified를 반환한다.",
+    "같은 WI가 Player와 NPC에 의해 수행되면 첫 번째 부호는 유지되고 두 번째 부호만 실제 Actor에 따라 달라진다."
+  ]
+}

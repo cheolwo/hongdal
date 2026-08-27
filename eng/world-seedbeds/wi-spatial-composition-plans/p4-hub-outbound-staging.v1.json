@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-composition-plan.v1",
+  "planStableId": "wi-spatial-composition-plan:p4-hub-outbound-staging.v1",
+  "revision": 1,
+  "title": "진부 Hub 피킹·출고 준비 공간 구성",
+  "priorityCode": "P4",
+  "knowledgeStateCode": "CandidateForReview",
+  "targetLandscapeBlockCandidateRef": "h2-candidate:hub:inbound-storage",
+  "worldInteractionSequence": ["WI-HUB-03", "WI-HUB-04", "WI-HUB-05"],
+  "spaces": [
+    {
+      "spaceCode": "picking-area",
+      "title": "Hub 피킹 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:hub-outbound-staging.v1",
+      "interactionH1Ref": "h1-stock:hub-outbound-staging",
+      "worldInteractionIds": ["WI-HUB-03", "WI-HUB-04"],
+      "requiredCapabilityCodes": ["Spatial.Storage", "Spatial.PickingWorkArea", "Spatial.WorkerAccessible"],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": ["city:화물 대기 야드"],
+      "preferredCompositionKey": "city:화물 대기 야드:A"
+    },
+    {
+      "spaceCode": "outbound-staging-area",
+      "title": "Hub 출고 대기 공간",
+      "h1DefinitionRef": "wi-spatial-seedbed:hub-outbound-staging.v1",
+      "interactionH1Ref": "h1-stock:hub-outbound-staging",
+      "worldInteractionIds": ["WI-HUB-05"],
+      "requiredCapabilityCodes": ["Spatial.OutboundStagingArea", "Spatial.PackingWorkArea", "Spatial.LoadingWorkArea", "Spatial.CargoAccessible", "Spatial.WorkerAccessible"],
+      "capacityRequirements": [
+        { "capacityCode": "WorkArea", "minimumQuantity": 1, "unitCode": "slot" }
+      ],
+      "expressionGrammarSetRefs": ["city:화물 대기 야드", "city:상하차 Dock"],
+      "preferredCompositionKey": "city:화물 대기 야드:A"
+    }
+  ],
+  "relations": [
+    {
+      "fromSpaceCode": "picking-area",
+      "toSpaceCode": "outbound-staging-area",
+      "relationCode": "PickingToOutboundStaging",
+      "connectorTypeCode": "cargo-handoff",
+      "playerTraversalRequired": true
+    }
+  ],
+  "lhEngineHandoff": {
+    "selectionPolicyCode": "ApprovedH1Only",
+    "candidateH2MayGuidePreview": true,
+    "candidateH2GrantsTraversalAuthority": false,
+    "requiresContinuousPlayerPath": true,
+    "requiresDeterministicRelationOrder": true,
+    "forbidsAbsoluteCoordinatesBeforeE5PlacementApproval": true,
+    "forbidsScenarioFallbackForGraphRequest": true
+  },
+  "realityGrounding": {
+    "stageCode": "E6",
+    "policyCode": "Optional",
+    "applicationStateCode": "NotApplied",
+    "requiredForTargetCompletion": false,
+    "blocksScenarioExecution": false,
+    "candidateEvidencePurposeCodes": ["BuildingFootprint", "BlockBoundary"],
+    "groundingGapItems": ["실제 진부 창고 건물 외곽과 내부 통로 근거는 아직 연결되지 않았다."],
+    "limitations": ["25x20m 구성은 Synty 모듈과 Scenario 업무 흐름을 위한 첫 기준안이다."]
+  },
+  "unresolvedItems": ["canonical SimulationWorldShell의 저장 배치와 실제 통행 증거가 필요하다."],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -1,16 +1,67 @@
 {
   "catalogKey": "simulation-world-interactions",
-  "schemaVersion": "3",
-  "revision": "simulation-world-interactions.r8",
-  "lastVerifiedDate": "2026-08-24",
+  "schemaVersion": "5",
+  "revision": "simulation-world-interactions.r27",
+  "lastVerifiedDate": "2026-08-27",
   "defaultImplementationTargetStage": "E3",
   "defaultIntegrationTargetStage": "E7",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "triggerSourceCatalogPath": "eng/execution-ledgers/world-interaction-trigger-sources.json",
+  "responsibilityPolicyPath": "eng/execution-ledgers/world-interaction-responsibilities.json",
+  "workflowCatalogPath": "eng/execution-ledgers/world-interaction-flows.json",
+  "polarityQuadrantCatalogPath": "eng/execution-ledgers/world-interaction-polarity-quadrants.json",
+  "catalogOrderMeaning": "sequence는 대장 탐색 순서일 뿐 실행 절차나 선행 조건을 뜻하지 않는다.",
   "interactionKinds": ["Command", "AutomaticTransition", "SharedPolicy"],
+  "originCodes": ["OperationsDerived", "SimulationNative", "Hybrid"],
+  "controlPolicyCodes": ["NpcRoutine", "PlayerOrNpc", "PlayerDirect", "WorldAutomatic"],
+  "groupDisplayNames": {
+    "ACTOR": "행위자 공통 물품·장착",
+    "FARM": "농장 생산",
+    "LOG": "영역 간 화물 이동",
+    "HUB": "물류 거점 창고",
+    "MARKET": "마트 입고·진열",
+    "ORDER": "주민 주문·소비",
+    "NATURE": "자연 탐사·생활 거점",
+    "REFLECT": "거점 성찰",
+    "CARD": "메이저 아르카나",
+    "CON": "영역 건설",
+    "CITY": "도심 운영",
+    "WORLD": "공통 세계 운영"
+  },
   "items": [
     {
-      "id": "WI-FARM-01", "groupCode": "FARM", "sequence": 1, "title": "밭갈기", "kind": "Command",
+      "id": "WI-ACTOR-01", "groupCode": "ACTOR", "sequence": 1, "title": "물품 획득", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "행위자가 세계에 놓인 고유 물품 인스턴스의 소유권을 얻어 인벤토리에 넣는다.",
+      "startStateCodes": ["WorldItemAvailable", "ActorDoesNotOwnItem"], "completionStateCodes": ["ItemOwnedInInventory"],
+      "actorRequirements": ["물품을 획득할 수 있는 Player 또는 NPC"], "spatialRequirements": [], "resourceRequirements": ["획득 가능한 고유 물품 인스턴스"], "reservationKinds": ["Actor", "ItemInstance"],
+      "previewRule": "행위자·물품 인스턴스·현재 위치·중복 소유·장착 원장 개정을 검사하고 상태를 바꾸지 않는다.", "confirmRule": "ExpectedEquipmentRevision으로 물품 인스턴스를 WorldPickup에서 Inventory로 한 번만 이전한다.", "taskRule": "첫 판본은 즉시 완료하며 획득과 장착을 분리한다.", "effectCodes": ["ItemAcquired"],
+      "cancellationPolicy": "소유권 이전 전에는 확정하지 않으며 완료 뒤에는 별도 버리기 WI 없이 되돌리지 않는다.", "blockReasonCodes": ["ActorEquipmentExpectedRevisionMismatch", "ActorEquipmentItemInstanceNotFound", "ActorEquipmentItemNotInWorld"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "AcquireItem", "ruleRevision": "actor-equipment.r1",
+      "saveReplayPayloadCodes": ["ActorItemAcquireConfirm", "ActorEquipmentState", "simulation-save.v27"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/actor-equipment/acquisitions/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/actor-equipment/acquisitions/confirm"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationActorEquipment.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationActorEquipmentService.cs", "Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationActorEquipmentTests에서 Preview·Confirm 분리, 세션 생성 멱등성, 고유 인스턴스 소유권 이전, v27 저장·복원과 LocalProcess·RemoteHost 동등성을 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E5", "targetStage": "E7", "evidence": ["Nature 도끼 획득 특화 WI가 공통 물품 획득 권위 전이를 사용한다. Unity 장착 상태창과 소비 어셈블리 컴파일은 통과했으나 변경 뒤 실제 Play Mode·Game View 재검증은 남아 있다."] },
+      "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["공간 접근 조건은 이 보편 WI가 아니라 도끼·상자·채집물 같은 구체 특화 WI가 소유한다."]
+    },
+    {
+      "id": "WI-ACTOR-02", "groupCode": "ACTOR", "sequence": 2, "title": "장착 상태 변경", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "행위자가 소유한 고유 물품 인스턴스를 허용 슬롯에 장착·해제·교체하고 그 결과로 사용 능력을 얻거나 잃는다.",
+      "startStateCodes": ["ItemOwnedInInventory", "ItemEquipped"], "completionStateCodes": ["EquipmentStateChanged"],
+      "actorRequirements": ["장착 원장을 가진 Player 또는 NPC"], "spatialRequirements": [], "resourceRequirements": ["소유한 고유 물품 인스턴스", "허용 장착 슬롯"], "reservationKinds": ["Actor", "EquipmentSlot", "ItemInstance"],
+      "previewRule": "소유·허용 슬롯·현재 점유·교체 대상·장착 원장 개정을 검사하고 상태를 바꾸지 않는다.", "confirmRule": "Equip·Unequip·Swap 중 하나를 ExpectedEquipmentRevision으로 원자적으로 확정한다.", "taskRule": "첫 판본은 즉시 완료하며 능력 코드는 장착 완료 상태에서만 파생한다.", "effectCodes": ["ItemEquipmentChanged"],
+      "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 완료 뒤에는 반대 장착 명령을 새로 확정한다.", "blockReasonCodes": ["ActorEquipmentExpectedRevisionMismatch", "ActorEquipmentItemNotInInventory", "ActorEquipmentSlotNotAllowed", "ActorEquipmentSlotOccupied"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "ChangeEquipment", "ruleRevision": "actor-equipment.r1",
+      "saveReplayPayloadCodes": ["ActorEquipmentChangeConfirm", "ActorEquipmentState", "simulation-save.v27"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/actor-equipment/changes/preview", "POST /api/simulation/v1/sessions/{sessionStableId}/actor-equipment/changes/confirm"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationActorEquipment.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationActorEquipmentService.cs", "Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs", "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/Nature생존Controller.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationActorEquipmentTests에서 획득과 장착 분리, MainHand 장착·해제, 장착 능력에 따른 벌목 차단·허용, v27 저장·복원과 LocalProcess·RemoteHost 동등성을 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E5", "targetStage": "E7", "evidence": ["canonical SimulationWorldShell 소비 코드에 I 장착 상태창, 8개 슬롯, 권위 Confirm, 손 도끼 표현을 연결하고 Unity Presentation·EditMode·PlayMode 어셈블리 컴파일을 통과했다. 실제 입력·Game View는 재검증 전이다."] },
+      "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["역할 카드 장착 WI-WORLD-06과 전투 편성 원장은 같은 장착 어휘를 쓰지만 물리 물품 원장과 합치지 않는다.", "삽·곡괭이·도끼는 이 WI의 ItemDefinition·Capability 특화로 확장한다."]
+    },
+    {
+      "id": "WI-FARM-01", "groupCode": "FARM", "sequence": 1, "title": "경작지 밭갈이", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
       "worldAction": "행위자가 농지 작업 구획을 경작 가능한 상태로 만든다.",
       "startStateCodes": ["Untilled"], "completionStateCodes": ["Tilled"],
       "actorRequirements": ["Player 또는 농장 작업 NPC"], "spatialRequirements": ["WorkerAccessible", "TillingWorkArea"], "resourceRequirements": ["노동 또는 체력"], "reservationKinds": ["WorkArea", "Actor"],
@@ -24,7 +75,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
-      "id": "WI-FARM-02", "groupCode": "FARM", "sequence": 2, "title": "파종", "kind": "Command",
+      "id": "WI-FARM-02", "groupCode": "FARM", "sequence": 2, "title": "경작지 씨앗 파종", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
       "worldAction": "경작된 농지에 작물 재배 단위를 시작한다.", "startStateCodes": ["Tilled"], "completionStateCodes": ["Growing"],
       "actorRequirements": ["파종 가능 행위자"], "spatialRequirements": ["CropProduction", "WorkerAccessible"], "resourceRequirements": ["종자", "노동"], "reservationKinds": ["Parcel", "WorkArea", "Actor"],
       "previewRule": "경작 상태·종자·행위자·농지 수용 가능성을 검사한다.", "confirmRule": "대상 농지와 종자를 예약하고 파종 작업을 만든다.", "taskRule": "완료 Tick에 재배 단위를 Growing으로 만든다.", "effectCodes": ["CultivationStarted"],
@@ -35,7 +87,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
-      "id": "WI-FARM-03", "groupCode": "FARM", "sequence": 3, "title": "관수·재배 관리", "kind": "Command",
+      "id": "WI-FARM-03", "groupCode": "FARM", "sequence": 3, "title": "농작물 생육 관리", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
       "worldAction": "Growing 재배 단위의 생육 조건을 관리한다.", "startStateCodes": ["Growing"], "completionStateCodes": ["Growing", "HarvestReady"],
       "actorRequirements": ["재배 관리 가능 행위자"], "spatialRequirements": ["CropProduction", "WaterAccessible", "WorkerAccessible"], "resourceRequirements": ["물", "노동"], "reservationKinds": ["WorkArea", "Actor"],
       "previewRule": "생육 상태와 물·노동·공간 접근을 검사한다.", "confirmRule": "재배 관리 작업과 필요한 자원을 예약한다.", "taskRule": "완료 효과가 생육 진행도를 반영한다.", "effectCodes": ["CropCareApplied"],
@@ -46,7 +99,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "eng/world-seedbeds/area-sets/pyeongchang-farm-hub-town.v1/spatial-capabilities.v1.json"], "notes": ["Graph·DB 적용 완료, 저장 Scene 미적용으로 공식 단계는 E3이다."]
     },
     {
-      "id": "WI-FARM-04", "groupCode": "FARM", "sequence": 4, "title": "수확", "kind": "Command",
+      "id": "WI-FARM-04", "groupCode": "FARM", "sequence": 4, "title": "익은 농작물 수확", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
       "worldAction": "수확 가능한 감자 재배 단위를 수확 Lot으로 전환한다.", "startStateCodes": ["HarvestReady"], "completionStateCodes": ["Harvested", "HarvestedAtField"],
       "actorRequirements": ["FarmHarvest"], "spatialRequirements": ["CropProduction", "WorkerAccessible", "CargoAccessible", "HarvestWorkArea"], "resourceRequirements": ["노동 또는 체력", "수확 대상 재배 단위"], "reservationKinds": ["CultivationUnit", "WorkArea", "Actor"],
       "previewRule": "100㎡·3kg/㎡와 승인된 계수를 적용해 300kg 후보를 계산하고 상태는 바꾸지 않는다.", "confirmRule": "재배 단위·행위자·수확 작업 영역을 예약한다.", "taskRule": "Player 1 Tick, NPC 2 Tick 뒤 수확 Lot을 만든다.", "effectCodes": ["HarvestLotCreated", "CultivationHarvested"],
@@ -58,7 +112,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation감자생산Contracts.cs"], "notes": ["Scenario 공간은 실제 공공 공간자료 증거가 아니다."]
     },
     {
-      "id": "WI-FARM-05", "groupCode": "FARM", "sequence": 5, "title": "수확물 집하", "kind": "Command",
+      "id": "WI-FARM-05", "groupCode": "FARM", "sequence": 5, "title": "수확물 집하장 모으기", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
       "worldAction": "밭의 수확 Lot을 농장 집하장으로 옮긴다.", "startStateCodes": ["HarvestedAtField"], "completionStateCodes": ["CollectedAtYard"],
       "actorRequirements": ["FarmCollection"], "spatialRequirements": ["CollectionWorkArea", "WorkerAccessible", "CargoAccessible"], "resourceRequirements": ["수확 Lot", "노동"], "reservationKinds": ["HarvestLot", "WorkArea", "Actor"],
       "previewRule": "Lot 상태·행위자·집하 공간을 검사한다.", "confirmRule": "Lot과 집하 작업 영역을 예약한다.", "taskRule": "완료 Tick에 Lot 위치 상태를 CollectedAtYard로 바꾼다.", "effectCodes": ["HarvestLotCollected"],
@@ -69,7 +124,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-FARM-06", "groupCode": "FARM", "sequence": 6, "title": "출하 준비·포장", "kind": "Command",
+      "id": "WI-FARM-06", "groupCode": "FARM", "sequence": 6, "title": "출하 물량 포장", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
       "worldAction": "집하된 수확 Lot을 포장 Lot과 운송 Cargo로 만든다.", "startStateCodes": ["CollectedAtYard"], "completionStateCodes": ["PackedForShipment", "PreparedForShipment"],
       "actorRequirements": ["FarmPacking"], "spatialRequirements": ["PackingWorkArea", "WorkerAccessible", "CargoAccessible"], "resourceRequirements": ["수확 Lot", "포장 노동"], "reservationKinds": ["HarvestLot", "WorkArea", "Actor"],
       "previewRule": "Lot 상태·수량·포장 공간을 검사하고 Cargo 계보 후보를 제시한다.", "confirmRule": "Lot과 포장 작업 영역을 예약한다.", "taskRule": "완료 Tick에 PackageLot과 Cargo를 동일 수량으로 만든다.", "effectCodes": ["PackageLotCreated", "CargoPrepared"],
@@ -80,7 +136,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["기존 물류 요청의 HarvestLotStableId·PackageLotStableId·CargoStableId를 이어 쓴다."]
     },
     {
-      "id": "WI-LOG-01", "groupCode": "LOG", "sequence": 1, "title": "차량 상차 확정", "kind": "Command",
+      "id": "WI-LOG-01", "groupCode": "LOG", "sequence": 1, "title": "출하 차량 상차 확정", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "Farm 출하 Cargo를 차량과 Farm 상차 공간에 예약한다.", "startStateCodes": ["PreparedForShipment"], "completionStateCodes": ["Reserved"],
       "actorRequirements": ["운송 담당 행위자"], "spatialRequirements": ["VehicleAccessible", "CargoAccessible", "LoadingWorkArea"], "resourceRequirements": ["Cargo", "차량 용량"], "reservationKinds": ["Cargo", "Vehicle", "WorkArea"],
       "previewRule": "Cargo·차량 용량·원점 상차 공간·경로·도착 하차 공간을 함께 검사한다.", "confirmRule": "하나의 물류 결정으로 Cargo·차량·공간을 예약한다.", "taskRule": "확정된 운송 작업이 후속 자동 전이를 소유한다.", "effectCodes": ["CargoTransportReserved"],
@@ -91,7 +148,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["하나의 명령이 출발·이동·도착 자동 전이의 원인이다."]
     },
     {
-      "id": "WI-LOG-02", "groupCode": "LOG", "sequence": 2, "title": "Farm 출발", "kind": "AutomaticTransition",
+      "id": "WI-LOG-02", "groupCode": "LOG", "sequence": 2, "title": "농장에서 출발", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "상차 예약된 Cargo가 운송 시작 Tick에 Farm을 출발한다.", "startStateCodes": ["Reserved"], "completionStateCodes": ["InTransit"],
       "actorRequirements": [], "spatialRequirements": ["OriginLoading"], "resourceRequirements": [], "reservationKinds": ["OriginWorkAreaRelease"],
       "previewRule": "독립 Preview가 없고 WI-LOG-01 Preview 결과를 사용한다.", "confirmRule": "독립 Confirm이 없고 WI-LOG-01 Command 계보를 사용한다.", "taskRule": "ScheduledStartTick 도달 시 결정적으로 전이한다.", "effectCodes": ["CargoDeparted"],
@@ -101,7 +159,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["운송 첫 Tick에서 상차 공간 예약 해제와 운송중 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-loading-gate.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-log-02"], "e6EvidenceRefs": ["question:farm-seasonal:repeat-loop.r1", "closure:farm:processing-to-shipping.r1"], "e7EvidenceRefs": [], "evidence": ["Farm Gate 출발과 계절 출하 폐루프가 E6에서 통과했다. 첫 Farm E7에서는 실제 출발 조작을 별도로 검증한다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-LOG-03", "groupCode": "LOG", "sequence": 3, "title": "Farm→Hub 화물 이동", "kind": "AutomaticTransition",
+      "id": "WI-LOG-03", "groupCode": "LOG", "sequence": 3, "title": "농장에서 물류 거점으로 화물 이동", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "Cargo가 승인된 Farm–Hub 경로를 따라 이동 진행도를 갱신한다.", "startStateCodes": ["InTransit"], "completionStateCodes": ["InTransit", "ArrivedAtDestination"],
       "actorRequirements": [], "spatialRequirements": ["CargoRoute"], "resourceRequirements": [], "reservationKinds": ["RouteAccess"],
       "previewRule": "독립 Preview 없이 부모 명령에서 경로 접근을 검사한다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "WorldTick에 따라 CompletedRouteTicks를 결정적으로 갱신한다.", "effectCodes": ["CargoRouteProgressed"], "cancellationPolicy": "부모 운송 작업 규칙을 따른다.", "blockReasonCodes": [],
@@ -111,7 +170,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["3 Tick Farm→Hub 회랑 진행과 Save/Replay·시험 HTTP 호스트 자동 시험 통과"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:farm-hub-corridor.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Farm–Hub 화물회랑 공간 모판에서 3 Tick 이동과 양쪽 외부 연결구 요구를 재검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-LOG-04", "groupCode": "LOG", "sequence": 4, "title": "Hub 하차", "kind": "AutomaticTransition",
+      "id": "WI-LOG-04", "groupCode": "LOG", "sequence": 4, "title": "물류 거점 도착 화물 하차", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "도착 Cargo가 Hub 하차 작업 영역을 사용하고 도착 후보가 된다.", "startStateCodes": ["InTransit"], "completionStateCodes": ["ArrivedAtDestination"],
       "actorRequirements": [], "spatialRequirements": ["UnloadingWorkArea", "CargoAccessible"], "resourceRequirements": [], "reservationKinds": ["DestinationWorkAreaRelease"],
       "previewRule": "부모 Preview가 도착 공간을 선검사한다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "ExpectedEndTick에 도착·하차 상태로 전이한다.", "effectCodes": ["CargoUnloaded"], "cancellationPolicy": "부모 운송 작업 규칙을 따른다.", "blockReasonCodes": [],
@@ -121,7 +181,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["도착 Tick에서 하차 공간 예약 해제와 하차지도착 전이를 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:hub-receiving-storage.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Hub 입고·보관 공간 모판의 하차영역과 검수 인계 관계에서 도착 전이를 재검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-LOG-05", "groupCode": "LOG", "sequence": 5, "title": "Hub 인수", "kind": "AutomaticTransition",
+      "id": "WI-LOG-05", "groupCode": "LOG", "sequence": 5, "title": "물류 거점 도착 화물 인수", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "Hub 입고검수 완료가 운송 Cargo의 인수 완료를 함께 확정한다.", "startStateCodes": ["ArrivedAtDestination", "PendingInspection"], "completionStateCodes": ["Received", "StorageEligible"],
       "actorRequirements": [], "spatialRequirements": ["InspectionWorkArea"], "resourceRequirements": ["도착 Cargo"], "reservationKinds": [],
       "previewRule": "독립 Preview가 없고 WI-001 입고검수 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없고 WI-001 Command에 포함된다.", "taskRule": "WI-001 Task 완료 시 같은 계보로 전이한다.", "effectCodes": ["FreightReceived", "StorageEligible"], "cancellationPolicy": "WI-001 취소 규칙을 따른다.", "blockReasonCodes": [],
@@ -131,7 +192,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["기존 입고검수 Confirm 안의 인수 계보와 PendingInspection 생성을 자동 시험으로 확인"] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:hub-receiving-storage.v1"], "e5PlacementRefs": [], "e6EvidenceRefs": [], "e7EvidenceRefs": [], "evidence": ["Hub 입고·보관 공간 모판의 검수영역에서 기존 입고검수 부모 명령 안의 자동 인수 계보를 재검증했다."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["별도 인수 Confirm API를 만들지 않는다."]
     },
     {
-      "id": "WI-001", "groupCode": "HUB", "sequence": 1, "title": "진부 Hub 입고검수", "kind": "Command",
+      "id": "WI-001", "groupCode": "HUB", "sequence": 1, "title": "입고 화물 검수", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "도착 Cargo를 적격 NPC와 검수 공간에서 검수한다.", "startStateCodes": ["ArrivedAtDestination", "PendingInspection"], "completionStateCodes": ["StorageEligible", "Received"],
       "actorRequirements": ["WarehouseInspection"], "spatialRequirements": ["CargoAccessible", "WorkerAccessible", "InspectionWorkArea"], "resourceRequirements": ["도착 Cargo", "NPC 노동"], "reservationKinds": ["WorkArea", "Actor"],
       "previewRule": "Cargo·NPC·검수 공간·개정·예약 충돌을 검사하며 상태는 바꾸지 않는다.", "confirmRule": "Decision·Task·NPC 배정·작업 영역 예약을 원자적으로 만든다.", "taskRule": "배정→이동→작업→완료 상태를 서버 Tick이 확정한다.", "effectCodes": ["InspectionWorkAreaReleased", "StorageEligible", "FreightReceived"],
@@ -144,7 +206,8 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Tests/Simulation공간상호작용Tests.cs"], "notes": ["구현 완료 E3와 실제 공간·Unity 통합 완료를 분리한다."]
     },
     {
-      "id": "WI-002", "groupCode": "HUB", "sequence": 2, "title": "진부 Hub 창고 적재", "kind": "Command",
+      "id": "WI-002", "groupCode": "HUB", "sequence": 2, "title": "검수 완료 화물 창고 적재", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "검수 완료 재고를 창고 용량과 적재 작업 영역을 사용해 적재한다.", "startStateCodes": ["StorageEligible"], "completionStateCodes": ["PutAwayCompleted"],
       "actorRequirements": ["WarehousePutAway"], "spatialRequirements": ["Storage", "CargoAccessible", "WorkerAccessible", "LoadingWorkArea"], "resourceRequirements": ["StorageEligible 재고", "NPC 노동"], "reservationKinds": ["StorageCapacity", "WorkArea", "Actor"],
       "previewRule": "남은 보관 용량과 작업 영역·행위자·개정을 검사한다.", "confirmRule": "재고 수량만큼 보관 용량과 작업 영역을 원자적으로 예약한다.", "taskRule": "완료 Tick에 예약 용량을 실제 점유량으로 전환한다.", "effectCodes": ["SpatialStorageCapacityConsumed", "SpatialWorkAreaReleased", "PutAwayCompleted"],
@@ -157,34 +220,38 @@
       "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md", "Ssalddel.Simulation.Tests/Simulation공간상호작용Tests.cs"], "notes": ["AvailableCapacity는 저장하지 않고 계산한다."]
     },
     {
-      "id": "WI-HUB-03", "groupCode": "HUB", "sequence": 3, "title": "출고 요청", "kind": "Command",
+      "id": "WI-HUB-03", "groupCode": "HUB", "sequence": 3, "title": "출고 대상 재고 요청", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "창고 재고에 대해 목적지 출고를 요청한다.", "startStateCodes": ["PutAwayCompleted"], "completionStateCodes": ["OutboundRequested"],
       "actorRequirements": ["출고 권한 행위자"], "spatialRequirements": ["Storage", "WorkerAccessible"], "resourceRequirements": ["창고 재고"], "reservationKinds": ["Stock"],
       "previewRule": "재고·목적지·권한을 검사한다.", "confirmRule": "출고 결정과 대상 재고 예약을 만든다.", "taskRule": "후속 피킹 자동 전이의 부모 작업이다.", "effectCodes": ["OutboundRequested"], "cancellationPolicy": "피킹 전 재고 예약을 반환한다.", "blockReasonCodes": ["WarehouseStockInsufficient"],
       "predecessorWiIds": ["WI-002"], "successorWiIds": ["WI-HUB-04"], "actionCode": "WarehouseOutboundRequest", "ruleRevision": "world-interaction.hub.r1",
-      "saveReplayPayloadCodes": ["DecisionConfirm"], "httpContracts": ["기존 창고 출고 계약 재사용 예정"], "existingImplementationReferences": [],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 요청 자동 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 요청 자동 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+      "saveReplayPayloadCodes": ["DecisionConfirm", "NpcRoutineExecutions", "simulation-save.v21"], "httpContracts": ["GET /api/simulation/v1/sessions/{sessionStableId}/npc-routine-work?areaCode=Hub", "npc-routine-control.r1에서는 플레이어 직접 Confirm 금지"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNpcRoutineWork.cs", "Ssalddel.Simulation.Server/Controllers/경영Simulation물류창고Controller.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["독립 Hub 재고 Fixture에서 전용 NPC·정책의 결정적 출고 요청, 직접 Confirm 차단, Local·Hosted 조회와 v21 Save/Replay 집중 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["코드·자동 시험은 E3 증거이며 승인된 Hub H 공간과 실제 World 발현은 아직 없다."] }, "sourceReferences": ["docs/Architecture/NPC루틴WI통제정책.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["WI-HUB-06 차량 상차와 외부 운송은 첫 NPC 루틴 폐루프에서 제외한다.", "E5 세계 발현, 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 주장하지 않는다."]
     },
     {
-      "id": "WI-HUB-04", "groupCode": "HUB", "sequence": 4, "title": "피킹", "kind": "AutomaticTransition",
+      "id": "WI-HUB-04", "groupCode": "HUB", "sequence": 4, "title": "출고 대상 재고 피킹", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "출고 요청 재고를 창고에서 피킹한다.", "startStateCodes": ["OutboundRequested"], "completionStateCodes": ["Picked"],
       "actorRequirements": [], "spatialRequirements": ["Storage", "WorkerAccessible", "PickingWorkArea"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
       "previewRule": "부모 출고 요청이 피킹 가능성을 검사한다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "부모 Task 진행 중 자동 상태로 기록한다.", "effectCodes": ["StockPicked"], "cancellationPolicy": "부모 작업 규칙을 따른다.", "blockReasonCodes": [],
-      "predecessorWiIds": ["WI-HUB-03"], "successorWiIds": ["WI-HUB-05"], "actionCode": "WarehousePickingTransition", "ruleRevision": "world-interaction.hub.r1", "saveReplayPayloadCodes": ["WarehouseOutboundState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": [],
+      "predecessorWiIds": ["WI-HUB-03"], "successorWiIds": ["WI-HUB-05"], "actionCode": "WarehousePickingTransition", "ruleRevision": "world-interaction.hub.r1", "saveReplayPayloadCodes": ["WarehouseOutboundState", "NpcRoutineExecutions", "simulation-save.v21"], "httpContracts": ["독립 Command 경로 없음", "NPC 루틴 읽기 모델에 부모 실행 계보 포함"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNpcRoutineWork.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationSupplyChainWork.cs"],
       "automaticTransition": { "triggerWiId": "WI-HUB-03", "triggerState": "OutboundRequested", "targetState": "Picked", "causeLineage": "출고 요청 TaskStableId" },
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 피킹 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 피킹 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["WI-HUB-03 부모 실행에서 WorldDerived 피킹 계보가 한 번 생성되고 Save/Replay되는 집중 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["PickingWorkArea 승인 H 결속과 실제 배치 증거가 없어 E1에 머문다."] }, "sourceReferences": ["docs/Architecture/NPC루틴WI통제정책.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["독립 Confirm을 만들지 않고 부모 출고 작업의 권위 전이를 따른다."]
     },
     {
-      "id": "WI-HUB-05", "groupCode": "HUB", "sequence": 5, "title": "출고 준비", "kind": "AutomaticTransition",
+      "id": "WI-HUB-05", "groupCode": "HUB", "sequence": 5, "title": "피킹 화물 포장", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "피킹 재고를 출고 가능한 Cargo 후보로 만든다.", "startStateCodes": ["Picked"], "completionStateCodes": ["OutboundReady"],
       "actorRequirements": [], "spatialRequirements": ["PackingWorkArea", "CargoAccessible"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
       "previewRule": "부모 출고 요청 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "피킹 뒤 결정적으로 출고 준비 상태가 된다.", "effectCodes": ["OutboundCargoPrepared"], "cancellationPolicy": "부모 작업 규칙을 따른다.", "blockReasonCodes": [],
-      "predecessorWiIds": ["WI-HUB-04"], "successorWiIds": ["WI-HUB-06"], "actionCode": "WarehouseOutboundPreparationTransition", "ruleRevision": "world-interaction.hub.r1", "saveReplayPayloadCodes": ["WarehouseOutboundState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": [],
+      "predecessorWiIds": ["WI-HUB-04"], "successorWiIds": ["WI-HUB-06"], "actionCode": "WarehouseOutboundPreparationTransition", "ruleRevision": "world-interaction.hub.r1", "saveReplayPayloadCodes": ["WarehouseOutboundState", "NpcRoutineExecutions", "simulation-save.v21"], "httpContracts": ["독립 Command 경로 없음", "NPC 루틴 읽기 모델에 부모 실행 계보 포함"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNpcRoutineWork.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationSupplyChainWork.cs"],
       "automaticTransition": { "triggerWiId": "WI-HUB-03", "triggerState": "Picked", "targetState": "OutboundReady", "causeLineage": "출고 요청 TaskStableId" },
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 준비 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 준비 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["WorldDerived 출고 준비 계보, OutboundReady, 다음 후보 반환과 v21 복원 hash 집중 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["OutboundStagingArea 승인 H 결속과 실제 배치 증거가 없어 E1에 머문다."] }, "sourceReferences": ["docs/Architecture/NPC루틴WI통제정책.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["OutboundReady는 차량 상차나 외부 운송 완료가 아니다."]
     },
     {
-      "id": "WI-HUB-06", "groupCode": "HUB", "sequence": 6, "title": "Hub 차량 상차", "kind": "Command",
+      "id": "WI-HUB-06", "groupCode": "HUB", "sequence": 6, "title": "출고 차량 상차", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "출고 준비 Cargo를 Town행 차량에 상차한다.", "startStateCodes": ["OutboundReady"], "completionStateCodes": ["Reserved"],
       "actorRequirements": ["운송 담당 행위자"], "spatialRequirements": ["LoadingWorkArea", "VehicleAccessible", "CargoAccessible"], "resourceRequirements": ["Cargo", "차량"], "reservationKinds": ["Cargo", "Vehicle", "WorkArea"],
       "previewRule": "Cargo·차량·Hub 상차 공간을 검사한다.", "confirmRule": "운송 예약을 원자적으로 만든다.", "taskRule": "Hub→Town 운송의 선행 작업이다.", "effectCodes": ["HubCargoLoaded"], "cancellationPolicy": "출발 전 예약을 반환한다.", "blockReasonCodes": ["FreightVehicleCapacityExceeded"],
@@ -192,7 +259,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 상차·배분 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub 출고 상차·배분 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-MARKET-01", "groupCode": "MARKET", "sequence": 1, "title": "Hub→마트 운송", "kind": "Command",
+      "id": "WI-MARKET-01", "groupCode": "MARKET", "sequence": 1, "title": "물류 거점에서 마트로 운송", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "Hub 출고 Cargo를 Town 마트로 운송한다.", "startStateCodes": ["Reserved"], "completionStateCodes": ["ArrivedAtDestination"],
       "actorRequirements": ["운송 담당 행위자"], "spatialRequirements": ["CargoRoute", "VehicleAccessible"], "resourceRequirements": ["Cargo", "차량"], "reservationKinds": ["Cargo", "Vehicle"],
       "previewRule": "경로·차량·목적지 접근을 검사한다.", "confirmRule": "운송 작업을 확정한다.", "taskRule": "Tick 기반 운송 하위 상태를 진행한다.", "effectCodes": ["MarketCargoArrived"], "cancellationPolicy": "운송 상태에 따른 부모 취소 규칙을 사용한다.", "blockReasonCodes": ["CargoRouteUnavailable"],
@@ -200,7 +268,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub→마트 운송 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 Hub→마트 운송 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-MARKET-02", "groupCode": "MARKET", "sequence": 2, "title": "마트 하차·인수", "kind": "Command",
+      "id": "WI-MARKET-02", "groupCode": "MARKET", "sequence": 2, "title": "마트 도착 화물 인수", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "도착 Cargo를 마트 하차 공간에서 인수한다.", "startStateCodes": ["ArrivedAtDestination"], "completionStateCodes": ["MarketReceived"],
       "actorRequirements": ["마트 입고 담당"], "spatialRequirements": ["UnloadingWorkArea", "CargoAccessible", "WorkerAccessible"], "resourceRequirements": ["도착 Cargo"], "reservationKinds": ["WorkArea", "Actor"],
       "previewRule": "도착 상태·담당자·하차 공간을 검사한다.", "confirmRule": "인수 작업과 공간을 예약한다.", "taskRule": "완료 Tick에 마트 인수 상태가 된다.", "effectCodes": ["MarketFreightReceived"], "cancellationPolicy": "완료 전 예약을 반환한다.", "blockReasonCodes": ["MarketReceivingUnavailable"],
@@ -208,7 +277,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 하차·인수 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 하차·인수 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-MARKET-03", "groupCode": "MARKET", "sequence": 3, "title": "마트 입고검수", "kind": "Command",
+      "id": "WI-MARKET-03", "groupCode": "MARKET", "sequence": 3, "title": "마트 입고 상품 검수", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "마트 인수 재고의 품질과 수량을 검수한다.", "startStateCodes": ["MarketReceived"], "completionStateCodes": ["MarketStorageEligible"],
       "actorRequirements": ["마트 검수 담당"], "spatialRequirements": ["InspectionWorkArea", "WorkerAccessible"], "resourceRequirements": ["마트 인수 재고"], "reservationKinds": ["WorkArea", "Actor"],
       "previewRule": "재고·담당자·검수 공간을 검사한다.", "confirmRule": "검수 작업을 확정한다.", "taskRule": "완료 시 후방 적재 가능 상태가 된다.", "effectCodes": ["MarketStorageEligible"], "cancellationPolicy": "완료 전 예약을 반환한다.", "blockReasonCodes": ["MarketInventoryStateInvalid"],
@@ -216,7 +286,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 입고 검수 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 입고 검수 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-MARKET-04", "groupCode": "MARKET", "sequence": 4, "title": "마트 후방 적재", "kind": "Command",
+      "id": "WI-MARKET-04", "groupCode": "MARKET", "sequence": 4, "title": "검수 상품 후방 창고 적재", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "검수 완료 마트 재고를 후방 창고에 적재한다.", "startStateCodes": ["MarketStorageEligible"], "completionStateCodes": ["MarketBackroomStored"],
       "actorRequirements": ["마트 적재 담당"], "spatialRequirements": ["Storage", "LoadingWorkArea", "WorkerAccessible"], "resourceRequirements": ["마트 적재 가능 재고"], "reservationKinds": ["StorageCapacity", "WorkArea", "Actor"],
       "previewRule": "후방 용량과 작업 영역을 검사한다.", "confirmRule": "용량·작업 영역·행위자를 예약한다.", "taskRule": "완료 시 후방 점유량이 증가한다.", "effectCodes": ["MarketBackroomStored"], "cancellationPolicy": "완료 전 용량 예약을 반환한다.", "blockReasonCodes": ["SimulationSpatialCapacityInsufficient"],
@@ -224,7 +295,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 후방 적재 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 후방 적재 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-MARKET-05", "groupCode": "MARKET", "sequence": 5, "title": "진열 보충", "kind": "Command",
+      "id": "WI-MARKET-05", "groupCode": "MARKET", "sequence": 5, "title": "매장 진열대 상품 보충", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "후방 재고를 고객 진열 공간으로 옮긴다.", "startStateCodes": ["MarketBackroomStored"], "completionStateCodes": ["Displayed"],
       "actorRequirements": ["진열 담당"], "spatialRequirements": ["DisplayArea", "CustomerAccessible", "WorkerAccessible"], "resourceRequirements": ["후방 재고"], "reservationKinds": ["DisplayCapacity", "WorkArea", "Actor"],
       "previewRule": "후방 재고와 진열 용량을 검사한다.", "confirmRule": "진열 공간과 재고를 예약한다.", "taskRule": "완료 시 판매 가능한 진열 재고가 된다.", "effectCodes": ["DisplayStockReplenished"], "cancellationPolicy": "완료 전 예약을 반환한다.", "blockReasonCodes": ["DisplayCapacityInsufficient"],
@@ -232,7 +304,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 진열 보충 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 마트 진열 보충 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-ORDER-01", "groupCode": "ORDER", "sequence": 1, "title": "주문 확정", "kind": "Command",
+      "id": "WI-ORDER-01", "groupCode": "ORDER", "sequence": 1, "title": "주민 주문 확정", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "주민의 수요 후보를 명시적 주문으로 확정한다.", "startStateCodes": ["DemandCandidate"], "completionStateCodes": ["OrderConfirmed"],
       "actorRequirements": ["주문자"], "spatialRequirements": [], "resourceRequirements": ["상품·수량·가격 후보"], "reservationKinds": [],
       "previewRule": "수요와 주문을 구분하고 주문 조건을 검사한다.", "confirmRule": "명시적 주문만 생성한다.", "taskRule": "주문 예약 자동 전이의 부모 원인이다.", "effectCodes": ["OrderConfirmed"], "cancellationPolicy": "예약·이행 단계에 따라 주문 취소 규칙을 적용한다.", "blockReasonCodes": ["OrderTermsInvalid"],
@@ -240,7 +313,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 확정 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 확정 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-ORDER-02", "groupCode": "ORDER", "sequence": 2, "title": "주문 재고 예약", "kind": "AutomaticTransition",
+      "id": "WI-ORDER-02", "groupCode": "ORDER", "sequence": 2, "title": "주문 상품 재고 예약", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "확정 주문 수량을 시장 재고에서 예약한다.", "startStateCodes": ["OrderConfirmed"], "completionStateCodes": ["StockReserved"],
       "actorRequirements": [], "spatialRequirements": [], "resourceRequirements": ["판매 재고"], "reservationKinds": ["Stock"],
       "previewRule": "주문 Preview에서 재고 가능성을 계산한다.", "confirmRule": "주문 Confirm과 같은 원자적 변경으로 예약한다.", "taskRule": "독립 Task가 아니다.", "effectCodes": ["OrderStockReserved"], "cancellationPolicy": "주문 취소 시 미이행 예약을 반환한다.", "blockReasonCodes": [],
@@ -249,7 +323,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 재고 예약 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 재고 예약 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-ORDER-03", "groupCode": "ORDER", "sequence": 3, "title": "주문 피킹", "kind": "AutomaticTransition",
+      "id": "WI-ORDER-03", "groupCode": "ORDER", "sequence": 3, "title": "주문 상품 피킹", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "예약 재고를 주문별로 피킹한다.", "startStateCodes": ["StockReserved"], "completionStateCodes": ["Picked"],
       "actorRequirements": [], "spatialRequirements": ["PickingWorkArea"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
       "previewRule": "부모 주문 이행 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "주문 이행 Task의 하위 상태다.", "effectCodes": ["OrderStockPicked"], "cancellationPolicy": "부모 주문 이행 규칙을 따른다.", "blockReasonCodes": [],
@@ -258,7 +333,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 피킹 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 피킹 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-ORDER-04", "groupCode": "ORDER", "sequence": 4, "title": "주문 포장", "kind": "AutomaticTransition",
+      "id": "WI-ORDER-04", "groupCode": "ORDER", "sequence": 4, "title": "주문 상품 포장", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "피킹된 주문 재고를 수령 단위로 포장한다.", "startStateCodes": ["Picked"], "completionStateCodes": ["Packed"],
       "actorRequirements": [], "spatialRequirements": ["PackingWorkArea"], "resourceRequirements": [], "reservationKinds": ["WorkArea"],
       "previewRule": "부모 주문 이행 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "주문 이행 Task의 하위 상태다.", "effectCodes": ["OrderPacked"], "cancellationPolicy": "부모 주문 이행 규칙을 따른다.", "blockReasonCodes": [],
@@ -267,7 +343,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 포장 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주문 포장 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-ORDER-05", "groupCode": "ORDER", "sequence": 5, "title": "수령 준비", "kind": "AutomaticTransition",
+      "id": "WI-ORDER-05", "groupCode": "ORDER", "sequence": 5, "title": "주문 상품 수령 준비", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "포장 주문을 주민 수령 가능 상태로 만든다.", "startStateCodes": ["Packed"], "completionStateCodes": ["ReadyForPickup"],
       "actorRequirements": [], "spatialRequirements": ["CustomerAccessible"], "resourceRequirements": [], "reservationKinds": [],
       "previewRule": "부모 주문 이행 Preview에 포함된다.", "confirmRule": "독립 Confirm이 없다.", "taskRule": "포장 완료 뒤 자동 전이한다.", "effectCodes": ["OrderReadyForPickup"], "cancellationPolicy": "부모 주문 상태 규칙을 따른다.", "blockReasonCodes": [],
@@ -276,7 +353,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 수령 준비 자동 전이 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 수령 준비 자동 전이 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-ORDER-06", "groupCode": "ORDER", "sequence": 6, "title": "주민 수령", "kind": "Command",
+      "id": "WI-ORDER-06", "groupCode": "ORDER", "sequence": 6, "title": "주민 주문 상품 수령", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "주민이 준비된 주문을 수령한다.", "startStateCodes": ["ReadyForPickup"], "completionStateCodes": ["Fulfilled"],
       "actorRequirements": ["주문자 또는 승인된 수령자"], "spatialRequirements": ["CustomerAccessible", "PickupArea"], "resourceRequirements": ["수령 준비 주문"], "reservationKinds": ["PickupArea"],
       "previewRule": "수령자·주문·수령 공간을 검사한다.", "confirmRule": "수령 행위를 명시적으로 확정한다.", "taskRule": "완료 시 주문 이행 상태가 된다.", "effectCodes": ["OrderFulfilled"], "cancellationPolicy": "수령 확정 전 예약을 반환한다.", "blockReasonCodes": ["OrderNotReadyForPickup"],
@@ -284,7 +362,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주민 수령 공간 예약 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 주민 수령 공간 예약 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["수령 시 시장 재고를 한 번만 차감한다."]
     },
     {
-      "id": "WI-ORDER-07", "groupCode": "ORDER", "sequence": 7, "title": "주민 소비", "kind": "Command",
+      "id": "WI-ORDER-07", "groupCode": "ORDER", "sequence": 7, "title": "주민 상품 소비", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
       "worldAction": "주민이 이미 이행된 주문 상품을 소비 상태로 전환한다.", "startStateCodes": ["Fulfilled"], "completionStateCodes": ["Consumed"],
       "actorRequirements": ["주문 수령 주민"], "spatialRequirements": [], "resourceRequirements": ["주민 보유 상품"], "reservationKinds": [],
       "previewRule": "이행 계보와 중복 소비 여부를 검사한다.", "confirmRule": "소비 행위를 확정한다.", "taskRule": "완료 효과는 주민 상태만 바꾸고 시장 재고를 재차감하지 않는다.", "effectCodes": ["ResidentConsumed"], "cancellationPolicy": "소비 완료 뒤 취소하지 않는다.", "blockReasonCodes": ["OrderNotFulfilled", "ConsumptionAlreadyApplied"],
@@ -292,15 +371,17 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 소비·시장 재고 단일 차감 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationIndividualOrderTests.cs의 소비·시장 재고 단일 차감 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["소비에서 시장 재고를 다시 차감하지 않는다."]
     },
     {
-      "id": "WI-NATURE-01", "groupCode": "NATURE", "sequence": 1, "title": "자연권 위협 관찰", "kind": "Command",
+      "id": "WI-NATURE-01", "groupCode": "NATURE", "sequence": 1, "title": "자연 지역 위험 징후 확인", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "플레이어가 전문 경관에서 번진 자연권 위협의 경로와 현재 압력을 관찰한다.", "startStateCodes": ["Stable", "Warning", "Threatened", "Infested"], "completionStateCodes": ["ThreatObserved"],
       "actorRequirements": ["탐사 또는 관찰 가능 행위자"], "spatialRequirements": ["Traversable", "ObservationArea", "ThreatMonitoringArea"], "resourceRequirements": ["현재 자연권 위협 상태 사본"], "reservationKinds": ["ObservationArea"],
       "previewRule": "자연권 위협 경로·관찰 공간·행위자와 현재 개정을 검사하고 관찰 가능한 경고만 제시한다.", "confirmRule": "관찰 대상 경로를 명시적으로 확정하되 압력이나 사건 결과를 변경하지 않는다.", "taskRule": "관찰 작업은 경로별 위협 사본과 원인 계보를 기록하고 후퇴 또는 복원 판단을 연다.", "effectCodes": ["NatureThreatObserved"], "cancellationPolicy": "완료 전 관찰 공간과 행위자 예약을 반환한다.", "blockReasonCodes": ["NatureThreatRouteUnavailable", "NatureObservationAreaUnavailable"],
-      "predecessorWiIds": [], "successorWiIds": ["WI-NATURE-02", "WI-NATURE-03"], "actionCode": "RegionalThreatObservation", "ruleRevision": "world-interaction.nature.r1", "saveReplayPayloadCodes": ["DecisionConfirm", "NatureThreatState", "SpatialReservations"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/world-events/nature-threat/observation-previews", "POST /api/simulation/v1/sessions/{sessionStableId}/world-events/nature-threat/observations/confirm"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationRegionalIncidents.cs", "Ssalddel.Simulation.Domain/SimulationNatureThreatObservation.cs", "Ssalddel.Simulation.Tests/SimulationRegionalIncidentTests.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationRegionalIncidentTests에서 Preview 무변경, 공간 예약·취소 반환, Confirm 멱등성·payload 충돌, Tick 완료 효과, 압력 불변, Save/Replay hash와 HTTP 왕복을 검증했다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["위치 독립 Nature H1·H2 후보 계보와 Scenario 관찰 공간을 사용하며 실제 E5 배치는 아직 없다."] }, "sourceReferences": ["docs/Architecture/지역사건-자연권위협-규칙.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["관찰은 압력 감소나 사건 해결을 확정하지 않는다.", "현재 공간 근거는 Scenario이며 공식 H1이나 실제 Nature AreaSet 근거가 아니다."]
+      "predecessorWiIds": [], "successorWiIds": ["WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-11"], "actionCode": "RegionalThreatObservation", "ruleRevision": "world-interaction.nature.r1", "saveReplayPayloadCodes": ["DecisionConfirm", "NatureThreatState", "SpatialReservations"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/world-events/nature-threat/observation-previews", "POST /api/simulation/v1/sessions/{sessionStableId}/world-events/nature-threat/observations/confirm"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationRegionalIncidents.cs", "Ssalddel.Simulation.Domain/SimulationNatureThreatObservation.cs", "Ssalddel.Simulation.Tests/SimulationRegionalIncidentTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationRegionalIncidentTests에서 Preview 무변경, 공간 예약·취소 반환, Confirm 멱등성·payload 충돌, Tick 완료 효과, 압력 불변, Save/Replay hash와 HTTP 왕복을 검증했다."] }, "integration": { "status": "Done", "currentStage": "E7", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-encounter.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-01"], "e6EvidenceRefs": ["world-interaction-delivery-priorities.r5:wi-nature-01:e6", "Ssalddel.Unity.Tests/몰입WorldLayoutTests.cs", "artifacts/local/validation/nature-twilight/nature-twilight-wi01-e6-current.trx"], "e7EvidenceRefs": ["Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs", "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi01-observed-game-view.png", "artifacts/local/validation/nature-twilight/nature-twilight-wi01-host-parity-current.trx"], "evidence": ["새 Goal의 첫 WI로 선택해 E1 관찰 책임과 E2 계약·Adapter, E3 Preview·Confirm·Tick·Save/Replay·HTTP 회귀를 다시 기준선으로 삼았다.", "기존 ApprovedForSimulation Nature 탐사·조우 모판의 threat-watch 공간에 Player Actor·위협 상태 사본·ObservationArea·ThreatMonitoringArea·1 slot 예약을 결속했다.", "실제 Nature threat-recovery 경관 Graph의 nature-incident-trace Node와 H1·H2·H3 계보를 결속하고 미래 E5 대기 WI가 기존 직접 WI 폐루프를 소급 무효화하지 않도록 검증했다.", "위협 방향·압력·안전 거점과 후퇴·복원 선택을 카메라·애니메이션·음향 Cue로 투영하되 WI-NATURE-11의 전투 참여 방식을 관찰 WI가 발명하지 않는 E6 표현 경계를 검증했다.", "canonical SimulationWorldShell에서 저장·복원 뒤 실제 R 차단→O 관찰 확정→F/R 선택 허용과 후퇴를 검증하고 Game View 및 Console 오류 0개를 확인했다.", "같은 황혼 관찰 입력 열을 LocalProcess와 RemoteHost에 적용해 최종 revision과 Save/Restore/Replay hash 동등성을 검증했다."] }, "sourceReferences": ["docs/Architecture/지역사건-자연권위협-규칙.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["관찰은 압력 감소나 사건 해결을 확정하지 않는다.", "실제 E5 공간 근거는 승인 모판과 Nature threat-recovery LandscapeGraph의 결정적 결속이다.", "전투 참여 방식과 결과는 WI-NATURE-11 및 Simulation Core가 소유한다."]
     },
     {
-      "id": "WI-NATURE-02", "groupCode": "NATURE", "sequence": 2, "title": "자연권 긴급 후퇴", "kind": "Command",
+      "id": "WI-NATURE-02", "groupCode": "NATURE", "sequence": 2, "title": "안전 거점으로 긴급 후퇴", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "플레이어와 동료가 조우 위험대에서 경계 완충대를 거쳐 안전 생활핵으로 후퇴한다.", "startStateCodes": ["ThreatObserved", "EncounterActive"], "completionStateCodes": ["RetreatedToSafeCore"],
       "actorRequirements": ["후퇴 가능한 플레이어 또는 파티"], "spatialRequirements": ["Traversable", "EmergencyAccess", "PlayerEscapeRoute"], "resourceRequirements": ["유효한 안전 생활핵 연결"], "reservationKinds": ["EscapeRoute", "Actor"],
       "previewRule": "현재 조우·후퇴 경로·안전 생활핵 연결과 예약 충돌을 검사한다.", "confirmRule": "선택한 후퇴 경로와 파티를 명시적으로 확정한다.", "taskRule": "후퇴 작업은 안전 생활핵 도달 상태를 만들지만 원인 사건이나 위협 압력을 해결하지 않는다.", "effectCodes": ["PartyRetreatedToSafeCore"], "cancellationPolicy": "후퇴 시작 전 경로와 행위자 예약을 반환하고 시작 뒤에는 별도 중단 규칙을 사용한다.", "blockReasonCodes": ["NatureEmergencyRouteUnavailable", "NatureSafeCoreUnavailable"],
@@ -308,7 +389,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationRegionalIncidentTests에서 선행 관찰, Preview 무변경, 후퇴 경로 예약·취소 반환, Confirm 멱등성·payload 충돌, Tick 완료 효과, 위협 압력 불변, Save/Replay hash와 HTTP 왕복을 검증했다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["자연권 긴급 후퇴 H1과 Scenario 후퇴 경로를 사용하며 실제 E5 배치는 아직 없다."] }, "sourceReferences": ["docs/Architecture/지역사건-자연권위협-규칙.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["후퇴 성공은 전투 승리나 사건 해결이 아니다.", "공간 근거는 Scenario이며 공식 H1이나 실제 Nature AreaSet 근거가 아니다."]
     },
     {
-      "id": "WI-NATURE-03", "groupCode": "NATURE", "sequence": 3, "title": "자연권 복원", "kind": "Command",
+      "id": "WI-NATURE-03", "groupCode": "NATURE", "sequence": 3, "title": "훼손된 자연 경로 복원", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "원인 사건이 해결된 자연권 경로에서 정화·복구 작업을 수행한다.", "startStateCodes": ["ThreatObserved", "CauseResolved"], "completionStateCodes": ["NatureRouteRestored"],
       "actorRequirements": ["복원 작업 가능 행위자"], "spatialRequirements": ["WorkerAccessible", "RestorationWorkArea", "CargoAccessible"], "resourceRequirements": ["해결된 원인 계보", "복원 자재"], "reservationKinds": ["WorkArea", "Actor", "Material"],
       "previewRule": "원인 해결 계보·남은 압력·복원 공간·자재·행위자와 현재 개정을 검사한다.", "confirmRule": "복원 작업과 필요한 자재·공간을 원자적으로 예약한다.", "taskRule": "완료 효과만 해당 경로의 복원 상태를 갱신하며 다른 경로 압력을 변경하지 않는다.", "effectCodes": ["NatureRouteRestored"], "cancellationPolicy": "미사용 자재와 작업 공간·행위자 예약을 원인 계보별로 반환한다.", "blockReasonCodes": ["NatureIncidentCauseUnresolved", "NatureRestorationMaterialInsufficient", "NatureRestorationAreaUnavailable"],
@@ -316,7 +398,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationRegionalIncidentTests에서 관찰된 원인 전체 해결, Preview 무변경, 복원 공간·자재 예약과 취소 반환, 자재 소비, Confirm 멱등성, Tick 효과, 압력 불변, Save/Replay hash와 HTTP 왕복을 검증했다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["자연권 정화·복구 H1과 Scenario 복원 공간을 사용하며 실제 E5 배치는 아직 없다."] }, "sourceReferences": ["docs/Architecture/지역사건-자연권위협-규칙.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["원인 미해결 상태에서 복원으로 압력을 우회 감소시키지 않는다.", "현재 공간·자재 근거는 Scenario이며 공식 H1이나 실제 Nature AreaSet 근거가 아니다."]
     },
     {
-      "id": "WI-NATURE-04", "groupCode": "NATURE", "sequence": 4, "title": "파티 회복", "kind": "Command",
+      "id": "WI-NATURE-04", "groupCode": "NATURE", "sequence": 4, "title": "탐사대 안전 회복", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "안전 생활핵에서 플레이어와 동료가 위협 대응 뒤 다음 행동을 준비한다.", "startStateCodes": ["RetreatedToSafeCore", "NatureRouteRestored"], "completionStateCodes": ["PartyRecovered"],
       "actorRequirements": ["회복 대상 플레이어 또는 파티"], "spatialRequirements": ["Traversable", "RestArea", "SafeCore"], "resourceRequirements": ["회복 시간 또는 보급"], "reservationKinds": ["RestArea", "Actor"],
       "previewRule": "안전 생활핵·회복 공간·파티 상태·보급과 현재 예약을 검사한다.", "confirmRule": "회복 대상과 공간을 명시적으로 확정한다.", "taskRule": "회복 작업은 파티 준비 상태만 갱신하고 지역 사건이나 자연권 압력을 자동 변경하지 않는다.", "effectCodes": ["PartyRecovered"], "cancellationPolicy": "완료 전 회복 공간과 미사용 보급 예약을 반환한다.", "blockReasonCodes": ["NatureSafeCoreUnavailable", "PartyRecoveryUnavailable"],
@@ -324,23 +407,26 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationRegionalIncidentTests에서 후퇴·복원 선행 효과, Preview 무변경, 휴식 공간·회복 보급 예약과 취소 반환, 보급 소비, Confirm 멱등성, Tick 효과, 압력 불변, Save/Replay hash와 HTTP 왕복을 검증했다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["자연권 안전 회복 H1과 Scenario 회복 야영지를 사용하며 실제 E5 배치는 아직 없다."] }, "sourceReferences": ["docs/Architecture/지역사건-자연권위협-규칙.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["회복 완료는 자연권 압력 해결이 아니다.", "현재 공간·보급 근거는 Scenario이며 공식 H1이나 실제 Nature AreaSet 근거가 아니다."]
     },
     {
-      "id": "WI-NATURE-05", "groupCode": "NATURE", "sequence": 5, "title": "도끼 획득", "kind": "Command",
-      "worldAction": "플레이어가 안전 빈터의 도구 획득 지점에서 기본 도끼의 소유권을 얻는다.", "startStateCodes": ["AxeAvailable", "PlayerWithoutAxe"], "completionStateCodes": ["AxeOwned"],
+      "id": "WI-NATURE-05", "groupCode": "NATURE", "sequence": 5, "title": "벌목 도끼 획득", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 안전 빈터의 도구 획득 지점에서 기본 도끼 인스턴스의 소유권을 얻어 인벤토리에 넣는다.", "startStateCodes": ["AxeAvailable", "PlayerWithoutAxe"], "completionStateCodes": ["AxeOwnedInInventory"],
       "actorRequirements": ["Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "PlayerAccessible", "ToolPickupPoint"], "resourceRequirements": ["획득 가능한 기본 도끼"], "reservationKinds": ["Actor", "Tool"],
-      "previewRule": "플레이어·도구 지점·중복 소유 여부와 현재 개정을 검사하며 상태를 바꾸지 않는다.", "confirmRule": "도끼 소유권을 플레이어 인벤토리로 한 번만 이전한다.", "taskRule": "즉시 완료 명령이며 별도 시간 진행 Task를 만들지 않는다.", "effectCodes": ["AxeAcquired"], "cancellationPolicy": "소유권 이전 전에는 확정하지 않으며 이전 완료 뒤에는 취소하지 않는다.", "blockReasonCodes": ["SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
-      "predecessorWiIds": [], "successorWiIds": ["WI-NATURE-06"], "actionCode": "AcquireAxe", "ruleRevision": "nature-survival.realtime.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "WorldInventory", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests에서 Local·HTTP Preview/Confirm, 도끼 인벤토리 반영과 정식 WI 식별자 매핑을 검증한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "evidence": ["승인된 Nature 생존 생활핵 모판에 ToolPickupPoint와 Tool 용량을 정의했으며 실제 H2·H3 배치와 Game View 증거는 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["플레이어가 명시적으로 선택하고 권위 인벤토리가 바뀌므로 독립 WI다."]
+      "previewRule": "플레이어·도구 지점·중복 소유 여부와 현재 개정을 검사하며 상태를 바꾸지 않는다.", "confirmRule": "WI-ACTOR-01 권위 전이를 사용해 도끼 인스턴스를 플레이어 인벤토리로 한 번만 이전한다.", "taskRule": "즉시 완료 명령이며 장착은 후속 WI-ACTOR-02가 담당한다.", "effectCodes": ["AxeAcquired"], "cancellationPolicy": "소유권 이전 전에는 확정하지 않으며 이전 완료 뒤에는 취소하지 않는다.", "blockReasonCodes": ["SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
+      "predecessorWiIds": [], "successorWiIds": ["WI-ACTOR-02"], "actionCode": "AcquireAxe", "ruleRevision": "nature-survival.realtime.r5", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "ActorEquipmentState", "simulation-save.v27", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationActorEquipment.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs", "Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationActorEquipmentTests와 SimulationNatureSurvivalTests에서 Local·HTTP Preview/Confirm, 도끼 인스턴스의 Inventory 이전, 명시적 장착 전 벌목 차단과 Save/Replay를 검증한다."] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "e5PlacementRefs": ["spatial:actual-e5:wi-nature-05"], "e6EvidenceRefs": ["world-interaction-delivery-priorities.r3:wi-nature-05:e6"], "e7EvidenceRefs": ["Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs", "artifacts/local/validation/nature-e7/playmode-loop-current.xml", "artifacts/local/validation/nature-e7/nature-shelter-parity-current.trx", "Assets/Documentation/Changes/2026-08-26-nature-e7-entry/nature-e7-restored-closed-loop-game-view.png", "docs/Changes/2026-08-26-nature-shelter-e7-manual.md"], "evidence": ["승인된 Nature 생존 생활핵 모판의 ToolPickupPoint를 Actual E5 정의와 결속하고 Preview·Confirm·저장 재생을 검증했다.", "도끼 발견·접근·조준·획득과 장착 전후 능력 차이를 E6 코드로 정제했다.", "과거 E7 증거는 획득 즉시 자동 장착 계약에서 수집됐다. 새 명시적 장착 입력이 추가됐으므로 현재 E6으로 다시 열고 canonical SimulationWorldShell 실제 입력·Game View·Console을 재검증한다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["WI-ACTOR-01의 도끼·공간 특화이며 획득과 장착을 분리한다."]
     },
     {
-      "id": "WI-NATURE-06", "groupCode": "NATURE", "sequence": 6, "title": "벌목 시작", "kind": "Command",
-      "worldAction": "플레이어가 도끼와 서 있는 나무를 선택해 벌목 작업을 시작한다.", "startStateCodes": ["AxeOwned", "TreeStanding", "PlayerIdle"], "completionStateCodes": ["HarvestWorkScheduled"],
-      "actorRequirements": ["도끼를 소유한 Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "WorkerAccessible", "HarvestResourceWorkArea"], "resourceRequirements": ["서 있는 나무", "기본 도끼"], "reservationKinds": ["Actor", "Tool", "ResourceNode", "WorkArea"],
-      "previewRule": "나무 상태·도끼 소유·진행 중 작업·현재 개정을 검사하며 나무나 인벤토리를 바꾸지 않는다.", "confirmRule": "대상 나무를 참조하는 4초 벌목 Task를 생성한다.", "taskRule": "실시간 입력이 유지되는 동안 Task를 진행하고 완료 시 나무를 그루터기로 바꾸며 통나무를 생성한다.", "effectCodes": ["TreeFelled", "TimberCreated"], "cancellationPolicy": "완료 전 WI-NATURE-12로 취소하면 진행률과 Actor·Tool·ResourceNode·WorkArea 점유를 해제하고 나무와 인벤토리는 변경하지 않는다.", "blockReasonCodes": ["SimulationNatureResourceNodeNotFound", "SimulationNatureResourceNodeUnavailable", "SimulationNatureAxeRequired", "SimulationNatureSurvivalActionBlocked"],
-      "predecessorWiIds": ["WI-NATURE-05", "WI-NATURE-06"], "successorWiIds": ["WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-12"], "actionCode": "BeginHarvest", "ruleRevision": "nature-survival.realtime.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureActiveWork", "NatureResourceNodes", "WorldInventory", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "id": "WI-NATURE-06", "groupCode": "NATURE", "sequence": 6, "title": "나무 벌목 작업 시작", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 MainHand에 장착한 벌목 도구와 서 있는 나무를 선택해 벌목 작업을 시작한다.", "startStateCodes": ["WoodcuttingCapabilityEquipped", "TreeStanding", "PlayerIdle"], "completionStateCodes": ["HarvestWorkScheduled"],
+      "actorRequirements": ["capability:woodcutting을 장착 상태에서 가진 Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "WorkerAccessible", "HarvestResourceWorkArea"], "resourceRequirements": ["서 있는 나무", "장착된 벌목 도구"], "reservationKinds": ["Actor", "Tool", "ResourceNode", "WorkArea"],
+      "previewRule": "나무 상태·장착된 벌목 능력·진행 중 작업·현재 개정을 검사하며 나무나 인벤토리를 바꾸지 않는다.", "confirmRule": "대상 나무를 참조하는 4초 벌목 Task를 생성한다.", "taskRule": "실시간 입력이 유지되는 동안 Task를 진행하고 완료 시 나무를 그루터기로 바꾸며 통나무를 생성한다.", "effectCodes": ["TreeFelled", "TimberCreated"], "cancellationPolicy": "완료 전 WI-NATURE-12로 취소하면 진행률과 Actor·Tool·ResourceNode·WorkArea 점유를 해제하고 나무와 인벤토리는 변경하지 않는다.", "blockReasonCodes": ["SimulationNatureResourceNodeNotFound", "SimulationNatureResourceNodeUnavailable", "SimulationNatureAxeRequired", "SimulationNatureSurvivalActionBlocked"],
+      "predecessorWiIds": ["WI-ACTOR-02", "WI-NATURE-06", "WI-NATURE-17"], "successorWiIds": ["WI-NATURE-18", "WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-12"], "actionCode": "BeginHarvest", "ruleRevision": "nature-survival.realtime.r5", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureActiveWork", "NatureResourceNodes", "NatureDroppedTimber", "ActorEquipmentState", "WorldInventory", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationActorEquipment.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs", "Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests에서 Preview, 4초 작업 진행, 나무 단일 소모, 통나무 생성, 중복 시계 명령과 Save/Replay를 검증한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-encounter.v1"], "evidence": ["벌목 WorkArea·ResourceNode 용량을 Actual E5 H1·H2·H3·Graph에 결속하고 WI-NATURE-12 취소에서 점유 해제를 검증했다. Hosted와 수동 Game View는 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["벌목을 선택하고 확정하는 순간은 WI이며 4초 진행과 완료 효과는 Task·Effect다."]
     },
     {
-      "id": "WI-NATURE-07", "groupCode": "NATURE", "sequence": 7, "title": "오두막 위치 배치", "kind": "Command",
+      "id": "WI-NATURE-07", "groupCode": "NATURE", "sequence": 7, "title": "오두막을 지을 터 선정", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "플레이어가 안전 생활핵 안에서 오두막을 지을 위치와 방향을 선택한다.", "startStateCodes": ["CabinPlanned", "BuildingSiteAvailable"], "completionStateCodes": ["CabinBlueprintPlaced"],
       "actorRequirements": ["Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "PlayerAccessible", "BuildingSite"], "resourceRequirements": ["오두막 설계안"], "reservationKinds": ["Actor", "BuildingSite"],
       "previewRule": "생활핵 허용 범위·기존 오두막 상태·현재 개정을 검사하고 배치 좌표만 제안한다.", "confirmRule": "선택한 위치와 방향을 오두막 설계 상태에 기록한다.", "taskRule": "배치는 즉시 완료되며 건설 시간과 자재 소비는 후속 WI가 담당한다.", "effectCodes": ["CabinBlueprintPlaced"], "cancellationPolicy": "건설 시작 전 재배치·취소 계약은 아직 없으며 E4 후속 규칙으로 남긴다.", "blockReasonCodes": ["SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
@@ -348,23 +434,26 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests에서 허용 범위 Preview와 좌표·방향의 권위 상태 반영 및 Save/Replay를 검증한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "evidence": ["승인된 생활핵 모판에 BuildingSite 용량과 오두막 위치를 정의했으며 실제 H2·H3 배치 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["위치 선택은 플레이어 의도이므로 건설 시작과 분리된 WI다."]
     },
     {
-      "id": "WI-NATURE-08", "groupCode": "NATURE", "sequence": 8, "title": "오두막 건설 시작", "kind": "Command",
+      "id": "WI-NATURE-08", "groupCode": "NATURE", "sequence": 8, "title": "오두막 건설 작업 시작", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "플레이어가 배치된 오두막 설계안에 통나무를 예약하고 건설 작업을 시작한다.", "startStateCodes": ["CabinBlueprintPlaced", "TimberAvailable", "PlayerIdle"], "completionStateCodes": ["CabinBuildScheduled"],
       "actorRequirements": ["Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "WorkerAccessible", "BuildingSite", "ShelterConstructionWorkArea"], "resourceRequirements": ["통나무 6개", "배치된 오두막 설계안"], "reservationKinds": ["Actor", "Material", "BuildingSite", "WorkArea"],
       "previewRule": "설계안·통나무 수량·진행 중 작업·현재 개정을 검사하며 자재를 소비하지 않는다.", "confirmRule": "통나무 6개를 예약·차감하고 30초 건설 Task를 생성한다.", "taskRule": "실시간 입력이 유지되는 동안 Task를 진행하고 완료 시 오두막을 사용 가능 상태로 전환한다.", "effectCodes": ["CabinOperational", "CabinRecoveryEnabled", "CabinDefenseEnabled"], "cancellationPolicy": "완료 전 WI-NATURE-12로 취소하면 Actor·BuildingSite·WorkArea 점유를 해제하고 예약 통나무 6개를 인벤토리에 반환한다.", "blockReasonCodes": ["SimulationNatureCabinBlueprintRequired", "SimulationNatureTimberInsufficient", "SimulationNatureSurvivalActionBlocked"],
-      "predecessorWiIds": ["WI-NATURE-07"], "successorWiIds": ["WI-NATURE-09", "WI-NATURE-12"], "actionCode": "BeginCabinBuild", "ruleRevision": "nature-survival.realtime.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureActiveWork", "NatureCabin", "WorldInventory", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "predecessorWiIds": ["WI-NATURE-07"], "successorWiIds": ["WI-NATURE-09", "WI-NATURE-12", "WI-NATURE-13"], "actionCode": "BeginCabinBuild", "ruleRevision": "nature-survival.realtime.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureActiveWork", "NatureCabin", "WorldInventory", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests에서 자재 검사·차감, 30초 작업, 오두막 완공 효과와 Save/Replay를 검증한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "evidence": ["건설 WorkArea·Material 용량을 Actual E5 H1·H2·H3·Graph에 결속하고 취소 시 예약 통나무 전량 반환을 검증했다. Hosted와 수동 Game View는 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["건설 시작은 WI이며 30초 진행과 완공은 Task·Effect다."]
     },
     {
-      "id": "WI-NATURE-09", "groupCode": "NATURE", "sequence": 9, "title": "오두막 입장", "kind": "Command",
+      "id": "WI-NATURE-09", "groupCode": "NATURE", "sequence": 9, "title": "오두막 안으로 들어가기", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "플레이어가 완성된 오두막 내부 점유를 선택한다.", "startStateCodes": ["CabinOperational", "PlayerOutsideCabin"], "completionStateCodes": ["PlayerInsideCabin"],
       "actorRequirements": ["Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "PlayerAccessible", "ShelterInterior", "ShelterEntrance"], "resourceRequirements": ["사용 가능한 오두막"], "reservationKinds": ["Actor", "ShelterOccupancy"],
       "previewRule": "오두막 완공·입구 접근·내부 점유 상태와 현재 개정을 검사한다.", "confirmRule": "플레이어의 현재 H1과 실내 점유 상태를 오두막으로 전환한다.", "taskRule": "즉시 공간 상태를 바꾸며 이동 애니메이션은 표현 계층에서 처리한다.", "effectCodes": ["PlayerEnteredCabin"], "cancellationPolicy": "입장 완료 뒤 되돌리기는 WI-NATURE-10 퇴장으로 수행한다.", "blockReasonCodes": ["SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
-      "predecessorWiIds": ["WI-NATURE-08", "WI-NATURE-10"], "successorWiIds": ["WI-NATURE-10"], "actionCode": "EnterCabin", "ruleRevision": "nature-survival.realtime.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NaturePlayerSpatialState", "NatureCabin", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "predecessorWiIds": ["WI-NATURE-08", "WI-NATURE-10"], "successorWiIds": ["WI-NATURE-10", "WI-NATURE-13"], "actionCode": "EnterCabin", "ruleRevision": "nature-survival.realtime.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NaturePlayerSpatialState", "NatureCabin", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests의 오두막 상태와 Nature 저장·재생 경계가 플레이어 실내 상태를 보존한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "evidence": ["승인된 생활핵 모판에 입구·실내와 ShelterOccupancy 용량을 정의했으며 실제 동선·점유 충돌 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["입장은 권위 공간 상태를 바꾸므로 단순 이동 애니메이션과 구분한 WI다."]
     },
     {
-      "id": "WI-NATURE-10", "groupCode": "NATURE", "sequence": 10, "title": "오두막 퇴장", "kind": "Command",
+      "id": "WI-NATURE-10", "groupCode": "NATURE", "sequence": 10, "title": "오두막 밖으로 나가기", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "플레이어가 오두막 내부 점유를 해제하고 안전 빈터로 돌아간다.", "startStateCodes": ["PlayerInsideCabin"], "completionStateCodes": ["PlayerOutsideCabin"],
       "actorRequirements": ["오두막 내부의 Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "ShelterInterior", "ShelterEntrance", "PlayerAccessible"], "resourceRequirements": ["사용 가능한 오두막 출입구"], "reservationKinds": ["Actor", "ShelterOccupancy"],
       "previewRule": "플레이어의 현재 실내 상태와 출입구 사용 가능성 및 현재 개정을 검사한다.", "confirmRule": "실내 점유를 해제하고 플레이어의 현재 H1을 안전 빈터로 전환한다.", "taskRule": "즉시 공간 상태를 바꾸며 이동 애니메이션은 표현 계층에서 처리한다.", "effectCodes": ["PlayerLeftCabin"], "cancellationPolicy": "퇴장 완료 뒤 되돌리기는 WI-NATURE-09 입장으로 수행한다.", "blockReasonCodes": ["SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
@@ -372,15 +461,17 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests의 Nature 저장·재생 경계가 플레이어 실내·실외 상태를 보존한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "evidence": ["승인된 생활핵 모판에 출입구와 점유 해제 계약을 정의했으며 실제 동선 검증은 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["퇴장은 권위 점유 상태를 해제하는 WI다."]
     },
     {
-      "id": "WI-NATURE-11", "groupCode": "NATURE", "sequence": 11, "title": "황혼 조우 대응", "kind": "Command",
-      "worldAction": "플레이어가 황혼 조우에서 싸움 또는 후퇴를 선택해 대응 결과를 확정한다.", "startStateCodes": ["EncounterPending"], "completionStateCodes": ["EncounterResolved", "BattleHandoffRequested", "PlayerRetreated"],
+      "id": "WI-NATURE-11", "groupCode": "NATURE", "sequence": 11, "title": "황혼 위협 대응 방식 확정", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 황혼 조우에서 싸움 또는 후퇴를 선택하고 기존 현장 전투의 승리·후퇴·패배 결과를 한 번만 인계한다.", "startStateCodes": ["EncounterPending", "CombatActive"], "completionStateCodes": ["EncounterResolved", "BattleHandoffRequested", "PlayerRetreated", "PlayerDefeated"],
       "actorRequirements": ["조우 중인 Nature 생존 플레이어"], "spatialRequirements": ["Traversable", "EncounterDecisionArea", "RetreatRoute"], "resourceRequirements": ["대기 중인 조우", "Fight 또는 Retreat 선택"], "reservationKinds": ["Actor", "EncounterArea", "RetreatRoute"],
-      "previewRule": "조우 대기 상태·선택 코드·대응 공간과 현재 개정을 검사하며 결과를 바꾸지 않는다.", "confirmRule": "Fight 또는 Retreat의 안정 선택 식별자를 확정하고 조우 상태를 한 번만 해결한다.", "taskRule": "Fight는 전투 인계 의도를 만들고 Retreat는 안전 생활핵 복귀 효과를 적용한다.", "effectCodes": ["EncounterResolved", "BattleHandoffRequested", "PlayerRetreated"], "cancellationPolicy": "대응 확정 전에는 선택을 바꿀 수 있고 확정 완료 뒤에는 같은 조우를 재확정하지 않는다.", "blockReasonCodes": ["SimulationNatureEncounterNotPending", "SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
-      "predecessorWiIds": [], "successorWiIds": ["WI-NATURE-04"], "actionCode": "ResolveEncounter", "ruleRevision": "nature-survival.realtime.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureEncounter", "NaturePlayerSpatialState", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests에서 결정적 첫 황혼 조우, 대응 선택, 중복 명령과 Save/Replay 상태를 검증한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-encounter.v1"], "evidence": ["승인된 Nature 생존 탐사 모판에 EncounterDecisionArea와 RetreatRoute를 정의했으며 실제 전투 인계와 H2·H3 플레이 증거는 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["황혼에 조우가 자동 발생하는 것은 상태 전이이며 플레이어가 대응을 고르는 순간만 WI다."]
+      "previewRule": "조우 대기 또는 전투 활성 상태, 선택 코드와 현재 개정을 검사하며 결과를 바꾸지 않는다.", "confirmRule": "Fight는 연결 전투 식별자만 열고 승리·후퇴·패배 결과 인계 또는 직접 Retreat만 조우를 한 번 해결한다.", "taskRule": "전투 활성 동안 Nature 시계를 정지하고 기존 100ms BattleTick 결과만 수용한다.", "effectCodes": ["BattleHandoffRequested", "EncounterVictoryRewarded", "PlayerRetreated", "CarriedMaterialsLost", "EncounterResolved"], "cancellationPolicy": "전투 결과 적용 뒤 같은 조우는 새 명령으로 재확정할 수 없다.", "blockReasonCodes": ["SimulationNatureEncounterNotPending", "SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
+      "predecessorWiIds": ["WI-NATURE-01", "WI-NATURE-13"], "successorWiIds": ["WI-NATURE-04", "WI-NATURE-14", "WI-NATURE-17"], "actionCode": "ResolveEncounter", "ruleRevision": "nature-survival.realtime.r2", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureEncounter", "NaturePlayerSpatialState", "WorldInventory", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests에서 결정적 첫 황혼 조우, 대응 선택, 직접 후퇴 결과 코드, 중복 명령과 Save/Replay 상태를 검증한다."] }, "integration": { "status": "Done", "currentStage": "E7", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-encounter.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-11"], "e6EvidenceRefs": ["world-interaction-delivery-priorities.r5:wi-nature-11:e6", "Assets/Ssalddel/Presentation/World/Nature생존Controller.cs", "Assets/Ssalddel/Presentation/World/전투시점Controller.cs"], "e7EvidenceRefs": ["Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs", "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi01-observed-game-view.png", "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi11-direct-result-game-view.png", "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi11-retreat-result-game-view.png", "artifacts/local/validation/nature-twilight/nature-twilight-wi11-host-parity-current.trx"], "evidence": ["승인된 Nature 생존 탐사 모판에 EncounterDecisionArea와 RetreatRoute를 정의했다.", "실제 nature-home-encounter-defense 경관 Graph의 nature-emergency-retreat Node와 H1·H2·H3 계보에 EncounterArea·RetreatRoute·Actor 용량을 결속했다.", "3인칭 관찰 운영과 1인칭 직접 개입의 선택·대가·피드백·귀환 표현을 분리하고 Unity가 피해·결과·보상을 계산하지 않는 E6 경계를 확인했다.", "canonical SimulationWorldShell에서 실제 O/F 입력으로 ObserverOperation, 실제 O/F/좌클릭 입력으로 DirectAction, 실제 O/R 입력으로 안전 후퇴를 완주해 모든 경로가 Nature 거점 다음 선택으로 돌아왔다.", "두 참여 방식의 동일 명령열을 LocalProcess와 RemoteHost에 적용해 결과, World revision, Battle Replay hash, simulation-save.v23 hash와 Battle Store 포함 슬롯 복원을 일치시켰다.", "전투 생성 실패 뒤 CombatActive 상태의 F 재시도는 Nature Effect를 중복 적용하지 않고 기존 전투 권위 인계만 다시 요청한다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["황혼에 조우가 자동 발생하는 것은 상태 전이이며 플레이어가 대응을 고르는 순간만 WI다.", "WI-NATURE-11의 Retreat는 황혼 조우 해결이며, WI-NATURE-02 EmergencyRetreat는 지역 사건 압력을 유지한 파티·경로 예약 이동이므로 별도 책임이다.", "WorldLocal Nature 전투는 별도 DerivedBattlefield 문맥을 섞지 않아 LocalProcess와 RemoteHost가 같은 canonical hash를 만든다."]
     },
     {
-      "id": "WI-NATURE-12", "groupCode": "NATURE", "sequence": 12, "title": "진행 작업 취소", "kind": "Command",
+      "id": "WI-NATURE-12", "groupCode": "NATURE", "sequence": 12, "title": "진행 중 작업 취소", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
       "worldAction": "플레이어가 진행 중인 벌목 또는 오두막 건설을 취소하고 점유와 예약 자원을 안전하게 반환한다.", "startStateCodes": ["WorkActive"], "completionStateCodes": ["WorkCancelled", "SafeChoiceAvailable"],
       "actorRequirements": ["진행 작업을 소유한 Nature 생존 플레이어"], "spatialRequirements": ["ActiveWorkReservationContext"], "resourceRequirements": ["진행 중인 Nature 작업"], "reservationKinds": ["Actor", "WorkArea", "ResourceNode", "BuildingSite", "Material"],
       "previewRule": "진행 중 작업과 대상 일치, 현재 개정 및 원래 작업의 공간 문맥을 검사하며 상태를 바꾸지 않는다.", "confirmRule": "원래 작업을 취소 상태로 닫고 점유를 해제하며 건설 예약 통나무를 인벤토리로 반환한다.", "taskRule": "즉시 취소 효과를 적용하고 원래 WI 발현 기록과 취소 WI 기록을 같은 개정 전이에 결속한다.", "effectCodes": ["WorkCancelled", "SpatialReservationReleased", "ReservedMaterialReturned"], "cancellationPolicy": "취소 명령 자체는 멱등하며 새 작업은 별도 Preview와 Confirm으로 다시 시작한다.", "blockReasonCodes": ["SimulationNatureActiveWorkRequired", "SimulationNatureSurvivalActionBlocked", "SimulationExpectedRevisionMismatch"],
@@ -388,7 +479,145 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationNatureSurvivalTests와 LocalSimulationRuntimeTests에서 벌목 취소, 건설 예약 통나무 반환, 원 WI·취소 WI 발현 및 V15 Save/Replay hash를 검증한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1", "wi-spatial-seedbed:nature-survival-encounter.v1"], "evidence": ["취소는 새 H1을 만들지 않고 진행 작업이 이미 결속한 공간과 예약 문맥을 이어받는다. SimulationWorldShell PlayMode의 C 입력은 통과했고 Hosted와 수동 Game View 증거는 남아 있다."] }, "sourceReferences": ["docs/Architecture/Nature생존생활거점세로조각.md", "docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": ["작업 입력을 잠시 놓는 것은 일시 정지이며, 명시적으로 예약을 반환하는 선택만 독립 WI다."]
     },
     {
-      "id": "WI-WORLD-01", "groupCode": "WORLD", "sequence": 1, "title": "NPC 작업 배정", "kind": "SharedPolicy",
+      "id": "WI-NATURE-13", "groupCode": "NATURE", "sequence": 13, "title": "획득 자원 거점 보관", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 완성된 오두막 보관함과 상호작용해 소지 통나무 중 가능한 수량을 직접 보관한다.", "startStateCodes": ["CabinOperational", "PlayerInsideCabin", "TimberCarried"], "completionStateCodes": ["TimberStored"],
+      "actorRequirements": ["오두막에 접근한 Nature 생존 플레이어"], "spatialRequirements": ["ShelterInterior", "StorageInteractionAnchor"], "resourceRequirements": ["소지 통나무", "남은 보관 용량"], "reservationKinds": ["ContainerCapacity", "Material"],
+      "previewRule": "오두막 완공·접근·소지량·용량과 현재 개정을 검사하고 가능한 이동량만 계산한다.", "confirmRule": "Confirm에서만 소지 통나무를 오두막 Container로 옮기고 입고 Transfer를 남긴다.", "taskRule": "첫 구현은 가능한 수량 모두를 즉시 옮긴다.", "effectCodes": ["TimberStored", "CabinStorageTransferRecorded"], "cancellationPolicy": "확정 전에는 무변경이며 확정된 입고는 별도 인출 WI 전까지 유지한다.", "blockReasonCodes": ["SimulationNatureCabinRequired", "SimulationNatureCabinAccessRequired", "SimulationNatureCabinStorageFull", "SimulationNatureTimberNotCarried", "SimulationExpectedRevisionMismatch"],
+      "predecessorWiIds": ["WI-NATURE-08", "WI-NATURE-09"], "successorWiIds": ["WI-NATURE-11", "WI-NATURE-14", "WI-NATURE-17"], "actionCode": "StoreAtCabin", "ruleRevision": "nature-survival.realtime.r2", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "WorldInventory", "NatureCabin", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Preview 무변경, 가능한 수량 전체 입고, 중복 Command 멱등성과 기존 WorldInventory Container·Transfer를 집중 시험한다."] }, "integration": { "status": "Done", "currentStage": "E7", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-13"], "e6EvidenceRefs": ["world-interaction-delivery-priorities.r7:wi-nature-13:e6"], "e7EvidenceRefs": ["evidence:nature-night-day2-wi13-playmode-20260826", "evidence:nature-night-day2-wi13-hosted-parity-20260826"], "evidence": ["오두막 H1에 ShelterStorage·StorageInteractionAnchor와 ContainerCapacity·Material을 추가하고 실제 nature-home-encounter-defense Graph의 nature-shelter Node에 결정적 Actual E5 결속을 생성했다.", "보관 가능한 수량·용량·입고 결과·다음 수면 선택을 표시하되 Unity가 이동량·용량·Transfer를 계산하지 않는 E6 경계를 고정했다.", "canonical SimulationWorldShell에서 실제 G 입력으로 소지 통나무 2개를 오두막에 보관하고 Game View와 Console 오류 0건을 확인했다. 동일 r2 명령열의 LocalProcess·RemoteHost 최종 revision, simulation-save.v23 Replay hash, Container·Transfer와 Local slot 복원이 일치했다."] }, "sourceReferences": ["docs/Architecture/Nature생존생활거점세로조각.md"], "notes": []
+    },
+    {
+      "id": "WI-NATURE-14", "groupCode": "NATURE", "sequence": 14, "title": "오두막에서 수면·새벽 맞기", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 전투가 끝난 밤에 완성된 오두막 안에서 수면을 선택한다.", "startStateCodes": ["Night", "PlayerInsideCabin", "EncounterResolved"], "completionStateCodes": ["Sleeping", "DawnReached"],
+      "actorRequirements": ["오두막 내부의 Nature 생존 플레이어"], "spatialRequirements": ["ShelterInterior", "SleepInteractionAnchor"], "resourceRequirements": ["완성된 오두막"], "reservationKinds": ["ShelterOccupancy"],
+      "previewRule": "밤·오두막 내부·전투 종료·현재 개정을 검사한다.", "confirmRule": "수면 상태를 확정하고 이후 실시간 진행만 밤 구간에서 6배로 계산한다.", "taskRule": "새벽 1110초에 자동 해제하며 WorldTick 의미를 바꾸지 않는다.", "effectCodes": ["SleepStarted", "DawnReached", "SleepReleased"], "cancellationPolicy": "첫 구현은 새벽 자동 해제만 허용한다.", "blockReasonCodes": ["SimulationNatureCabinRequired", "SimulationNatureCabinAccessRequired", "SimulationNatureNightRequired", "SimulationNatureSurvivalActionBlocked"],
+      "predecessorWiIds": ["WI-NATURE-11", "WI-NATURE-13"], "successorWiIds": ["WI-NATURE-15"], "actionCode": "SleepInCabin", "ruleRevision": "nature-survival.realtime.r2", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureClock", "NatureCabin", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/clock/advance"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["밤 6배 진행, 새벽 자동 해제와 v17 재생을 집중 시험한다."] }, "integration": { "status": "InProgress", "currentStage": "E5", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-14"], "e6EvidenceRefs": ["world-interaction-delivery-priorities.r9:wi-nature-14:e6", "world-interaction-delivery-priorities.r20:wi-nature-14:sky-engine-e6"], "e7EvidenceRefs": ["evidence:nature-night-day2-wi14-playmode-20260826", "evidence:nature-night-day2-wi14-hosted-parity-20260826"], "evidence": ["오두막 H1에 ShelterSleep·SleepInteractionAnchor와 ShelterOccupancy를 추가하고 실제 nature-home-encounter-defense Graph의 nature-shelter Node에 결정적 Actual E5 결속을 생성했다.", "수면 가능 조건·밤 6배 진행·새벽 자동 기상·다음 계획 선택 피드백을 정제하고 Unity가 시간 배율과 기상을 판정하지 않는 E6 경계를 고정했다.", "기존 E7 증거는 보존하지만 world-atmosphere.r1과 simulation-save.v25가 추가돼 맑음·비·뇌우·실내 차폐·새벽 Clear의 실제 Play Mode·Game View를 다시 검증할 때까지 표현 E6을 다시 열었다."] }, "sourceReferences": ["docs/Architecture/Nature생존생활거점세로조각.md", "docs/Architecture/SkyEngine세계대기표현계층.md"], "notes": []
+    },
+    {
+      "id": "WI-NATURE-15", "groupCode": "NATURE", "sequence": 15, "title": "다음 날 거점 확장 계획 선택", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 새벽에 작업대·보관대·방책 중 다음 날 목표 하나를 선택한다.", "startStateCodes": ["Dawn", "PlanUnselected"], "completionStateCodes": ["Day2Ready", "ExpansionPlanSelected"],
+      "actorRequirements": ["첫날을 마친 Nature 생존 플레이어"], "spatialRequirements": ["ShelterInterior"], "resourceRequirements": ["계획 비용 표시용 소지·보관 자원"], "reservationKinds": [],
+      "previewRule": "새벽·미선택 상태·안정 계획 코드를 검사하고 부족 재료는 차단 대신 목표로 표시한다.", "confirmRule": "계획 코드와 Day2Ready만 고정하며 비용이나 향후 효과를 즉시 적용하지 않는다.", "taskRule": "다음 날 구현에서 계획 비용과 효과를 별도 WI로 실행한다.", "effectCodes": ["ExpansionPlanSelected", "Day2Ready"], "cancellationPolicy": "첫날 저장 기준선에서는 선택을 고정하며 변경은 다음 날 별도 규칙으로 다룬다.", "blockReasonCodes": ["SimulationNatureExpansionPlanInvalid", "SimulationNatureExpansionPlanAlreadySelected", "SimulationNatureSurvivalActionBlocked"],
+      "predecessorWiIds": ["WI-NATURE-14"], "successorWiIds": ["WI-CON-01"], "returnContractCodes": ["Day2Ready"], "actionCode": "SelectExpansionPlan", "ruleRevision": "nature-survival.realtime.r2", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "ExpansionPlan", "Day2Ready", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["계획 고정, Day2Ready와 simulation-save.v17 canonical hash 재생을 집중 시험한다."] }, "integration": { "status": "Done", "currentStage": "E7", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-15"], "e6RefinementRefs": ["world-interaction-delivery-priorities.r12:wi-nature-15:e6"], "e7EvidenceRefs": ["evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-night-day2-wi15-hosted-parity-20260826"], "evidence": ["오두막 H1에 DawnPlanChoice·DawnPlanChoiceAnchor를 추가하고 실제 nature-home-encounter-defense Graph의 nature-shelter Node에 결정적 Actual E5 결속을 생성했다.", "canonical SimulationWorldShell에서 실제 숫자 1 입력으로 Workbench 계획을 고정하고 Day2Ready Game View·Console 0 오류를 확인했다.", "LocalProcess와 RemoteHost가 계획 선택, 최종 revision, simulation-save.v23 Replay hash와 복원 상태를 동일하게 만들었고 생활 거점 동등성 회귀 4/4가 통과했다."] }, "sourceReferences": ["docs/Architecture/Nature생존생활거점세로조각.md"], "notes": ["재료가 부족해도 계획 선택은 허용하며 부족량은 다음 날 목표다."]
+    },
+    {
+      "id": "WI-NATURE-16", "groupCode": "NATURE", "sequence": 16, "title": "현장 보급 꾸러미 제작", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 운영 중인 Nature 작업대에서 거점의 통나무와 소지 재건 부품을 조립해 다음 현장 원정용 보급 꾸러미를 만든다.", "startStateCodes": ["Day2Ready", "NatureWorkbenchOperational", "PlayerInsideCabin"], "completionStateCodes": ["NatureFieldSupplyPackAdded", "FieldExpeditionChoiceAvailable"],
+      "actorRequirements": ["Nature 생활 거점의 플레이어"], "spatialRequirements": ["ShelterInterior", "CraftingWorkArea", "ActiveWorkReservationContext"], "resourceRequirements": ["소지 또는 보관 통나무 2", "소지 재건 부품 1", "운영 중인 Nature 작업대"], "reservationKinds": ["Actor", "CraftingWorkArea", "Material"],
+      "previewRule": "r4 세션, 작업대 운영, 오두막 H1 접근, 재료, 진행 작업과 현재 개정을 검사하며 상태를 바꾸지 않는다.", "confirmRule": "통나무 2와 재건 부품 1을 예약·소비하고 4초 권위 제작 작업을 만든다.", "taskRule": "입력 유지 4초 뒤 현장 보급 꾸러미 1개를 지급하며 취소하면 이 제작 작업의 예약 재료만 반환한다.", "effectCodes": ["NatureFieldSupplyPackAdded", "ExpeditionPrepared", "OneCarriedMaterialStackProtected"], "cancellationPolicy": "완료 전 WI-NATURE-12가 예약 재료를 반환하고 완료된 꾸러미는 다음 WI-NATURE-06에서 선택·소비한다.", "blockReasonCodes": ["SimulationNatureWorkbenchRequired", "SimulationNatureCabinAccessRequired", "SimulationNatureFieldSupplyTimberInsufficient", "SimulationNatureFieldSupplyRebuildPartInsufficient", "SimulationNatureSurvivalActionBlocked"],
+      "predecessorWiIds": [], "successorWiIds": [], "returnContractCodes": ["FieldExpeditionChoiceAvailable"], "actionCode": "PrepareFieldSupply", "ruleRevision": "nature-survival.realtime.r4", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureActiveWork", "WorldInventory", "ExpeditionPrepared", "simulation-save.v20"], "httpContracts": ["GET /api/simulation/v1/sessions/{sessionStableId}/nature-survival/player-opportunities", "GET /api/simulation/v1/sessions/{sessionStableId}/nature-survival/area-needs", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationAreaBuildingProgressionTests.cs", "Ssalddel.Simulation.Tests/LocalSimulationRuntimeTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["작업대 차단, Preview 무변경, 멱등 Confirm, 취소 반환, 4초 완료, 다음 원정 선택, 패배 시 한 소지 재료 스택 보호와 simulation-save.v20 재생을 집중 시험한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "evidence": ["작업대·오두막 H1 제작 문맥을 모판에 결속했으며 실제 Unity 작업대 입력과 화면 피드백은 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/플레이폐루프와증거묶음개발체계.md"], "notes": ["보급 꾸러미 없이도 기본 원정·귀환은 계속 가능하다.", "첫 구현의 보호 단위는 별도 Lot 원장이 없는 현재 인벤토리에서 결정적으로 정렬한 소지 재료 스택 하나다."]
+    },
+    {
+      "id": "WI-NATURE-17", "groupCode": "NATURE", "sequence": 17, "title": "현장 보급 제작 업무 위임", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "NpcRoutine",
+      "worldAction": "플레이어가 원정 보급 우선 정책을 활성화하면 적격 Nature 거점 NPC가 작업대와 재료를 예약해 다음 현장 원정용 보급 꾸러미를 만든다.", "startStateCodes": ["Day2Ready", "NatureWorkbenchOperational", "NpcFieldSupplyPolicyEnabled"], "completionStateCodes": ["NatureFieldSupplyPackAdded", "FieldExpeditionChoiceAvailable"],
+      "actorRequirements": ["현장보급제작 역량을 가진 Nature 거점 NPC"], "spatialRequirements": ["CraftingWorkArea", "ActiveWorkReservationContext"], "resourceRequirements": ["소지 또는 보관 통나무 2", "소지 재건 부품 1", "운영 중인 Nature 작업대", "활성 NPC 정책"], "reservationKinds": ["Actor", "CraftingWorkArea", "Material"],
+      "previewRule": "r4 세션과 npc-routine-control.r3, 작업대·재료·정책·담당 NPC·진행 작업·현재 재고 목표를 읽고 차단 이유만 반환한다.", "confirmRule": "플레이어가 작업 완료 명령을 보내지 않으며 정책 활성 뒤 Nature 권위 시계가 적격 NPC를 결정적으로 선택하고 재료를 한 번 예약한다.", "taskRule": "NPC 작업은 입력 유지 없이 Nature 권위 시계 4초 동안 진행하고 꾸러미 한 개가 있으면 추가 제작하지 않는다.", "effectCodes": ["NpcFieldSupplyPolicySelected", "NatureFieldSupplyPackAdded", "FieldExpeditionChoiceAvailable"], "cancellationPolicy": "완료 전 WI-NATURE-12가 이 작업의 예약 재료만 반환하며 정책 중지는 새 작업만 막고 진행 작업을 암묵적으로 취소하지 않는다.", "blockReasonCodes": ["SimulationNpcRoutineNatureRevisionRequired", "SimulationNpcRoutinePolicyMissing", "SimulationNpcAutomationDisabled", "SimulationNpcAutoDelegationDisabled", "SimulationNpcEligibleActorMissing", "SimulationNatureWorkbenchRequired", "SimulationNatureFieldSupplyTimberInsufficient", "SimulationNatureFieldSupplyRebuildPartInsufficient", "SimulationNatureFieldSupplyAlreadyAvailable", "SimulationNatureSurvivalActionBlocked"],
+      "predecessorWiIds": ["WI-NATURE-11", "WI-NATURE-13"], "successorWiIds": ["WI-NATURE-06"], "returnContractCodes": ["FieldExpeditionChoiceAvailable"], "actionCode": "PrepareFieldSupplyDelegated", "ruleRevision": "npc-routine-control.r3", "saveReplayPayloadCodes": ["NpcWorkPolicy", "NpcTaskAssignment", "NpcRoutineExecution", "NpcWorkRecord", "NatureActiveWork", "WorldInventory", "simulation-save.v21"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/npc-policies", "GET /api/simulation/v1/sessions/{sessionStableId}/npc-routine-work?areaCode=Nature", "GET /api/simulation/v1/sessions/{sessionStableId}/nature-survival/player-opportunities", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/clock"], "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNaturePlayFlowCycle.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNpcRoutineWork.cs", "Ssalddel.Simulation.Tests/SimulationNaturePlayFlowCycleTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["정책·담당자·재료 차단, 결정적 예약, 입력 없는 4초 완료, 직접 제작 경합, 취소 반환과 simulation-save.v21 재생을 집중 시험한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "evidence": ["WI-NATURE-16과 같은 작업대 H1 문맥을 재사용하며 실제 NPC 이동·작업 표현과 Game View는 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/NPC루틴WI통제정책.md"], "notes": ["플레이 흐름은 수렴이고 실행 발생원은 NpcDriven이다.", "직접 제작과 기본 원정은 정책 상태와 무관하게 유지한다.", "발산·수렴 분류는 타로 방향과 배율을 바꾸지 않는다."]
+    },
+    {
+      "id": "WI-NATURE-18", "groupCode": "NATURE", "sequence": 18, "title": "벌목 통나무 줍기", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 벌목으로 지면에 생성된 통나무 묶음을 선택해 소지 인벤토리로 옮긴다.", "startStateCodes": ["DroppedTimberAvailable", "InventoryCapacityAvailable"], "completionStateCodes": ["DroppedTimberCollected", "TimberCarried"],
+      "actorRequirements": ["Nature 생존 플레이어"], "spatialRequirements": ["WorkerAccessible", "DroppedTimberPickupAnchor"], "resourceRequirements": ["수집 가능한 지면 통나무 묶음", "묶음 전체를 담을 인벤토리 여유"], "reservationKinds": ["Actor", "DroppedTimber"],
+      "previewRule": "r5 세션, 지면 통나무 존재·가용 상태, 현재 개정과 인벤토리 잔여 용량을 검사하며 상태를 바꾸지 않는다.", "confirmRule": "대상 통나무 묶음을 한 번 Collected로 전이하고 동일 수량을 플레이어 인벤토리에 원자적으로 더한다.", "taskRule": "즉시 상태 전이하며 벌목 Task나 월드 시계를 대신 진행하지 않는다.", "effectCodes": ["TimberCollected", "DroppedTimberRemoved"], "cancellationPolicy": "Confirm 전에는 상태가 변하지 않으며 Confirm 뒤 동일 묶음은 다시 획득할 수 없다.", "blockReasonCodes": ["SimulationNatureDroppedTimberNotFound", "SimulationNatureDroppedTimberUnavailable", "SimulationWorldInventoryPlayerCapacityExceeded", "SimulationExpectedRevisionMismatch"],
+      "predecessorWiIds": ["WI-NATURE-06"], "successorWiIds": ["WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-13"], "actionCode": "CollectDroppedTimber", "ruleRevision": "nature-survival.realtime.r5", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "NatureDroppedTimber", "WorldInventory", "WorldRevision", "simulation-save.v24"], "httpContracts": ["GET /api/simulation/v1/sessions/{sessionStableId}/nature-survival/player-opportunities", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["r5 벌목 결과와 별도 획득 상태 전이, 용량 차단, 멱등 Confirm, v24 Save/Replay 및 LocalProcess·RemoteHost 동등성 시험 45개가 통과했다."] }, "integration": { "status": "Done", "currentStage": "E7", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-encounter.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-18"], "e6EvidenceRefs": ["evidence:nature-dual-loop-game-view-20260826"], "e7EvidenceRefs": ["evidence:nature-r5-logic-20260826", "evidence:nature-dual-loop-game-view-20260826"], "evidence": ["승인 Actual E5 PickupAnchor에서 지면 통나무 생성·획득·v24 재생 hash와 LocalProcess·RemoteHost 동등성을 검증했다.", "canonical SimulationWorldShell에서 Synty 통나무 세 묶음을 지면에 표시하고 실제 왼쪽 버튼으로 각각 주워 수량 6과 다음 선택 상태로 돌아오는 PlayMode·Game View를 검증했다."] }, "sourceReferences": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/플레이폐루프와증거묶음개발체계.md", "docs/Architecture/플레이폐루프논리시각이중순환체계.md"], "notes": ["벌목 시작과 지면 통나무 획득을 단일 책임 WI로 분리한다.", "r1~r4는 기존 즉시 인벤토리 지급을 유지하고 r5부터 별도 수집을 요구한다."]
+    },
+    {
+      "id": "WI-REFLECT-01", "groupCode": "REFLECT", "sequence": 1, "title": "승인 자료로 거점 성찰 확정", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 거점 귀환 뒤 그냥 휴식하거나 세션 시작 때 동결된 승인 자료를 골라 오늘 행동을 성찰하고 다음 활동에 적용할 내면 학습 하나를 확정한다.",
+      "startStateCodes": ["ReturnedToBase", "NatureSafeChoiceAvailable", "ReflectionChoiceAvailable"],
+      "completionStateCodes": ["InnerLearningPending"],
+      "actorRequirements": ["Nature 거점에 귀환한 플레이어"],
+      "spatialRequirements": ["ReflectionInteractionAnchor", "ShelterInterior"],
+      "resourceRequirements": ["선택적인 승인 학습 Publication", "해당 일차의 미사용 성찰 기회"],
+      "reservationKinds": ["DailyReflectionOpportunity", "PublicationRevisionGrant"],
+      "previewRule": "현재 개정, 플레이어, 일차, 승인 Publication stable ID·revision·hash, 하루 한 번과 캐릭터별 revision 한 번 지급을 검사하고 다음 활동 효과만 보여준다.",
+      "confirmRule": "CommandId·ExpectedRevision과 Preview stable ID를 검증하고 영상 시청 정보 없이 InnerLearningPending 지급 계보를 한 번 만든다.",
+      "taskRule": "다음 활동 경계에서 허용된 Awareness+1/BeginnerMind 또는 Resolve+1/IntegratedProgress만 영구 적용하고 다음 발산 선택으로 돌아간다.",
+      "effectCodes": ["InnerLearningPending"],
+      "cancellationPolicy": "Confirm 전에는 상태를 바꾸지 않으며 Confirm 뒤 지급 계보를 제자리 수정하지 않고 후속 보정 명령을 사용한다.",
+      "blockReasonCodes": ["SimulationApprovedLearningMaterialUnavailable", "SimulationReflectionDailyLimitReached", "SimulationReflectionPublicationAlreadyGranted", "SimulationReflectionPreviewMismatch", "SimulationExpectedRevisionMismatch"],
+      "predecessorWiIds": ["WI-NATURE-11", "WI-NATURE-16"],
+      "successorWiIds": ["WI-NATURE-06"],
+      "returnContractCodes": ["FieldExpeditionChoiceAvailable", "NatureSafeChoiceAvailable"],
+      "actionCode": "ConfirmBaseReflection", "ruleRevision": "base-reflection.r1",
+      "saveReplayPayloadCodes": ["ApprovedLearningLedgerRevision", "BaseReflectionStateHash", "InnerLearningGrant"],
+      "httpContracts": ["GET /api/simulation/v1/sessions/{sessionStableId}/base-reflection", "POST /api/simulation/v1/sessions/{sessionStableId}/base-reflection/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/base-reflection/commands"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationBaseReflectionContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationBaseReflection.cs", "Ssalddel.Simulation.Tests/SimulationBaseReflectionTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["승인 Publication hash·멱등 동기화, 하루/revision 제한, 원문 열기 무보상, 다음 활동 적용, 상태 hash 복원·변조 거부와 동일 입력 계산을 집중 시험한다."] },
+      "integration": { "status": "NotSelected", "currentStage": "E3", "targetStage": "E7", "evidence": ["H1·Application Adapter·주 세션 저장·SimulationWorldShell 실제 입력은 후속 E4~E7 범위다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/nature-base-reflection.v1.md", "docs/Architecture/플레이어중심게임개발업무구조.md"],
+      "notes": ["플레이 흐름은 수렴(陰), 실행 주체는 플레이어이므로 -+다.", "보상은 게임 안 성찰 선택에만 귀속하며 YouTube 재생·시청 시간은 읽지 않는다.", "기존 Unity 저녁학당 형식은 삭제하지 않고 approved-learning-material.v1 호환 Adapter 대상으로 남긴다."]
+    },
+    {
+      "id": "WI-CARD-01", "groupCode": "CARD", "sequence": 1, "title": "현재 세계의 메이저 아르카나 활성화", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 메이저 아르카나를 선택하면 Simulation이 활성화 시점의 권위 세계 상태로 이번 활성화의 정·역방향을 한 번 판정하고 하위 카드 영향 상태 사본을 만든다.", "startStateCodes": ["MajorArcanaChoiceAvailable"], "completionStateCodes": ["MajorArcanaActivationFrozen", "TownLifeChoiceAvailable"],
+      "actorRequirements": ["메이저 아르카나 선택 권한 플레이어"], "spatialRequirements": [], "resourceRequirements": ["승인된 메이저 아르카나", "Town 회복비중 상태 사본"], "reservationKinds": ["MajorArcanaActivation"],
+      "previewRule": "카드 고유 식별자, 현재 개정, 회복비중과 활성화 중복을 검사하고 방향 후보와 근거만 반환한다.", "confirmRule": "새 MajorArcanaActivationStableId를 만들고 고정 정밀도 51% 규칙으로 방향·근거·정책 revision을 동결한다.", "taskRule": "활성화 수명 동안 방향을 다시 계산하지 않고 승인된 하위 카드 영향에 한 번만 전개한다.", "effectCodes": ["MajorArcanaActivated", "ArcanaOrientationFrozen", "ArcanaInfluenceSnapshotsCreated"], "cancellationPolicy": "해제·교체는 기존 활성화를 종료하고 다음 활성화에서 새 방향을 판정하며 과거 계보는 수정하지 않는다.", "blockReasonCodes": ["SimulationMajorArcanaInvalid", "SimulationMajorArcanaActivationRevisionConflict", "SimulationMajorArcanaRecoveryEvidenceInvalid"],
+      "predecessorWiIds": [], "successorWiIds": [], "returnContractCodes": ["TownLifeChoiceAvailable"], "actionCode": "ActivateMajorArcana", "ruleRevision": "arcana-town-life.r1", "saveReplayPayloadCodes": ["MajorArcanaActivation", "OrientationDecisionEvidence", "InheritanceSnapshots", "MultiplierBreakdown", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/turn-closing/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/turn-closing/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationArcanaTownLife.cs", "Ssalddel.Simulation.Tests/SimulationArcanaTownNpcLifeTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["활성화별 방향 가변성, 활성 중 불변성, 단일 전개, 고정 정밀도와 simulation-save.v16 복원을 집중 시험한다."] }, "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "evidence": ["Town NPC 주문·소비 문맥 결속은 구현됐지만 전체 E5 생활복구 폐루프와 Unity 실제 입력은 남아 있다."] }, "sourceReferences": ["docs/Architecture/게임기획통합기준.md", "docs/Architecture/플레이폐루프완결로드맵.md"], "notes": ["WI-WORLD-06 역할 카드 장착과 다른 메이저 아르카나 전용 WI다."]
+    },
+    {
+      "id": "WI-CON-01", "groupCode": "CON", "sequence": 1, "title": "영역 건물 건설 확정", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 영역 청사진을 선택하고 재료·시간·배치 조건을 통과해 H1 건물을 운영 상태로 만든다.", "startStateCodes": ["Available"], "completionStateCodes": ["Building", "Operational"],
+      "actorRequirements": ["해당 영역 건설 권한 플레이어"], "spatialRequirements": ["AreaBuildingPlacementAllowed", "FootprintAvailable"], "resourceRequirements": ["청사진별 재료", "권위 작업 시간"], "reservationKinds": ["Material", "BuildingFootprint", "Actor"],
+      "previewRule": "청사진 revision/hash, 선행 건물, 비용, 배치 반경과 발자국 겹침을 검사하고 상태를 바꾸지 않는다.", "confirmRule": "CommandId·ExpectedRevision으로 재료와 발자국을 예약하고 Building 상태를 만든다.", "taskRule": "권위 시간이 끝나면 Operational로 전이하고 취소 시 이 작업의 예약만 반환한다.", "effectCodes": ["AreaBuildingOperational"], "cancellationPolicy": "완료 전 WI-NATURE-12 또는 공통 작업 취소가 재료·발자국 예약을 반환한다.", "blockReasonCodes": ["SimulationAreaBuildingBlueprintLocked", "SimulationAreaBuildingTimberInsufficient", "SimulationAreaBuildingPlacementOutsideHome", "SimulationAreaBuildingPlacementOverlap"],
+      "predecessorWiIds": ["WI-NATURE-15"], "successorWiIds": [], "returnContractCodes": ["AreaBuildingChoiceAvailable"], "actionCode": "BeginBuildingConstruction", "ruleRevision": "area-building-tech-tree.r1", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "AreaBuildingProgression", "LearningVisit", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands", "GET /api/simulation/v1/sessions/{sessionStableId}/nature-survival/building-progression/{areaCode}"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationAreaBuildingProgression.cs", "Ssalddel.Simulation.Tests/SimulationAreaBuildingProgressionTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Nature 작업대→배움터→학습 방문과 simulation-save.v19 재생, 취소 반환 시험이 통과했다."] }, "integration": { "status": "Done", "currentStage": "E7", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-con-01"], "e6RefinementRefs": ["world-interaction-delivery-priorities.r14:wi-con-01:e6"], "e7EvidenceRefs": ["evidence:nature-workbench-wi-con-01-playmode-20260826", "evidence:nature-workbench-wi-con-01-hosted-parity-20260826"], "evidence": ["Nature r3 결정적 Fixture에서 비용·배치·완료·반환이 발현됐다.", "작업대 Preview 비용·취소 반환·Operational 제작 선택 귀환을 플레이어 관점으로 정제했다.", "canonical SimulationWorldShell 실제 입력과 Game View·Console, LocalProcess·RemoteHost simulation-save.v23 Replay hash 동등성으로 E7을 닫았다."] }, "sourceReferences": ["docs/Architecture/영역별건물발전테크트리계획.md"], "notes": ["현재 실제 건설 상태 전이는 Nature만 지원하고 다른 영역은 정의 카탈로그다."]
+    },
+    {
+      "id": "WI-CITY-01", "groupCode": "CITY", "sequence": 1, "title": "도심 서비스 수요 확정", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
+      "worldAction": "플레이어가 City 내부 수요 Fixture에서 이번 처리 대상을 확정한다.", "startStateCodes": ["CityDemandChoiceAvailable"], "completionStateCodes": ["CityDemandConfirmed"],
+      "actorRequirements": ["City 운영 플레이어"], "spatialRequirements": ["UrbanDemandArea"], "resourceRequirements": ["City 독립 수요 Fixture"], "reservationKinds": ["DemandSlot"],
+      "previewRule": "수요·지역 재고·현재 개정을 검사한다.", "confirmRule": "StableId와 ExpectedRevision으로 수요를 확정한다.", "taskRule": "확정된 수요를 지역 재고 배정으로 인계한다.", "effectCodes": ["CityDemandConfirmed"], "cancellationPolicy": "배정 전 수요 슬롯을 반환한다.", "blockReasonCodes": ["SimulationCityDemandUnavailable"],
+      "predecessorWiIds": [], "successorWiIds": ["WI-CITY-02"], "actionCode": "CityDemandConfirm", "ruleRevision": "city-independent-service.r1", "saveReplayPayloadCodes": ["CityOperationCommand"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/city-operations/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/city-operations/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/도심마트수요CompositionModels.cs"],
+      "implementation": { "status": "NotStarted", "currentStage": "E1", "targetStage": "E3", "evidence": ["기존 도심마트 수요 Fixture를 권위 명령으로 감싸는 구현이 필요하다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["독립 City E5 세로 조각이 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이폐루프완결로드맵.md"], "notes": []
+    },
+    {
+      "id": "WI-CITY-02", "groupCode": "CITY", "sequence": 2, "title": "도심 서비스용 지역 재고 배정", "kind": "AutomaticTransition",
+      "originCode": "OperationsDerived", "controlPolicyCode": "WorldAutomatic",
+      "worldAction": "확정 수요에 City 독립 재고를 결정적으로 배정한다.", "startStateCodes": ["CityDemandConfirmed"], "completionStateCodes": ["CityInventoryAllocated", "CityInventoryShortage"],
+      "actorRequirements": ["Simulation Core"], "spatialRequirements": ["UrbanSortingArea"], "resourceRequirements": ["City 지역 재고"], "reservationKinds": ["Inventory"],
+      "previewRule": "확정 수요와 지역 재고를 읽는다.", "confirmRule": "WI-CITY-01 계보 안에서만 실행한다.", "taskRule": "StableId 정렬과 재고량으로 배정·부족을 확정한다.", "effectCodes": ["CityInventoryAllocated", "CityInventoryShortage"], "cancellationPolicy": "후속 처리 전 예약 재고를 반환한다.", "blockReasonCodes": ["SimulationCityInventoryUnavailable"],
+      "predecessorWiIds": ["WI-CITY-01"], "successorWiIds": ["WI-CITY-03"], "actionCode": "CityInventoryAllocationTransition", "ruleRevision": "city-independent-service.r1", "saveReplayPayloadCodes": ["CityOperationState"], "httpContracts": ["독립 경로 없음"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/도심마트공급경영SimulationEngine.cs"],
+      "automaticTransition": { "triggerWiId": "WI-CITY-01", "triggerState": "CityDemandConfirmed", "targetState": "CityInventoryAllocatedOrShortage", "causeLineage": "WI-CITY-01 수요 확정 계보와 결정적 지역 재고 판정" },
+      "implementation": { "status": "NotStarted", "currentStage": "E1", "targetStage": "E3", "evidence": ["기존 도심마트 재고 보존식과 결정적 배정 규칙을 재사용한다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["독립 City E5 세로 조각이 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이폐루프완결로드맵.md"], "notes": []
+    },
+    {
+      "id": "WI-CITY-03", "groupCode": "CITY", "sequence": 3, "title": "도심 주민 서비스 처리", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
+      "worldAction": "플레이어가 배정된 재고로 공동수령 또는 매장 서비스를 처리한다.", "startStateCodes": ["CityInventoryAllocated", "CityInventoryShortage"], "completionStateCodes": ["CityServiceCompleted", "CityServiceDeferred"],
+      "actorRequirements": ["City 운영 플레이어"], "spatialRequirements": ["LastMileHandoffArea"], "resourceRequirements": ["배정 재고 또는 부족 복구 선택"], "reservationKinds": ["ServiceSlot"],
+      "previewRule": "배정·부족 상태와 서비스 후보를 검사한다.", "confirmRule": "서비스 또는 부족 복구 선택을 확정한다.", "taskRule": "처리 결과와 미충족 수요를 별도 상태로 남긴다.", "effectCodes": ["CityServiceCompleted", "CityServiceDeferred"], "cancellationPolicy": "서비스 시작 전 예약을 반환한다.", "blockReasonCodes": ["SimulationCityServiceChoiceInvalid"],
+      "predecessorWiIds": ["WI-CITY-02"], "successorWiIds": ["WI-CITY-04"], "actionCode": "CityServiceProcess", "ruleRevision": "city-independent-service.r1", "saveReplayPayloadCodes": ["CityOperationCommand", "CityOperationState"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/city-operations/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/city-operations/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/도심마트공급경영SimulationEngine.cs"],
+      "implementation": { "status": "NotStarted", "currentStage": "E1", "targetStage": "E3", "evidence": ["City 독립 서비스 상태 전이가 필요하다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["독립 City E5 세로 조각이 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이폐루프완결로드맵.md"], "notes": []
+    },
+    {
+      "id": "WI-CITY-04", "groupCode": "CITY", "sequence": 4, "title": "도심 서비스 결과 확인", "kind": "Command",
+      "originCode": "OperationsDerived", "controlPolicyCode": "NpcRoutine",
+      "worldAction": "플레이어가 완료·유예 결과를 확인하고 다음 City 운영 선택으로 돌아간다.", "startStateCodes": ["CityServiceCompleted", "CityServiceDeferred"], "completionStateCodes": ["CityServiceChoiceAvailable"],
+      "actorRequirements": ["City 운영 플레이어"], "spatialRequirements": ["UrbanRecoveryRoute"], "resourceRequirements": [], "reservationKinds": [],
+      "previewRule": "미확인 결과와 현재 개정을 검사한다.", "confirmRule": "결과 확인과 다음 선택 가능 상태를 확정한다.", "taskRule": "즉시 반환 상태로 전이한다.", "effectCodes": ["CityServiceChoiceAvailable"], "cancellationPolicy": "결과 확인은 멱등 처리한다.", "blockReasonCodes": ["SimulationCityServiceResultUnavailable"],
+      "predecessorWiIds": ["WI-CITY-03"], "successorWiIds": [], "returnContractCodes": ["CityServiceChoiceAvailable"], "actionCode": "CityServiceResultAcknowledge", "ruleRevision": "city-independent-service.r1", "saveReplayPayloadCodes": ["CityOperationCommand", "CityOperationState"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/city-operations/commands"], "existingImplementationReferences": [],
+      "implementation": { "status": "NotStarted", "currentStage": "E1", "targetStage": "E3", "evidence": ["City 독립 반환 상태 구현이 필요하다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["독립 City E5 세로 조각이 남아 있다."] }, "sourceReferences": ["docs/Architecture/플레이폐루프완결로드맵.md"], "notes": []
+    },
+    {
+      "id": "WI-WORLD-01", "groupCode": "WORLD", "sequence": 1, "title": "NPC에게 반복 업무 배정", "kind": "SharedPolicy",
+      "originCode": "Hybrid", "controlPolicyCode": "WorldAutomatic",
       "worldAction": "여러 WI가 적격 NPC를 결정적으로 선택하고 배정한다.", "startStateCodes": ["Available"], "completionStateCodes": ["Assigned"],
       "actorRequirements": ["ActionCode별 NPC capability"], "spatialRequirements": [], "resourceRequirements": ["노동 용량"], "reservationKinds": ["Actor", "Labor"],
       "previewRule": "요구 역량·정책·현재 배정을 검사한다.", "confirmRule": "소비 WI의 Confirm 안에서 원자적으로 배정한다.", "taskRule": "독립 업무 Task를 만들지 않는다.", "effectCodes": ["NpcAssigned"], "cancellationPolicy": "소비 Task 취소 계보로 배정을 반환한다.", "blockReasonCodes": ["SimulationNpcCapabilityMissing", "SimulationNpcUnavailable"],
@@ -397,7 +626,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 결정적 배정 정책 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 결정적 배정 정책 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-WORLD-02", "groupCode": "WORLD", "sequence": 2, "title": "NPC 역량 위임", "kind": "Command",
+      "id": "WI-WORLD-02", "groupCode": "WORLD", "sequence": 2, "title": "NPC에게 업무 역량 위임", "kind": "Command",
+      "originCode": "Hybrid", "controlPolicyCode": "NpcRoutine",
       "worldAction": "승인된 주체가 NPC에 특정 업무 역량을 위임한다.", "startStateCodes": ["NotGranted"], "completionStateCodes": ["Granted"],
       "actorRequirements": ["위임 권한 주체"], "spatialRequirements": [], "resourceRequirements": [], "reservationKinds": [],
       "previewRule": "권한·대상·중복 위임을 검사한다.", "confirmRule": "역량 부여 원장을 갱신한다.", "taskRule": "즉시 상태 전이 또는 정책 Task를 따른다.", "effectCodes": ["NpcCapabilityGranted"], "cancellationPolicy": "철회는 별도 명령과 개정 검사를 사용한다.", "blockReasonCodes": ["NpcCapabilityGrantUnauthorized"],
@@ -405,7 +635,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 역량 위임·저장재생 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs의 NPC 역량 위임·저장재생 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-WORLD-03", "groupCode": "WORLD", "sequence": 3, "title": "작업 취소", "kind": "Command",
+      "id": "WI-WORLD-03", "groupCode": "WORLD", "sequence": 3, "title": "진행 중 세계 업무 취소", "kind": "Command",
+      "originCode": "Hybrid", "controlPolicyCode": "PlayerDirect",
       "worldAction": "진행 전 작업의 계보 소유 예약과 임시 상태를 취소한다.", "startStateCodes": ["Scheduled", "Blocked"], "completionStateCodes": ["Cancelled"],
       "actorRequirements": ["취소 권한 주체"], "spatialRequirements": [], "resourceRequirements": [], "reservationKinds": ["LineageOwnedReservations"],
       "previewRule": "현재 Task lifecycle과 취소 가능성을 검사한다.", "confirmRule": "CommandId·ExpectedRevision으로 취소를 확정한다.", "taskRule": "새 업무 Task를 만들지 않고 대상 Task를 취소한다.", "effectCodes": ["TaskCancelled", "ReservationsReleased"], "cancellationPolicy": "취소 명령 자체는 멱등 처리한다.", "blockReasonCodes": ["SimulationTaskCancellationNotAllowed"],
@@ -413,7 +644,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInboundInspectionUiVerticalSliceTests.cs의 작업 취소·예약 반환 HTTP 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInboundInspectionUiVerticalSliceTests.cs의 작업 취소·예약 반환 HTTP 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-WORLD-04", "groupCode": "WORLD", "sequence": 4, "title": "시설 수리", "kind": "Command",
+      "id": "WI-WORLD-04", "groupCode": "WORLD", "sequence": 4, "title": "손상된 시설 수리", "kind": "Command",
+      "originCode": "Hybrid", "controlPolicyCode": "PlayerOrNpc",
       "worldAction": "손상된 시설의 회복 가능한 내구도를 수리한다.", "startStateCodes": ["Damaged"], "completionStateCodes": ["Repaired"],
       "actorRequirements": ["수리 가능 행위자"], "spatialRequirements": ["WorkerAccessible", "RepairWorkArea"], "resourceRequirements": ["수리 자재", "노동"], "reservationKinds": ["WorkArea", "Actor", "Material"],
       "previewRule": "손상·자재·행위자·공간을 검사한다.", "confirmRule": "수리 작업과 자재를 예약한다.", "taskRule": "완료 시 내구도와 회복 가능 손상을 갱신한다.", "effectCodes": ["FacilityRepaired"], "cancellationPolicy": "미사용 자재와 공간을 반환한다.", "blockReasonCodes": ["RepairMaterialInsufficient"],
@@ -421,7 +653,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 시설 수리 공간·자재 예약 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs의 시설 수리 공간·자재 예약 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-WORLD-05", "groupCode": "WORLD", "sequence": 5, "title": "지역 발견", "kind": "Command",
+      "id": "WI-WORLD-05", "groupCode": "WORLD", "sequence": 5, "title": "새로운 지역 발견", "kind": "Command",
+      "originCode": "Hybrid", "controlPolicyCode": "PlayerDirect",
       "worldAction": "행위자가 아직 발견되지 않은 지역을 탐사한다.", "startStateCodes": ["Undiscovered"], "completionStateCodes": ["Discovered"],
       "actorRequirements": ["탐사 가능 행위자"], "spatialRequirements": ["Traversable"], "resourceRequirements": ["탐사 시간"], "reservationKinds": ["Actor"],
       "previewRule": "접근·발견 상태·행위자를 검사한다.", "confirmRule": "탐사 활동을 확정한다.", "taskRule": "완료 효과가 지역 발견 상태를 남긴다.", "effectCodes": ["RegionDiscovered"], "cancellationPolicy": "완료 전 행위자 예약을 반환한다.", "blockReasonCodes": ["RegionNotTraversable"],
@@ -429,7 +662,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationCollectibleCardRewardTests.cs의 지역 발견·저장재생·HTTP 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationCollectibleCardRewardTests.cs의 지역 발견·저장재생·HTTP 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-WORLD-06", "groupCode": "WORLD", "sequence": 6, "title": "역할 카드 장착", "kind": "Command",
+      "id": "WI-WORLD-06", "groupCode": "WORLD", "sequence": 6, "title": "일행 역할 카드 장착", "kind": "Command",
+      "originCode": "Hybrid", "controlPolicyCode": "PlayerDirect",
       "worldAction": "팀 역할 카드를 명시적으로 장착한다.", "startStateCodes": ["Unequipped"], "completionStateCodes": ["Equipped"],
       "actorRequirements": ["팀 역할 관리 권한"], "spatialRequirements": [], "resourceRequirements": ["보유 카드"], "reservationKinds": [],
       "previewRule": "소유·슬롯·중복 상태를 검사한다.", "confirmRule": "ExpectedRevision으로 장착 상태를 확정한다.", "taskRule": "즉시 상태 전이한다.", "effectCodes": ["TeamRoleCardEquipped"], "cancellationPolicy": "해제는 별도 명령으로 처리한다.", "blockReasonCodes": ["TeamRoleCardUnavailable"],
@@ -437,7 +671,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 역할 카드 장착·멱등성·HTTP 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 역할 카드 장착·멱등성·HTTP 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-WORLD-07", "groupCode": "WORLD", "sequence": 7, "title": "활동 시작·종료", "kind": "Command",
+      "id": "WI-WORLD-07", "groupCode": "WORLD", "sequence": 7, "title": "세계 활동 상태 변경", "kind": "Command",
+      "originCode": "Hybrid", "controlPolicyCode": "PlayerDirect",
       "worldAction": "팀 활동을 시작하거나 종료한다.", "startStateCodes": ["Available", "Active"], "completionStateCodes": ["Active", "Completed"],
       "actorRequirements": ["활동 관리 권한"], "spatialRequirements": [], "resourceRequirements": ["활동 조건"], "reservationKinds": ["ActivitySlot"],
       "previewRule": "활동 상태·조건·중복을 검사한다.", "confirmRule": "시작 또는 종료 명령을 확정한다.", "taskRule": "활동 상태를 서버가 소유한다.", "effectCodes": ["TeamActivityStarted", "TeamActivityEnded"], "cancellationPolicy": "활동 규칙에 따른 종료 명령을 사용한다.", "blockReasonCodes": ["TeamActivityStateInvalid"],
@@ -445,7 +680,8 @@
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 활동 시작·종료·저장재생 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationTeamRoleCardTests.cs의 활동 시작·종료·저장재생 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
     },
     {
-      "id": "WI-WORLD-08", "groupCode": "WORLD", "sequence": 8, "title": "턴 마감", "kind": "Command",
+      "id": "WI-WORLD-08", "groupCode": "WORLD", "sequence": 8, "title": "하루 운영 턴 마감", "kind": "Command",
+      "originCode": "Hybrid", "controlPolicyCode": "PlayerDirect",
       "worldAction": "현재 턴의 결정·효과를 마감하고 다음 세계 상태를 연다.", "startStateCodes": ["TurnOpen"], "completionStateCodes": ["TurnClosed"],
       "actorRequirements": ["턴 마감 권한"], "spatialRequirements": [], "resourceRequirements": [], "reservationKinds": [],
       "previewRule": "미해결 필수 작업과 마감 조건을 검사한다.", "confirmRule": "ExpectedRevision으로 턴 마감을 확정한다.", "taskRule": "턴 효과와 후속 상태를 결정적으로 계산한다.", "effectCodes": ["TurnClosed"], "cancellationPolicy": "확정된 턴 마감은 취소하지 않고 후속 보정 명령을 사용한다.", "blockReasonCodes": ["TurnClosingBlocked"],

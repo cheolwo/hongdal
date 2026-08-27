@@ -84,7 +84,7 @@
     "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.farm-hub-town-region.r1",
-  "derivationInputHashSha256": "e337218ca6b5f687e984805423120c024456251837f6851b97dc645b61b3338d",
+  "derivationInputHashSha256": "449acbd0f752dcc48143db611adc6c106d9fe87904b6635db9c922e579c5a91d",
   "authoredDocument": "authored/h4/farm-hub-town-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

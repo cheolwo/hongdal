@@ -51,7 +51,7 @@
     "transition:Nature–Farm 전환"
   ],
   "derivationRecipeCode": "h4.farm-production-processing-region.r1",
-  "derivationInputHashSha256": "111aea7564f07187b6c2ed6ed3b9f836476edc170e01cc762c84f4e721a26d4c",
+  "derivationInputHashSha256": "c6aef946487a006dd10e85089f466dd3941d6fff8d2037f37c29c2cf154d4329",
   "authoredDocument": "authored/h4/farm-production-processing-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

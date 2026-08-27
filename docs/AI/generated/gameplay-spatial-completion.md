@@ -65,14 +65,14 @@
 
 | 기준 플레이 | WI | 구현 | 통합 | E5 직접 배치 | E5 문맥 | E7 플레이 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `reference-play:nature-farm-day.v1` | 수확 (`WI-FARM-04`) | `E3` | `E6` | 2 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 수확물 집하 (`WI-FARM-05`) | `E3` | `E6` | 2 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 출하 준비·포장 (`WI-FARM-06`) | `E3` | `E6` | 2 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 자연권 위협 관찰 (`WI-NATURE-01`) | `E3` | `E5` | 1 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 자연권 긴급 후퇴 (`WI-NATURE-02`) | `E3` | `E5` | 1 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 자연권 복원 (`WI-NATURE-03`) | `E3` | `E5` | 1 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 파티 회복 (`WI-NATURE-04`) | `E3` | `E5` | 1 | 0 | 0 |
-| `reference-play:nature-farm-day.v1` | 지역 발견 (`WI-WORLD-05`) | `E3` | `E5` | 0 | 1 | 0 |
+| `reference-play:nature-farm-day.v1` | 익은 농작물 수확 (`WI-FARM-04`) | `E3` | `E6` | 2 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 수확물 집하장 모으기 (`WI-FARM-05`) | `E3` | `E6` | 2 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 출하 물량 포장 (`WI-FARM-06`) | `E3` | `E6` | 2 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 자연 지역 위험 징후 확인 (`WI-NATURE-01`) | `E3` | `E7` | 2 | 0 | 3 |
+| `reference-play:nature-farm-day.v1` | 안전 거점으로 긴급 후퇴 (`WI-NATURE-02`) | `E3` | `E5` | 1 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 훼손된 자연 경로 복원 (`WI-NATURE-03`) | `E3` | `E5` | 1 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 탐사대 안전 회복 (`WI-NATURE-04`) | `E3` | `E5` | 1 | 0 | 0 |
+| `reference-play:nature-farm-day.v1` | 새로운 지역 발견 (`WI-WORLD-05`) | `E3` | `E5` | 0 | 1 | 0 |
 
 ## 경고와 다음 순서
 

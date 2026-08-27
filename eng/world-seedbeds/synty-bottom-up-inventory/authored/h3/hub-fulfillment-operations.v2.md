@@ -7,6 +7,7 @@
 @required-h2 h2-candidate:hub-fulfillment
 @required-h2 h2-candidate:hub-outbound-vehicle
 @optional-h2 h2-candidate:hub-maintenance-yard
+@optional-h2 h2-candidate:hub-internal-warehouse
 @connector StorageCargoInput
 @connector FulfillmentLoop
 @connector HubLoadingOutput

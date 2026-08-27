@@ -1,4 +1,4 @@
-# Farm AreaSet E6 정밀 몰입 판정
+# Farm AreaSet E6 플레이 전 정제 판정
 
 - AreaSet: area-set:sim:pyeongchang:farm-production.v1
 - 공간 성숙도: E5Qualified
@@ -6,7 +6,7 @@
 - 최신성: Current
 - GIS 결속: NotApplied
 - E7 시작 관문: Open
-- 판정 해시: a27d751827c2a6d45b5dd2dd6be7689fcba30a224acbb8bcb105dbe01b933954
+- 판정 해시: c880165d7ed3150ca0c94bf44c3367932305c0cbc5d9fae2d6d77930103fb5b0
 
 ## H3 정밀 조사
 

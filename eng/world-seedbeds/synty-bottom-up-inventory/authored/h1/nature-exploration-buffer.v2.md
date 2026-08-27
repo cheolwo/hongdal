@@ -6,6 +6,7 @@
 @wi WI-WORLD-05
 @wi WI-WORLD-07
 @wi WI-NATURE-06
+@wi WI-NATURE-18
 @gameplay TimberHarvest
 @role NatureExplorationBuffer
 @capability Spatial.Traversable

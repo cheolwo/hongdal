@@ -148,7 +148,7 @@ foreach ($candidate in @($areaSetPriority.areaSetCandidates)) {
 
 $worldInteractionPath = Resolve-RepositoryPath $repositoryRoot ([string] $source.worldInteractionCatalogPath)
 $worldInteractionCatalog = Read-Json $worldInteractionPath
-Require ([string] $worldInteractionCatalog.schemaVersion -eq "3") "WorldInteractionSchema"
+Require ([string] $worldInteractionCatalog.schemaVersion -eq "5") "WorldInteractionSchema"
 $worldInteractionMap = @{}
 foreach ($interaction in @($worldInteractionCatalog.items)) {
     $wiId = [string] $interaction.id
@@ -158,7 +158,7 @@ foreach ($interaction in @($worldInteractionCatalog.items)) {
 
 $evidenceStagePath = Resolve-RepositoryPath $repositoryRoot ([string] $source.evidenceStageCatalogPath)
 $evidenceStageCatalog = Read-Json $evidenceStagePath
-Require ([string] $evidenceStageCatalog.schemaVersion -eq "simulation-evidence-stages.v4") "EvidenceStageSchema"
+Require ([string] $evidenceStageCatalog.schemaVersion -eq "simulation-evidence-stages.v7") "EvidenceStageSchema"
 $evidenceStageCodes = @($evidenceStageCatalog.stages.code)
 
 $theorySpatialFactoryPath = Resolve-RepositoryPath $repositoryRoot ([string] $source.theorySpatialFactoryOutputPath)

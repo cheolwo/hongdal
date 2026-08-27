@@ -15,6 +15,7 @@
   ],
   "sourceRoots": [
     "Ssalddel.CodeMetadata",
+    "Ssalddel.Interior.Contracts",
     "Ssalddel.WorkflowRules.Contracts",
     "Ssalddel.WorkflowRules",
     "Ssalddel.Simulation.Contracts",

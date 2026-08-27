@@ -3,12 +3,12 @@
   "revision": "simulation-world-gameplay-spatial-completion-report.r3",
   "sourceRevision": "simulation-world-gameplay-spatial-completion.r4",
   "hCatalogRevision": "simulation-world-spatial-design-knowledge.r3",
-  "worldInteractionRevision": "simulation-world-interactions.r7",
-  "evidenceStageRevision": "simulation-evidence-stages.r10",
+  "worldInteractionRevision": "simulation-world-interactions.r27",
+  "evidenceStageRevision": "simulation-evidence-stages.r13",
   "theorySpatialFactoryRevision": "simulation-world-theory-spatial-factory-output.r3",
   "theorySpatialFactoryPolicyRevision": "simulation-world-theory-spatial-factory-policy.r4",
-  "actualE5SpatialRevision": "simulation-world-actual-e5-spatial-output.r3",
-  "actualE5SpatialPolicyRevision": "simulation-world-actual-e5-spatial-policy.r4",
+  "actualE5SpatialRevision": "simulation-world-actual-e5-spatial-output.r6",
+  "actualE5SpatialPolicyRevision": "simulation-world-actual-e5-spatial-policy.r7",
   "axisDefinitions": {
     "h": "공간 자원의 종류와 H1→H4 조립 깊이",
     "gameplayTrace": "공간이 기준 플레이를 직접 또는 간접 지원하는 정도",
@@ -968,7 +968,7 @@
       "wiEvidence": [
         {
           "wiId": "WI-FARM-04",
-          "title": "수확",
+          "title": "익은 농작물 수확",
           "implementationStageCode": "E3",
           "catalogIntegrationStageCode": "E6",
           "integrationStageCode": "E6",
@@ -988,7 +988,7 @@
         },
         {
           "wiId": "WI-FARM-05",
-          "title": "수확물 집하",
+          "title": "수확물 집하장 모으기",
           "implementationStageCode": "E3",
           "catalogIntegrationStageCode": "E6",
           "integrationStageCode": "E6",
@@ -1008,7 +1008,7 @@
         },
         {
           "wiId": "WI-FARM-06",
-          "title": "출하 준비·포장",
+          "title": "출하 물량 포장",
           "implementationStageCode": "E3",
           "catalogIntegrationStageCode": "E6",
           "integrationStageCode": "E6",
@@ -1028,21 +1028,32 @@
         },
         {
           "wiId": "WI-NATURE-01",
-          "title": "자연권 위협 관찰",
+          "title": "자연 지역 위험 징후 확인",
           "implementationStageCode": "E3",
-          "catalogIntegrationStageCode": "E1",
-          "integrationStageCode": "E5",
-          "e4SeedbedRefs": [],
+          "catalogIntegrationStageCode": "E7",
+          "integrationStageCode": "E7",
+          "e4SeedbedRefs": [
+            "wi-spatial-seedbed:nature-survival-encounter.v1"
+          ],
           "e5PlacementRefs": [
+            "binding:actual-e5:wi-nature-01",
             "spatial:actual-e5:wi-nature-01"
           ],
           "e5ContextRefs": [],
-          "e6EvidenceRefs": [],
-          "e7EvidenceRefs": []
+          "e6EvidenceRefs": [
+            "world-interaction-delivery-priorities.r5:wi-nature-01:e6",
+            "Ssalddel.Unity.Tests/몰입WorldLayoutTests.cs",
+            "artifacts/local/validation/nature-twilight/nature-twilight-wi01-e6-current.trx"
+          ],
+          "e7EvidenceRefs": [
+            "Assets/Ssalddel/Tests/PlayMode/Nature생존E7폐루프PlayModeTests.cs",
+            "C:/Users/user/ssalddel/artifacts/local/validation/nature-twilight/nature-twilight-wi01-observed-game-view.png",
+            "artifacts/local/validation/nature-twilight/nature-twilight-wi01-host-parity-current.trx"
+          ]
         },
         {
           "wiId": "WI-NATURE-02",
-          "title": "자연권 긴급 후퇴",
+          "title": "안전 거점으로 긴급 후퇴",
           "implementationStageCode": "E3",
           "catalogIntegrationStageCode": "E1",
           "integrationStageCode": "E5",
@@ -1056,7 +1067,7 @@
         },
         {
           "wiId": "WI-NATURE-03",
-          "title": "자연권 복원",
+          "title": "훼손된 자연 경로 복원",
           "implementationStageCode": "E3",
           "catalogIntegrationStageCode": "E1",
           "integrationStageCode": "E5",
@@ -1070,7 +1081,7 @@
         },
         {
           "wiId": "WI-NATURE-04",
-          "title": "파티 회복",
+          "title": "탐사대 안전 회복",
           "implementationStageCode": "E3",
           "catalogIntegrationStageCode": "E1",
           "integrationStageCode": "E5",
@@ -1084,7 +1095,7 @@
         },
         {
           "wiId": "WI-WORLD-05",
-          "title": "지역 발견",
+          "title": "새로운 지역 발견",
           "implementationStageCode": "E3",
           "catalogIntegrationStageCode": "E1",
           "integrationStageCode": "E5",

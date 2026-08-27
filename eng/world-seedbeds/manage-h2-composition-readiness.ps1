@@ -29,7 +29,13 @@ function Read-Json([string] $Path) {
 }
 
 function Get-Sha256Lower([string] $Path) {
-    return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
+    $content = [IO.File]::ReadAllText($Path, [Text.Encoding]::UTF8)
+    $bytes = [Text.Encoding]::UTF8.GetBytes((ConvertTo-DeterministicText $content))
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace("-", "").ToLowerInvariant()
+    }
+    finally { $sha.Dispose() }
 }
 
 function Test-H1RecognizedPart([object] $Definition) {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-h-pattern-naming.v1",
-  "revision": "simulation-world-h-pattern-naming.r8",
+  "revision": "simulation-world-h-pattern-naming.r9",
   "title": "H2·H3 팩 주도 공간 패턴 이름 대장",
   "principle": "기존 H StableId는 보존하고 H 정의의 물리 공간 이름을 주 이름으로, 기존 행위 중심 이름을 게임플레이 활용 유형으로 분리한다.",
   "displayPolicy": {
@@ -105,7 +105,8 @@
     { "stableId": "h2-candidate:nature-town-relief-transition", "patternCode": "MIX-H2-NATURE-TOWN-01", "spatialDisplayNameKo": "자연권 출구–생활권 구호 인계 블록", "displayNameKo": "네이처–타운 전환 패턴 01 — 생활권 대피·구호형", "leadPackCode": "Mixed", "supportPackCodes": ["Nature", "Town"], "compositionModeCode": "CrossPackTransition", "patternFamilyCode": "NatureTown", "patternSequence": 1 },
     { "stableId": "h2-candidate:hub-fulfillment", "patternCode": "CITY-H2-FULFILLMENT-01", "spatialDisplayNameKo": "Hub 피킹·출고준비 작업 블록", "displayNameKo": "시티 허브 출고 패턴 02 — 피킹·출고준비형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Fulfillment", "patternSequence": 1 },
     { "stableId": "h2-candidate:town-market-receiving", "patternCode": "TOWN-H2-RECEIVING-01", "spatialDisplayNameKo": "마트 후방 입고·검수 블록", "displayNameKo": "타운 시장 패턴 01 — 후방 입고·검수형", "leadPackCode": "Town", "supportPackCodes": ["Network"], "compositionModeCode": "LeadPackWithSupport", "patternFamilyCode": "Receiving", "patternSequence": 1 },
-    { "stableId": "h2-candidate:town-order-fulfillment", "patternCode": "TOWN-H2-FULFILLMENT-01", "spatialDisplayNameKo": "주문 피킹·포장·수령 블록", "displayNameKo": "타운 시장 패턴 02 — 주문 이행·수령형", "leadPackCode": "Town", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Fulfillment", "patternSequence": 1 }
+    { "stableId": "h2-candidate:town-order-fulfillment", "patternCode": "TOWN-H2-FULFILLMENT-01", "spatialDisplayNameKo": "주문 피킹·포장·수령 블록", "displayNameKo": "타운 시장 패턴 02 — 주문 이행·수령형", "leadPackCode": "Town", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Fulfillment", "patternSequence": 1 },
+    { "stableId": "h2-candidate:hub-internal-warehouse", "patternCode": "CITY-H2-WAREHOUSE-01", "spatialDisplayNameKo": "Hub 입고·보관·출고 통합 블록", "displayNameKo": "시티 허브 창고 패턴 01 — 내부 업무 폐루프형", "leadPackCode": "City", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Warehouse", "patternSequence": 1 }
   ],
   "h3Patterns": [
     { "stableId": "h3-candidate:nature-exploration-buffer", "patternCode": "NATURE-H3-REGION-01", "spatialDisplayNameKo": "탐색로·산림완충지 구역", "displayNameKo": "네이처 경관 01 — 탐색·완충형", "leadPackCode": "Nature", "supportPackCodes": [], "compositionModeCode": "SinglePack", "patternFamilyCode": "Region", "patternSequence": 1 },

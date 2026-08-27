@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "synty-asset-human-taxonomy.v1",
+  "revision": "synty-asset-human-taxonomy.r1",
+  "계층순서": ["범위", "기능군", "세부 기능군", "자산 종류", "자산 계열", "실제 Prefab"],
+  "설계원칙": {
+    "사람이읽는이름은한국어": true,
+    "저장StableCode는영문": true,
+    "자산계열과Prefab은실제대장Entry에서연결": true,
+    "Prefab경로는세계상태StableId가아님": true
+  },
+  "표현범위": [
+    {
+      "범위Code": "Outdoor",
+      "범위이름": "실외 표현",
+      "기능군": [
+        {
+          "기능군Code": "world-surface",
+          "기능군이름": "월드 지면",
+          "세부기능군": [
+            { "세부기능군Code": "terrain-surface", "세부기능군이름": "지형 표면", "자산종류": [
+              { "자산종류Code": "soil", "자산종류이름": "흙" }, { "자산종류Code": "grassland", "자산종류이름": "풀밭" },
+              { "자산종류Code": "bedrock", "자산종류이름": "암반" }, { "자산종류Code": "sand", "자산종류이름": "모래" },
+              { "자산종류Code": "snowfield", "자산종류이름": "눈밭" }
+            ]},
+            { "세부기능군Code": "water-surface", "세부기능군이름": "물 표면", "자산종류": [
+              { "자산종류Code": "river", "자산종류이름": "강" }, { "자산종류Code": "stream", "자산종류이름": "개울" },
+              { "자산종류Code": "pond", "자산종류이름": "연못" }, { "자산종류Code": "drainage-channel", "자산종류이름": "배수로" }
+            ]},
+            { "세부기능군Code": "terrain-feature", "세부기능군이름": "지형 요소", "자산종류": [
+              { "자산종류Code": "cliff", "자산종류이름": "절벽" }, { "자산종류Code": "slope", "자산종류이름": "경사면" },
+              { "자산종류Code": "embankment", "자산종류이름": "둑" }, { "자산종류Code": "levee", "자산종류이름": "제방" }
+            ]}
+          ]
+        },
+        {
+          "기능군Code": "nature-vegetation",
+          "기능군이름": "자연 식생",
+          "세부기능군": [
+            { "세부기능군Code": "tree", "세부기능군이름": "나무", "자산종류": [
+              { "자산종류Code": "living-tree", "자산종류이름": "생목" }, { "자산종류Code": "dead-tree", "자산종류이름": "고사목" },
+              { "자산종류Code": "stump", "자산종류이름": "그루터기" }
+            ]},
+            { "세부기능군Code": "shrub", "세부기능군이름": "관목", "자산종류": [
+              { "자산종류Code": "bush", "자산종류이름": "덤불" }, { "자산종류Code": "hedge", "자산종류이름": "생울타리" }
+            ]},
+            { "세부기능군Code": "ground-vegetation", "세부기능군이름": "지표 식생", "자산종류": [
+              { "자산종류Code": "grass", "자산종류이름": "풀" }, { "자산종류Code": "flower", "자산종류이름": "꽃" },
+              { "자산종류Code": "weed", "자산종류이름": "잡초" }
+            ]},
+            { "세부기능군Code": "cultivated-plant", "세부기능군이름": "재배 식물", "자산종류": [
+              { "자산종류Code": "potato", "자산종류이름": "감자" }, { "자산종류Code": "grain", "자산종류이름": "곡물" },
+              { "자산종류Code": "vegetable", "자산종류이름": "채소" }, { "자산종류Code": "fruit-tree", "자산종류이름": "과수" }
+            ]},
+            { "세부기능군Code": "natural-debris", "세부기능군이름": "자연 잔해", "자산종류": [
+              { "자산종류Code": "log", "자산종류이름": "통나무" }, { "자산종류Code": "branch", "자산종류이름": "나뭇가지" },
+              { "자산종류Code": "stone", "자산종류이름": "돌" }
+            ]}
+          ]
+        },
+        {
+          "기능군Code": "exterior-structure",
+          "기능군이름": "실외 구조물",
+          "세부기능군": [
+            { "세부기능군Code": "building", "세부기능군이름": "건물", "자산종류": [
+              { "자산종류Code": "house", "자산종류이름": "주택" }, { "자산종류Code": "warehouse", "자산종류이름": "창고" },
+              { "자산종류Code": "barn", "자산종류이름": "헛간" }, { "자산종류Code": "greenhouse", "자산종류이름": "온실" },
+              { "자산종류Code": "shop", "자산종류이름": "상점" }
+            ]},
+            { "세부기능군Code": "building-part", "세부기능군이름": "건축 부재", "자산종류": [
+              { "자산종류Code": "wall", "자산종류이름": "벽" }, { "자산종류Code": "roof", "자산종류이름": "지붕" },
+              { "자산종류Code": "pillar", "자산종류이름": "기둥" }, { "자산종류Code": "stairs", "자산종류이름": "계단" }
+            ]},
+            { "세부기능군Code": "boundary-facility", "세부기능군이름": "경계 시설", "자산종류": [
+              { "자산종류Code": "fence", "자산종류이름": "울타리" }, { "자산종류Code": "boundary-wall", "자산종류이름": "담장" },
+              { "자산종류Code": "barrier", "자산종류이름": "차단시설" }
+            ]},
+            { "세부기능군Code": "outdoor-facility", "세부기능군이름": "실외 시설", "자산종류": [
+              { "자산종류Code": "shelter", "자산종류이름": "쉼터" }, { "자산종류Code": "worksite", "자산종류이름": "작업장" },
+              { "자산종류Code": "loading-yard", "자산종류이름": "하역장" }, { "자산종류Code": "platform", "자산종류이름": "승강장" }
+            ]}
+          ]
+        },
+        {
+          "기능군Code": "exterior-functional-prop",
+          "기능군이름": "실외 기능 소품",
+          "세부기능군": [
+            { "세부기능군Code": "outdoor-storage", "세부기능군이름": "보관", "자산종류": [
+              { "자산종류Code": "box", "자산종류이름": "상자" }, { "자산종류Code": "pallet", "자산종류이름": "팔레트" },
+              { "자산종류Code": "storage-rack", "자산종류이름": "보관대" }
+            ]},
+            { "세부기능군Code": "outdoor-work", "세부기능군이름": "작업", "자산종류": [
+              { "자산종류Code": "workbench", "자산종류이름": "작업대" }, { "자산종류Code": "bucket", "자산종류이름": "양동이" },
+              { "자산종류Code": "work-equipment", "자산종류이름": "작업 장비" }
+            ]},
+            { "세부기능군Code": "living-service", "세부기능군이름": "생활·서비스", "자산종류": [
+              { "자산종류Code": "trash-bin", "자산종류이름": "쓰레기통" }, { "자산종류Code": "mailbox", "자산종류이름": "우편함" },
+              { "자산종류Code": "public-utility", "자산종류이름": "공공설비" }
+            ]},
+            { "세부기능군Code": "guidance", "세부기능군이름": "안내", "자산종류": [
+              { "자산종류Code": "signboard", "자산종류이름": "표지판" }, { "자산종류Code": "billboard", "자산종류이름": "광고판" },
+              { "자산종류Code": "location-marker", "자산종류이름": "위치표식" }
+            ]}
+          ]
+        },
+        {
+          "기능군Code": "world-network",
+          "기능군이름": "도로·통행망",
+          "세부기능군": [
+            { "세부기능군Code": "pedestrian-network", "세부기능군이름": "보행망", "자산종류": [
+              { "자산종류Code": "footpath", "자산종류이름": "보행로" }, { "자산종류Code": "sidewalk", "자산종류이름": "인도" },
+              { "자산종류Code": "stair-path", "자산종류이름": "계단길" }
+            ]},
+            { "세부기능군Code": "vehicle-network", "세부기능군이름": "차량망", "자산종류": [
+              { "자산종류Code": "road", "자산종류이름": "일반도로" }, { "자산종류Code": "farm-road", "자산종류이름": "농로" },
+              { "자산종류Code": "work-road", "자산종류이름": "작업도로" }
+            ]},
+            { "세부기능군Code": "crossing-facility", "세부기능군이름": "횡단 시설", "자산종류": [
+              { "자산종류Code": "bridge", "자산종류이름": "다리" }, { "자산종류Code": "ford", "자산종류이름": "여울" },
+              { "자산종류Code": "crossing", "자산종류이름": "횡단로" }
+            ]},
+            { "세부기능군Code": "road-accessory", "세부기능군이름": "도로 부속", "자산종류": [
+              { "자산종류Code": "traffic-sign", "자산종류이름": "교통표지" }, { "자산종류Code": "guardrail", "자산종류이름": "가드레일" },
+              { "자산종류Code": "road-marking", "자산종류이름": "도로표식" }
+            ]}
+          ]
+        },
+        {
+          "기능군Code": "world-transition",
+          "기능군이름": "영역 전이",
+          "세부기능군": [
+            { "세부기능군Code": "access", "세부기능군이름": "출입", "자산종류": [
+              { "자산종류Code": "door", "자산종류이름": "문" }, { "자산종류Code": "gate", "자산종류이름": "대문" },
+              { "자산종류Code": "access-point", "자산종류이름": "출입구" }
+            ]},
+            { "세부기능군Code": "area-connection", "세부기능군이름": "영역 연결", "자산종류": [
+              { "자산종류Code": "entrance", "자산종류이름": "입구" }, { "자산종류Code": "exit", "자산종류이름": "출구" },
+              { "자산종류Code": "connection-corridor", "자산종류이름": "연결 회랑" }
+            ]},
+            { "세부기능군Code": "height-transition", "세부기능군이름": "높이 전이", "자산종류": [
+              { "자산종류Code": "stairs", "자산종류이름": "계단" }, { "자산종류Code": "ramp", "자산종류이름": "경사로" },
+              { "자산종류Code": "ladder", "자산종류이름": "사다리" }
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "범위Code": "Interior",
+      "범위이름": "실내 표현",
+      "기능군": [
+        { "기능군Code": "interior-structure", "기능군이름": "실내 구조", "세부기능군": [
+          { "세부기능군Code": "interior-structure-part", "세부기능군이름": "실내 구조", "자산종류": [
+            { "자산종류Code": "floor", "자산종류이름": "바닥" }, { "자산종류Code": "wall", "자산종류이름": "벽" },
+            { "자산종류Code": "ceiling", "자산종류이름": "천장" }, { "자산종류Code": "door", "자산종류이름": "문" },
+            { "자산종류Code": "window", "자산종류이름": "창문" }, { "자산종류Code": "partition", "자산종류이름": "칸막이" },
+            { "자산종류Code": "stairs", "자산종류이름": "계단" }
+          ]}
+        ]},
+        { "기능군Code": "interior-fixture", "기능군이름": "실내 설비", "세부기능군": [
+          { "세부기능군Code": "rest-fixture", "세부기능군이름": "휴식 설비", "자산종류": [
+            { "자산종류Code": "bed", "자산종류이름": "침대" }, { "자산종류Code": "sofa", "자산종류이름": "소파" },
+            { "자산종류Code": "chair", "자산종류이름": "의자" }
+          ]},
+          { "세부기능군Code": "storage-fixture", "세부기능군이름": "보관 설비", "자산종류": [
+            { "자산종류Code": "shelf", "자산종류이름": "선반" }, { "자산종류Code": "cabinet", "자산종류이름": "장" },
+            { "자산종류Code": "storage-rack", "자산종류이름": "보관대" }, { "자산종류Code": "locker", "자산종류이름": "사물함" }
+          ]},
+          { "세부기능군Code": "work-fixture", "세부기능군이름": "작업 설비", "자산종류": [
+            { "자산종류Code": "desk", "자산종류이름": "책상" }, { "자산종류Code": "workbench", "자산종류이름": "작업대" },
+            { "자산종류Code": "inspection-table", "자산종류이름": "검수대" }, { "자산종류Code": "checkout-counter", "자산종류이름": "계산대" }
+          ]},
+          { "세부기능군Code": "cooking-fixture", "세부기능군이름": "조리 설비", "자산종류": [
+            { "자산종류Code": "sink", "자산종류이름": "싱크대" }, { "자산종류Code": "countertop", "자산종류이름": "조리대" },
+            { "자산종류Code": "cooking-equipment", "자산종류이름": "조리기구" }
+          ]},
+          { "세부기능군Code": "sanitary-fixture", "세부기능군이름": "위생 설비", "자산종류": [
+            { "자산종류Code": "washbasin", "자산종류이름": "세면대" }, { "자산종류Code": "toilet", "자산종류이름": "변기" },
+            { "자산종류Code": "bathtub", "자산종류이름": "욕조" }
+          ]},
+          { "세부기능군Code": "logistics-fixture", "세부기능군이름": "물류 설비", "자산종류": [
+            { "자산종류Code": "pallet-rack", "자산종류이름": "팔레트 선반" }, { "자산종류Code": "packing-table", "자산종류이름": "포장대" },
+            { "자산종류Code": "sorting-table", "자산종류이름": "분류대" }, { "자산종류Code": "collection-table", "자산종류이름": "집하대" }
+          ]}
+        ]},
+        { "기능군Code": "interior-loose-item", "기능군이름": "실내 소품", "세부기능군": [
+          { "세부기능군Code": "container-packaging", "세부기능군이름": "용기·포장", "자산종류": [
+            { "자산종류Code": "box", "자산종류이름": "상자" }, { "자산종류Code": "basket", "자산종류이름": "바구니" },
+            { "자산종류Code": "bottle", "자산종류이름": "병" }, { "자산종류Code": "sack", "자산종류이름": "포대" }
+          ]},
+          { "세부기능군Code": "loose-item-kind", "세부기능군이름": "개별 소품", "자산종류": [
+            { "자산종류Code": "food", "자산종류이름": "식품" }, { "자산종류Code": "tool", "자산종류이름": "공구" },
+            { "자산종류Code": "document", "자산종류이름": "문서" }, { "자산종류Code": "product", "자산종류이름": "상품" },
+            { "자산종류Code": "household-item", "자산종류이름": "생활용품" }, { "자산종류Code": "decoration", "자산종류이름": "장식품" }
+          ]}
+        ]}
+      ]
+    },
+    {
+      "범위Code": "Shared",
+      "범위이름": "공통 표현",
+      "기능군": [
+        { "기능군Code": "construction-state", "기능군이름": "건설·복구 표현", "세부기능군": [
+          { "세부기능군Code": "construction-recovery-state", "세부기능군이름": "건설·복구 상태", "자산종류": [
+            { "자산종류Code": "planned", "자산종류이름": "계획 상태" }, { "자산종류Code": "under-construction", "자산종류이름": "건설 중" },
+            { "자산종류Code": "complete", "자산종류이름": "완성 상태" }, { "자산종류Code": "damaged", "자산종류이름": "파손 상태" },
+            { "자산종류Code": "under-repair", "자산종류이름": "수리 중" }, { "자산종류Code": "recovering", "자산종류이름": "복구 중" },
+            { "자산종류Code": "demolished", "자산종류이름": "철거 상태" }
+          ]}
+        ]},
+        { "기능군Code": "actor-vehicle-tool", "기능군이름": "인물·차량·도구", "세부기능군": [
+          { "세부기능군Code": "person", "세부기능군이름": "인물", "자산종류": [
+            { "자산종류Code": "player", "자산종류이름": "플레이어" }, { "자산종류Code": "worker", "자산종류이름": "작업자" },
+            { "자산종류Code": "resident", "자산종류이름": "주민" }, { "자산종류Code": "merchant", "자산종류이름": "상인" },
+            { "자산종류Code": "hostile-person", "자산종류이름": "적대 인물" }
+          ]},
+          { "세부기능군Code": "vehicle", "세부기능군이름": "차량", "자산종류": [
+            { "자산종류Code": "passenger-vehicle", "자산종류이름": "승용" }, { "자산종류Code": "cargo-vehicle", "자산종류이름": "화물" },
+            { "자산종류Code": "agricultural-vehicle", "자산종류이름": "농업" }, { "자산종류Code": "construction-vehicle", "자산종류이름": "건설" }
+          ]},
+          { "세부기능군Code": "hand-tool", "세부기능군이름": "손도구", "자산종류": [
+            { "자산종류Code": "gather-harvest-tool", "자산종류이름": "채집·수확" }, { "자산종류Code": "construction-tool", "자산종류이름": "건설" },
+            { "자산종류Code": "repair-tool", "자산종류이름": "수리" }, { "자산종류Code": "inspection-tool", "자산종류이름": "검사" }
+          ]},
+          { "세부기능군Code": "equipment", "세부기능군이름": "장비", "자산종류": [
+            { "자산종류Code": "mobility-equipment", "자산종류이름": "이동 장비" }, { "자산종류Code": "powered-equipment", "자산종류이름": "동력 장비" }
+          ]}
+        ]},
+        { "기능군Code": "world-feedback-fx", "기능군이름": "세계 피드백 효과", "세부기능군": [
+          { "세부기능군Code": "environment-effect", "세부기능군이름": "환경 효과", "자산종류": [
+            { "자산종류Code": "rain", "자산종류이름": "비" }, { "자산종류Code": "snow", "자산종류이름": "눈" },
+            { "자산종류Code": "fog", "자산종류이름": "안개" }, { "자산종류Code": "wind", "자산종류이름": "바람" }
+          ]},
+          { "세부기능군Code": "work-effect", "세부기능군이름": "작업 효과", "자산종류": [
+            { "자산종류Code": "dust", "자산종류이름": "먼지" }, { "자산종류Code": "spark", "자산종류이름": "불꽃" },
+            { "자산종류Code": "debris", "자산종류이름": "파편" }
+          ]},
+          { "세부기능군Code": "state-effect", "세부기능군이름": "상태 효과", "자산종류": [
+            { "자산종류Code": "smoke", "자산종류이름": "연기" }, { "자산종류Code": "fire", "자산종류이름": "불" },
+            { "자산종류Code": "steam", "자산종류이름": "수증기" }, { "자산종류Code": "wetness", "자산종류이름": "젖음" }
+          ]},
+          { "세부기능군Code": "interaction-feedback", "세부기능군이름": "상호작용 피드백", "자산종류": [
+            { "자산종류Code": "selection", "자산종류이름": "선택" }, { "자산종류Code": "success", "자산종류이름": "성공" },
+            { "자산종류Code": "warning", "자산종류이름": "경고" }, { "자산종류Code": "blocked", "자산종류이름": "차단" }
+          ]}
+        ]}
+      ]
+    }
+  ]
+}

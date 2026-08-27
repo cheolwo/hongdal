@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-actual-e5-spatial-output.v1",
-  "revision": "simulation-world-actual-e5-spatial-output.r4",
-  "policyRevision": "simulation-world-actual-e5-spatial-policy.r5",
+  "revision": "simulation-world-actual-e5-spatial-output.r6",
+  "policyRevision": "simulation-world-actual-e5-spatial-policy.r7",
   "compositionPlanRevision": "simulation-world-area-set-composition-plans.r1",
   "compositionLedgerRevision": "simulation-world-area-set-composition-patterns.r1",
   "generatedAtRuleCode": "DeterministicNoWallClock",
@@ -12,21 +12,21 @@
     "totalGraphs": 19,
     "networkRelations": 8,
     "deferredTheoryGraphs": 1,
-    "directBindings": 37,
+    "directBindings": 42,
     "contextualBindings": 6,
-    "nonSpatialWi": 6,
-    "pendingE5Wi": 0
+    "nonSpatialWi": 9,
+    "pendingE5Wi": 7
   },
   "network": {
     "schemaVersion": "simulation-world-area-set-network.v1",
     "networkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
-    "revision": 4,
+    "revision": 6,
     "title": "평창 Nature–Farm–Hub–Town 게임 플레이 Network",
     "summary": "Nature 생활 거점과 Farm·City/Hub·Town 업무 영역을 플레이어 이동과 화물 물류로 연결한 실제 E5 Network다.",
     "coordinateSpaceCode": "ScenarioLocalMeters",
     "evidenceStageCode": "ActualE5",
-    "definitionHashSha256": "e143805c7638f9beed4f445b6046bad9dbf7e1ce50af53bf382859f520c42d40",
-    "documentHashSha256": "43abdd9a8f30a64ecb0fdfccdd2bf3f3a6d2d1faca1b22702b40e5c6db35ff79",
+    "definitionHashSha256": "19d856194dca5773415f0d5331f949baf82a1a118874f72d3d87287478f213d4",
+    "documentHashSha256": "b39e72957858faee6118c5bd0dd3cf8c69fd2a50db3d568c979e4550df30d85f",
     "definitionStatusCode": "Available",
     "areaSets": [
       {
@@ -34,42 +34,42 @@
         "areaRoleCode": "NatureHome",
         "loadPolicyCode": "Persistent",
         "defaultEntryConnectorStableId": "stub:actual-e5:nature-home-encounter-defense:ingress",
-        "areaSetRevision": 4,
-        "definitionHashSha256": "66b82a07088d91c7ba8e3c79424e4589a87c437966e8f50169a07e4810f3aaab"
+        "areaSetRevision": 6,
+        "definitionHashSha256": "b87db038b144e7e914d8c2cab2342fc466bf60f0868062ca37dc2b8828515a6f"
       },
       {
         "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "areaRoleCode": "Farm",
         "loadPolicyCode": "OnDemand",
         "defaultEntryConnectorStableId": "stub:actual-e5:farm-processing-campus:ingress",
-        "areaSetRevision": 4,
-        "definitionHashSha256": "0cbc60ea63bbec04b166022ed40e7e8a5a6545a36e0aac8afb891abd1a1bc0e3"
+        "areaSetRevision": 6,
+        "definitionHashSha256": "122c9f327190b9923b04827d17c8fed57b0790533dd5db934f00f0f62067ee35"
       },
       {
         "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "areaRoleCode": "CityHub",
         "loadPolicyCode": "OnDemand",
         "defaultEntryConnectorStableId": "stub:actual-e5:hub-fulfillment-operations:ingress",
-        "areaSetRevision": 4,
-        "definitionHashSha256": "6a1d3c42408f1f7909ade1f0ddc020d0c635c5a5475b299cb977b3c11189abbe"
+        "areaSetRevision": 6,
+        "definitionHashSha256": "e29ad24be8939791f1398454b77de8457df3b46f81f66005bf0018b80fafd106"
       },
       {
         "areaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
         "areaRoleCode": "Town",
         "loadPolicyCode": "OnDemand",
         "defaultEntryConnectorStableId": "stub:actual-e5:circular-market-town:ingress",
-        "areaSetRevision": 4,
-        "definitionHashSha256": "4b80d7880740fce4243e2853891a71dad8d7d8e861a4f6de7823bc64563e3fae"
+        "areaSetRevision": 6,
+        "definitionHashSha256": "fa9d3490e49ecc68d3c09a7c0903a095eafdba081a0674f82a4f458abe58978d"
       }
     ],
     "routeGraphs": [
       {
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-exploration-buffer.v1",
         "graphRoleCode": "NetworkRoute",
-        "graphRevision": 4,
-        "definitionHashSha256": "30746db6ea9946fa536e103f7d80e6cd6a7f988714a4fa0c1ff06f0a27d9698b",
+        "graphRevision": 6,
+        "definitionHashSha256": "c565daa0c20b99fa04735ae64a852c89538a4e49da203c0f23868e51234a90df",
         "buildStatusCode": "Available",
-        "graphHashSha256": "ffd44a6a91c08d6214d4ddada4d018c095eaa5419f5b7cac20c37ddce7ee4739",
+        "graphHashSha256": "ea9c24731f9627bb9039ca5b6761e898d95b0f9977352ac107c4780f886a7e94",
         "spatialOwnerKindCode": "AreaSetNetwork",
         "spatialOwnerStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -90,7 +90,7 @@
       {
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-logistics.v1",
         "graphRoleCode": "NetworkRoute",
-        "graphRevision": 4,
+        "graphRevision": 6,
         "definitionHashSha256": "a3e7ccf011dffe575cdbf4e189375ca18243701167c968e575eed2e2b8dc95f6",
         "buildStatusCode": "Available",
         "graphHashSha256": "4c3ffa389e6d8627c72c36cf2371ed205bc2a00a420474766fa79a2b554e4416",
@@ -114,10 +114,10 @@
       {
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-logistics.v1",
         "graphRoleCode": "NetworkRoute",
-        "graphRevision": 4,
-        "definitionHashSha256": "b1882fea91efcf4701256180c13769d804abd4a47c98329a6134bd4d75b5270e",
+        "graphRevision": 6,
+        "definitionHashSha256": "3c30f82f2ec2d701e836b5f26c12cdf621665cc9179c6f98ac7e954d071e07e6",
         "buildStatusCode": "Available",
-        "graphHashSha256": "3b546adf5e8a998cd6532d67c7e2dc4af60a9286789b3260d918892b90259544",
+        "graphHashSha256": "82c1c9cfb583fc5bb8ab82df73fa61f4d26d3d6bd99048f030718f70f9e9b567",
         "spatialOwnerKindCode": "AreaSetNetwork",
         "spatialOwnerStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -274,22 +274,22 @@
       "theoryAreaSetStableId": "area-set:theory:nature-home-exploration-region",
       "compositionPatternStableId": "area-set-composition:nature:forest-river-home-loop",
       "compositionPatternCode": "NATURE-ASET-COMP-01",
-      "compositionPatternHashSha256": "162f49b1bcaa2ae8fee34c0e37459482da05f5421a9cac088257fe9542c1329d",
-      "compositionDocumentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361",
+      "compositionPatternHashSha256": "bc73e50002e8161edc8a4cd87b419081a5eeefae98131582f16e7ff4c1bbbd4b",
+      "compositionDocumentHashSha256": "6143f4dce29c59f0442309e50ac9c111a19885610d0621c807b1423ccdf606b5",
       "areaRoleCode": "NatureHome",
       "loadPolicyCode": "Persistent",
       "defaultEntryConnectorStableId": "stub:actual-e5:nature-home-encounter-defense:ingress",
       "definition": {
         "schemaVersion": "simulation-world-area-set.v1",
         "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
-        "revision": 4,
+        "revision": 6,
         "title": "Nature 생활·탐험 AreaSet",
         "summary": "역할 슬롯 기반 AreaSet 구성 패턴으로 H3·H2를 작성 Scenario 지역 Graph에 결속한 실제 E5 공간이다.",
-        "definitionHashSha256": "66b82a07088d91c7ba8e3c79424e4589a87c437966e8f50169a07e4810f3aaab",
-        "documentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361",
+        "definitionHashSha256": "b87db038b144e7e914d8c2cab2342fc466bf60f0868062ca37dc2b8828515a6f",
+        "documentHashSha256": "6143f4dce29c59f0442309e50ac9c111a19885610d0621c807b1423ccdf606b5",
         "sourceCompositionPatternStableId": "area-set-composition:nature:forest-river-home-loop",
         "sourceCompositionPatternCode": "NATURE-ASET-COMP-01",
-        "sourceCompositionPatternHashSha256": "162f49b1bcaa2ae8fee34c0e37459482da05f5421a9cac088257fe9542c1329d",
+        "sourceCompositionPatternHashSha256": "bc73e50002e8161edc8a4cd87b419081a5eeefae98131582f16e7ff4c1bbbd4b",
         "sourceCompositionLedgerRevision": "simulation-world-area-set-composition-patterns.r1",
         "canonicalNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -306,10 +306,10 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
             "graphRoleCode": "NatureHome",
-            "graphRevision": 4,
-            "definitionHashSha256": "4a67ab5e5ebd3eae7174a4c829a32d2de2e9e5878aa6c5445b59c4555c57fa3c",
+            "graphRevision": 6,
+            "definitionHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41",
             "buildStatusCode": "Available",
-            "graphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+            "graphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
             "spatialOwnerKindCode": "AreaSet",
             "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
             "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -332,7 +332,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
             "graphRoleCode": "NatureHome",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "92f70c8336ae05905dabae8ed628cd59fbaf0d0886aa1c95a0caf0ea436cfc44",
             "buildStatusCode": "Available",
             "graphHashSha256": "5658ade82761d62763443afa86763690e7860500fb98e87a4a8f68e38f657935",
@@ -358,10 +358,10 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-trail-network.v1",
             "graphRoleCode": "NatureHome",
-            "graphRevision": 4,
-            "definitionHashSha256": "3688c13f9275c4175b6678bca269eadb079a31c9c91aa5bf82b3b7417b871c32",
+            "graphRevision": 6,
+            "definitionHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d",
             "buildStatusCode": "Available",
-            "graphHashSha256": "ad7f6f8143ef185a2c0a64c1c53feb3e32d74825409340d4cd5a88ec5f5d4c44",
+            "graphHashSha256": "11a53aeae9518ea659a26964039fccd1782b70e799f4a9ac57f19018349be531",
             "spatialOwnerKindCode": "AreaSet",
             "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
             "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -429,16 +429,16 @@
           "schemaVersion": "simulation-world-landscape-graph.v2",
           "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
-          "graphBuildStableId": "graph-build:actual-e5:nature-home-encounter-defense:f6cf22cc7334",
+          "graphBuildStableId": "graph-build:actual-e5:nature-home-encounter-defense:9b394c857f00",
           "graphRoleCode": "NatureHome",
-          "graphRevision": 4,
-          "definitionHashSha256": "4a67ab5e5ebd3eae7174a4c829a32d2de2e9e5878aa6c5445b59c4555c57fa3c",
-          "graphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+          "graphRevision": 6,
+          "definitionHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41",
+          "graphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
           "spatialOwnerKindCode": "AreaSet",
           "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
           "coordinateSpaceCode": "ScenarioLocalMeters",
           "grammarRevision": "actual-e5-authored-scenario.r1",
-          "grammarHashSha256": "4a67ab5e5ebd3eae7174a4c829a32d2de2e9e5878aa6c5445b59c4555c57fa3c",
+          "grammarHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41",
           "statusCode": "Available",
           "bounds": {
             "minEastingMeters": -484.0,
@@ -926,7 +926,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
           "graphBuildStableId": "graph-build:actual-e5:nature-threat-recovery:5658ade82761",
           "graphRoleCode": "NatureHome",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "92f70c8336ae05905dabae8ed628cd59fbaf0d0886aa1c95a0caf0ea436cfc44",
           "graphHashSha256": "5658ade82761d62763443afa86763690e7860500fb98e87a4a8f68e38f657935",
           "spatialOwnerKindCode": "AreaSet",
@@ -1224,16 +1224,16 @@
           "schemaVersion": "simulation-world-landscape-graph.v2",
           "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-trail-network.v1",
-          "graphBuildStableId": "graph-build:actual-e5:nature-trail-network:ad7f6f8143ef",
+          "graphBuildStableId": "graph-build:actual-e5:nature-trail-network:11a53aeae951",
           "graphRoleCode": "NatureHome",
-          "graphRevision": 4,
-          "definitionHashSha256": "3688c13f9275c4175b6678bca269eadb079a31c9c91aa5bf82b3b7417b871c32",
-          "graphHashSha256": "ad7f6f8143ef185a2c0a64c1c53feb3e32d74825409340d4cd5a88ec5f5d4c44",
+          "graphRevision": 6,
+          "definitionHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d",
+          "graphHashSha256": "11a53aeae9518ea659a26964039fccd1782b70e799f4a9ac57f19018349be531",
           "spatialOwnerKindCode": "AreaSet",
           "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
           "coordinateSpaceCode": "ScenarioLocalMeters",
           "grammarRevision": "actual-e5-authored-scenario.r1",
-          "grammarHashSha256": "3688c13f9275c4175b6678bca269eadb079a31c9c91aa5bf82b3b7417b871c32",
+          "grammarHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d",
           "statusCode": "Available",
           "bounds": {
             "minEastingMeters": -314.0,
@@ -1526,22 +1526,22 @@
       "theoryAreaSetStableId": "area-set:theory:farm-production-processing-region",
       "compositionPatternStableId": "area-set-composition:farm:highland-production-processing",
       "compositionPatternCode": "FARM-ASET-COMP-01",
-      "compositionPatternHashSha256": "ec8179b01d3f485621356d94e6272584540e4c1266956ec623c5c81e5530d615",
-      "compositionDocumentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325",
+      "compositionPatternHashSha256": "c757de1fe82d736ece342cafa28fdb788b3ee5096060f959dd0d327ab6abde2f",
+      "compositionDocumentHashSha256": "eeba1bbe7c7f92b63e5ba84c112221727977e5aa76ebdefc86eaebe3fe892396",
       "areaRoleCode": "Farm",
       "loadPolicyCode": "OnDemand",
       "defaultEntryConnectorStableId": "stub:actual-e5:farm-processing-campus:ingress",
       "definition": {
         "schemaVersion": "simulation-world-area-set.v1",
         "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
-        "revision": 4,
+        "revision": 6,
         "title": "Farm 생산·생존 AreaSet",
         "summary": "역할 슬롯 기반 AreaSet 구성 패턴으로 H3·H2를 작성 Scenario 지역 Graph에 결속한 실제 E5 공간이다.",
-        "definitionHashSha256": "0cbc60ea63bbec04b166022ed40e7e8a5a6545a36e0aac8afb891abd1a1bc0e3",
-        "documentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325",
+        "definitionHashSha256": "122c9f327190b9923b04827d17c8fed57b0790533dd5db934f00f0f62067ee35",
+        "documentHashSha256": "eeba1bbe7c7f92b63e5ba84c112221727977e5aa76ebdefc86eaebe3fe892396",
         "sourceCompositionPatternStableId": "area-set-composition:farm:highland-production-processing",
         "sourceCompositionPatternCode": "FARM-ASET-COMP-01",
-        "sourceCompositionPatternHashSha256": "ec8179b01d3f485621356d94e6272584540e4c1266956ec623c5c81e5530d615",
+        "sourceCompositionPatternHashSha256": "c757de1fe82d736ece342cafa28fdb788b3ee5096060f959dd0d327ab6abde2f",
         "sourceCompositionLedgerRevision": "simulation-world-area-set-composition-patterns.r1",
         "canonicalNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -1559,7 +1559,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-seasonal-production-loop.v1",
             "graphRoleCode": "Farm",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "b75fa67772480909100c071e93117ab7134adf4159a1395286a25dabec91b009",
             "buildStatusCode": "Available",
             "graphHashSha256": "0b6c8cd318c6cae7a2fb1a4bb4d226cda48cd36fbc0383a1b8fc5bfb0c1b27c8",
@@ -1585,7 +1585,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-incident-recovery.v1",
             "graphRoleCode": "Farm",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "39f6549c7bae56ca62ea4d0e4e4b592fdc12d43f4d36d828a2db4760011aa9a4",
             "buildStatusCode": "Available",
             "graphHashSha256": "22285023566e2ad24a8b7030ee99c63db8feb92d6bd9e9b4ccee38f339d62c8b",
@@ -1611,7 +1611,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
             "graphRoleCode": "Farm",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "770b3ef795a6e31cdd9a4377ecf3771404f5a10e391493463d76dea5a69c2b63",
             "buildStatusCode": "Available",
             "graphHashSha256": "c83128ca867f3ca20c14003265c1922d592cbbf9da60007afc82cfb7c4302b6f",
@@ -1637,10 +1637,10 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
             "graphRoleCode": "Farm",
-            "graphRevision": 4,
-            "definitionHashSha256": "856747014e2d06d827a079b436159a0f7ba791e5676285497f4c94f29f34aecf",
+            "graphRevision": 6,
+            "definitionHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6",
             "buildStatusCode": "Available",
-            "graphHashSha256": "f4deaf0786acf6ec804e8fea8e4bbf038a62964efe70e1a70f2df2b257c4a92f",
+            "graphHashSha256": "b2245da0bbbb6ec47e6d87cdcb32a9c621d82322dbf51c80dca934f6637e5fcc",
             "spatialOwnerKindCode": "AreaSet",
             "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
             "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -1722,7 +1722,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-seasonal-production-loop.v1",
           "graphBuildStableId": "graph-build:actual-e5:farm-seasonal-production-loop:0b6c8cd318c6",
           "graphRoleCode": "Farm",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "b75fa67772480909100c071e93117ab7134adf4159a1395286a25dabec91b009",
           "graphHashSha256": "0b6c8cd318c6cae7a2fb1a4bb4d226cda48cd36fbc0383a1b8fc5bfb0c1b27c8",
           "spatialOwnerKindCode": "AreaSet",
@@ -2209,7 +2209,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-incident-recovery.v1",
           "graphBuildStableId": "graph-build:actual-e5:farm-incident-recovery:22285023566e",
           "graphRoleCode": "Farm",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "39f6549c7bae56ca62ea4d0e4e4b592fdc12d43f4d36d828a2db4760011aa9a4",
           "graphHashSha256": "22285023566e2ad24a8b7030ee99c63db8feb92d6bd9e9b4ccee38f339d62c8b",
           "spatialOwnerKindCode": "AreaSet",
@@ -2553,7 +2553,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
           "graphBuildStableId": "graph-build:actual-e5:farm-processing-campus:c83128ca867f",
           "graphRoleCode": "Farm",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "770b3ef795a6e31cdd9a4377ecf3771404f5a10e391493463d76dea5a69c2b63",
           "graphHashSha256": "c83128ca867f3ca20c14003265c1922d592cbbf9da60007afc82cfb7c4302b6f",
           "spatialOwnerKindCode": "AreaSet",
@@ -3280,16 +3280,16 @@
           "schemaVersion": "simulation-world-landscape-graph.v2",
           "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
-          "graphBuildStableId": "graph-build:actual-e5:highland-farm:f4deaf0786ac",
+          "graphBuildStableId": "graph-build:actual-e5:highland-farm:b2245da0bbbb",
           "graphRoleCode": "Farm",
-          "graphRevision": 4,
-          "definitionHashSha256": "856747014e2d06d827a079b436159a0f7ba791e5676285497f4c94f29f34aecf",
-          "graphHashSha256": "f4deaf0786acf6ec804e8fea8e4bbf038a62964efe70e1a70f2df2b257c4a92f",
+          "graphRevision": 6,
+          "definitionHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6",
+          "graphHashSha256": "b2245da0bbbb6ec47e6d87cdcb32a9c621d82322dbf51c80dca934f6637e5fcc",
           "spatialOwnerKindCode": "AreaSet",
           "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
           "coordinateSpaceCode": "ScenarioLocalMeters",
           "grammarRevision": "actual-e5-authored-scenario.r1",
-          "grammarHashSha256": "856747014e2d06d827a079b436159a0f7ba791e5676285497f4c94f29f34aecf",
+          "grammarHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6",
           "statusCode": "Available",
           "bounds": {
             "minEastingMeters": -484.0,
@@ -3725,22 +3725,22 @@
       "theoryAreaSetStableId": "area-set:theory:logistics-hub-region",
       "compositionPatternStableId": "area-set-composition:cityhub:inbound-storage-outbound",
       "compositionPatternCode": "CITYHUB-ASET-COMP-01",
-      "compositionPatternHashSha256": "918819f66a529060da2347dc58b087e63a7a9452ab386f42c7d3dfb1a4e8b99d",
-      "compositionDocumentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252",
+      "compositionPatternHashSha256": "71804c826f5e4ed6dc2ac577620aa4c679ba298f22a2d1424f55dc40ae3b1483",
+      "compositionDocumentHashSha256": "16be5e91a1f8a5c11f7ebb348dab0767e7b29441e10a2484b8b23c93267b14f2",
       "areaRoleCode": "CityHub",
       "loadPolicyCode": "OnDemand",
       "defaultEntryConnectorStableId": "stub:actual-e5:hub-fulfillment-operations:ingress",
       "definition": {
         "schemaVersion": "simulation-world-area-set.v1",
         "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
-        "revision": 4,
+        "revision": 6,
         "title": "City/Hub 물류 AreaSet",
         "summary": "역할 슬롯 기반 AreaSet 구성 패턴으로 H3·H2를 작성 Scenario 지역 Graph에 결속한 실제 E5 공간이다.",
-        "definitionHashSha256": "6a1d3c42408f1f7909ade1f0ddc020d0c635c5a5475b299cb977b3c11189abbe",
-        "documentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252",
+        "definitionHashSha256": "e29ad24be8939791f1398454b77de8457df3b46f81f66005bf0018b80fafd106",
+        "documentHashSha256": "16be5e91a1f8a5c11f7ebb348dab0767e7b29441e10a2484b8b23c93267b14f2",
         "sourceCompositionPatternStableId": "area-set-composition:cityhub:inbound-storage-outbound",
         "sourceCompositionPatternCode": "CITYHUB-ASET-COMP-01",
-        "sourceCompositionPatternHashSha256": "918819f66a529060da2347dc58b087e63a7a9452ab386f42c7d3dfb1a4e8b99d",
+        "sourceCompositionPatternHashSha256": "71804c826f5e4ed6dc2ac577620aa4c679ba298f22a2d1424f55dc40ae3b1483",
         "sourceCompositionLedgerRevision": "simulation-world-area-set-composition-patterns.r1",
         "canonicalNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -3758,10 +3758,10 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-fulfillment-operations.v1",
             "graphRoleCode": "CityHub",
-            "graphRevision": 4,
-            "definitionHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b",
+            "graphRevision": 6,
+            "definitionHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590",
             "buildStatusCode": "Available",
-            "graphHashSha256": "8307ad55be00fc13f829946c30e422a7422719374538c51d40986a57601c47af",
+            "graphHashSha256": "22860f733a7330318ffb4f07528b8f7689382b45a61a29594fb338acb02bb90e",
             "spatialOwnerKindCode": "AreaSet",
             "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
             "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -3784,10 +3784,10 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
             "graphRoleCode": "CityHub",
-            "graphRevision": 4,
-            "definitionHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3",
+            "graphRevision": 6,
+            "definitionHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6",
             "buildStatusCode": "Available",
-            "graphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+            "graphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
             "spatialOwnerKindCode": "AreaSet",
             "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
             "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -3810,10 +3810,10 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-maintenance-emergency-loop.v1",
             "graphRoleCode": "CityHub",
-            "graphRevision": 4,
-            "definitionHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee",
+            "graphRevision": 6,
+            "definitionHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992",
             "buildStatusCode": "Available",
-            "graphHashSha256": "95566f32a0ac5e61aafab747893c6877af506a15eec71107b8edda14ac1a43b4",
+            "graphHashSha256": "0a32e107b1497463122f2ede72f827f34533b10f1c78d1696016b9cdb36e8e2d",
             "spatialOwnerKindCode": "AreaSet",
             "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
             "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -3836,10 +3836,10 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:resilient-logistics-hub.v1",
             "graphRoleCode": "CityHub",
-            "graphRevision": 4,
-            "definitionHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b",
+            "graphRevision": 6,
+            "definitionHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5",
             "buildStatusCode": "Available",
-            "graphHashSha256": "cf7ad5b9cb9d950642dc40dce647f0532a3bb8afe8046536994153149a454150",
+            "graphHashSha256": "7b83650a74d181f7842e408d2534a894505936bbf4bf3af63983d2fd12696a88",
             "spatialOwnerKindCode": "AreaSet",
             "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
             "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -3919,16 +3919,16 @@
           "schemaVersion": "simulation-world-landscape-graph.v2",
           "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-fulfillment-operations.v1",
-          "graphBuildStableId": "graph-build:actual-e5:hub-fulfillment-operations:8307ad55be00",
+          "graphBuildStableId": "graph-build:actual-e5:hub-fulfillment-operations:22860f733a73",
           "graphRoleCode": "CityHub",
-          "graphRevision": 4,
-          "definitionHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b",
-          "graphHashSha256": "8307ad55be00fc13f829946c30e422a7422719374538c51d40986a57601c47af",
+          "graphRevision": 6,
+          "definitionHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590",
+          "graphHashSha256": "22860f733a7330318ffb4f07528b8f7689382b45a61a29594fb338acb02bb90e",
           "spatialOwnerKindCode": "AreaSet",
           "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "coordinateSpaceCode": "ScenarioLocalMeters",
           "grammarRevision": "actual-e5-authored-scenario.r1",
-          "grammarHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b",
+          "grammarHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590",
           "statusCode": "Available",
           "bounds": {
             "minEastingMeters": -314.0,
@@ -4318,16 +4318,16 @@
           "schemaVersion": "simulation-world-landscape-graph.v2",
           "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-          "graphBuildStableId": "graph-build:actual-e5:jinbu-hub:0e93f0eeb31c",
+          "graphBuildStableId": "graph-build:actual-e5:jinbu-hub:2adbaf3635a9",
           "graphRoleCode": "CityHub",
-          "graphRevision": 4,
-          "definitionHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3",
-          "graphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+          "graphRevision": 6,
+          "definitionHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6",
+          "graphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
           "spatialOwnerKindCode": "AreaSet",
           "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "coordinateSpaceCode": "ScenarioLocalMeters",
           "grammarRevision": "actual-e5-authored-scenario.r1",
-          "grammarHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3",
+          "grammarHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6",
           "statusCode": "Available",
           "bounds": {
             "minEastingMeters": -274.0,
@@ -4618,16 +4618,16 @@
           "schemaVersion": "simulation-world-landscape-graph.v2",
           "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-maintenance-emergency-loop.v1",
-          "graphBuildStableId": "graph-build:actual-e5:hub-maintenance-emergency-loop:95566f32a0ac",
+          "graphBuildStableId": "graph-build:actual-e5:hub-maintenance-emergency-loop:0a32e107b149",
           "graphRoleCode": "CityHub",
-          "graphRevision": 4,
-          "definitionHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee",
-          "graphHashSha256": "95566f32a0ac5e61aafab747893c6877af506a15eec71107b8edda14ac1a43b4",
+          "graphRevision": 6,
+          "definitionHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992",
+          "graphHashSha256": "0a32e107b1497463122f2ede72f827f34533b10f1c78d1696016b9cdb36e8e2d",
           "spatialOwnerKindCode": "AreaSet",
           "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "coordinateSpaceCode": "ScenarioLocalMeters",
           "grammarRevision": "actual-e5-authored-scenario.r1",
-          "grammarHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee",
+          "grammarHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992",
           "statusCode": "Available",
           "bounds": {
             "minEastingMeters": -314.0,
@@ -5061,16 +5061,16 @@
           "schemaVersion": "simulation-world-landscape-graph.v2",
           "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:resilient-logistics-hub.v1",
-          "graphBuildStableId": "graph-build:actual-e5:resilient-logistics-hub:cf7ad5b9cb9d",
+          "graphBuildStableId": "graph-build:actual-e5:resilient-logistics-hub:7b83650a74d1",
           "graphRoleCode": "CityHub",
-          "graphRevision": 4,
-          "definitionHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b",
-          "graphHashSha256": "cf7ad5b9cb9d950642dc40dce647f0532a3bb8afe8046536994153149a454150",
+          "graphRevision": 6,
+          "definitionHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5",
+          "graphHashSha256": "7b83650a74d181f7842e408d2534a894505936bbf4bf3af63983d2fd12696a88",
           "spatialOwnerKindCode": "AreaSet",
           "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
           "coordinateSpaceCode": "ScenarioLocalMeters",
           "grammarRevision": "actual-e5-authored-scenario.r1",
-          "grammarHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b",
+          "grammarHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5",
           "statusCode": "Available",
           "bounds": {
             "minEastingMeters": -274.0,
@@ -5605,22 +5605,22 @@
       "theoryAreaSetStableId": "area-set:theory:lowrise-market-region",
       "compositionPatternStableId": "area-set-composition:town:lowrise-life-market",
       "compositionPatternCode": "TOWN-ASET-COMP-01",
-      "compositionPatternHashSha256": "17113a5debb758e1753630d15b8b17dca10c31d097f7a8b126252f0a0ef83e50",
-      "compositionDocumentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1",
+      "compositionPatternHashSha256": "9d41b4157e453c7817f6cf8a6d6441044de89a6816bf4b9b8104219d15e76611",
+      "compositionDocumentHashSha256": "72dfb87779c5b71a5b677711352858b2401b7a797bfd6a1852f8015ef78ddaf4",
       "areaRoleCode": "Town",
       "loadPolicyCode": "OnDemand",
       "defaultEntryConnectorStableId": "stub:actual-e5:circular-market-town:ingress",
       "definition": {
         "schemaVersion": "simulation-world-area-set.v1",
         "areaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
-        "revision": 4,
+        "revision": 6,
         "title": "Town 생활·시장 AreaSet",
         "summary": "역할 슬롯 기반 AreaSet 구성 패턴으로 H3·H2를 작성 Scenario 지역 Graph에 결속한 실제 E5 공간이다.",
-        "definitionHashSha256": "4b80d7880740fce4243e2853891a71dad8d7d8e861a4f6de7823bc64563e3fae",
-        "documentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1",
+        "definitionHashSha256": "fa9d3490e49ecc68d3c09a7c0903a095eafdba081a0674f82a4f458abe58978d",
+        "documentHashSha256": "72dfb87779c5b71a5b677711352858b2401b7a797bfd6a1852f8015ef78ddaf4",
         "sourceCompositionPatternStableId": "area-set-composition:town:lowrise-life-market",
         "sourceCompositionPatternCode": "TOWN-ASET-COMP-01",
-        "sourceCompositionPatternHashSha256": "17113a5debb758e1753630d15b8b17dca10c31d097f7a8b126252f0a0ef83e50",
+        "sourceCompositionPatternHashSha256": "9d41b4157e453c7817f6cf8a6d6441044de89a6816bf4b9b8104219d15e76611",
         "sourceCompositionLedgerRevision": "simulation-world-area-set-composition-patterns.r1",
         "canonicalNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -5639,7 +5639,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:circular-market-town.v1",
             "graphRoleCode": "Town",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "87c7a687a6729790c66cd5c18a9f01f1a52d6e5ab0be8a49cfe321a65999d825",
             "buildStatusCode": "Available",
             "graphHashSha256": "a6e12050b947729b31537c58cc790a7145edb04a68b5feea441178a95a7dbd23",
@@ -5665,7 +5665,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-market-fulfillment.v1",
             "graphRoleCode": "Town",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "492257f10d3b34d0d16fb6b95ede991ddfa2d055378337c4be940e609f29376c",
             "buildStatusCode": "Available",
             "graphHashSha256": "e185e4cec7fb6c80c9d12306ca3c49d6e424fa357f63bc8ddc12380ebc0c8f16",
@@ -5691,7 +5691,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
             "graphRoleCode": "Town",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "f11c359dbb8f9deded748b4ce93d3a02af239df55d344602549f44d94d60fc57",
             "buildStatusCode": "Available",
             "graphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
@@ -5717,7 +5717,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-contamination-relief.v1",
             "graphRoleCode": "Town",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "12c4169f2dedb312ed9ba5c9d7cefbfea678b23aea9c9006c7859f56700518f6",
             "buildStatusCode": "Available",
             "graphHashSha256": "3d7d308b53592a181a0318056d8b2dec9ef117ca4fef60f3fad69493a37449f8",
@@ -5743,7 +5743,7 @@
           {
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-resident-service-loop.v1",
             "graphRoleCode": "Town",
-            "graphRevision": 4,
+            "graphRevision": 6,
             "definitionHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278",
             "buildStatusCode": "Available",
             "graphHashSha256": "62c457c68c6a7f09f630607dc404baf94926c816a214c78c999fd87f13474c5f",
@@ -5840,7 +5840,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:circular-market-town.v1",
           "graphBuildStableId": "graph-build:actual-e5:circular-market-town:a6e12050b947",
           "graphRoleCode": "Town",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "87c7a687a6729790c66cd5c18a9f01f1a52d6e5ab0be8a49cfe321a65999d825",
           "graphHashSha256": "a6e12050b947729b31537c58cc790a7145edb04a68b5feea441178a95a7dbd23",
           "spatialOwnerKindCode": "AreaSet",
@@ -6272,7 +6272,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-market-fulfillment.v1",
           "graphBuildStableId": "graph-build:actual-e5:town-market-fulfillment:e185e4cec7fb",
           "graphRoleCode": "Town",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "492257f10d3b34d0d16fb6b95ede991ddfa2d055378337c4be940e609f29376c",
           "graphHashSha256": "e185e4cec7fb6c80c9d12306ca3c49d6e424fa357f63bc8ddc12380ebc0c8f16",
           "spatialOwnerKindCode": "AreaSet",
@@ -6803,7 +6803,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
           "graphBuildStableId": "graph-build:actual-e5:lowrise-market-town:5d7551a86c4e",
           "graphRoleCode": "Town",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "f11c359dbb8f9deded748b4ce93d3a02af239df55d344602549f44d94d60fc57",
           "graphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
           "spatialOwnerKindCode": "AreaSet",
@@ -7191,7 +7191,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-contamination-relief.v1",
           "graphBuildStableId": "graph-build:actual-e5:town-contamination-relief:3d7d308b5359",
           "graphRoleCode": "Town",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "12c4169f2dedb312ed9ba5c9d7cefbfea678b23aea9c9006c7859f56700518f6",
           "graphHashSha256": "3d7d308b53592a181a0318056d8b2dec9ef117ca4fef60f3fad69493a37449f8",
           "spatialOwnerKindCode": "AreaSet",
@@ -7535,7 +7535,7 @@
           "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-resident-service-loop.v1",
           "graphBuildStableId": "graph-build:actual-e5:town-resident-service-loop:62c457c68c6a",
           "graphRoleCode": "Town",
-          "graphRevision": 4,
+          "graphRevision": 6,
           "definitionHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278",
           "graphHashSha256": "62c457c68c6a7f09f630607dc404baf94926c816a214c78c999fd87f13474c5f",
           "spatialOwnerKindCode": "AreaSet",
@@ -7936,16 +7936,16 @@
       "schemaVersion": "simulation-world-landscape-graph.v2",
       "areaSetStableId": "",
       "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-exploration-buffer.v1",
-      "graphBuildStableId": "graph-build:actual-e5:nature-exploration-buffer:ffd44a6a91c0",
+      "graphBuildStableId": "graph-build:actual-e5:nature-exploration-buffer:ea9c24731f96",
       "graphRoleCode": "NetworkRoute",
-      "graphRevision": 4,
-      "definitionHashSha256": "30746db6ea9946fa536e103f7d80e6cd6a7f988714a4fa0c1ff06f0a27d9698b",
-      "graphHashSha256": "ffd44a6a91c08d6214d4ddada4d018c095eaa5419f5b7cac20c37ddce7ee4739",
+      "graphRevision": 6,
+      "definitionHashSha256": "c565daa0c20b99fa04735ae64a852c89538a4e49da203c0f23868e51234a90df",
+      "graphHashSha256": "ea9c24731f9627bb9039ca5b6761e898d95b0f9977352ac107c4780f886a7e94",
       "spatialOwnerKindCode": "AreaSetNetwork",
       "spatialOwnerStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
       "coordinateSpaceCode": "ScenarioLocalMeters",
       "grammarRevision": "actual-e5-authored-scenario.r1",
-      "grammarHashSha256": "30746db6ea9946fa536e103f7d80e6cd6a7f988714a4fa0c1ff06f0a27d9698b",
+      "grammarHashSha256": "c565daa0c20b99fa04735ae64a852c89538a4e49da203c0f23868e51234a90df",
       "statusCode": "Available",
       "bounds": {
         "minEastingMeters": -274.0,
@@ -8236,7 +8236,7 @@
       "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-logistics.v1",
       "graphBuildStableId": "graph-build:actual-e5:farm-hub-logistics:4c3ffa389e6d",
       "graphRoleCode": "NetworkRoute",
-      "graphRevision": 4,
+      "graphRevision": 6,
       "definitionHashSha256": "a3e7ccf011dffe575cdbf4e189375ca18243701167c968e575eed2e2b8dc95f6",
       "graphHashSha256": "4c3ffa389e6d8627c72c36cf2371ed205bc2a00a420474766fa79a2b554e4416",
       "spatialOwnerKindCode": "AreaSetNetwork",
@@ -8631,16 +8631,16 @@
       "schemaVersion": "simulation-world-landscape-graph.v2",
       "areaSetStableId": "",
       "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-logistics.v1",
-      "graphBuildStableId": "graph-build:actual-e5:hub-town-logistics:3b546adf5e8a",
+      "graphBuildStableId": "graph-build:actual-e5:hub-town-logistics:82c1c9cfb583",
       "graphRoleCode": "NetworkRoute",
-      "graphRevision": 4,
-      "definitionHashSha256": "b1882fea91efcf4701256180c13769d804abd4a47c98329a6134bd4d75b5270e",
-      "graphHashSha256": "3b546adf5e8a998cd6532d67c7e2dc4af60a9286789b3260d918892b90259544",
+      "graphRevision": 6,
+      "definitionHashSha256": "3c30f82f2ec2d701e836b5f26c12cdf621665cc9179c6f98ac7e954d071e07e6",
+      "graphHashSha256": "82c1c9cfb583fc5bb8ab82df73fa61f4d26d3d6bd99048f030718f70f9e9b567",
       "spatialOwnerKindCode": "AreaSetNetwork",
       "spatialOwnerStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
       "coordinateSpaceCode": "ScenarioLocalMeters",
       "grammarRevision": "actual-e5-authored-scenario.r1",
-      "grammarHashSha256": "b1882fea91efcf4701256180c13769d804abd4a47c98329a6134bd4d75b5270e",
+      "grammarHashSha256": "3c30f82f2ec2d701e836b5f26c12cdf621665cc9179c6f98ac7e954d071e07e6",
       "statusCode": "Available",
       "bounds": {
         "minEastingMeters": -524.0,
@@ -9208,7 +9208,7 @@
     "schemaVersion": "simulation-world-interaction-graph-binding.v2",
     "networkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
     "catalogRevision": "actual-e5-regional-gameplay.r1",
-    "catalogHashSha256": "b95d7359ffe99cedbc0a950bfdf6015a3d54919ee3d2edf28c2851088117fd7d",
+    "catalogHashSha256": "206c4f81515aa7b7fb97e2c3a72d699a4b2e1e9731932608a787a8ac4c5f3017",
     "bindings": [
       {
         "bindingStableId": "binding:actual-e5:wi-001",
@@ -9218,8 +9218,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
         "requiredNodeSemanticCode": "hub-receiving-storage",
         "spatialRoleCode": "HubInspectionArea",
         "spatialStableId": "spatial:actual-e5:wi-001",
@@ -9236,7 +9236,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9260,8 +9260,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
         "requiredNodeSemanticCode": "hub-receiving-storage",
         "spatialRoleCode": "HubInspectionArea",
         "spatialStableId": "spatial:actual-e5:wi-002",
@@ -9279,7 +9279,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9296,6 +9296,63 @@
         ]
       },
       {
+        "bindingStableId": "binding:actual-e5:wi-con-01",
+        "worldInteractionId": "WI-CON-01",
+        "participationCode": "Required",
+        "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "spatialOwnerKindCode": "AreaSet",
+        "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
+        "requiredNodeSemanticCode": "nature-shelter",
+        "spatialRoleCode": "NatureTemporaryShelterArea",
+        "spatialStableId": "spatial:actual-e5:wi-con-01",
+        "facilityStableId": "facility:actual-e5:nature-home.v1",
+        "areaStableId": "area:actual-e5:nature-home.v1",
+        "capabilityCodes": [
+          "Spatial.AreaBuildingPlacementAllowed",
+          "Spatial.FootprintAvailable"
+        ],
+        "baseCapacities": [
+          {
+            "capacityCode": "BuildingSite",
+            "quantity": 1.0,
+            "unitCode": "slot",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-home.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "WorkArea",
+            "quantity": 1.0,
+            "unitCode": "slot",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-home.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "Material",
+            "quantity": 6.0,
+            "unitCode": "EA",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-home.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          }
+        ],
+        "reviewStatusCode": "ApprovedForSimulation",
+        "h1Ref": "h1-stock:nature-shelter",
+        "h2Ref": "h2-candidate:nature-defense-ring",
+        "h3Ref": "h3-candidate:nature-home-encounter-defense",
+        "sourceStableIds": [
+          "source:user-approved-plan:farm-immersive-living-region.r2",
+          "h1-stock:nature-shelter",
+          "h2-candidate:nature-defense-ring",
+          "h3-candidate:nature-home-encounter-defense",
+          "wi-spatial-seedbed:nature-survival-home.v1"
+        ]
+      },
+      {
         "bindingStableId": "binding:actual-e5:wi-farm-01",
         "worldInteractionId": "WI-FARM-01",
         "participationCode": "Required",
@@ -9303,8 +9360,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f4deaf0786acf6ec804e8fea8e4bbf038a62964efe70e1a70f2df2b257c4a92f",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "b2245da0bbbb6ec47e6d87cdcb32a9c621d82322dbf51c80dca934f6637e5fcc",
         "requiredNodeSemanticCode": "farm-production",
         "spatialRoleCode": "FarmProductionPlot",
         "spatialStableId": "spatial:actual-e5:wi-farm-01",
@@ -9320,7 +9377,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9344,8 +9401,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f4deaf0786acf6ec804e8fea8e4bbf038a62964efe70e1a70f2df2b257c4a92f",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "b2245da0bbbb6ec47e6d87cdcb32a9c621d82322dbf51c80dca934f6637e5fcc",
         "requiredNodeSemanticCode": "farm-production",
         "spatialRoleCode": "FarmProductionPlot",
         "spatialStableId": "spatial:actual-e5:wi-farm-02",
@@ -9376,8 +9433,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f4deaf0786acf6ec804e8fea8e4bbf038a62964efe70e1a70f2df2b257c4a92f",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "b2245da0bbbb6ec47e6d87cdcb32a9c621d82322dbf51c80dca934f6637e5fcc",
         "requiredNodeSemanticCode": "farm-production",
         "spatialRoleCode": "FarmProductionPlot",
         "spatialStableId": "spatial:actual-e5:wi-farm-03",
@@ -9409,8 +9466,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:highland-farm.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f4deaf0786acf6ec804e8fea8e4bbf038a62964efe70e1a70f2df2b257c4a92f",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "b2245da0bbbb6ec47e6d87cdcb32a9c621d82322dbf51c80dca934f6637e5fcc",
         "requiredNodeSemanticCode": "farm-production",
         "spatialRoleCode": "FarmProductionPlot",
         "spatialStableId": "spatial:actual-e5:wi-farm-04",
@@ -9428,7 +9485,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9452,7 +9509,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "c83128ca867f3ca20c14003265c1922d592cbbf9da60007afc82cfb7c4302b6f",
         "requiredNodeSemanticCode": "farm-work-yard",
         "spatialRoleCode": "FarmCollectionArea",
@@ -9470,7 +9527,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9494,7 +9551,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "c83128ca867f3ca20c14003265c1922d592cbbf9da60007afc82cfb7c4302b6f",
         "requiredNodeSemanticCode": "farm-work-yard",
         "spatialRoleCode": "FarmCollectionArea",
@@ -9512,7 +9569,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9536,8 +9593,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
         "requiredNodeSemanticCode": "hub-outbound-staging",
         "spatialRoleCode": "HubOutboundStagingArea",
         "spatialStableId": "spatial:actual-e5:wi-hub-04",
@@ -9554,7 +9611,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9566,7 +9623,8 @@
           "source:user-approved-plan:farm-immersive-living-region.r2",
           "h1-stock:hub-outbound-staging",
           "h2-candidate:hub-outbound-vehicle",
-          "h3-candidate:jinbu-hub"
+          "h3-candidate:jinbu-hub",
+          "wi-spatial-seedbed:hub-outbound-staging.v1"
         ]
       },
       {
@@ -9577,8 +9635,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
         "requiredNodeSemanticCode": "hub-outbound-staging",
         "spatialRoleCode": "HubOutboundStagingArea",
         "spatialStableId": "spatial:actual-e5:wi-hub-05",
@@ -9594,7 +9652,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9606,7 +9664,8 @@
           "source:user-approved-plan:farm-immersive-living-region.r2",
           "h1-stock:hub-outbound-staging",
           "h2-candidate:hub-outbound-vehicle",
-          "h3-candidate:jinbu-hub"
+          "h3-candidate:jinbu-hub",
+          "wi-spatial-seedbed:hub-outbound-staging.v1"
         ]
       },
       {
@@ -9617,8 +9676,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
         "requiredNodeSemanticCode": "hub-vehicle-yard",
         "spatialRoleCode": "HubVehicleLoadingArea",
         "spatialStableId": "spatial:actual-e5:wi-hub-06",
@@ -9635,7 +9694,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9658,7 +9717,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "c83128ca867f3ca20c14003265c1922d592cbbf9da60007afc82cfb7c4302b6f",
         "requiredNodeSemanticCode": "farm-loading-gate",
         "spatialRoleCode": "FarmGate",
@@ -9676,7 +9735,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9700,7 +9759,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "c83128ca867f3ca20c14003265c1922d592cbbf9da60007afc82cfb7c4302b6f",
         "requiredNodeSemanticCode": "farm-loading-gate",
         "spatialRoleCode": "FarmGate",
@@ -9731,7 +9790,7 @@
         "spatialOwnerKindCode": "AreaSetNetwork",
         "spatialOwnerStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-hub-logistics.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "4c3ffa389e6d8627c72c36cf2371ed205bc2a00a420474766fa79a2b554e4416",
         "requiredNodeSemanticCode": "farm-hub-corridor",
         "spatialRoleCode": "FarmHubCargoCorridor",
@@ -9762,8 +9821,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
         "requiredNodeSemanticCode": "hub-receiving-storage",
         "spatialRoleCode": "HubInspectionArea",
         "spatialStableId": "spatial:actual-e5:wi-log-04",
@@ -9779,7 +9838,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9803,8 +9862,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:jinbu-hub.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "0e93f0eeb31c82eaa6546dbb80f7c5a101a75eb2da4b1d2b5ceb1596dd63353a",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "2adbaf3635a98dd9c66dce10619aa4986bf552371c8b444f3eea7912a10e5ec3",
         "requiredNodeSemanticCode": "hub-receiving-storage",
         "spatialRoleCode": "HubInspectionArea",
         "spatialStableId": "spatial:actual-e5:wi-log-05",
@@ -9819,7 +9878,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9843,8 +9902,8 @@
         "spatialOwnerKindCode": "AreaSetNetwork",
         "spatialOwnerStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-town-logistics.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "3b546adf5e8a998cd6532d67c7e2dc4af60a9286789b3260d918892b90259544",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "82c1c9cfb583fc5bb8ab82df73fa61f4d26d3d6bd99048f030718f70f9e9b567",
         "requiredNodeSemanticCode": "hub-market-transfer",
         "spatialRoleCode": "HubMarketTransferArea",
         "spatialStableId": "spatial:actual-e5:wi-market-01",
@@ -9874,7 +9933,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-market-receiving",
         "spatialRoleCode": "MarketBackroomArea",
@@ -9892,7 +9951,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9915,7 +9974,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-market-receiving",
         "spatialRoleCode": "MarketBackroomArea",
@@ -9932,7 +9991,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9955,7 +10014,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-market-receiving",
         "spatialRoleCode": "MarketBackroomArea",
@@ -9973,7 +10032,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -9996,7 +10055,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-market-display",
         "spatialRoleCode": "MarketDisplayArea",
@@ -10014,7 +10073,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -10037,7 +10096,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5658ade82761d62763443afa86763690e7860500fb98e87a4a8f68e38f657935",
         "requiredNodeSemanticCode": "nature-incident-trace",
         "spatialRoleCode": "NatureIncidentTraceArea",
@@ -10052,11 +10111,27 @@
         "baseCapacities": [
           {
             "capacityCode": "WorkArea",
-            "quantity": 1,
+            "quantity": 1.0,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
-            "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "Actor",
+            "quantity": 1.0,
+            "unitCode": "player",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "MonitoredThreatRoute",
+            "quantity": 1.0,
+            "unitCode": "route",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
           }
         ],
         "reviewStatusCode": "ApprovedForSimulation",
@@ -10067,7 +10142,8 @@
           "source:user-approved-plan:farm-immersive-living-region.r2",
           "h1-stock:nature-incident-trace",
           "h2-candidate:nature-threat-response",
-          "h3-candidate:nature-threat-recovery"
+          "h3-candidate:nature-threat-recovery",
+          "wi-spatial-seedbed:nature-survival-encounter.v1"
         ]
       },
       {
@@ -10078,7 +10154,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5658ade82761d62763443afa86763690e7860500fb98e87a4a8f68e38f657935",
         "requiredNodeSemanticCode": "nature-emergency-retreat",
         "spatialRoleCode": "NatureEmergencyRetreatArea",
@@ -10110,7 +10186,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5658ade82761d62763443afa86763690e7860500fb98e87a4a8f68e38f657935",
         "requiredNodeSemanticCode": "nature-restoration-site",
         "spatialRoleCode": "NatureRestorationWorkArea",
@@ -10128,7 +10204,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -10151,7 +10227,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5658ade82761d62763443afa86763690e7860500fb98e87a4a8f68e38f657935",
         "requiredNodeSemanticCode": "nature-safe-recovery-camp",
         "spatialRoleCode": "NatureSafeRecoveryCampArea",
@@ -10169,7 +10245,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -10192,8 +10268,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
         "requiredNodeSemanticCode": "nature-trailhead",
         "spatialRoleCode": "NatureTrailheadArea",
         "spatialStableId": "spatial:actual-e5:wi-nature-05",
@@ -10242,8 +10318,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-trail-network.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "ad7f6f8143ef185a2c0a64c1c53feb3e32d74825409340d4cd5a88ec5f5d4c44",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "11a53aeae9518ea659a26964039fccd1782b70e799f4a9ac57f19018349be531",
         "requiredNodeSemanticCode": "nature-exploration-buffer",
         "spatialRoleCode": "NatureExplorationBuffer",
         "spatialStableId": "spatial:actual-e5:wi-nature-06",
@@ -10286,6 +10362,14 @@
             "evidenceKindCode": "Scenario",
             "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
             "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "DroppedTimber",
+            "quantity": 3.0,
+            "unitCode": "bundle",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
           }
         ],
         "reviewStatusCode": "ApprovedForSimulation",
@@ -10308,8 +10392,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
         "requiredNodeSemanticCode": "nature-shelter",
         "spatialRoleCode": "NatureTemporaryShelterArea",
         "spatialStableId": "spatial:actual-e5:wi-nature-07",
@@ -10366,8 +10450,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
         "requiredNodeSemanticCode": "nature-shelter",
         "spatialRoleCode": "NatureTemporaryShelterArea",
         "spatialStableId": "spatial:actual-e5:wi-nature-08",
@@ -10425,8 +10509,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
         "requiredNodeSemanticCode": "nature-shelter",
         "spatialRoleCode": "NatureTemporaryShelterArea",
         "spatialStableId": "spatial:actual-e5:wi-nature-09",
@@ -10468,8 +10552,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
         "requiredNodeSemanticCode": "nature-shelter",
         "spatialRoleCode": "NatureTemporaryShelterArea",
         "spatialStableId": "spatial:actual-e5:wi-nature-10",
@@ -10511,8 +10595,8 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
-        "requiredGraphRevision": 4,
-        "requiredGraphHashSha256": "f6cf22cc733479f076370344210252df6386305ecc5f8500700dbd225ae46598",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
         "requiredNodeSemanticCode": "nature-emergency-retreat",
         "spatialRoleCode": "NatureEmergencyRetreatArea",
         "spatialStableId": "spatial:actual-e5:wi-nature-11",
@@ -10562,6 +10646,201 @@
         ]
       },
       {
+        "bindingStableId": "binding:actual-e5:wi-nature-13",
+        "worldInteractionId": "WI-NATURE-13",
+        "participationCode": "Required",
+        "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "spatialOwnerKindCode": "AreaSet",
+        "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
+        "requiredNodeSemanticCode": "nature-shelter",
+        "spatialRoleCode": "NatureTemporaryShelterArea",
+        "spatialStableId": "spatial:actual-e5:wi-nature-13",
+        "facilityStableId": "facility:actual-e5:nature-home.v1",
+        "areaStableId": "area:actual-e5:nature-home.v1",
+        "capabilityCodes": [
+          "Spatial.ShelterInterior",
+          "Spatial.StorageInteractionAnchor"
+        ],
+        "baseCapacities": [
+          {
+            "capacityCode": "ShelterOccupancy",
+            "quantity": 1.0,
+            "unitCode": "player",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-home.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          }
+        ],
+        "reviewStatusCode": "ApprovedForSimulation",
+        "h1Ref": "h1-stock:nature-shelter",
+        "h2Ref": "h2-candidate:nature-defense-ring",
+        "h3Ref": "h3-candidate:nature-home-encounter-defense",
+        "sourceStableIds": [
+          "source:user-approved-plan:farm-immersive-living-region.r2",
+          "h1-stock:nature-shelter",
+          "h2-candidate:nature-defense-ring",
+          "h3-candidate:nature-home-encounter-defense",
+          "wi-spatial-seedbed:nature-survival-home.v1"
+        ]
+      },
+      {
+        "bindingStableId": "binding:actual-e5:wi-nature-14",
+        "worldInteractionId": "WI-NATURE-14",
+        "participationCode": "Required",
+        "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "spatialOwnerKindCode": "AreaSet",
+        "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
+        "requiredNodeSemanticCode": "nature-shelter",
+        "spatialRoleCode": "NatureTemporaryShelterArea",
+        "spatialStableId": "spatial:actual-e5:wi-nature-14",
+        "facilityStableId": "facility:actual-e5:nature-home.v1",
+        "areaStableId": "area:actual-e5:nature-home.v1",
+        "capabilityCodes": [
+          "Spatial.ShelterInterior",
+          "Spatial.SleepInteractionAnchor"
+        ],
+        "baseCapacities": [
+          {
+            "capacityCode": "ShelterOccupancy",
+            "quantity": 1.0,
+            "unitCode": "player",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-home.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          }
+        ],
+        "reviewStatusCode": "ApprovedForSimulation",
+        "h1Ref": "h1-stock:nature-shelter",
+        "h2Ref": "h2-candidate:nature-defense-ring",
+        "h3Ref": "h3-candidate:nature-home-encounter-defense",
+        "sourceStableIds": [
+          "source:user-approved-plan:farm-immersive-living-region.r2",
+          "h1-stock:nature-shelter",
+          "h2-candidate:nature-defense-ring",
+          "h3-candidate:nature-home-encounter-defense",
+          "wi-spatial-seedbed:nature-survival-home.v1"
+        ]
+      },
+      {
+        "bindingStableId": "binding:actual-e5:wi-nature-15",
+        "worldInteractionId": "WI-NATURE-15",
+        "participationCode": "Required",
+        "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "spatialOwnerKindCode": "AreaSet",
+        "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-home-encounter-defense.v1",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "9b394c857f003943ca4c91106a6753ed4dd0ec9b93057d4f15026e3b73fc93c4",
+        "requiredNodeSemanticCode": "nature-shelter",
+        "spatialRoleCode": "NatureTemporaryShelterArea",
+        "spatialStableId": "spatial:actual-e5:wi-nature-15",
+        "facilityStableId": "facility:actual-e5:nature-home.v1",
+        "areaStableId": "area:actual-e5:nature-home.v1",
+        "capabilityCodes": [
+          "Spatial.ShelterInterior"
+        ],
+        "baseCapacities": [
+          {
+            "capacityCode": "ShelterOccupancy",
+            "quantity": 1.0,
+            "unitCode": "player",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-home.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          }
+        ],
+        "reviewStatusCode": "ApprovedForSimulation",
+        "h1Ref": "h1-stock:nature-shelter",
+        "h2Ref": "h2-candidate:nature-defense-ring",
+        "h3Ref": "h3-candidate:nature-home-encounter-defense",
+        "sourceStableIds": [
+          "source:user-approved-plan:farm-immersive-living-region.r2",
+          "h1-stock:nature-shelter",
+          "h2-candidate:nature-defense-ring",
+          "h3-candidate:nature-home-encounter-defense",
+          "wi-spatial-seedbed:nature-survival-home.v1"
+        ]
+      },
+      {
+        "bindingStableId": "binding:actual-e5:wi-nature-18",
+        "worldInteractionId": "WI-NATURE-18",
+        "participationCode": "Required",
+        "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "spatialOwnerKindCode": "AreaSet",
+        "spatialOwnerStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:nature-trail-network.v1",
+        "requiredGraphRevision": 6,
+        "requiredGraphHashSha256": "11a53aeae9518ea659a26964039fccd1782b70e799f4a9ac57f19018349be531",
+        "requiredNodeSemanticCode": "nature-exploration-buffer",
+        "spatialRoleCode": "NatureExplorationBuffer",
+        "spatialStableId": "spatial:actual-e5:wi-nature-18",
+        "facilityStableId": "facility:actual-e5:nature-home.v1",
+        "areaStableId": "area:actual-e5:nature-home.v1",
+        "capabilityCodes": [
+          "Spatial.DroppedTimberPickupAnchor",
+          "Spatial.WorkerAccessible"
+        ],
+        "baseCapacities": [
+          {
+            "capacityCode": "WorkArea",
+            "quantity": 1.0,
+            "unitCode": "slot",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "ResourceNode",
+            "quantity": 3.0,
+            "unitCode": "tree",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "Actor",
+            "quantity": 1.0,
+            "unitCode": "player",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "Tool",
+            "quantity": 1.0,
+            "unitCode": "EA",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          },
+          {
+            "capacityCode": "DroppedTimber",
+            "quantity": 3.0,
+            "unitCode": "bundle",
+            "evidenceKindCode": "Scenario",
+            "evidenceReference": "wi-spatial-seedbed:nature-survival-encounter.v1",
+            "capacityRuleRevision": "nature-survival-spatial-capacity.r1"
+          }
+        ],
+        "reviewStatusCode": "ApprovedForSimulation",
+        "h1Ref": "h1-stock:nature-exploration-buffer",
+        "h2Ref": "h2-candidate:nature-water-buffer",
+        "h3Ref": "h3-candidate:nature-trail-network",
+        "sourceStableIds": [
+          "source:user-approved-plan:farm-immersive-living-region.r2",
+          "h1-stock:nature-exploration-buffer",
+          "h2-candidate:nature-water-buffer",
+          "h3-candidate:nature-trail-network",
+          "wi-spatial-seedbed:nature-survival-encounter.v1"
+        ]
+      },
+      {
         "bindingStableId": "binding:actual-e5:wi-order-03",
         "worldInteractionId": "WI-ORDER-03",
         "participationCode": "Required",
@@ -10569,7 +10848,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-market-display",
         "spatialRoleCode": "MarketDisplayArea",
@@ -10585,7 +10864,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -10608,7 +10887,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-order-packing",
         "spatialRoleCode": "OrderPackingArea",
@@ -10624,7 +10903,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -10647,7 +10926,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-resident-pickup",
         "spatialRoleCode": "ResidentPickupArea",
@@ -10677,7 +10956,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:town-market.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:lowrise-market-town.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "5d7551a86c4e06f1d3bf4efc91818e4268a200197f449428e3812d7e280480cb",
         "requiredNodeSemanticCode": "town-resident-pickup",
         "spatialRoleCode": "ResidentPickupArea",
@@ -10694,7 +10973,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -10717,7 +10996,7 @@
         "spatialOwnerKindCode": "AreaSet",
         "spatialOwnerStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
-        "requiredGraphRevision": 4,
+        "requiredGraphRevision": 6,
         "requiredGraphHashSha256": "c83128ca867f3ca20c14003265c1922d592cbbf9da60007afc82cfb7c4302b6f",
         "requiredNodeSemanticCode": "farm-maintenance-yard",
         "spatialRoleCode": "FarmMaintenanceYard",
@@ -10734,7 +11013,7 @@
             "quantity": 1,
             "unitCode": "slot",
             "evidenceKindCode": "Scenario",
-            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r5",
+            "evidenceReference": "simulation-world-actual-e5-spatial-policy.r7",
             "capacityRuleRevision": "actual-e5-work-area-capacity.r1"
           }
         ],
@@ -10807,6 +11086,9 @@
       }
     ],
     "nonSpatialWiIds": [
+      "WI-ACTOR-01",
+      "WI-ACTOR-02",
+      "WI-CARD-01",
       "WI-ORDER-01",
       "WI-ORDER-02",
       "WI-WORLD-02",
@@ -10814,7 +11096,15 @@
       "WI-WORLD-06",
       "WI-WORLD-08"
     ],
-    "pendingE5WiIds": [],
+    "pendingE5WiIds": [
+      "WI-CITY-01",
+      "WI-CITY-02",
+      "WI-CITY-03",
+      "WI-CITY-04",
+      "WI-NATURE-16",
+      "WI-NATURE-17",
+      "WI-REFLECT-01"
+    ],
     "transitions": [
       {
         "transitionStableId": "transition:actual-e5:wi-farm-01:wi-farm-02",
@@ -10967,6 +11257,11 @@
         "toWorldInteractionId": "WI-NATURE-03"
       },
       {
+        "transitionStableId": "transition:actual-e5:wi-nature-01:wi-nature-11",
+        "fromWorldInteractionId": "WI-NATURE-01",
+        "toWorldInteractionId": "WI-NATURE-11"
+      },
+      {
         "transitionStableId": "transition:actual-e5:wi-nature-02:wi-nature-04",
         "fromWorldInteractionId": "WI-NATURE-02",
         "toWorldInteractionId": "WI-NATURE-04"
@@ -10977,9 +11272,24 @@
         "toWorldInteractionId": "WI-NATURE-04"
       },
       {
-        "transitionStableId": "transition:actual-e5:wi-nature-05:wi-nature-06",
+        "transitionStableId": "transition:actual-e5:wi-nature-11:wi-nature-04",
+        "fromWorldInteractionId": "WI-NATURE-11",
+        "toWorldInteractionId": "WI-NATURE-04"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-05:wi-actor-02",
         "fromWorldInteractionId": "WI-NATURE-05",
+        "toWorldInteractionId": "WI-ACTOR-02"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-actor-02:wi-nature-06",
+        "fromWorldInteractionId": "WI-ACTOR-02",
         "toWorldInteractionId": "WI-NATURE-06"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-06:wi-nature-18",
+        "fromWorldInteractionId": "WI-NATURE-06",
+        "toWorldInteractionId": "WI-NATURE-18"
       },
       {
         "transitionStableId": "transition:actual-e5:wi-nature-06:wi-nature-06",
@@ -11012,9 +11322,19 @@
         "toWorldInteractionId": "WI-NATURE-12"
       },
       {
+        "transitionStableId": "transition:actual-e5:wi-nature-08:wi-nature-13",
+        "fromWorldInteractionId": "WI-NATURE-08",
+        "toWorldInteractionId": "WI-NATURE-13"
+      },
+      {
         "transitionStableId": "transition:actual-e5:wi-nature-09:wi-nature-10",
         "fromWorldInteractionId": "WI-NATURE-09",
         "toWorldInteractionId": "WI-NATURE-10"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-09:wi-nature-13",
+        "fromWorldInteractionId": "WI-NATURE-09",
+        "toWorldInteractionId": "WI-NATURE-13"
       },
       {
         "transitionStableId": "transition:actual-e5:wi-nature-10:wi-nature-09",
@@ -11022,9 +11342,69 @@
         "toWorldInteractionId": "WI-NATURE-09"
       },
       {
-        "transitionStableId": "transition:actual-e5:wi-nature-11:wi-nature-04",
+        "transitionStableId": "transition:actual-e5:wi-nature-11:wi-nature-14",
         "fromWorldInteractionId": "WI-NATURE-11",
-        "toWorldInteractionId": "WI-NATURE-04"
+        "toWorldInteractionId": "WI-NATURE-14"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-11:wi-nature-17",
+        "fromWorldInteractionId": "WI-NATURE-11",
+        "toWorldInteractionId": "WI-NATURE-17"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-13:wi-nature-11",
+        "fromWorldInteractionId": "WI-NATURE-13",
+        "toWorldInteractionId": "WI-NATURE-11"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-13:wi-nature-14",
+        "fromWorldInteractionId": "WI-NATURE-13",
+        "toWorldInteractionId": "WI-NATURE-14"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-13:wi-nature-17",
+        "fromWorldInteractionId": "WI-NATURE-13",
+        "toWorldInteractionId": "WI-NATURE-17"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-14:wi-nature-15",
+        "fromWorldInteractionId": "WI-NATURE-14",
+        "toWorldInteractionId": "WI-NATURE-15"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-15:wi-con-01",
+        "fromWorldInteractionId": "WI-NATURE-15",
+        "toWorldInteractionId": "WI-CON-01"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-17:wi-nature-06",
+        "fromWorldInteractionId": "WI-NATURE-17",
+        "toWorldInteractionId": "WI-NATURE-06"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-18:wi-nature-06",
+        "fromWorldInteractionId": "WI-NATURE-18",
+        "toWorldInteractionId": "WI-NATURE-06"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-nature-18:wi-nature-07",
+        "fromWorldInteractionId": "WI-NATURE-18",
+        "toWorldInteractionId": "WI-NATURE-07"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-city-01:wi-city-02",
+        "fromWorldInteractionId": "WI-CITY-01",
+        "toWorldInteractionId": "WI-CITY-02"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-city-02:wi-city-03",
+        "fromWorldInteractionId": "WI-CITY-02",
+        "toWorldInteractionId": "WI-CITY-03"
+      },
+      {
+        "transitionStableId": "transition:actual-e5:wi-city-03:wi-city-04",
+        "fromWorldInteractionId": "WI-CITY-03",
+        "toWorldInteractionId": "WI-CITY-04"
       }
     ]
   },

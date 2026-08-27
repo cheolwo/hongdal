@@ -3,16 +3,16 @@
 > 이 문서는 `eng/world-seedbeds/spatial-hierarchy-levels.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
 - 계층 대장 개정: `simulation-world-spatial-hierarchy.r1`
-- 증거 단계 개정: `simulation-evidence-stages.r10`
+- 증거 단계 개정: `simulation-evidence-stages.r13`
 - 축 구분: `E`는 증거 성숙도, `G`는 성숙도를 높이는 관리 체계, `H`는 공간 포함 깊이다.
 - 모판 계열: `H1 작업공간 → H2 블록 → H3 경관 → H4 지역`으로 상향 조립하며 재고 상태는 별도 대장에서 관리한다.
-- 현재 정의 수: `H1 7 / H2 0 / H3 5 / H4 1`
+- 현재 정의 수: `H1 8 / H2 0 / H3 5 / H4 1`
 
 ## 포함 계층
 
 | 계층 | 의미 | 포함 | 현재 정의 | 현재 정책 |
 | --- | --- | --- | ---: | --- |
-| `H1` | 작업공간 모판 | - | 7 | `Defined` |
+| `H1` | 작업공간 모판 | - | 8 | `Defined` |
 | `H2` | 블록 모판 | H1 | 0 | `DesignInventorySeparatedFromE5Instances` |
 | `H3` | 경관 모판 | H2 | 5 | `DefinedPartialAssemblyAllowed` |
 | `H4` | 지역 모판 | H3 | 1 | `DefinedPartialAssemblyAllowed` |
@@ -35,8 +35,8 @@ H 코드는 리소스 종류를 분류할 뿐 E 완료 상태를 올리지 않�
 | `E5` | 공간 WI의 조건부 증거로 H1→H5 조립 사용 | 권위 전이·Task/Effect·결과·후속 선택이 결정적 세계에서 발현된다. 공간 조립만으로 완료되지 않는다. |
 | `E6` | E5 WI 폐루프와 필요한 H 결과 사용 | WI·상태 변화와 인과 폐루프를 설명하고 필요한 현실 문맥의 출처·판본·hash·한계를 결속한다. |
 | `E7` | E6 결과 사용 | 플레이어가 실제 서버와 저장 Scene에서 폐루프를 수행한다. |
-| `E8` | 선정된 E7 세계의 H 경로 사용 | NPC가 지속되는 생활·업무 주체로 행동한다. |
-| `E9` | E1~E8 계약과 증거 재사용 | 변경 영향 분석과 하위 단계 재검증을 거쳐 새 안정 상태를 만든다. |
+| `E8` | 한 E7 PlayableUnit의 H 경로와 상태 사본 사용 | 같은 폐루프의 반복 결정성·Save 재진입·Local/Remote·실제 입력 안정성을 확인한다. |
+| `E9` | 같은 영역의 E8 Core 둘 이상과 H 인계 사용 | 공간·시간·자원·회복·조건부 NPC 연속성의 조화와 사람 승인을 확인한다. |
 
 ## 계층에서 제외하는 축
 

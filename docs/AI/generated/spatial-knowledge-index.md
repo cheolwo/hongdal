@@ -14,10 +14,11 @@
 | `ApprovedReference` | `h1-stock:farm-loading-gate` | 농장 상차·출입 공간 | WI-LOG-01, WI-LOG-02, Spatial.CargoAccessible, Spatial.LoadingWorkArea, Spatial.VehicleAccessible, Spatial.WorkerAccessible, Farm, Transition |
 | `ApprovedReference` | `h1-stock:farm-production` | 농업 생산구획 | WI-FARM-01, WI-FARM-02, WI-FARM-03, WI-FARM-04, Spatial.CargoAccessible, Spatial.CropCareWorkArea, Spatial.CropProduction, Spatial.HarvestWorkArea, Spatial.SowingWorkArea, Spatial.TillingWorkArea, Spatial.WaterAccessible, Spatial.WorkerAccessible, Farm |
 | `ApprovedReference` | `h1-stock:farm-work-yard` | 수확·집하 작업마당 | WI-FARM-05, WI-FARM-06, WI-WORLD-04, Spatial.CargoAccessible, Spatial.CollectionWorkArea, Spatial.PackingWorkArea, Spatial.WorkerAccessible, Farm |
+| `ApprovedReference` | `h1-stock:hub-outbound-staging` | Hub 피킹·출고 준비 공간 | WI-HUB-03, WI-HUB-04, WI-HUB-05, Spatial.CargoAccessible, Spatial.OutboundStagingArea, Spatial.PickingWorkArea, Spatial.Storage, Spatial.WorkerAccessible, City |
 | `ApprovedReference` | `h1-stock:hub-receiving-storage` | Hub 입고·검수·보관 공간 | WI-LOG-04, WI-LOG-05, WI-001, WI-002, Spatial.CargoAccessible, Spatial.InspectionWorkArea, Spatial.LoadingWorkArea, Spatial.Storage, Spatial.UnloadingWorkArea, Spatial.WorkerAccessible, City |
 | `CandidateForReview` | `h1-stock:farm-tool-storage` | 농기구 보관 공간 | WI-WORLD-04, ToolCheckout, ToolReturn, NextTaskPreparation, Spatial.Storage, Spatial.WorkerAccessible, Farm |
 | `CandidateForReview` | `h1-stock:farm-worker-waiting` | 농가 귀환·작업자 대기 공간 | WI-WORLD-01, WorkerBriefing, ShiftHandoff, FarmReturn, FarmRest, NextTaskSelection, Spatial.WorkerAccessible, Spatial.NpcWorkArea, Spatial.RestArea, Farm, Town |
-| `CandidateForReview` | `h1-stock:nature-emergency-retreat` | 자연권 긴급 후퇴 길목 | WI-NATURE-02, EmergencyRetreat, ThreatEvacuation, SafeCoreReturn, Spatial.Traversable, Spatial.EmergencyAccess, Spatial.PlayerEscapeRoute, Nature |
+| `CandidateForReview` | `h1-stock:nature-emergency-retreat` | 자연권 긴급 후퇴 길목 | WI-NATURE-02, WI-NATURE-11, EmergencyRetreat, ThreatEvacuation, SafeCoreReturn, Spatial.Traversable, Spatial.EmergencyAccess, Spatial.PlayerEscapeRoute, Spatial.EncounterDecisionArea, Spatial.RetreatRoute, Nature |
 | `CandidateForReview` | `h1-stock:nature-incident-trace` | 자연권 사건 흔적 조사 구역 | WI-NATURE-01, IncidentTraceInvestigation, CauseIdentification, ThreatTracking, Spatial.Traversable, Spatial.InvestigationArea, Spatial.ThreatMonitoringArea, Nature |
 | `CandidateForReview` | `h1-stock:nature-restoration-site` | 자연권 정화·복구 작업 공간 | WI-NATURE-03, NatureRestoration, ContaminationCleanup, RouteRecovery, Spatial.WorkerAccessible, Spatial.RestorationWorkArea, Spatial.CargoAccessible, Nature |
 | `CandidateForReview` | `h1-stock:nature-safe-recovery-camp` | 자연권 안전 회복 야영지 | WI-NATURE-04, PartyRecovery, ThreatDebrief, NextActionPreparation, Spatial.Traversable, Spatial.RestArea, Spatial.SafeCore, Spatial.NpcWorkArea, Nature |
@@ -30,14 +31,13 @@
 | `ExploratoryInventory` | `h1-stock:farm-weather-protection` | 농장 기상 보호 적치 공간 | WeatherProtectedStaging, HarvestDelay, MaterialShelter, Spatial.CargoAccessible, Spatial.TemporaryStorage, Spatial.WeatherShelter, Farm |
 | `ExploratoryInventory` | `h1-stock:hub-long-term-storage` | Hub 장기 보관 공간 | WI-002, LongTermStorage, StorageAging, CapacityPlanning, Spatial.Storage, Spatial.CargoAccessible, Spatial.WorkerAccessible, City |
 | `ExploratoryInventory` | `h1-stock:hub-market-transfer` | Hub–시장 화물 인계 공간 | WI-MARKET-01, WI-MARKET-02, City, Transition |
-| `ExploratoryInventory` | `h1-stock:hub-outbound-staging` | Hub 피킹·출고 준비 공간 | WI-HUB-03, WI-HUB-04, WI-HUB-05, City |
 | `ExploratoryInventory` | `h1-stock:hub-service-maintenance` | Hub 시설 정비 공간 | WI-WORLD-04, City, Transition |
 | `ExploratoryInventory` | `h1-stock:hub-temporary-staging` | Hub 임시 적치 공간 | WI-001, WI-HUB-04, WI-HUB-05, InboundStaging, OutboundStaging, Spatial.CargoAccessible, Spatial.WorkerAccessible, Spatial.TemporaryStorage, City |
 | `ExploratoryInventory` | `h1-stock:hub-town-corridor` | Hub–Town 물류 회랑 | WI-MARKET-01, Network, Transition |
 | `ExploratoryInventory` | `h1-stock:hub-vehicle-yard` | Hub 차량 상차·대기 공간 | WI-HUB-06, WI-MARKET-01, City |
-| `ExploratoryInventory` | `h1-stock:nature-exploration-buffer` | 자연 탐색·완충 공간 | WI-WORLD-05, WI-WORLD-07, Nature |
+| `ExploratoryInventory` | `h1-stock:nature-exploration-buffer` | 자연 탐색·완충 공간 | WI-WORLD-05, WI-WORLD-07, WI-NATURE-06, WI-NATURE-18, TimberHarvest, Spatial.Traversable, Spatial.WorkerAccessible, Spatial.HarvestResourceWorkArea, Nature |
 | `ExploratoryInventory` | `h1-stock:nature-farm-edge` | 숲 경계형 농장 전환 공간 | WI-WORLD-05, Nature, Transition |
-| `ExploratoryInventory` | `h1-stock:nature-trailhead` | 자연 탐색 출발지 | WI-WORLD-05, WI-WORLD-07, TrailStart, RouteCheck, ExplorationBriefing, Spatial.Traversable, Spatial.WorkerAccessible, Spatial.InformationArea, Nature |
+| `ExploratoryInventory` | `h1-stock:nature-trailhead` | 자연 탐색 출발지 | WI-WORLD-05, WI-WORLD-07, WI-NATURE-05, TrailStart, RouteCheck, ExplorationBriefing, Spatial.Traversable, Spatial.WorkerAccessible, Spatial.InformationArea, Spatial.PlayerAccessible, Spatial.ToolPickupPoint, Nature |
 | `ExploratoryInventory` | `h1-stock:road-facility-access` | 도로–시설 진입 전환 공간 | WI-WORLD-04, Network, Transition |
 | `ExploratoryInventory` | `h1-stock:town-contamination-inspection` | 생활권 재고 오염 점검 공간 | MarketContaminationInspection, StockSafetyAssessment, SaleHoldDecision, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.InspectionWorkArea, City, Town |
 | `ExploratoryInventory` | `h1-stock:town-living-square` | 생활권 작은 광장 | WI-WORLD-05, WI-ORDER-07, Town |
@@ -56,7 +56,7 @@
 | `IdeaInventory` | `h1-stock:hub-quarantine` | Hub 검역·격리 공간 | CargoQuarantine, QualityHold, ReleaseOrReject, Spatial.CargoAccessible, Spatial.WorkerAccessible, Spatial.ExclusiveOccupancy, City |
 | `IdeaInventory` | `h1-stock:hub-returns` | Hub 반품 처리 공간 | ReturnReceiving, ReturnInspection, RestockOrDispose, Spatial.CargoAccessible, Spatial.WorkerAccessible, Spatial.InspectionWorkArea, City |
 | `IdeaInventory` | `h1-stock:nature-lookout` | 자연 전망·관찰 공간 | WI-WORLD-05, LandscapeObservation, ThreatObservation, Spatial.Traversable, Spatial.ObservationArea, Nature |
-| `IdeaInventory` | `h1-stock:nature-shelter` | 자연 임시 대피 공간 | WI-WORLD-07, TemporaryShelter, WeatherWait, Recovery, Spatial.Traversable, Spatial.RestArea, Spatial.WeatherShelter, Nature |
+| `IdeaInventory` | `h1-stock:nature-shelter` | 자연 임시 대피 공간 | WI-WORLD-07, WI-NATURE-07, WI-NATURE-08, WI-NATURE-09, WI-NATURE-10, WI-NATURE-13, WI-NATURE-14, WI-NATURE-15, WI-CON-01, TemporaryShelter, WeatherWait, Recovery, Spatial.Traversable, Spatial.RestArea, Spatial.WeatherShelter, Spatial.PlayerAccessible, Spatial.WorkerAccessible, Spatial.BuildingSite, Spatial.ShelterConstructionWorkArea, Spatial.ShelterEntrance, Spatial.ShelterInterior, Spatial.ShelterStorage, Spatial.StorageInteractionAnchor, Spatial.ShelterSleep, Spatial.SleepInteractionAnchor, Spatial.DawnPlanChoice, Spatial.DawnPlanChoiceAnchor, Spatial.AreaBuildingFootprint, Spatial.AreaBuildingPlacementAllowed, Spatial.FootprintAvailable, Spatial.CraftingWorkArea, Spatial.ActiveWorkReservationContext, Nature |
 | `IdeaInventory` | `h1-stock:town-cleanup-transfer` | 생활권 정화·폐기 인계 공간 | ContaminatedWasteTransfer, MarketCleanup, ServiceVehicleHandoff, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.VehicleAccessible, Spatial.WasteHandlingArea, City, Town |
 | `IdeaInventory` | `h1-stock:town-contamination-quarantine` | 생활권 오염 재고 격리 공간 | MarketStockQuarantine, RecallHold, ReleaseOrDispose, Spatial.WorkerAccessible, Spatial.CargoAccessible, Spatial.ExclusiveOccupancy, Spatial.TemporaryStorage, City, Town |
 | `IdeaInventory` | `h1-stock:town-returns` | 마트 반품 접수 공간 | CustomerReturn, ReturnTriage, ReturnHandoff, Spatial.CustomerAccessible, Spatial.WorkerAccessible, Spatial.InspectionWorkArea, City, Town |
@@ -68,6 +68,7 @@
 | 상태 | 고유 식별자 | 이름 | 검색 단서 |
 | --- | --- | --- | --- |
 | `ApprovedReference` | `h2-candidate:farm-worker-support` | 농가·작업지원 생활 블록 | h1-stock:farm-worker-waiting, h1-stock:farm-tool-storage, h1-stock:farm-maintenance-yard, FarmHomeIngress, FarmRoadAccess, ProductionAccess |
+| `ApprovedReference` | `h2-candidate:hub-internal-warehouse` | Hub 내부 입고·보관·출고 작업 블록 | h1-stock:hub-receiving-storage, h1-stock:hub-outbound-staging, ReceivingOutput, OutboundInput, WorkerTraversal |
 | `CandidateForReview` | `h2-candidate:nature-restoration-recovery` | 자연 복원·안전 회복 블록 | h1-stock:nature-restoration-site, h1-stock:nature-safe-recovery-camp, IncidentRouteInput, RetreatRecoveryInput, SafeCoreOutput, RestoredRouteOutput |
 | `CandidateForReview` | `h2-candidate:nature-threat-response` | 자연 위협 추적·대피 블록 | h1-stock:nature-threat-watch, h1-stock:nature-incident-trace, h1-stock:nature-emergency-retreat, SafeCoreInput, ThreatBandContinuation, EmergencyExit, RecoveryHandoff |
 | `ExploratoryInventory` | `h2-candidate:farm-harvest-throughput` | 농장 집중 수확·집하 블록 | h1-stock:farm-production, h1-stock:farm-harvest-staging, h1-stock:farm-work-yard, ProductionInput, HarvestFlow, ProcessingOutput |

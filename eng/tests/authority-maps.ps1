@@ -38,7 +38,7 @@ function Assert-Contains {
 
 Assert-Contains (Join-Path $mapRoot '00_GAME_DESIGN_TREE.md') @(
     'Nature↔Farm',
-    '플레이 목적 → WI → H → E → G',
+    '플레이 목적 → PlayableLoop → WI → H → E → G → EvidencePackage',
     '독립 내부 폐루프'
 )
 
@@ -60,8 +60,8 @@ $wiLedgerPath = Join-Path $repoRoot 'eng/execution-ledgers/world-interactions.js
 $wiLedger = Get-Content -LiteralPath $wiLedgerPath -Raw -Encoding utf8 | ConvertFrom-Json
 $wiMap = Get-Content -LiteralPath (Join-Path $mapRoot '04_WI_GAMEPLAY_GRAPH.md') -Raw -Encoding utf8
 $wiIds = @($wiLedger.items | ForEach-Object { $_.id })
-if ($wiIds.Count -ne 49) {
-    throw "Expected 49 WI ledger entries, found $($wiIds.Count). Update the authority map and this gate together."
+if ($wiIds.Count -ne 64) {
+    throw "Expected 64 WI ledger entries, found $($wiIds.Count). Update the authority map and this gate together."
 }
 foreach ($wiId in $wiIds) {
     if (-not $wiMap.Contains($wiId)) {
@@ -85,10 +85,14 @@ Assert-Contains (Join-Path $mapRoot '06_UNITY_CURRENT_STRUCTURE.md') @(
     '실시간 재확인하지 않았다'
 )
 Assert-Contains (Join-Path $mapRoot '07_CURRENT_COMPLETION_LEDGER.md') @(
-    '완료 또는 현재 기준으로 확정',
-    '부분 완료',
-    '미완료',
-    '보류 또는 독립 준비 후 통합'
+    '판정 기준',
+    '전체 상태',
+    '영역 집계와 자식 상태',
+    '현재 닫힌 E5 단위',
+    '열린 경계',
+    '보류 또는 독립 준비 후 통합',
+    '현재 증거 묶음',
+    'playable-loop:nature-survival-homestead.v1'
 )
 Assert-Contains (Join-Path $mapRoot '08_CURRENT_WORK.md') @('../CURRENT_WORK.md')
 Assert-Contains (Join-Path $mapRoot '09_DECISIONS.md') @('../DECISIONS.md')

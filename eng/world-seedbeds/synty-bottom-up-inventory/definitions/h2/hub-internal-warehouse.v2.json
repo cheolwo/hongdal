@@ -18,7 +18,9 @@
     "WorkerTraversal"
   ],
   "sizeVariantCodes": [
-    "Standard"
+    "Compact",
+    "Standard",
+    "Expanded"
   ],
   "authoredDocument": "authored/h2/hub-internal-warehouse.v2.md",
   "sourceReferences": [

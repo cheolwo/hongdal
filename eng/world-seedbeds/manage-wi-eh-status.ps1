@@ -86,11 +86,11 @@ foreach ($binding in @($actualE5.interactionSpatialCatalog.bindings)) {
 }
 
 Require ([string] $worldCatalog.revision -eq [string] $priority.worldInteractionCatalogRevision) "PriorityWorldCatalogRevisionMismatch"
-Require (@($worldCatalog.items).Count -eq 49) "WorldInteractionCountMustBe49"
+Require (@($worldCatalog.items).Count -eq 64) "WorldInteractionCountMustBe64"
 Require ([string] $priority.schemaVersion -eq "simulation-world-interaction-spatial-priorities.v1") "PrioritySchemaInvalid"
 Require ([string] $compositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "CompositionPlanSchemaInvalid"
 Require ([string] $p2CompositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "P2CompositionPlanSchemaInvalid"
-Require ([string] $resourceInventory.revision -eq "simulation-world-spatial-resource-inventory.r9") "ResourceInventoryRevisionInvalid"
+Require ([string] $resourceInventory.revision -eq "simulation-world-spatial-resource-inventory.r10") "ResourceInventoryRevisionInvalid"
 
 $itemsById = @{}
 foreach ($item in @($worldCatalog.items)) { $itemsById[[string] $item.id] = $item }
@@ -234,10 +234,14 @@ foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) 
     $resolvedE5Bindings = @($e5Refs | Where-Object { $actualE5BindingsById.ContainsKey([string] $_) })
     if ($e5Refs.Count -gt 0 -and $resolvedE5Bindings.Count -ne $e5Refs.Count) { $warnings.Add("E5PlacementReferenceMissing") }
     if ([string] $item.integration.currentStage -eq "E4" -and $official.Count -eq 0) { $warnings.Add("E4WithoutApprovedH1") }
+    if ([string] $item.integration.currentStage -in @("E5", "E6", "E7") -and
+        $participation -eq "Required" -and $e5Refs.Count -eq 0) {
+        $warnings.Add("E5WithoutActualPlacement")
+    }
 
     $designState = if ($participation -eq "NotRequired") { "NotApplicable" }
         elseif ([string] $item.integration.currentStage -in @("E5", "E6", "E7") -and $e5Refs.Count -gt 0 -and $resolvedE5Bindings.Count -eq $e5Refs.Count) { "EstablishedH3" }
-        elseif ($official.Count -gt 0 -and [string] $item.integration.currentStage -eq "E4") { "EstablishedH1" }
+        elseif ($official.Count -gt 0 -and [string] $item.integration.currentStage -in @("E4", "E5", "E6", "E7")) { "EstablishedH1" }
         elseif ($interaction.Count -gt 0) { "CandidateLineage" }
         elseif ($participation -eq "Required") { "MissingRequired" }
         else { "NeedsDecision" }
@@ -252,6 +256,8 @@ foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) 
     $rows += [pscustomobject][ordered]@{
         worldInteractionId = $id
         groupCode = [string] $item.groupCode
+        groupDisplayName = [string] $worldCatalog.groupDisplayNames.PSObject.Properties[
+            [string] $item.groupCode].Value
         sequence = [int] $item.sequence
         title = [string] $item.title
         interactionKindCode = [string] $item.kind
@@ -288,14 +294,18 @@ $summary = [ordered]@{
     definedH3Count = 5
     definedH4Count = 1
 }
-Require ($summary.implementationE3Count -eq 49) "AllWorldInteractionsMustBeE3"
-Require ($summary.establishedH1Count -eq 13) "EstablishedH1CountMustBe13"
-Require ($summary.establishedH3Count -eq 8) "EstablishedH3CountMustBe8"
-Require ($summary.candidateLineageCount -eq 22) "CandidateLineageCountMustBe22"
-Require ($summary.missingRequiredCount -eq 0) "MissingRequiredCountMustBe0"
-Require ($summary.notApplicableCount -eq 6) "NotApplicableCountMustBe6"
+Require ($summary.implementationE3Count -eq 60) "ImplementationE3CountMustBe60"
+Require ($summary.establishedH1Count -eq 14) "EstablishedH1CountMustBe14"
+Require ($summary.establishedH3Count -eq 15) "EstablishedH3CountMustBe15"
+Require ($summary.candidateLineageCount -eq 21) "CandidateLineageCountMustBe21"
+Require ($summary.missingRequiredCount -eq 5) "MissingRequiredCountMustBe5"
+Require ($summary.notApplicableCount -eq 9) "NotApplicableCountMustBe9"
 Require ($summary.officialH2DefinitionCount -eq 0) "OfficialH2MustRemainZero"
-Require (@($rows | Where-Object { $_.warningCodes -contains "RequiredSpatialDesignMissing" }).Count -eq 0) "RequiredSpatialDesignGapMustBeClosed"
+$missingSpatialIds = @($rows | Where-Object {
+    $_.warningCodes -contains "RequiredSpatialDesignMissing"
+} | Sort-Object worldInteractionId | ForEach-Object worldInteractionId)
+Require (($missingSpatialIds -join ",") -eq "WI-CITY-01,WI-CITY-02,WI-CITY-03,WI-CITY-04,WI-REFLECT-01") `
+    "OnlyKnownSpatialGapsAllowed"
 Require (@($rows | Where-Object { $_.warningCodes -contains "GraphBindingWithoutApprovedH1" }).worldInteractionId -contains "WI-WORLD-04") "FacilityRepairBindingGapMustBeVisible"
 
 $payload = [ordered]@{
@@ -347,14 +357,15 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("후보 H2·H3·H4 계보와 Graph binding은 설계 입력이며 E 단계나 실제 배치를 자동 승격하지 않는다.")
 
 foreach ($group in @($rows | Group-Object groupCode)) {
+    $groupDisplayName = [string] $group.Group[0].groupDisplayName
     [void] $builder.AppendLine()
-    [void] $builder.AppendLine("## $($group.Name)")
+    [void] $builder.AppendLine("## $groupDisplayName (``$($group.Name)``)")
     [void] $builder.AppendLine()
     [void] $builder.AppendLine("| WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |")
     [void] $builder.AppendLine("| --- | --- | --- | --- | --- | --- | --- | --- |")
     foreach ($row in @($group.Group | Sort-Object sequence, worldInteractionId)) {
         $established = if ([string]::IsNullOrWhiteSpace([string] $row.highestEstablishedHLevelCode)) { "-" } else { [string] $row.highestEstablishedHLevelCode }
-        [void] $builder.AppendLine("| ``$($row.worldInteractionId)`` $(Escape-Markdown $row.title) | ``$($row.implementationEvidenceStage)/$($row.integrationEvidenceStage)`` | ``$($row.spatialParticipationCode)`` | ``$established`` | ``$($row.spatialDesignStateCode)`` | ``$($row.priorityCode)`` | ``$($row.lhEngineHandoffStateCode)`` | $(Escape-Markdown (@($row.warningCodes) -join ', ')) |")
+        [void] $builder.AppendLine("| $(Escape-Markdown $row.title) · ``$($row.worldInteractionId)`` | ``$($row.implementationEvidenceStage)/$($row.integrationEvidenceStage)`` | ``$($row.spatialParticipationCode)`` | ``$established`` | ``$($row.spatialDesignStateCode)`` | ``$($row.priorityCode)`` | ``$($row.lhEngineHandoffStateCode)`` | $(Escape-Markdown (@($row.warningCodes) -join ', ')) |")
     }
 }
 

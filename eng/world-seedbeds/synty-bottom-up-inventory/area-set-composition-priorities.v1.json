@@ -14,7 +14,7 @@
       "optionalH3Refs": ["h3-candidate:nature-exploration-buffer", "h3-candidate:nature-town-relief-loop"],
       "playerWorldRoleCode": "PersistentHomeWorld"
       ,"corePlayerVerbCodes": ["Explore", "AcquireTool", "Harvest", "PlaceShelter", "BuildShelter", "EnterShelter", "RespondEncounter", "ObserveThreat", "Retreat", "Restore", "Recover"]
-      ,"coreWiIds": ["WI-WORLD-05", "WI-WORLD-07", "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12"]
+      ,"coreWiIds": ["WI-WORLD-05", "WI-WORLD-07", "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-18", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12"]
     },
     {
       "priorityCode": "P2",

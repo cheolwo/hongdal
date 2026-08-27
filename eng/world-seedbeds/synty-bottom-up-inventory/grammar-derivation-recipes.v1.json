@@ -53,7 +53,8 @@
     { "targetKnowledgeRef": "h2-candidate:nature-town-relief-transition", "recipeCode": "h2.nature-town-relief-transition.r1", "supplementalGrammarSetRefs": ["network:타운도로 곡선", "network:농촌도로 곡선"] },
     { "targetKnowledgeRef": "h2-candidate:hub-fulfillment", "recipeCode": "h2.hub-fulfillment.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선", "network:도시도로 T자"] },
     { "targetKnowledgeRef": "h2-candidate:town-market-receiving", "recipeCode": "h2.town-market-receiving.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선", "transition:Road–BuildingFront 전환"] },
-    { "targetKnowledgeRef": "h2-candidate:town-order-fulfillment", "recipeCode": "h2.town-order-fulfillment.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선"] }
+    { "targetKnowledgeRef": "h2-candidate:town-order-fulfillment", "recipeCode": "h2.town-order-fulfillment.r1", "supplementalGrammarSetRefs": ["network:타운도로 직선"] },
+    { "targetKnowledgeRef": "h2-candidate:hub-internal-warehouse", "recipeCode": "h2.hub-internal-warehouse.r1", "supplementalGrammarSetRefs": ["network:도시도로 직선", "network:도시도로 T자"] }
   ],
   "h3Derivations": [
     { "targetKnowledgeRef": "h3-candidate:circular-market-town", "recipeCode": "h3.circular-market-town.r1", "supplementalGrammarSetRefs": ["transition:Road–BuildingFront 전환", "transition:Town–City 전환"] },

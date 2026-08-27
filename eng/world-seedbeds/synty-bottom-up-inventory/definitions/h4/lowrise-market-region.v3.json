@@ -66,7 +66,7 @@
     "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.lowrise-market-region.r1",
-  "derivationInputHashSha256": "7af95db58a400c659a1332a310b9327b914dba586a4d91f7dfad06462d20eac5",
+  "derivationInputHashSha256": "31c29d91b0d80b51845842c844af7960660524fccc9fdc8cefbffb9837b11f3e",
   "authoredDocument": "authored/h4/lowrise-market-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

@@ -6,7 +6,7 @@ H 재고는 게임 기획 묶음에 속해야 하며, WI 또는 예상 플레이
 
 - 상호작용 H1: 52장
 - 팩 표현 H1: 32장
-- H2/H3/H4: 37/20/6
+- H2/H3/H4: 38/20/6
 - 맥락·계보 위반: 0건
 - 게임 기획 연결 전 격리된 팩 표현 H1: 9장
 
@@ -17,7 +17,7 @@ H 재고는 게임 기획 묶음에 속해야 하며, WI 또는 예상 플레이
 | P1 | Nature 생활·탐험 AreaSet (NatureHomeThreatRecovery) | Explore → AcquireTool → Harvest → PlaceShelter → BuildShelter → EnterShelter → RespondEncounter → ObserveThreat → Retreat → Restore → Recover | 16/11/5/2 |
 | P2 | Farm 생산·생존 AreaSet (FarmProductionSurvival) | Cultivate → Harvest → ContainIncident → RecoverLoss → Ship | 17/10/4/1 |
 | P3 | Town 생활·시장 AreaSet (TownLivingMarketSafety) | ReceiveGoods → Display → Order → Pack → Pickup → RelieveResidents | 22/12/6/1 |
-| P4 | City/Hub 물류 AreaSet (CityHubLogisticsResilience) | Unload → Inspect → Store → Pick → Stage → Load | 10/8/4/1 |
+| P4 | City/Hub 물류 AreaSet (CityHubLogisticsResilience) | Unload → Inspect → Store → Pick → Stage → Load | 10/9/4/1 |
 
 ## H 확장 순서
 
@@ -52,7 +52,7 @@ H 조립 상태, 게임플레이 추적, E 증거와 사람이 완주하는 완�
 1. **E-P1 Farm 수확·출하 공간 실행** — `Integration` 현재 E6 → 목표 E6
 1. **E-P2 Hub 입고·검수·보관 공간 실행** — `Integration` 현재 E4 → 목표 E5
 1. **E-P3 Town 입고·주문·수령 공간 실행** — `Integration` 현재 E1 → 목표 E4
-1. **E-P4 Nature 생활·탐사·사건 공간 모판 재검증** — `Integration` 현재 E1, E4 → 목표 E4
+1. **E-P4 Nature 생활·탐사·사건 공간 모판 재검증** — `Integration` 현재 E1, E4, E6, E7 → 목표 E7
 1. **E-P5 선정 WI 공공데이터 계보** — `Integration` 현재 선정 뒤 판정 → 목표 E6
 
 ## 경계

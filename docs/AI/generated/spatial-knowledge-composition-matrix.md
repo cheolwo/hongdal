@@ -18,6 +18,7 @@
 | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | `Cluster` | h1-stock:hub-cold-storage, h1-stock:hub-long-term-storage, h1-stock:hub-service-maintenance | h1-stock:hub-temporary-staging |
 | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | `Linear` | h1-stock:hub-outbound-staging, h1-stock:hub-temporary-staging | h1-stock:hub-long-term-storage, h1-stock:hub-vehicle-yard |
 | `h2-candidate:hub-inbound-storage` Hub 입고·창고 블록 | `ModifiedGrid` | h1-stock:hub-receiving-storage, h1-stock:hub-service-maintenance |  |
+| `h2-candidate:hub-internal-warehouse` Hub 내부 입고·보관·출고 작업 블록 | `ModifiedGrid` | h1-stock:hub-receiving-storage, h1-stock:hub-outbound-staging |  |
 | `h2-candidate:hub-longterm-cold-storage` Hub 장기·저온 보관 블록 | `Grid` | h1-stock:hub-long-term-storage, h1-stock:hub-cold-storage | h1-stock:hub-temporary-staging |
 | `h2-candidate:hub-maintenance-yard` Hub 차량·시설 정비 블록 | `ModifiedGrid` | h1-stock:hub-vehicle-yard, h1-stock:hub-service-maintenance | h1-stock:hub-temporary-staging |
 | `h2-candidate:hub-outbound-vehicle` Hub 출고·차량 블록 | `Linear` | h1-stock:hub-outbound-staging, h1-stock:hub-vehicle-yard, h1-stock:hub-market-transfer |  |
@@ -52,7 +53,7 @@
 | `h3-candidate:farm-processing-campus` 농가·생산·후처리 생활 경관 | `ModifiedGrid` | h2-candidate:farm-worker-support, h2-candidate:highland-production, h2-candidate:farm-seed-and-tools, h2-candidate:farm-wash-sort-pack, h2-candidate:farm-processing-shipping | h2-candidate:forest-edge-farm | FarmHomeIngress, FarmExternalGate, NatureEdge |
 | `h3-candidate:farm-seasonal-production-loop` Farm 계절 생산·출하 순환 경관 | `ModifiedGrid` | h2-candidate:farm-irrigation-service, h2-candidate:farm-harvest-throughput, h2-candidate:farm-processing-shipping | h2-candidate:farm-worker-support | SeasonInput, ProductionLoop, FarmShippingGate |
 | `h3-candidate:highland-farm` 고지대 농장 경관 | `ContourAdaptive` | h2-candidate:highland-production, h2-candidate:farm-processing-shipping, h2-candidate:forest-edge-farm |  | FarmExternalGate |
-| `h3-candidate:hub-fulfillment-operations` City/Hub 보관·피킹·상차 운영 경관 | `ModifiedGrid` | h2-candidate:hub-longterm-cold-storage, h2-candidate:hub-fulfillment, h2-candidate:hub-outbound-vehicle | h2-candidate:hub-maintenance-yard | StorageCargoInput, FulfillmentLoop, HubLoadingOutput |
+| `h3-candidate:hub-fulfillment-operations` City/Hub 보관·피킹·상차 운영 경관 | `ModifiedGrid` | h2-candidate:hub-longterm-cold-storage, h2-candidate:hub-fulfillment, h2-candidate:hub-outbound-vehicle | h2-candidate:hub-maintenance-yard, h2-candidate:hub-internal-warehouse | StorageCargoInput, FulfillmentLoop, HubLoadingOutput |
 | `h3-candidate:hub-maintenance-emergency-loop` City/Hub 정비·비상운영 회복 경관 | `ModifiedGrid` | h2-candidate:hub-maintenance-yard, h2-candidate:hub-emergency-power, h2-candidate:hub-outbound-vehicle | h2-candidate:hub-longterm-cold-storage | IncidentInput, EmergencyOperationsLoop, HubOperationsReturn |
 | `h3-candidate:hub-town-logistics` Hub–Town 연결 경관 | `Linear` | h2-candidate:hub-outbound-vehicle, h2-candidate:hub-town-corridor, h2-candidate:market-life-commerce |  | HubOutboundGate, TownReceivingGate |
 | `h3-candidate:jinbu-hub` 진부형 물류 Hub 경관 | `ModifiedGrid` | h2-candidate:hub-inbound-storage, h2-candidate:hub-outbound-vehicle |  | HubInboundGate, HubOutboundGate |

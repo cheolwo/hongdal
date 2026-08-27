@@ -4,12 +4,12 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "c3c81e76f131e3f2ae25ccb57cc0e0e622892553669903cc2ea8f8635518237b",
+  "previousCatalogSha256": "075fec259742d68c4eb88bfcef583fb2c5a4462135ffc92e96c2358a1d7440bd",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
   "derivationRecipePath": "eng/world-seedbeds/synty-bottom-up-inventory/grammar-derivation-recipes.v1.json",
-  "derivationRecipeSha256": "1e82042ba16855c460c729799c2bb3ec438a3a067819ce5031acfd7c8cc73162",
+  "derivationRecipeSha256": "0e7a8b21c1dd4d1ced47d43d002f869241a369946a89dcbdb879e20d661c5f02",
   "h1InteractionDefinitionRefs": [
     {
       "stableId": "h1-stock:farm-exposure-inspection",
@@ -151,9 +151,9 @@
       "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "1643289d8cf85b448d01c3425a93474dca336dc40c26e984b459df6441736e4b",
+      "definitionSha256": "bded7dc7d8d2347c99aef14d49874703f29654d86ed6751a363ced8cea28c6c5",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "c0bce67dcc86f09d8690569d183e8f051f74926c0f85c9ec228eaa25e253f1c7"
+      "documentSha256": "3f7d50caa60e82e355b16a3b3ad931cdaab3a6522c6e14b1179950b013626af1"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -184,12 +184,12 @@
     },
     {
       "stableId": "h1-stock:hub-outbound-staging",
-      "revision": 2,
+      "revision": 3,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/hub-outbound-staging.v2.json",
-      "definitionSha256": "1f55a9f9e25f9023da72c24b39ee73417c624c7d306daee9080a6e460b492855",
+      "definitionSha256": "4128469b1766ae241792a023d06aed7cc9b3e212bb0289b8462ce6a29bcd4dc2",
       "documentPath": "authored/h1/hub-outbound-staging.v2.md",
-      "documentSha256": "3d1b4b951a1aa2477c9a8cd4940230054779859ac49847d5fd086a589ee63752"
+      "documentSha256": "d8ef37fb390cf0e47388078ca576f092a17fd7caac7c21c926fe04e98fe72fb7"
     },
     {
       "stableId": "h1-stock:hub-quarantine",
@@ -259,18 +259,18 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
-      "definitionSha256": "92b0f06134723288ed05e0ea9cd73eb85d4cea22db12dc579a0536950c0ed88c",
+      "definitionSha256": "7fede21634576ab1cc9e4c05b62491f7505e234842128bc62e17c02ac8c937d0",
       "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
-      "documentSha256": "b85c34ef5a0b62450dbe3472703b490e361246f342357bed027823471ebb70c7"
+      "documentSha256": "bebb33ae4f53fe5d447f36e7159d03130202baa1e1852c8a4ed6cbd251224fe5"
     },
     {
       "stableId": "h1-stock:nature-exploration-buffer",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-exploration-buffer.v2.json",
-      "definitionSha256": "4b71cb2fb01baab9dfe7b91ceeee84a1c93812301e8c6767592279f93dbe8a42",
+      "definitionSha256": "7d922e2edfa196d30e8c0fe4435577c064f0fb3f2980706a1b3d12b280a80ce6",
       "documentPath": "authored/h1/nature-exploration-buffer.v2.md",
-      "documentSha256": "ecbe9bd84b3cd88c34cb8f11fceb2d970ee1ad3c14429134ee5ff60c57ffddd5"
+      "documentSha256": "6c62b0e69a91f2fa8cc8db0294dce66a47ce7b5f3a6ccb339b61ffaadc6a6350"
     },
     {
       "stableId": "h1-stock:nature-farm-edge",
@@ -319,12 +319,12 @@
     },
     {
       "stableId": "h1-stock:nature-shelter",
-      "revision": 1,
+      "revision": 4,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-shelter.v2.json",
-      "definitionSha256": "2b2d12eada017481a7e61d2909c46746c2481a5dcd42d7879f9f1f9f60f6f9b5",
+      "definitionSha256": "275f2b60978bd753251b5eae947240eaf6ae6850858d9889cf1f0550e6e4fd54",
       "documentPath": "authored/h1/nature-shelter.v2.md",
-      "documentSha256": "731f5c0c1c7d77200ab6816c9912e0e0097f75e1676fc3be06e94e1de2ef3c2a"
+      "documentSha256": "d576a129b4ac2cf20d4c4f1ba414ceceeb257f7c071767a78b9132628516f225"
     },
     {
       "stableId": "h1-stock:nature-threat-watch",
@@ -340,9 +340,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-trailhead.v2.json",
-      "definitionSha256": "92fa147d40e5bec5cec7bee4dad77e70dd9d495c078290a425e17b3f74856729",
+      "definitionSha256": "16c8529a15eacda6475e10c5591d98fd26c1451c0ec3546c8f9a46f77ec5340a",
       "documentPath": "authored/h1/nature-trailhead.v2.md",
-      "documentSha256": "211445bb8085c28aab2e6107f0f10f3d0494b8ff1b4c2c50721d68e330625f04"
+      "documentSha256": "68043ea6c346394a382a9ad885f13dec31c2cccc627fc548a80075f90fe4351d"
     },
     {
       "stableId": "h1-stock:road-facility-access",
@@ -1199,9 +1199,9 @@
       "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "1643289d8cf85b448d01c3425a93474dca336dc40c26e984b459df6441736e4b",
+      "definitionSha256": "bded7dc7d8d2347c99aef14d49874703f29654d86ed6751a363ced8cea28c6c5",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "c0bce67dcc86f09d8690569d183e8f051f74926c0f85c9ec228eaa25e253f1c7"
+      "documentSha256": "3f7d50caa60e82e355b16a3b3ad931cdaab3a6522c6e14b1179950b013626af1"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -1232,12 +1232,12 @@
     },
     {
       "stableId": "h1-stock:hub-outbound-staging",
-      "revision": 2,
+      "revision": 3,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/hub-outbound-staging.v2.json",
-      "definitionSha256": "1f55a9f9e25f9023da72c24b39ee73417c624c7d306daee9080a6e460b492855",
+      "definitionSha256": "4128469b1766ae241792a023d06aed7cc9b3e212bb0289b8462ce6a29bcd4dc2",
       "documentPath": "authored/h1/hub-outbound-staging.v2.md",
-      "documentSha256": "3d1b4b951a1aa2477c9a8cd4940230054779859ac49847d5fd086a589ee63752"
+      "documentSha256": "d8ef37fb390cf0e47388078ca576f092a17fd7caac7c21c926fe04e98fe72fb7"
     },
     {
       "stableId": "h1-stock:hub-quarantine",
@@ -1307,18 +1307,18 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
-      "definitionSha256": "92b0f06134723288ed05e0ea9cd73eb85d4cea22db12dc579a0536950c0ed88c",
+      "definitionSha256": "7fede21634576ab1cc9e4c05b62491f7505e234842128bc62e17c02ac8c937d0",
       "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
-      "documentSha256": "b85c34ef5a0b62450dbe3472703b490e361246f342357bed027823471ebb70c7"
+      "documentSha256": "bebb33ae4f53fe5d447f36e7159d03130202baa1e1852c8a4ed6cbd251224fe5"
     },
     {
       "stableId": "h1-stock:nature-exploration-buffer",
       "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-exploration-buffer.v2.json",
-      "definitionSha256": "4b71cb2fb01baab9dfe7b91ceeee84a1c93812301e8c6767592279f93dbe8a42",
+      "definitionSha256": "7d922e2edfa196d30e8c0fe4435577c064f0fb3f2980706a1b3d12b280a80ce6",
       "documentPath": "authored/h1/nature-exploration-buffer.v2.md",
-      "documentSha256": "ecbe9bd84b3cd88c34cb8f11fceb2d970ee1ad3c14429134ee5ff60c57ffddd5"
+      "documentSha256": "6c62b0e69a91f2fa8cc8db0294dce66a47ce7b5f3a6ccb339b61ffaadc6a6350"
     },
     {
       "stableId": "h1-stock:nature-farm-edge",
@@ -1367,12 +1367,12 @@
     },
     {
       "stableId": "h1-stock:nature-shelter",
-      "revision": 1,
+      "revision": 4,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-shelter.v2.json",
-      "definitionSha256": "2b2d12eada017481a7e61d2909c46746c2481a5dcd42d7879f9f1f9f60f6f9b5",
+      "definitionSha256": "275f2b60978bd753251b5eae947240eaf6ae6850858d9889cf1f0550e6e4fd54",
       "documentPath": "authored/h1/nature-shelter.v2.md",
-      "documentSha256": "731f5c0c1c7d77200ab6816c9912e0e0097f75e1676fc3be06e94e1de2ef3c2a"
+      "documentSha256": "d576a129b4ac2cf20d4c4f1ba414ceceeb257f7c071767a78b9132628516f225"
     },
     {
       "stableId": "h1-stock:nature-threat-watch",
@@ -1388,9 +1388,9 @@
       "revision": 1,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-trailhead.v2.json",
-      "definitionSha256": "92fa147d40e5bec5cec7bee4dad77e70dd9d495c078290a425e17b3f74856729",
+      "definitionSha256": "16c8529a15eacda6475e10c5591d98fd26c1451c0ec3546c8f9a46f77ec5340a",
       "documentPath": "authored/h1/nature-trailhead.v2.md",
-      "documentSha256": "211445bb8085c28aab2e6107f0f10f3d0494b8ff1b4c2c50721d68e330625f04"
+      "documentSha256": "68043ea6c346394a382a9ad885f13dec31c2cccc627fc548a80075f90fe4351d"
     },
     {
       "stableId": "h1-stock:road-facility-access",
@@ -1642,6 +1642,14 @@
       "documentSha256": "fed6725b72053230cc23991609223ebdf3e88c6aa03db9bc9ab50fb163baedcd"
     },
     {
+      "stableId": "h2-candidate:hub-internal-warehouse",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-internal-warehouse.v2.json",
+      "definitionSha256": "73d321ea68ef3b00006d77405215b47643ff1df8fbdf773620c918d4b116d84e",
+      "documentPath": "authored/h2/hub-internal-warehouse.v2.md",
+      "documentSha256": "ae1ee4eed9c1319b2df65223671579ed712ff58563fbad7c33316a193b302476"
+    },
+    {
       "stableId": "h2-candidate:hub-longterm-cold-storage",
       "revision": 1,
       "definitionPath": "definitions/h2/hub-longterm-cold-storage.v2.json",
@@ -1879,9 +1887,9 @@
       "stableId": "h3-candidate:hub-fulfillment-operations",
       "revision": 1,
       "definitionPath": "definitions/h3/hub-fulfillment-operations.v2.json",
-      "definitionSha256": "120653a2af66685fd7cc2d6d0b2991f38f256226fa5171df32d47c109fe248d4",
+      "definitionSha256": "d312098fe83390107fd6b0a34e6302f374eb912bfcb6ba633f8df0e9b5f40064",
       "documentPath": "authored/h3/hub-fulfillment-operations.v2.md",
-      "documentSha256": "1918d33e3d131ef13564a74b2c13607c0c185feb16b7e1eae908b52f00b2e34e"
+      "documentSha256": "c09bb2e345b1683b78f2bef28d06fc741458105d63438f5726b63615e17eeff4"
     },
     {
       "stableId": "h3-candidate:hub-maintenance-emergency-loop",
@@ -1929,7 +1937,7 @@
       "definitionPath": "definitions/h3/nature-home-encounter-defense.v2.json",
       "definitionSha256": "35d4129d86783537de4b72314dda1f999135708705523c59b8ad401a7ee142c8",
       "documentPath": "authored/h3/nature-home-encounter-defense.v2.md",
-      "documentSha256": "f6f2ad3c033840bf6d85110298243e1112e9350fc2c87d521ad731dc2abdbeae"
+      "documentSha256": "44cf389dcf7e7b2a0cbfbcc3e4873c261fab62f4b6e73a46f4f37babd5de04e1"
     },
     {
       "stableId": "h3-candidate:nature-threat-recovery",
@@ -1994,7 +2002,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-hub-town-region.v3.json",
-      "definitionSha256": "3e18b8fe3718564f135c9cae91a6e399b334430757360e3d0f43af764faf8754",
+      "definitionSha256": "f5f136b34d8c0f8839ed3e4e441fb9b473cac684ff53ccedcb06c56942ffac4e",
       "documentPath": "authored/h4/farm-hub-town-region.v3.md",
       "documentSha256": "73526189ac42cd3b98c6a0e6bd6fee44870bb29b1e48de0523a38c042760a7a4"
     },
@@ -2003,7 +2011,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/farm-production-processing-region.v3.json",
-      "definitionSha256": "6a3307b299929915d6d8d76c877a7916875ac02665f671365e5755edf3631ac5",
+      "definitionSha256": "0b8ab0298b72c8908098a7ee7099a8d716df3eaf4202f3b42822162a56f6d036",
       "documentPath": "authored/h4/farm-production-processing-region.v3.md",
       "documentSha256": "23fadf8553ba8b147e666a0d525cfff6aee0b1f78d772a69f51a909a82a54a6d"
     },
@@ -2012,7 +2020,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/logistics-hub-region.v3.json",
-      "definitionSha256": "7bd52ed890fbce4fe3e28c9924ec0b62cda058c83b706f1d923c47ff56c87ac7",
+      "definitionSha256": "5d46697b09e8a5f1b6b99da2a692bf7d81f6181a07e385aa86123e2359c928fc",
       "documentPath": "authored/h4/logistics-hub-region.v3.md",
       "documentSha256": "5e54bdc10e71a3e63ef166b7b466b074e402fe598f72f2bb143dbe8c04423214"
     },
@@ -2021,7 +2029,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/lowrise-market-region.v3.json",
-      "definitionSha256": "4651ab31b5c7be8b2f9f94d355009e133b74be347a3c993d2a3f76761810e874",
+      "definitionSha256": "b2377c86dbdac092cb80ed5d4e998cf2f00a7c413def93688dd37dee307a1196",
       "documentPath": "authored/h4/lowrise-market-region.v3.md",
       "documentSha256": "4df253a4f25ce9c12907ce88e4f68e8eeceb67a52444e52f92119e9bd96e9fa2"
     },
@@ -2030,7 +2038,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/nature-home-exploration-region.v3.json",
-      "definitionSha256": "db9959b37dfada55a6f8d4f1ce1ff8884f8c8aff8728b01e81d1e610b166d575",
+      "definitionSha256": "b9f49c725f65a08dc82960bd32b60b62c762e56bda1a1241dbb4ccf77719df58",
       "documentPath": "authored/h4/nature-home-exploration-region.v3.md",
       "documentSha256": "094abd28a0f9f7d316d98bf2faa2862f5de1690667be58a30b73121e5134071a"
     },
@@ -2039,7 +2047,7 @@
       "revision": 1,
       "cardKindCode": "RegionalBlueprint",
       "definitionPath": "definitions/h4/nature-water-region.v3.json",
-      "definitionSha256": "f34f7b073e9e794f2ead2ff7c4da6cf9d78b1830e88f9d2b3c5f910b0a8a037a",
+      "definitionSha256": "370ef6ba86aa7b5964a78856c7628f9873162605b559e4d6fc3900ca0342b4d9",
       "documentPath": "authored/h4/nature-water-region.v3.md",
       "documentSha256": "129d5e323d409c7eb88c12e42525e7b1a3d26cf7915ffdbe57e815c6aa40f80a"
     }
@@ -2064,7 +2072,7 @@
         "network:농촌도로 T자",
         "town:버스 정류장·보행 쉼터"
       ],
-      "derivationInputHashSha256": "1dccf9c7cc9082ad8645b4da4048f94e1d68a632866494e7657e3031f21d4fd2",
+      "derivationInputHashSha256": "b4fde9c3bd39cfc5015d2696d76030325268b4c066ca0916e33ef7517ddd07d3",
       "presentationOnly": true
     },
     {
@@ -2178,7 +2186,7 @@
         "network:농촌도로 직선",
         "town:버스 정류장·보행 쉼터"
       ],
-      "derivationInputHashSha256": "4a7d2fbd1d17461b2b55aa73512b52d541855ae3280894fc34d6e383e49bd9d9",
+      "derivationInputHashSha256": "b062d4ffc0f0ef80aebb6ea46987c544eccf6ee92539942bf0855e81f883b482",
       "presentationOnly": true
     },
     {
@@ -2215,7 +2223,7 @@
         "network:농촌도로 직선",
         "town:버스 정류장·보행 쉼터"
       ],
-      "derivationInputHashSha256": "c7a1a18c8f14d996224ca06373b7a8a04f0be909727738f7e8d96ed0b52edf39",
+      "derivationInputHashSha256": "cf779427d53ea8746d8057695a829fe37a35736b2c253082f0e283a22651559e",
       "presentationOnly": true
     },
     {
@@ -2236,7 +2244,7 @@
         "network:농촌도로 곡선",
         "transition:Nature–Farm 전환"
       ],
-      "derivationInputHashSha256": "a1b3340a46c88f7125a059cf31c6a70a101bc06769ddc242ac83ec67ddd7adbf",
+      "derivationInputHashSha256": "41b96badfddb5c2d25efc93e02232c274b37d99166f45edca9f0a505a7a80964",
       "presentationOnly": true
     },
     {
@@ -2296,7 +2304,7 @@
         "network:도시도로 직선",
         "network:도시도로 T자"
       ],
-      "derivationInputHashSha256": "57e1a9542f7c579c663af4d9c49e07c4558d5f8a538490f366b9827c206f5c6a",
+      "derivationInputHashSha256": "2b69f025129e2397ee05b6b1bd5c8211d1941c44661ebff96c504d99040cf554",
       "presentationOnly": true
     },
     {
@@ -2317,6 +2325,24 @@
         "transition:Road–BuildingFront 전환"
       ],
       "derivationInputHashSha256": "78a807e55674d1567e802c551596f4b0b6aaecadaced178dcf2ab98182cd4e88",
+      "presentationOnly": true
+    },
+    {
+      "targetKnowledgeRef": "h2-candidate:hub-internal-warehouse",
+      "targetHierarchyLevelCode": "H2",
+      "derivationRecipeCode": "h2.hub-internal-warehouse.r1",
+      "childKnowledgeRefs": [
+        "h1-stock:hub-outbound-staging",
+        "h1-stock:hub-receiving-storage"
+      ],
+      "sourceGrammarRefs": [
+        "city:물류 Station 진입부",
+        "city:상하차 Dock",
+        "city:화물 대기 야드",
+        "network:도시도로 직선",
+        "network:도시도로 T자"
+      ],
+      "derivationInputHashSha256": "fe572011e2450f858bdce5a52363659b3d722896863ad84ea27f3af777b5cf5d",
       "presentationOnly": true
     },
     {
@@ -2374,7 +2400,7 @@
         "network:도시도로 T자",
         "transition:Town–Hub 전환"
       ],
-      "derivationInputHashSha256": "31e716844da70f7b2eda7f82820d7908e5d32a7dc914d39c26e9bcd65de28b67",
+      "derivationInputHashSha256": "63e91df3a8119e101b01a765696c7def4168fca517de6780064626ba02d3b7db",
       "presentationOnly": true
     },
     {
@@ -2497,7 +2523,7 @@
         "network:농촌도로 곡선",
         "network:농촌도로 T자"
       ],
-      "derivationInputHashSha256": "0c697c344d658b255c5f72f59f4150cfded1ac0ecbde65308613964b59e92150",
+      "derivationInputHashSha256": "8c5e0b0ed1c15f44ebdb86d19ba41a4e8511641acc533e6d097974d8eca609ff",
       "presentationOnly": true
     },
     {
@@ -2518,7 +2544,7 @@
         "nature:숲 빈터·고사목",
         "network:농촌도로 곡선"
       ],
-      "derivationInputHashSha256": "ebd6fbcab53875b01a46de4092a33218fc3bbefbb94ef7612432f70b6099117d",
+      "derivationInputHashSha256": "19b946c43ccfd6a96311e6926fc13de42b1d65ddd5b421343ff4c5c8eb4ab7a9",
       "presentationOnly": true
     },
     {
@@ -2540,7 +2566,7 @@
         "nature:초지·야생화",
         "network:농촌도로 곡선"
       ],
-      "derivationInputHashSha256": "6ecacc4b6b405c208df17acb6aaf088c8e869fd5b5b1660c1a71e3a8d2ed7abc",
+      "derivationInputHashSha256": "0a8dc126912649e8676a6af2184ed7c4f73fab8ed9a71d9924b8be55472cb1d1",
       "presentationOnly": true
     },
     {
@@ -2561,7 +2587,7 @@
         "nature:초지·야생화",
         "network:농촌도로 곡선"
       ],
-      "derivationInputHashSha256": "822fe0b02adf4d0c4c1e9c17c85f61dda459e48c5449982ecbe9a9215f9a83fd",
+      "derivationInputHashSha256": "6dfd7f2edb9abafd006b0132921bdae0824ff9f0e15c1780293883972568d5f6",
       "presentationOnly": true
     },
     {
@@ -2583,7 +2609,7 @@
         "nature:숲 빈터·고사목",
         "network:농촌도로 곡선"
       ],
-      "derivationInputHashSha256": "54736c06c0821e4cc6c75423fd5e6a086891aa21a65c27427466f759cc7b775e",
+      "derivationInputHashSha256": "c43d275fd0c1357b44bd8332c36538da6adb4aab8cda47b246184f05ca782497",
       "presentationOnly": true
     },
     {
@@ -2609,7 +2635,7 @@
         "town:생활 공공광장",
         "town:읍내 상점 전면"
       ],
-      "derivationInputHashSha256": "52b290af010bfd3ec2e729351ba8fdcdf9ed25e2fdc18d76b539cfe4e57c16e7",
+      "derivationInputHashSha256": "03885a8dce65389ebc41e105120c32d9a05ca1f98daf4b0b5a2050a1a5d2f12e",
       "presentationOnly": true
     },
     {
@@ -2630,7 +2656,7 @@
         "nature:숲 빈터·고사목",
         "network:농촌도로 곡선"
       ],
-      "derivationInputHashSha256": "f3ebd48e09bd709b2321d2ffefb92e896fd179c07f68c5246f1009b21f3dcf63",
+      "derivationInputHashSha256": "447491a9ebf03d0d36a7ef55795cbda00c4abdf28eb1613d3e349795bc4112db",
       "presentationOnly": true
     },
     {
@@ -2648,7 +2674,7 @@
         "network:농촌도로 곡선",
         "transition:Nature–Farm 전환"
       ],
-      "derivationInputHashSha256": "66ad302ffe3a5ce820cbe2df692f213eb8be709614d7e90408936dd3eba1901b",
+      "derivationInputHashSha256": "d299bbae939f6b99977d8aebb12eecdda99d24064fd632a095bdb6131d50e32a",
       "presentationOnly": true
     },
     {
@@ -2882,7 +2908,7 @@
         "transition:Farm–Hub 전환",
         "transition:Nature–Farm 전환"
       ],
-      "derivationInputHashSha256": "182ababb811c871c89845b07e4dc2a11b51ef6dd75553676650e523ce1cfc477",
+      "derivationInputHashSha256": "a51dc02656c9e69e400795f16aea45cf7efce0b7cd53b51bdfdce827b1165eef",
       "presentationOnly": true
     },
     {
@@ -2916,7 +2942,7 @@
         "transition:Farm–Town 전환",
         "transition:Nature–Farm 전환"
       ],
-      "derivationInputHashSha256": "4f95b9c594b2cd018c1385be74ef1276d29fc3810611505eb1576b024a810354",
+      "derivationInputHashSha256": "3180ad998a35d1c1be3b4539e6ff86ad891bbc75630f3deafbf71746cd2f0866",
       "presentationOnly": true
     },
     {
@@ -2941,7 +2967,7 @@
         "transition:Farm–Hub 전환",
         "transition:Farm–Town 전환"
       ],
-      "derivationInputHashSha256": "3724d0837e9fafed43c9b1e367668814697a06b2c573784fc586be5f743786a7",
+      "derivationInputHashSha256": "8af56b8b1d22be2a4ff2e73183fdf1488ed888c0cf19b1558ab3b44d51d9d6e9",
       "presentationOnly": true
     },
     {
@@ -2969,7 +2995,7 @@
         "transition:Farm–Hub 전환",
         "transition:Nature–Farm 전환"
       ],
-      "derivationInputHashSha256": "b55b1ee77b51d4158f018a1aef1d7857bac33bd22e2ecf552e3b8f5233b37846",
+      "derivationInputHashSha256": "5fbf723afb9fdc917ff7f334f08b7f40509a0bc857fb3a62c2ce2f91383d2357",
       "presentationOnly": true
     },
     {
@@ -2978,6 +3004,7 @@
       "derivationRecipeCode": "h3.hub-fulfillment-operations.r1",
       "childKnowledgeRefs": [
         "h2-candidate:hub-fulfillment",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-longterm-cold-storage",
         "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-outbound-vehicle"
@@ -2993,7 +3020,7 @@
         "transition:Road–BuildingFront 전환",
         "transition:Town–Hub 전환"
       ],
-      "derivationInputHashSha256": "89fdb155c4095b272930cf2d6f6701bf769dd1b4b136878825ddc4c12b55406f",
+      "derivationInputHashSha256": "b43bc8589e295a9768ebda8ef0f6b1b0142c50aeb51d0031d78408cbeb0c4a00",
       "presentationOnly": true
     },
     {
@@ -3017,7 +3044,7 @@
         "transition:Road–BuildingFront 전환",
         "transition:Town–Hub 전환"
       ],
-      "derivationInputHashSha256": "a0a97697b313c89fa20cb2433417bb86a5306ca6f9bb1fab3b466db386ed24cc",
+      "derivationInputHashSha256": "1c1e36507f312d17c73a811aaf3febf4872afdda0e0f2526eb9445dce91d8106",
       "presentationOnly": true
     },
     {
@@ -3048,7 +3075,7 @@
         "transition:Road–BuildingFront 전환",
         "transition:Town–Hub 전환"
       ],
-      "derivationInputHashSha256": "b167e5551a144dca13432d88f21ba1053edb66ff5de1fbd79df8c2f3c1091684",
+      "derivationInputHashSha256": "6b5479c205c4306ebf2923311e63c11650ad31c5d18696f8964c46d8e07f59c3",
       "presentationOnly": true
     },
     {
@@ -3071,7 +3098,7 @@
         "transition:Road–BuildingFront 전환",
         "transition:Town–Hub 전환"
       ],
-      "derivationInputHashSha256": "c8316c100a3ddd4ce49d58ca06d153b5f181af2037cf98d57609eb3199a37e9c",
+      "derivationInputHashSha256": "d1a3119a73e28e8ec5b6149e2548b8750f69b4b34854e0fa9acaabad667e601b",
       "presentationOnly": true
     },
     {
@@ -3116,7 +3143,7 @@
         "transition:Nature–Farm 전환",
         "transition:Water–Land 전환"
       ],
-      "derivationInputHashSha256": "d97c5c4d5adc85eea8729e9ac93013c9580936ca3d5fb4fbb38d6b6f706141f7",
+      "derivationInputHashSha256": "5e01df4f7dfb3211e3d116359928636b544724c0462edb82d4e16c2bd40cb026",
       "presentationOnly": true
     },
     {
@@ -3141,7 +3168,7 @@
         "network:농촌도로 T자",
         "transition:Water–Land 전환"
       ],
-      "derivationInputHashSha256": "acab3e5ddeb20d0c38131b2ed4696e51e0b1d6f618f7ba6b75bc4710b20e324e",
+      "derivationInputHashSha256": "c48bec3fa4bb1a8cfd90b0c744c988a4543a8e2fab40ef7339853aa62273c20b",
       "presentationOnly": true
     },
     {
@@ -3166,7 +3193,7 @@
         "transition:Nature–Farm 전환",
         "transition:Water–Land 전환"
       ],
-      "derivationInputHashSha256": "6781c05d0adda18c9d1c709c91f7d9307cb105448daf0f5f8f95de7f3f2df987",
+      "derivationInputHashSha256": "88d823d0db24e1f8cdd6897141f8ac6a9dee43ded9c4591f95e9c84659d37f55",
       "presentationOnly": true
     },
     {
@@ -3199,7 +3226,7 @@
         "transition:Road–BuildingFront 전환",
         "transition:Water–Land 전환"
       ],
-      "derivationInputHashSha256": "3eabfc753f5e69f7d27fc0442fad1b81339341200057d304fadc9a8c7a4abc5d",
+      "derivationInputHashSha256": "4148b5da067880ca50ede2de0fc2b867aada7d71335f77aa10381cf0b2f37672",
       "presentationOnly": true
     },
     {
@@ -3223,7 +3250,7 @@
         "transition:Nature–Farm 전환",
         "transition:Water–Land 전환"
       ],
-      "derivationInputHashSha256": "54d9ed4e1b364032ccb31191400b24d6b1a38e5a13b9148ee1dd4122eb06da2e",
+      "derivationInputHashSha256": "c38fc6f45f6a04cbdf056a1fc58c81984f2e2816d456997d5473cbf297d64fbf",
       "presentationOnly": true
     },
     {
@@ -3249,7 +3276,7 @@
         "transition:Road–BuildingFront 전환",
         "transition:Town–Hub 전환"
       ],
-      "derivationInputHashSha256": "a810d31504c2cf287e4e4b2affa69e24f21395816f60911d750c38d3c0a81960",
+      "derivationInputHashSha256": "e9ea82efe507ea2fd7178cd8c7c8e459c561dba12ae04f185920efa26b61f225",
       "presentationOnly": true
     },
     {
@@ -3347,5 +3374,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "e46a06a6d05e544bdbfb51be6d67984945e0ea24d72d33f1ba750a230cacb9a6"
+  "contentHashSha256": "eb7be32e180472ef862550a700e230883b17bfec209d6a5c1c58d34451c6d9d4"
 }

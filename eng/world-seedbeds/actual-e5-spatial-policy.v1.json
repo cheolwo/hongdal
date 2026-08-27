@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-actual-e5-spatial-policy.v1",
-  "revision": "simulation-world-actual-e5-spatial-policy.r5",
-  "outputRevision": 4,
+  "revision": "simulation-world-actual-e5-spatial-policy.r7",
+  "outputRevision": 6,
   "networkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
   "legacyFacadeAreaSetStableId": "area-set:sim:pyeongchang:farm-hub-town.v1",
   "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -103,6 +103,10 @@
       "routeH3Ref": "h3-candidate:hub-town-logistics"
     }
   ],
+  "wiBindingH1Overrides": {
+    "WI-CON-01": "h1-stock:nature-shelter",
+    "WI-NATURE-18": "h1-stock:nature-exploration-buffer"
+  },
   "wiBindingPreferences": {
     "WI-FARM-01": "h3-candidate:highland-farm",
     "WI-FARM-02": "h3-candidate:highland-farm",
@@ -135,11 +139,16 @@
     "WI-NATURE-04": "h3-candidate:nature-threat-recovery",
     "WI-NATURE-05": "h3-candidate:nature-home-encounter-defense",
     "WI-NATURE-06": "h3-candidate:nature-trail-network",
+    "WI-NATURE-18": "h3-candidate:nature-trail-network",
     "WI-NATURE-07": "h3-candidate:nature-home-encounter-defense",
     "WI-NATURE-08": "h3-candidate:nature-home-encounter-defense",
     "WI-NATURE-09": "h3-candidate:nature-home-encounter-defense",
     "WI-NATURE-10": "h3-candidate:nature-home-encounter-defense",
     "WI-NATURE-11": "h3-candidate:nature-home-encounter-defense",
+    "WI-NATURE-13": "h3-candidate:nature-home-encounter-defense",
+    "WI-NATURE-14": "h3-candidate:nature-home-encounter-defense",
+    "WI-NATURE-15": "h3-candidate:nature-home-encounter-defense",
+    "WI-CON-01": "h3-candidate:nature-home-encounter-defense",
     "WI-WORLD-04": "h3-candidate:farm-processing-campus"
   },
   "presentationOnly": true,

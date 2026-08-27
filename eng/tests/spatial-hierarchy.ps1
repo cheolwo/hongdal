@@ -15,7 +15,7 @@ $check = & $script -Mode Check
 
 if ($firstHash -ne $secondHash) { throw "SpatialHierarchyGenerationIsNotDeterministic" }
 if ($firstWriteTicks -ne $secondWriteTicks) { throw "SpatialHierarchyUnchangedOutputWasRewritten" }
-if ($check -notmatch "SpatialHierarchyValid:H1=7;H2=0;H3=5;H4=1") {
+if ($check -notmatch "SpatialHierarchyValid:H1=8;H2=0;H3=5;H4=1") {
     throw "SpatialHierarchyValidationDidNotComplete"
 }
 

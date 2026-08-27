@@ -1,6 +1,6 @@
 {
   "schemaVersion": "world-interaction-trigger-sources.v1",
-  "revision": "world-interaction-trigger-sources.r1",
+  "revision": "world-interaction-trigger-sources.r6",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "principles": {
     "observationCollectionIsNotWorldInteraction": true,
@@ -9,6 +9,11 @@
     "executionInstanceStoresSingleSource": true,
     "subjectBindingRemainsSeparate": true,
     "clientCannotChooseTrustedSource": true
+  },
+  "classificationBoundary": {
+    "originCodeMeaning": "WI 정의가 운영 업무에서 파생되었는지, Simulation 고유인지, 혼합인지를 표시한다.",
+    "controlPolicyCodeMeaning": "해당 WI를 NPC 루틴·플레이어/NPC 공유·플레이어 직접·세계 자동 중 어떤 통제 방식으로 실행하는지 표시한다.",
+    "actualTriggerSourceRemainsPerExecution": true
   },
   "triggerSourceCodes": [
     { "code": "DataDriven", "koreanName": "데이터 발생", "trustedBoundary": "ObservationThresholdEvaluator" },
@@ -22,12 +27,14 @@
     "SharedPolicy": ["NpcDriven", "WorldDerived"]
   },
   "overrides": {
+    "WI-CARD-01": ["PlayerDriven"],
+    "WI-REFLECT-01": ["PlayerDriven"],
     "WI-NATURE-01": ["PlayerDriven", "NpcDriven", "WorldDerived"],
     "WI-WORLD-05": ["PlayerDriven", "NpcDriven", "WorldDerived"],
     "WI-WORLD-08": ["PlayerDriven", "NpcDriven", "WorldDerived"]
   },
   "notes": [
-    "현재 49개 WI에는 DataDriven 전용 정의가 없다. 향후 기상·가격 관측이 임계값을 넘어 권위 상태를 바꾸는 WI를 추가할 때 명시적으로 허용한다.",
-    "Command 기본값은 플레이어와 NPC가 같은 WI 계약을 재사용할 수 있게 하며 실제 실행 포트가 준비되지 않은 발생원은 E4 ContextPartiallyBound로 남긴다."
+    "현재 64개 WI에는 DataDriven 전용 정의가 없다. 향후 기상·가격 관측이 임계값을 넘어 권위 상태를 바꾸는 WI를 추가할 때 명시적으로 허용한다.",
+    "Command의 허용 발생원과 실제 조작 권한은 다르다. NpcRoutine은 NpcDriven으로 실행하며 플레이어는 정책·예외 개입만 사용한다."
   ]
 }

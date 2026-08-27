@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $standardPath = Join-Path $repoRoot 'docs/Architecture/WorldTick과실시간실행경계.md'

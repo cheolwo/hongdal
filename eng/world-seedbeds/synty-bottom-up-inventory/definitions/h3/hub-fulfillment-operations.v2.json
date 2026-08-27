@@ -13,7 +13,8 @@
     "h2-candidate:hub-outbound-vehicle"
   ],
   "optionalH2Refs": [
-    "h2-candidate:hub-maintenance-yard"
+    "h2-candidate:hub-maintenance-yard",
+    "h2-candidate:hub-internal-warehouse"
   ],
   "connectorRoleCodes": [
     "StorageCargoInput",

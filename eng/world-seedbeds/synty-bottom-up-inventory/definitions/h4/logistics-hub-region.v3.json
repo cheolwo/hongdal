@@ -42,7 +42,7 @@
     "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.logistics-hub-region.r1",
-  "derivationInputHashSha256": "4c30fdda5e941287cf01f96537c6ac1a1bf90c4235b4f1d94d234adf4c02d637",
+  "derivationInputHashSha256": "97d32f803f350ee14a11fa492cf0385a313a537bfa8b3e0f1241404b2d7c7e69",
   "authoredDocument": "authored/h4/logistics-hub-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

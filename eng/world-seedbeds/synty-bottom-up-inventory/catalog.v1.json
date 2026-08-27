@@ -87,8 +87,8 @@
       "inventoryId": "h1-stock:hub-outbound-staging",
       "title": "Hub 피킹·출고 준비 공간",
       "groupCode": "HubCity",
-      "stateCode": "CandidateForReview",
-      "approvedSeedbedStableId": null,
+      "stateCode": "ApprovedReference",
+      "approvedSeedbedStableId": "wi-spatial-seedbed:hub-outbound-staging.v1",
       "wiIds": ["WI-HUB-03", "WI-HUB-04", "WI-HUB-05"],
       "spatialRoleCodes": ["HubPickingArea", "HubOutboundStagingArea"],
       "grammarSetRefs": ["city:화물 대기 야드", "city:상하차 Dock"]

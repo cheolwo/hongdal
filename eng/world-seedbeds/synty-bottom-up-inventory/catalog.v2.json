@@ -130,9 +130,9 @@
       "stableId": "h1-stock:farm-worker-waiting",
       "revision": 2,
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "1643289d8cf85b448d01c3425a93474dca336dc40c26e984b459df6441736e4b",
+      "definitionSha256": "bded7dc7d8d2347c99aef14d49874703f29654d86ed6751a363ced8cea28c6c5",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "c0bce67dcc86f09d8690569d183e8f051f74926c0f85c9ec228eaa25e253f1c7"
+      "documentSha256": "3f7d50caa60e82e355b16a3b3ad931cdaab3a6522c6e14b1179950b013626af1"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -160,11 +160,11 @@
     },
     {
       "stableId": "h1-stock:hub-outbound-staging",
-      "revision": 2,
+      "revision": 3,
       "definitionPath": "definitions/h1/hub-outbound-staging.v2.json",
-      "definitionSha256": "1f55a9f9e25f9023da72c24b39ee73417c624c7d306daee9080a6e460b492855",
+      "definitionSha256": "4128469b1766ae241792a023d06aed7cc9b3e212bb0289b8462ce6a29bcd4dc2",
       "documentPath": "authored/h1/hub-outbound-staging.v2.md",
-      "documentSha256": "3d1b4b951a1aa2477c9a8cd4940230054779859ac49847d5fd086a589ee63752"
+      "documentSha256": "d8ef37fb390cf0e47388078ca576f092a17fd7caac7c21c926fe04e98fe72fb7"
     },
     {
       "stableId": "h1-stock:hub-quarantine",
@@ -226,17 +226,17 @@
       "stableId": "h1-stock:nature-emergency-retreat",
       "revision": 1,
       "definitionPath": "definitions/h1/nature-emergency-retreat.v2.json",
-      "definitionSha256": "92b0f06134723288ed05e0ea9cd73eb85d4cea22db12dc579a0536950c0ed88c",
+      "definitionSha256": "7fede21634576ab1cc9e4c05b62491f7505e234842128bc62e17c02ac8c937d0",
       "documentPath": "authored/h1/nature-emergency-retreat.v2.md",
-      "documentSha256": "b85c34ef5a0b62450dbe3472703b490e361246f342357bed027823471ebb70c7"
+      "documentSha256": "bebb33ae4f53fe5d447f36e7159d03130202baa1e1852c8a4ed6cbd251224fe5"
     },
     {
       "stableId": "h1-stock:nature-exploration-buffer",
       "revision": 2,
       "definitionPath": "definitions/h1/nature-exploration-buffer.v2.json",
-      "definitionSha256": "4b71cb2fb01baab9dfe7b91ceeee84a1c93812301e8c6767592279f93dbe8a42",
+      "definitionSha256": "7d922e2edfa196d30e8c0fe4435577c064f0fb3f2980706a1b3d12b280a80ce6",
       "documentPath": "authored/h1/nature-exploration-buffer.v2.md",
-      "documentSha256": "ecbe9bd84b3cd88c34cb8f11fceb2d970ee1ad3c14429134ee5ff60c57ffddd5"
+      "documentSha256": "6c62b0e69a91f2fa8cc8db0294dce66a47ce7b5f3a6ccb339b61ffaadc6a6350"
     },
     {
       "stableId": "h1-stock:nature-farm-edge",
@@ -280,11 +280,11 @@
     },
     {
       "stableId": "h1-stock:nature-shelter",
-      "revision": 1,
+      "revision": 4,
       "definitionPath": "definitions/h1/nature-shelter.v2.json",
-      "definitionSha256": "2b2d12eada017481a7e61d2909c46746c2481a5dcd42d7879f9f1f9f60f6f9b5",
+      "definitionSha256": "275f2b60978bd753251b5eae947240eaf6ae6850858d9889cf1f0550e6e4fd54",
       "documentPath": "authored/h1/nature-shelter.v2.md",
-      "documentSha256": "731f5c0c1c7d77200ab6816c9912e0e0097f75e1676fc3be06e94e1de2ef3c2a"
+      "documentSha256": "d576a129b4ac2cf20d4c4f1ba414ceceeb257f7c071767a78b9132628516f225"
     },
     {
       "stableId": "h1-stock:nature-threat-watch",
@@ -298,9 +298,9 @@
       "stableId": "h1-stock:nature-trailhead",
       "revision": 1,
       "definitionPath": "definitions/h1/nature-trailhead.v2.json",
-      "definitionSha256": "92fa147d40e5bec5cec7bee4dad77e70dd9d495c078290a425e17b3f74856729",
+      "definitionSha256": "16c8529a15eacda6475e10c5591d98fd26c1451c0ec3546c8f9a46f77ec5340a",
       "documentPath": "authored/h1/nature-trailhead.v2.md",
-      "documentSha256": "211445bb8085c28aab2e6107f0f10f3d0494b8ff1b4c2c50721d68e330625f04"
+      "documentSha256": "68043ea6c346394a382a9ad885f13dec31c2cccc627fc548a80075f90fe4351d"
     },
     {
       "stableId": "h1-stock:road-facility-access",
@@ -535,6 +535,14 @@
       "definitionSha256": "b2bbeb6511452b9b881439f68f32c417252238acfa2d5ce8177d1c3515c145a0",
       "documentPath": "authored/h2/hub-inbound-storage.v2.md",
       "documentSha256": "fed6725b72053230cc23991609223ebdf3e88c6aa03db9bc9ab50fb163baedcd"
+    },
+    {
+      "stableId": "h2-candidate:hub-internal-warehouse",
+      "revision": 1,
+      "definitionPath": "definitions/h2/hub-internal-warehouse.v2.json",
+      "definitionSha256": "73d321ea68ef3b00006d77405215b47643ff1df8fbdf773620c918d4b116d84e",
+      "documentPath": "authored/h2/hub-internal-warehouse.v2.md",
+      "documentSha256": "ae1ee4eed9c1319b2df65223671579ed712ff58563fbad7c33316a193b302476"
     },
     {
       "stableId": "h2-candidate:hub-longterm-cold-storage",
@@ -774,9 +782,9 @@
       "stableId": "h3-candidate:hub-fulfillment-operations",
       "revision": 1,
       "definitionPath": "definitions/h3/hub-fulfillment-operations.v2.json",
-      "definitionSha256": "120653a2af66685fd7cc2d6d0b2991f38f256226fa5171df32d47c109fe248d4",
+      "definitionSha256": "d312098fe83390107fd6b0a34e6302f374eb912bfcb6ba633f8df0e9b5f40064",
       "documentPath": "authored/h3/hub-fulfillment-operations.v2.md",
-      "documentSha256": "1918d33e3d131ef13564a74b2c13607c0c185feb16b7e1eae908b52f00b2e34e"
+      "documentSha256": "c09bb2e345b1683b78f2bef28d06fc741458105d63438f5726b63615e17eeff4"
     },
     {
       "stableId": "h3-candidate:hub-maintenance-emergency-loop",
@@ -824,7 +832,7 @@
       "definitionPath": "definitions/h3/nature-home-encounter-defense.v2.json",
       "definitionSha256": "35d4129d86783537de4b72314dda1f999135708705523c59b8ad401a7ee142c8",
       "documentPath": "authored/h3/nature-home-encounter-defense.v2.md",
-      "documentSha256": "f6f2ad3c033840bf6d85110298243e1112e9350fc2c87d521ad731dc2abdbeae"
+      "documentSha256": "44cf389dcf7e7b2a0cbfbcc3e4873c261fab62f4b6e73a46f4f37babd5de04e1"
     },
     {
       "stableId": "h3-candidate:nature-threat-recovery",

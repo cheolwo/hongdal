@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
@@ -15,7 +15,7 @@ $check = & $script -Mode Check
 
 if ($firstHash -ne $secondHash) { throw "SpatialResourceInventoryGenerationIsNotDeterministic" }
 if ($firstWriteTicks -ne $secondWriteTicks) { throw "SpatialResourceInventoryUnchangedOutputWasRewritten" }
-if ($check -notmatch "SpatialResourceInventoryValid:H1=84/5;H2=38/0;H3=20/5;H4=6/1") {
+if ($check -notmatch "SpatialResourceInventoryValid:H1=84/8;H2=39/0;H3=20/5;H4=6/1") {
     throw "SpatialResourceInventoryValidationDidNotComplete"
 }
 

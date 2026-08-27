@@ -17,29 +17,29 @@
       "areaRoleCode": "CityHub",
       "baselinePatternStableId": "area-set-composition:cityhub:inbound-storage-outbound",
       "worldIntentRef": "h4-blueprint:logistics-hub-region",
-      "compositionPatternHashSha256": "918819f66a529060da2347dc58b087e63a7a9452ab386f42c7d3dfb1a4e8b99d",
-      "documentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252"
+      "compositionPatternHashSha256": "71804c826f5e4ed6dc2ac577620aa4c679ba298f22a2d1424f55dc40ae3b1483",
+      "documentHashSha256": "16be5e91a1f8a5c11f7ebb348dab0767e7b29441e10a2484b8b23c93267b14f2"
     },
     {
       "areaRoleCode": "Farm",
       "baselinePatternStableId": "area-set-composition:farm:highland-production-processing",
       "worldIntentRef": "h4-blueprint:farm-production-processing-region",
-      "compositionPatternHashSha256": "ec8179b01d3f485621356d94e6272584540e4c1266956ec623c5c81e5530d615",
-      "documentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325"
+      "compositionPatternHashSha256": "c757de1fe82d736ece342cafa28fdb788b3ee5096060f959dd0d327ab6abde2f",
+      "documentHashSha256": "eeba1bbe7c7f92b63e5ba84c112221727977e5aa76ebdefc86eaebe3fe892396"
     },
     {
       "areaRoleCode": "NatureHome",
       "baselinePatternStableId": "area-set-composition:nature:forest-river-home-loop",
       "worldIntentRef": "h4-blueprint:nature-home-exploration-region",
-      "compositionPatternHashSha256": "162f49b1bcaa2ae8fee34c0e37459482da05f5421a9cac088257fe9542c1329d",
-      "documentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361"
+      "compositionPatternHashSha256": "bc73e50002e8161edc8a4cd87b419081a5eeefae98131582f16e7ff4c1bbbd4b",
+      "documentHashSha256": "6143f4dce29c59f0442309e50ac9c111a19885610d0621c807b1423ccdf606b5"
     },
     {
       "areaRoleCode": "Town",
       "baselinePatternStableId": "area-set-composition:town:lowrise-life-market",
       "worldIntentRef": "h4-blueprint:lowrise-market-region",
-      "compositionPatternHashSha256": "17113a5debb758e1753630d15b8b17dca10c31d097f7a8b126252f0a0ef83e50",
-      "documentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1"
+      "compositionPatternHashSha256": "9d41b4157e453c7817f6cf8a6d6441044de89a6816bf4b9b8104219d15e76611",
+      "documentHashSha256": "72dfb87779c5b71a5b677711352858b2401b7a797bfd6a1852f8015ef78ddaf4"
     }
   ],
   "resolvedPatterns": [
@@ -57,7 +57,7 @@
         "Construction"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/cityhub.md",
-      "documentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252",
+      "documentHashSha256": "16be5e91a1f8a5c11f7ebb348dab0767e7b29441e10a2484b8b23c93267b14f2",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:cityhub:fulfillment",
@@ -74,7 +74,7 @@
           "z": 0.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Standard",
-          "h3TheoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
+          "h3TheoryHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590"
         },
         {
           "placementStableId": "placement:area-pattern:cityhub:inbound",
@@ -90,7 +90,7 @@
           "z": 0.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Standard",
-          "h3TheoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
+          "h3TheoryHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6"
         },
         {
           "placementStableId": "placement:area-pattern:cityhub:maintenance",
@@ -107,7 +107,7 @@
           "z": 960.0,
           "rotationDegrees": 90,
           "scaleVariantCode": "Compact",
-          "h3TheoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
+          "h3TheoryHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992"
         },
         {
           "placementStableId": "placement:area-pattern:cityhub:storage",
@@ -125,7 +125,7 @@
           "z": 0.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Expanded",
-          "h3TheoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
+          "h3TheoryHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5"
         }
       ],
       "resolvedH2Overrides": [],
@@ -205,7 +205,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "918819f66a529060da2347dc58b087e63a7a9452ab386f42c7d3dfb1a4e8b99d",
+      "compositionPatternHashSha256": "71804c826f5e4ed6dc2ac577620aa4c679ba298f22a2d1424f55dc40ae3b1483",
       "runtimeState": false,
       "presentationOnly": true
     },
@@ -223,7 +223,7 @@
         "Construction"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/cityhub.md",
-      "documentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252",
+      "documentHashSha256": "16be5e91a1f8a5c11f7ebb348dab0767e7b29441e10a2484b8b23c93267b14f2",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:cityhub-v01:fulfillment",
@@ -240,7 +240,7 @@
           "z": 0.0,
           "rotationDegrees": 180,
           "scaleVariantCode": "Compact",
-          "h3TheoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
+          "h3TheoryHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590"
         },
         {
           "placementStableId": "placement:area-pattern:cityhub-v01:inbound",
@@ -256,7 +256,7 @@
           "z": -960.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Compact",
-          "h3TheoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
+          "h3TheoryHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6"
         },
         {
           "placementStableId": "placement:area-pattern:cityhub-v01:maintenance",
@@ -273,7 +273,7 @@
           "z": 960.0,
           "rotationDegrees": 270,
           "scaleVariantCode": "Expanded",
-          "h3TheoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
+          "h3TheoryHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992"
         },
         {
           "placementStableId": "placement:area-pattern:cityhub-v01:storage",
@@ -291,7 +291,7 @@
           "z": 0.0,
           "rotationDegrees": 90,
           "scaleVariantCode": "Expanded",
-          "h3TheoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
+          "h3TheoryHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5"
         }
       ],
       "resolvedH2Overrides": [],
@@ -369,7 +369,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "88a268c1aab94c47c1e5e38a259ca8e59bdc3904131fd98676809b321b2408b9",
+      "compositionPatternHashSha256": "a2668b24dc3ad77a81f88c1c8b1b301f20d7b292a78abe7915ac5a5560c22d8f",
       "runtimeState": false,
       "presentationOnly": true
     },
@@ -388,7 +388,7 @@
         "Nature"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/farm.md",
-      "documentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325",
+      "documentHashSha256": "eeba1bbe7c7f92b63e5ba84c112221727977e5aa76ebdefc86eaebe3fe892396",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:farm:dispatch",
@@ -457,7 +457,7 @@
           "z": 0.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Expanded",
-          "h3TheoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
+          "h3TheoryHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6"
         }
       ],
       "resolvedH2Overrides": [],
@@ -538,7 +538,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "ec8179b01d3f485621356d94e6272584540e4c1266956ec623c5c81e5530d615",
+      "compositionPatternHashSha256": "c757de1fe82d736ece342cafa28fdb788b3ee5096060f959dd0d327ab6abde2f",
       "runtimeState": false,
       "presentationOnly": true
     },
@@ -557,7 +557,7 @@
         "Nature"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/farm.md",
-      "documentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325",
+      "documentHashSha256": "eeba1bbe7c7f92b63e5ba84c112221727977e5aa76ebdefc86eaebe3fe892396",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:farm-v01:dispatch",
@@ -626,7 +626,7 @@
           "z": 0.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Expanded",
-          "h3TheoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
+          "h3TheoryHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6"
         }
       ],
       "resolvedH2Overrides": [],
@@ -703,7 +703,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "7beac03eab8487c161772922f00abff276a63261a5b663f26ff3aa0607960dc7",
+      "compositionPatternHashSha256": "fc45c966664c835ee9f6bcb763d7934dd4d31d6156b1d244b279f408fafff281",
       "runtimeState": false,
       "presentationOnly": true
     },
@@ -721,7 +721,7 @@
         "Construction"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/nature.md",
-      "documentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361",
+      "documentHashSha256": "6143f4dce29c59f0442309e50ac9c111a19885610d0621c807b1423ccdf606b5",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:nature:home",
@@ -738,7 +738,7 @@
           "z": 0.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Standard",
-          "h3TheoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
+          "h3TheoryHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41"
         },
         {
           "placementStableId": "placement:area-pattern:nature:threat",
@@ -754,7 +754,7 @@
           "z": 0.0,
           "rotationDegrees": 90,
           "scaleVariantCode": "Standard",
-          "h3TheoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
+          "h3TheoryHashSha256": "92f70c8336ae05905dabae8ed628cd59fbaf0d0886aa1c95a0caf0ea436cfc44"
         },
         {
           "placementStableId": "placement:area-pattern:nature:trail",
@@ -770,7 +770,7 @@
           "z": 960.0,
           "rotationDegrees": 270,
           "scaleVariantCode": "Standard",
-          "h3TheoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
+          "h3TheoryHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d"
         }
       ],
       "resolvedH2Overrides": [],
@@ -834,7 +834,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "162f49b1bcaa2ae8fee34c0e37459482da05f5421a9cac088257fe9542c1329d",
+      "compositionPatternHashSha256": "bc73e50002e8161edc8a4cd87b419081a5eeefae98131582f16e7ff4c1bbbd4b",
       "runtimeState": false,
       "presentationOnly": true
     },
@@ -852,7 +852,7 @@
         "Construction"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/nature.md",
-      "documentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361",
+      "documentHashSha256": "6143f4dce29c59f0442309e50ac9c111a19885610d0621c807b1423ccdf606b5",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:nature-v01:home",
@@ -869,7 +869,7 @@
           "z": -960.0,
           "rotationDegrees": 0,
           "scaleVariantCode": "Compact",
-          "h3TheoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
+          "h3TheoryHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41"
         },
         {
           "placementStableId": "placement:area-pattern:nature-v01:threat",
@@ -885,7 +885,7 @@
           "z": 960.0,
           "rotationDegrees": 180,
           "scaleVariantCode": "Expanded",
-          "h3TheoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
+          "h3TheoryHashSha256": "92f70c8336ae05905dabae8ed628cd59fbaf0d0886aa1c95a0caf0ea436cfc44"
         },
         {
           "placementStableId": "placement:area-pattern:nature-v01:trail",
@@ -901,7 +901,7 @@
           "z": 960.0,
           "rotationDegrees": 90,
           "scaleVariantCode": "Expanded",
-          "h3TheoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
+          "h3TheoryHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d"
         }
       ],
       "resolvedH2Overrides": [],
@@ -963,7 +963,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "a0a152742a93f9e05d5bc4ee370e5813af17bca732e218a215fb95e673eec901",
+      "compositionPatternHashSha256": "f63bbce57eb2c5dacdd4cde0e6082c9ba490ab1810923dd6b50b5a0273894395",
       "runtimeState": false,
       "presentationOnly": true
     },
@@ -982,7 +982,7 @@
         "Nature"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/town.md",
-      "documentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1",
+      "documentHashSha256": "72dfb87779c5b71a5b677711352858b2401b7a797bfd6a1852f8015ef78ddaf4",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:town-v01:circular",
@@ -1154,7 +1154,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "1cceafbba55af99d657b812df4998833b41b74250973189decd83bb72cbdb6ad",
+      "compositionPatternHashSha256": "2e27459e1b34c1c0f20a4abb34c75f44f559f493c21bddb1294caf1bbe981062",
       "runtimeState": false,
       "presentationOnly": true
     },
@@ -1173,7 +1173,7 @@
         "Nature"
       ],
       "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/town.md",
-      "documentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1",
+      "documentHashSha256": "72dfb87779c5b71a5b677711352858b2401b7a797bfd6a1852f8015ef78ddaf4",
       "resolvedH3Placements": [
         {
           "placementStableId": "placement:area-pattern:town:circular",
@@ -1349,7 +1349,7 @@
       ],
       "structureQualificationCode": "AreaSetCompositionStructureQualified",
       "closureStateCode": "Closed",
-      "compositionPatternHashSha256": "17113a5debb758e1753630d15b8b17dca10c31d097f7a8b126252f0a0ef83e50",
+      "compositionPatternHashSha256": "9d41b4157e453c7817f6cf8a6d6441044de89a6816bf4b9b8104219d15e76611",
       "runtimeState": false,
       "presentationOnly": true
     }

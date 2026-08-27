@@ -5,6 +5,9 @@
 @state ApprovedReference
 @required-h1 h1-stock:hub-receiving-storage
 @required-h1 h1-stock:hub-outbound-staging
+@connector ReceivingOutput
+@connector OutboundInput
+@connector WorkerTraversal
 
 ## 존재 이유
 

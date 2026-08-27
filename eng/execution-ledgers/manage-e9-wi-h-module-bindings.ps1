@@ -13,6 +13,7 @@ if (-not [bool] $binding.principles.wiOrWiLoopIsEvidenceSubject -or
 $wiCatalog = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.sources.worldInteractionCatalogPath) -Raw -Encoding UTF8 | ConvertFrom-Json
 $moduleCatalog = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.sources.e9ModuleCatalogPath) -Raw -Encoding UTF8 | ConvertFrom-Json
 $spatialRaw = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.sources.gameplaySpatialCompletionPath) -Raw -Encoding UTF8
+$actualSpatialRaw = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.sources.actualE5SpatialPath) -Raw -Encoding UTF8
 $hRoot = Join-Path $repositoryRoot $binding.sources.hDefinitionRootPath
 $hDefinitions = @(Get-ChildItem -LiteralPath $hRoot -Recurse -File -Filter "*.json" | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json })
 $h1SeedbedRoot = Join-Path $repositoryRoot $binding.sources.h1SeedbedRootPath
@@ -23,6 +24,7 @@ $runtimeInterfaceRaw = Get-Content -LiteralPath (Join-Path $repositoryRoot $bind
 $localAdapterRaw = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.e2RuntimeBoundary.localAdapterSourcePath) -Raw -Encoding UTF8
 $downwardSkeletonRaw = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.downwardCodeSkeleton.sourcePath) -Raw -Encoding UTF8
 $natureSurvivalContractsRaw = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.sources.natureSurvivalContractsSourcePath) -Raw -Encoding UTF8
+$areaBuildingContractsRaw = Get-Content -LiteralPath (Join-Path $repositoryRoot $binding.sources.areaBuildingContractsSourcePath) -Raw -Encoding UTF8
 if (-not $runtimeInterfaceRaw.Contains("interface $($binding.e2RuntimeBoundary.portTechnicalName)")) { throw "E9WiHModuleBindingsInvalid:E2RuntimePortMissing" }
 
 $expectedStages = @("E9", "E8", "E7", "E6", "E5", "E4", "E3", "E2", "E1")
@@ -91,7 +93,8 @@ foreach ($item in $binding.bindings) {
         if (-not $downwardSkeletonRaw.Contains($operation)) { throw "E9WiHModuleBindingsInvalid:ExecutionHeadOperationMissing:$($item.wiId):$operation" }
     }
     if (-not $downwardSkeletonRaw.Contains($item.wiId) -and
-        -not $natureSurvivalContractsRaw.Contains($item.wiId)) {
+        -not $natureSurvivalContractsRaw.Contains($item.wiId) -and
+        -not $areaBuildingContractsRaw.Contains($item.wiId)) {
         throw "E9WiHModuleBindingsInvalid:ExecutionHeadWiMissing:$($item.wiId)"
     }
 
@@ -100,6 +103,8 @@ foreach ($item in $binding.bindings) {
     $implementationSnapshot = "$($wi[0].implementation.currentStage)/$($wi[0].implementation.status)"
     $integrationSnapshot = "$($wi[0].integration.currentStage)/$($wi[0].integration.status)"
     if ($item.sourceEvidenceSnapshot.implementation -ne $implementationSnapshot -or $item.sourceEvidenceSnapshot.integration -ne $integrationSnapshot) { throw "E9WiHModuleBindingsInvalid:EvidenceSnapshotStale:$($item.wiId)" }
+    $actualPlacementProperty = $item.e4Audit.PSObject.Properties["actualSpatialPlacementStateCode"]
+    $actualSpatialPlacementStateCode = if ($null -eq $actualPlacementProperty) { "ActualE5Bound" } else { [string] $actualPlacementProperty.Value }
 
     foreach ($level in @("H1", "H2", "H3", "H4")) {
         $refs = @($item.hRefs.$level)
@@ -121,7 +126,9 @@ foreach ($item in $binding.bindings) {
                 throw "E9WiHModuleBindingsInvalid:UnresolvedSpatialRef:$($item.wiId):$ref"
             }
             elseif ($wi[0].integration.currentStage -in @("E5", "E6", "E7") -and
-                    -not $spatialRaw.Contains($ref)) {
+                    -not $spatialRaw.Contains($ref) -and
+                    -not $actualSpatialRaw.Contains($ref) -and
+                    $actualSpatialPlacementStateCode -ne "ApprovedH1InputOnly") {
                 throw "E9WiHModuleBindingsInvalid:SpatialCompletionRefMissing:$($item.wiId):$ref"
             }
         }
@@ -136,6 +143,10 @@ foreach ($item in $binding.bindings) {
     $directH1Claims = @($h1Definitions | Where-Object { @($_.wiIds) -contains $item.wiId }).Count +
         @($boundH1Seedbeds | Where-Object { @($_.includedWiIds) -contains $item.wiId }).Count
     if ($directH1Claims -eq 0 -or $item.e4Audit.directH1WiClaimCode -ne "Present") { throw "E9WiHModuleBindingsInvalid:E4DirectH1WiClaim:$($item.wiId)" }
+    if ($actualSpatialPlacementStateCode -eq "ApprovedH1InputOnly" -and
+        [string] $item.stageStates.E7 -ne "EvidenceMissing") {
+        throw "E9WiHModuleBindingsInvalid:ActualPlacementEvidenceOverstated:$($item.wiId)"
+    }
     if ($item.e4Audit.spatialReservationCoverageCode -eq "MissingCapacityConcept" -and
         (@($item.e4Audit.unresolvedSpatialReservationKinds).Count -eq 0 -or
          @($item.e4Audit.proposedCapacityConceptCodes).Count -eq 0)) { throw "E9WiHModuleBindingsInvalid:E4CapacityGapNotNamed:$($item.wiId)" }

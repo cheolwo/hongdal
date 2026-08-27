@@ -27,7 +27,7 @@
       "evidenceKindCode": "KamisMarketContext",
       "sourceStableId": "public-data:kamis-price-observations",
       "sourceRevision": "simulation-shared-public-data.v1",
-      "sourceReferencePath": "Ssalddel.Simulation.Contracts/SimulationSharedPublicDataContracts.cs",
+      "sourceReferencePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationSharedPublicDataContracts.cs",
       "linkStatusCode": "ContractReference",
       "limitationCodes": [
         "MarketContextOnly",

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
   "stableId": "h1-stock:nature-shelter",
-  "revision": 1,
+  "revision": 4,
   "hierarchyLevelCode": "H1",
   "title": "자연 임시 대피 공간",
-  "summary": "기상·위험·피로로 탐색을 계속하기 어려울 때 잠시 머무는 회복 공간이다.",
+  "summary": "기상·위험·피로로 탐색을 계속하기 어려울 때 머물며 획득 자원을 보관하고 안전하게 수면한 뒤 다음 확장 계획을 선택하는 생활 거점 공간이다.",
   "knowledgeStateCode": "IdeaInventory",
   "originModeCode": "WorldIntent",
   "approvedDefinitionStableId": null,
@@ -13,7 +13,11 @@
     "WI-NATURE-07",
     "WI-NATURE-08",
     "WI-NATURE-09",
-    "WI-NATURE-10"
+    "WI-NATURE-10",
+    "WI-NATURE-13",
+    "WI-NATURE-14",
+    "WI-NATURE-15",
+    "WI-CON-01"
   ],
   "anticipatedGameplayCodes": [
     "TemporaryShelter",
@@ -32,13 +36,25 @@
     "Spatial.BuildingSite",
     "Spatial.ShelterConstructionWorkArea",
     "Spatial.ShelterEntrance",
-    "Spatial.ShelterInterior"
+    "Spatial.ShelterInterior",
+    "Spatial.ShelterStorage",
+    "Spatial.StorageInteractionAnchor",
+    "Spatial.ShelterSleep",
+    "Spatial.SleepInteractionAnchor",
+    "Spatial.DawnPlanChoice",
+    "Spatial.DawnPlanChoiceAnchor",
+    "Spatial.AreaBuildingFootprint",
+    "Spatial.AreaBuildingPlacementAllowed",
+    "Spatial.FootprintAvailable",
+    "Spatial.CraftingWorkArea",
+    "Spatial.ActiveWorkReservationContext"
   ],
   "capacityConceptCodes": [
     "BuildingSite",
     "WorkArea",
     "Material",
-    "ShelterOccupancy"
+    "ShelterOccupancy",
+    "ContainerCapacity"
   ],
   "predecessorH1Refs": [
     "h1-stock:nature-trailhead"

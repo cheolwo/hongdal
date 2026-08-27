@@ -30,7 +30,7 @@
 | 검토 후보 | `FarmNature` | `h1-stock:nature-farm-edge` 숲 경계형 농장 전환 공간 | WI-WORLD-05 | nature:숲 가장자리, transition:Nature–Farm 전환 |
 | 검토 후보 | `FarmNature` | `h1-stock:nature-exploration-buffer` 자연 탐색·완충 공간 | WI-WORLD-05, WI-WORLD-07 | nature:숲 빈터·고사목, nature:산길·바위 길목 |
 | 승인 H1 참조 | `HubCity` | `h1-stock:hub-receiving-storage` Hub 입고·검수·보관 공간 | WI-LOG-04, WI-LOG-05, WI-001, WI-002 | city:물류 Station 진입부, city:상하차 Dock, city:화물 대기 야드 |
-| 검토 후보 | `HubCity` | `h1-stock:hub-outbound-staging` Hub 피킹·출고 준비 공간 | WI-HUB-03, WI-HUB-04, WI-HUB-05 | city:화물 대기 야드, city:상하차 Dock |
+| 승인 H1 참조 | `HubCity` | `h1-stock:hub-outbound-staging` Hub 피킹·출고 준비 공간 | WI-HUB-03, WI-HUB-04, WI-HUB-05 | city:화물 대기 야드, city:상하차 Dock |
 | 검토 후보 | `HubCity` | `h1-stock:hub-vehicle-yard` Hub 차량 상차·대기 공간 | WI-HUB-06, WI-MARKET-01 | city:상하차 Dock, city:화물 대기 야드 |
 | 검토 후보 | `HubCity` | `h1-stock:hub-market-transfer` Hub–시장 화물 인계 공간 | WI-MARKET-01, WI-MARKET-02 | transition:Town–Hub 전환, city:물류 Station 진입부 |
 | 검토 후보 | `HubCity` | `h1-stock:hub-service-maintenance` Hub 시설 정비 공간 | WI-WORLD-04 | city:화물 대기 야드, transition:Road–BuildingFront 전환 |

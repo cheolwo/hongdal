@@ -306,7 +306,7 @@ function New-KnowledgeMarkdown([object] $Definition) {
 
 function Test-DirectiveSet([string] $Markdown, [string] $Name, [object[]] $Expected, [string] $Id) {
     $matches = [regex]::Matches($Markdown, "(?m)^@$([regex]::Escape($Name)) (.+)$")
-    $actual = @($matches | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
+    $actual = @($matches | ForEach-Object { $_.Groups[1].Value.TrimEnd("`r") } | Sort-Object)
     $wanted = @($Expected | ForEach-Object { [string] $_ } | Sort-Object)
     Require (($actual -join "|") -eq ($wanted -join "|")) "MarkdownDirectiveMismatch:${Id}:$Name"
 }
@@ -418,7 +418,7 @@ foreach ($level in @("h1", "h2", "h3")) {
 }
 
 Require (@($definitionsByLevel.H1).Count -eq 52) "H1CountMustBe52"
-Require (@($definitionsByLevel.H2).Count -eq 37) "H2CountMustBe37"
+Require (@($definitionsByLevel.H2).Count -eq 38) "H2CountMustBe38"
 Require (@($definitionsByLevel.H3).Count -eq 20) "H3CountMustBe20"
 foreach ($h1 in @($definitionsByLevel.H1)) {
     foreach ($reference in @($h1.predecessorH1Refs + $h1.successorH1Refs)) { Require ($definitionsById.ContainsKey([string] $reference)) "H1RelationUnknown:$($h1.stableId):$reference" }
@@ -575,10 +575,10 @@ if ($Mode -eq "Check") {
         Require (Test-Path -LiteralPath $path) "GeneratedDocumentMissing:$($pair.Key)"
         Require ((ConvertTo-StableText ([IO.File]::ReadAllText($path))) -ceq $pair.Value) "GeneratedDocumentOutOfDate:$($pair.Key)"
     }
-    Write-Output "SpatialDesignKnowledgeValid:H1=52;H2=37;H3=20"
+    Write-Output "SpatialDesignKnowledgeValid:H1=52;H2=38;H3=20"
 }
 else {
     [void] (Write-TextIfChanged $catalogPath (ConvertTo-StableJson $catalog))
     foreach ($pair in $generated.GetEnumerator()) { [void] (Write-TextIfChanged (Resolve-RepositoryPath $repositoryRoot $pair.Key) $pair.Value) }
-    Write-Output "SpatialDesignKnowledgeGenerated:H1=52;H2=37;H3=20"
+    Write-Output "SpatialDesignKnowledgeGenerated:H1=52;H2=38;H3=20"
 }

@@ -56,7 +56,7 @@
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-worker-waiting"
   ],
   "unresolvedItems": [
-    "휴식은 표현·다음 작업 선택 기능이며 E8 NPC 자율성 권위를 만들지 않는다."
+    "휴식은 표현·다음 작업 선택 기능이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

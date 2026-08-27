@@ -1,9 +1,9 @@
 {
   "schemaVersion": "simulation-world-gameplay-h-inventory-demands.v1",
-  "revision": "simulation-world-gameplay-h-inventory-demands.r1",
+  "revision": "simulation-world-gameplay-h-inventory-demands.r2",
   "principle": "H 재고 수량이 아니라 게임플레이 인과선에서 실제로 분리되어야 하는 장소와 이동 흐름을 기준으로 H2·H3를 생산한다.",
   "targetInventoryAfterWave": {
-    "h2": 37,
+    "h2": 38,
     "h3": 20
   },
   "demandItems": [

@@ -75,6 +75,7 @@ $policy = Read-Json $PolicyPath
 $theory = Read-Json $TheoryPath
 $composition = Read-Json $CompositionPath
 $worldInteractions = Read-Json "eng/execution-ledgers/world-interactions.json"
+$worldInteractionFlows = Read-Json ([string] $worldInteractions.workflowCatalogPath)
 $spatialPriorities = Read-Json "eng/world-seedbeds/wi-spatial-priorities.v1.json"
 $spatialSeedbedCatalog = Read-Json "eng/world-seedbeds/wi-spatial-seedbeds/catalog.json"
 $designCatalog = Read-Json "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json"
@@ -534,6 +535,14 @@ foreach ($preference in @($policy.wiBindingPreferences.PSObject.Properties | Sor
     Require ($graphMetadata.ContainsKey($h3Ref)) "BindingGraphUnknown:$wiId"
     $metadata = $graphMetadata[$h3Ref]
     $candidates = @($metadata.Nodes | Where-Object { @($_.WiIds) -contains $wiId } | Sort-Object NodeStableId)
+    if ($candidates.Count -eq 0 -and
+        $null -ne $policy.PSObject.Properties["wiBindingH1Overrides"] -and
+        $null -ne $policy.wiBindingH1Overrides.PSObject.Properties[$wiId]) {
+        $overrideH1Ref = [string] $policy.wiBindingH1Overrides.$wiId
+        $candidates = @($metadata.Nodes | Where-Object {
+                [string] $_.H1Ref -eq $overrideH1Ref
+            } | Sort-Object NodeStableId)
+    }
     Require ($candidates.Count -gt 0) "BindingH1NodeMissing:$wiId"
     $selected = $candidates[0]
     $graph = $metadata.Graph
@@ -549,7 +558,8 @@ foreach ($preference in @($policy.wiBindingPreferences.PSObject.Properties | Sor
     $seedbedBinding = if ($spatialSeedbedByWi.ContainsKey($wiId)) {
         $spatialSeedbedByWi[$wiId]
     } else { $null }
-    if ($null -ne $seedbedBinding -and $wiId -like "WI-NATURE-*") {
+    if ($null -ne $seedbedBinding -and
+        ($wiId -like "WI-NATURE-*" -or $wiId -eq "WI-CON-01")) {
         foreach ($requirement in $requirements) {
             Require (@($seedbedBinding.Space.capabilityCodes) -contains $requirement) "SeedbedCapabilityMissing:${wiId}:$requirement"
         }
@@ -624,22 +634,29 @@ $classifiedWiIds = @($bindings.worldInteractionId) +
 $pendingE5WiIds = @($worldInteractions.items.id |
     Where-Object { $classifiedWiIds -notcontains [string] $_ } |
     Sort-Object)
-Require ($bindings.Count -eq 37) "DirectBindingCount:$($bindings.Count)"
+Require ($bindings.Count -eq 42) "DirectBindingCount:$($bindings.Count)"
 Require ($contextBindings.Count -eq 6) "ContextBindingCount:$($contextBindings.Count)"
-Require ($nonSpatialWiIds.Count -eq 6) "NonSpatialCount:$($nonSpatialWiIds.Count)"
-Require ($pendingE5WiIds.Count -eq 0) "PendingE5Count:$($pendingE5WiIds.Count)"
+Require ($nonSpatialWiIds.Count -eq 9) "NonSpatialCount:$($nonSpatialWiIds.Count)"
+$expectedPendingE5WiIds = @(
+    "WI-CITY-01", "WI-CITY-02", "WI-CITY-03", "WI-CITY-04",
+    "WI-NATURE-16", "WI-NATURE-17", "WI-REFLECT-01"
+) | Sort-Object
+Require (($pendingE5WiIds -join ",") -eq ($expectedPendingE5WiIds -join ",")) `
+    "PendingE5Set:$($pendingE5WiIds -join ',')"
 
 $transitions = @()
 $transitionIds = @{}
-foreach ($wi in @($worldInteractions.items)) {
-    foreach ($successor in @($wi.successorWiIds)) {
-        $stableId = "transition:actual-e5:" + ([string] $wi.id).ToLowerInvariant() + ":" + ([string] $successor).ToLowerInvariant()
+foreach ($flow in @($worldInteractionFlows.flows)) {
+    foreach ($edge in @($flow.edges)) {
+        $fromWorldInteractionId = [string] $edge.fromWorldInteractionId
+        $toWorldInteractionId = [string] $edge.toWorldInteractionId
+        $stableId = "transition:actual-e5:" + $fromWorldInteractionId.ToLowerInvariant() + ":" + $toWorldInteractionId.ToLowerInvariant()
         if ($transitionIds.ContainsKey($stableId)) { continue }
         $transitionIds[$stableId] = $true
         $transitions += [ordered]@{
             transitionStableId = $stableId
-            fromWorldInteractionId = [string] $wi.id
-            toWorldInteractionId = [string] $successor
+            fromWorldInteractionId = $fromWorldInteractionId
+            toWorldInteractionId = $toWorldInteractionId
         }
     }
 }

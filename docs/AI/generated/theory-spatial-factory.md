@@ -2,7 +2,7 @@
 
 H2·H3·AreaSet·World를 같은 연결점·관계·흐름 규칙으로 판정한 위치 독립 결과다.
 
-- H2 이론 적격: 37
+- H2 이론 적격: 38
 - H3 이론 적격: 20
 - 이론 E5 AreaSet: 4
 - 이론 World: `TheoryWorldQualified`

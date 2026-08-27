@@ -66,9 +66,9 @@
                 "connectorPoseHashSha256": "25ba70fa5177c4ba0c8e52bbb076dcb1427d1cf0863e5111e21c27fa68625bab"
               }
             ],
-            "sourcePatternHashSha256": "342a8a93fe39c6b74fc70b0b7fcb13d1636dc0fb4cd84591ae840de083f5e25e",
+            "sourcePatternHashSha256": "39f6549c7bae56ca62ea4d0e4e4b592fdc12d43f4d36d828a2db4760011aa9a4",
             "placementHashSha256": "be21bf036db56ed71d6626e90183659c4165b287d53c68207afbe5049051054c",
-            "instanceHashSha256": "dace52238320a15f1f5478c720354966ba40126401d8c986133f74d44e701099"
+            "instanceHashSha256": "257e3f7a905f7faaa7a183cc006ac317f31c0d43a2032e9f0fc426be1e987c3d"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:farm-production-v1:farm-processing-campus",
@@ -110,9 +110,9 @@
                 "connectorPoseHashSha256": "ef8b035e0256a44d21b6e878f24fce825b2dd7a2b5ec4820982e2cd9cc885dcf"
               }
             ],
-            "sourcePatternHashSha256": "2288f710cbd2511a7a1269b3e51de8188de14f3011d8006d02a6d8c9863778f9",
+            "sourcePatternHashSha256": "770b3ef795a6e31cdd9a4377ecf3771404f5a10e391493463d76dea5a69c2b63",
             "placementHashSha256": "675308fba78e569e33a6570443ff5740b60474bc499f399219fd22a8bfb27122",
-            "instanceHashSha256": "dde178a15f66cf032be19db8716cf28d94e54089ab911b09a7e2c71c24e4e4d7"
+            "instanceHashSha256": "6a6929a07768c7c2b73cf04ef274e4de09f0965c556f697d263c4b1761d5cb64"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:farm-production-v1:farm-seasonal-production-loop",
@@ -154,9 +154,9 @@
                 "connectorPoseHashSha256": "dd09e546d08ebe95e63b422e3b4420a08fd41b37531d599dba8be0c0b01346a2"
               }
             ],
-            "sourcePatternHashSha256": "eba7a6a29d3dc5133b95a631b36fcaf1c006d3dc3c4400b3ea06dcc8bebaf63a",
+            "sourcePatternHashSha256": "b75fa67772480909100c071e93117ab7134adf4159a1395286a25dabec91b009",
             "placementHashSha256": "d9b259ef3466538caf340d5247073d5dd39d920e6d5b9e9eeb892e5e15fb7848",
-            "instanceHashSha256": "91a490d8986227f499e36847bc52893a7a291a45ead94dd339ad49aee29f50ef"
+            "instanceHashSha256": "7475efc01f4e35b09099e30e8026367a2ab3d648ede54f41d3fd9dd66bc96d85"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:farm-production-v1:highland-farm",
@@ -198,9 +198,9 @@
                 "connectorPoseHashSha256": "b9114eefac24c7944f5f7f3734b00343193240e99f79dff6368245434dfcd464"
               }
             ],
-            "sourcePatternHashSha256": "e89da2a9956b37c65dd5b52ec8bb39b4e7640e095dce128471e35d67c597b35a",
+            "sourcePatternHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6",
             "placementHashSha256": "d5e27d7893e7c507ada34017843f894eaa89ef4c85f820ba6b2ae76f6e38a344",
-            "instanceHashSha256": "e6e54899e1b7c90798e5b7ef428c47e63645054622151549030157c595ce4957"
+            "instanceHashSha256": "b430619d579956f581fa4d062a59dba80dec72d99d791b511e1bfa1069a68fb9"
           }
         ],
         "externalConnectors": [
@@ -310,7 +310,7 @@
           }
         ],
         "placementHashSha256": "842a13c979a106c6b596b8dc63d7182529c42a7c509e0b72d9a2377e8069f804",
-        "instanceHashSha256": "2519bbeb93b83d1a9eca44acc7f7fcf46aadfa61275cb59cb69c88f9612daea7"
+        "instanceHashSha256": "7c79703420cc103cbd1cf0f52b0d3423d61aae33f5d5ca88fac0250538473ee2"
       },
       {
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
@@ -326,6 +326,50 @@
           "mirrorCode": "None"
         },
         "graphInstances": [
+          {
+            "graphInstanceStableId": "graph-instance:h4:logistics-hub-v1:hub-fulfillment-operations",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-fulfillment-operations.v1",
+            "h3Ref": "h3-candidate:hub-fulfillment-operations",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 480.0,
+              "localZMeters": 480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:hub-fulfillment-operations:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 170.0,
+                "localZMeters": -210.0,
+                "rotationDegrees": 135.0,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "6725ff0d244036cf0086cceb082c6317095a9e5699e0c0154294db27c326b3c1"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:hub-fulfillment-operations:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -210.0,
+                "localZMeters": 210.0,
+                "rotationDegrees": 320.440332,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "49e7487fa201489e130d408d1807b0fa83eb95a4fd1b1d72dfe96bebbfda6d58"
+              }
+            ],
+            "sourcePatternHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590",
+            "placementHashSha256": "d9b259ef3466538caf340d5247073d5dd39d920e6d5b9e9eeb892e5e15fb7848",
+            "instanceHashSha256": "f6c8ceba29bf8aef60c573b471a714d342e7d6716dfe985b12b56bbf80621e90"
+          },
           {
             "graphInstanceStableId": "graph-instance:h4:logistics-hub-v1:hub-maintenance-emergency-loop",
             "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:hub-maintenance-emergency-loop.v1",
@@ -366,9 +410,9 @@
                 "connectorPoseHashSha256": "9d7f309692700c55804e289622853b722a96fb070a4811130d7e4668ca39f3c8"
               }
             ],
-            "sourcePatternHashSha256": "76a4832692979661e79a71f9bb12fe7281915ea55e2c8b90f91a5916fe7f85d6",
+            "sourcePatternHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992",
             "placementHashSha256": "be21bf036db56ed71d6626e90183659c4165b287d53c68207afbe5049051054c",
-            "instanceHashSha256": "9bb614493be050879c813a557befc16ba95997cb0f7d3d61518de0a51e1bc502"
+            "instanceHashSha256": "aadca9d1ffba8f7e2386e1065bcca5f86f1a7ada37b3c1a9d07a0628c56f458b"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:logistics-hub-v1:jinbu-hub",
@@ -410,9 +454,9 @@
                 "connectorPoseHashSha256": "4afd9aa160919b2c1bf18d22bf1e0418d8c1c5ee6ebb807a350060dfa23e53a2"
               }
             ],
-            "sourcePatternHashSha256": "1685288c2b4a43505fc73a8a2576502a574c6c6a090e04d15b806f86702f7b15",
+            "sourcePatternHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6",
             "placementHashSha256": "d5e27d7893e7c507ada34017843f894eaa89ef4c85f820ba6b2ae76f6e38a344",
-            "instanceHashSha256": "976ffae710b4605cdd1cb2535396fcdf124c7e4156c56546085707a658db16d1"
+            "instanceHashSha256": "db2da66bbf9a5533e9545a268683537f3653349c6691ed7d461c995f778c998a"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:logistics-hub-v1:resilient-logistics-hub",
@@ -454,12 +498,38 @@
                 "connectorPoseHashSha256": "5dc3c354fc49d3e6f2f86514ef422decb3c12e18ffe6d86bac97e58604adc3c4"
               }
             ],
-            "sourcePatternHashSha256": "f0b6de17878bf46891c5b92ee9c7cb8f916c9318379389bc2bc7757d834886f9",
+            "sourcePatternHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5",
             "placementHashSha256": "675308fba78e569e33a6570443ff5740b60474bc499f399219fd22a8bfb27122",
-            "instanceHashSha256": "d72a2c480f7a66ab9354ff027204dbd5a4679e09117e16846057b2b476914af3"
+            "instanceHashSha256": "98918bd00ee82af297f3f88f896a1512d81468648b862f18847c9da83b10fa4d"
           }
         ],
         "externalConnectors": [
+          {
+            "connectorStableId": "stub:actual-e5:hub-fulfillment-operations:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 650.0,
+            "localZMeters": 270.0,
+            "rotationDegrees": 135.0,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "91af937a51f9b1a3668a3e37480a7dda71714799921a0fd673fa40c001601ac5"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:hub-fulfillment-operations:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 270.0,
+            "localZMeters": 690.0,
+            "rotationDegrees": 320.440332,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "0d12735f00cb4d46e6e94371d3fb9c19fc0c4e6e851ae02fe1db1c8d86480d2a"
+          },
           {
             "connectorStableId": "stub:actual-e5:hub-maintenance-emergency-loop:ingress",
             "coordinateSpaceCode": "ParentLocalMeters",
@@ -540,7 +610,7 @@
           }
         ],
         "placementHashSha256": "141f7da93fc520e2e9fbc38b7fd0016dcd9f55860461abb16d78a86d1f5801a3",
-        "instanceHashSha256": "84f58055387692c43a55ffe2592a8292c385eb733d27100e0a308d475536b8fc"
+        "instanceHashSha256": "856eb308873a7631017e14bf34d28161d30c68bf5374685ab88fb5443ded77c3"
       },
       {
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
@@ -596,9 +666,9 @@
                 "connectorPoseHashSha256": "e3f63b109233d65ea6fbfe3e318d7b0febb1e8f2840cdfb910365ef4ab305532"
               }
             ],
-            "sourcePatternHashSha256": "6f58e862fadfa7fdff4010295301f78a2d7d55af98fef7291b517b8ccfdead8b",
+            "sourcePatternHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41",
             "placementHashSha256": "be21bf036db56ed71d6626e90183659c4165b287d53c68207afbe5049051054c",
-            "instanceHashSha256": "434920f277c6155001fd5090389bb9010cd441b19c07cce946de72602599b951"
+            "instanceHashSha256": "0b2129f804d50e182e0910706b42462d1d95972a175ef1d16f467a6710ac851d"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:nature-home-v1:nature-threat-recovery",
@@ -640,9 +710,9 @@
                 "connectorPoseHashSha256": "5697a34f622f9275e5952cbc50f8fbf6efe068e1b12a63d2432bad87a44d4733"
               }
             ],
-            "sourcePatternHashSha256": "b9be1b6e1d1a91542037925edc0f03795804124d7c62aecd6070bc2be79e287a",
+            "sourcePatternHashSha256": "92f70c8336ae05905dabae8ed628cd59fbaf0d0886aa1c95a0caf0ea436cfc44",
             "placementHashSha256": "d5e27d7893e7c507ada34017843f894eaa89ef4c85f820ba6b2ae76f6e38a344",
-            "instanceHashSha256": "2e07c53b941dfe5d91136fd52e81d140386d9a7672745ab62c6e8164a4092f8f"
+            "instanceHashSha256": "d33fd1748856e23afc935b3aacb5237078eea48e90fa044e6fa87c87eb4f4210"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:nature-home-v1:nature-trail-network",
@@ -684,9 +754,9 @@
                 "connectorPoseHashSha256": "0709ef9478137e4dc04a3731863cfd46a552d62d1cad889944f777c7b28ab815"
               }
             ],
-            "sourcePatternHashSha256": "810d1d6a2ed08c79ff777d791d68b7b90e6436739873d0b229bceb02a3c33932",
+            "sourcePatternHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d",
             "placementHashSha256": "675308fba78e569e33a6570443ff5740b60474bc499f399219fd22a8bfb27122",
-            "instanceHashSha256": "78f85bb2564a202ae19014be456be433e8517af205de419e76b72964ef54cac9"
+            "instanceHashSha256": "3c40e5102f06ce47462e31434a43c94d845067232736b15b75cc79c7d057a652"
           }
         ],
         "externalConnectors": [
@@ -770,7 +840,7 @@
           }
         ],
         "placementHashSha256": "245dd30cdbac334e50a5519aca4ef3fe000e6de798c1ef6403f38deaf0fa9f9d",
-        "instanceHashSha256": "439266c8b96dbe22abd300be12752a47fe822db0135afbdcb3b36229df542640"
+        "instanceHashSha256": "581e3434536f3a0b72c0d2c0ec3e27511a5747ed8a16cadcb5a723d93c3f38d6"
       },
       {
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
@@ -826,9 +896,9 @@
                 "connectorPoseHashSha256": "80e1768b4601de9baf5455ba9d5828d40756d824e8bf41116d7c7815a483ea5b"
               }
             ],
-            "sourcePatternHashSha256": "820b32798f844bd3182efc90f1de5536707380ae75087c36050394c56d351db1",
+            "sourcePatternHashSha256": "87c7a687a6729790c66cd5c18a9f01f1a52d6e5ab0be8a49cfe321a65999d825",
             "placementHashSha256": "ca41a8858aba396ced05483464a13f59c60775ad28178053cc1d6eeb0480b73b",
-            "instanceHashSha256": "2157d6b23298fa70878e4816315fd0bba20210ca176905c7ef11430ffb92054c"
+            "instanceHashSha256": "83edf55af3c2618acfdf240c5737ae1199b354e0c4b670d7a6cff3abfaa592f5"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:town-market-v1:lowrise-market-town",
@@ -870,9 +940,9 @@
                 "connectorPoseHashSha256": "365a57f170459d3372d6b2736d297e20ae0393d4709f384799ab6333e87c0e29"
               }
             ],
-            "sourcePatternHashSha256": "b2c398dae4b8f0dd4ae8f7df7da9f73dfbefed5a2ee5148e53b633de6ac2207b",
+            "sourcePatternHashSha256": "f11c359dbb8f9deded748b4ce93d3a02af239df55d344602549f44d94d60fc57",
             "placementHashSha256": "724ebfa46ab73f4348b2eacb0e27ad4c5c7c12390b694d520a3dc483ffbe27c6",
-            "instanceHashSha256": "68055a10bece10c17819272f879841cd371fb51362529ba9c12cd81a8213e439"
+            "instanceHashSha256": "a2b86e5c6b7bf7c850d38316af018751579d5202de9bff5ab042edb922c7275f"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:town-market-v1:town-contamination-relief",
@@ -914,9 +984,53 @@
                 "connectorPoseHashSha256": "7834f260d1168a3f3dcdb61b6b243f85560d221758e55bbe5a27583f47e45f53"
               }
             ],
-            "sourcePatternHashSha256": "c601db9e87d9e192d5de366d22c09bbf46755379ea644a021651b43353da6056",
+            "sourcePatternHashSha256": "12c4169f2dedb312ed9ba5c9d7cefbfea678b23aea9c9006c7859f56700518f6",
             "placementHashSha256": "375b872a0e3c699fb7f62dc42d5ea4d5e037c4cb933f6dd4d709caefc53f3ba4",
-            "instanceHashSha256": "47fadc62720dab2d22900ef8818313a6a29918725e60cba1717bc79ec93c9551"
+            "instanceHashSha256": "babb810cc76a7967d0afaa62d82729e83812236f1f4fb6c15e0d3822dc6a7627"
+          },
+          {
+            "graphInstanceStableId": "graph-instance:h4:town-market-v1:town-market-fulfillment",
+            "landscapeGraphStableId": "landscape-graph:sim:pyeongchang:town-market-fulfillment.v1",
+            "h3Ref": "h3-candidate:town-market-fulfillment",
+            "placementTransform": {
+              "coordinateSpaceCode": "ParentLocalMeters",
+              "localXMeters": 0.0,
+              "localZMeters": 480.0,
+              "rotationDegrees": 0.0,
+              "sizeVariantCode": "Reference",
+              "mirrorCode": "None"
+            },
+            "externalConnectors": [
+              {
+                "connectorStableId": "stub:actual-e5:town-market-fulfillment:ingress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": 210.0,
+                "localZMeters": -170.0,
+                "rotationDegrees": 131.82017,
+                "widthMeters": 6.0,
+                "directionCode": "Ingress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "3eb45d8038ee2345df7354c662a79dc4c2071123e86b9c55272a0087f9e552b1"
+              },
+              {
+                "connectorStableId": "stub:actual-e5:town-market-fulfillment:egress",
+                "coordinateSpaceCode": "ParentLocalMeters",
+                "localXMeters": -250.0,
+                "localZMeters": 250.0,
+                "rotationDegrees": 312.797402,
+                "widthMeters": 6.0,
+                "directionCode": "Egress",
+                "travelTypeCodes": [
+                  "PlayerTraversal"
+                ],
+                "connectorPoseHashSha256": "f583c7b57cab4d1a874a35ece2cdbe0e538b350a760bb846addfcf5c11cdd529"
+              }
+            ],
+            "sourcePatternHashSha256": "492257f10d3b34d0d16fb6b95ede991ddfa2d055378337c4be940e609f29376c",
+            "placementHashSha256": "54c5df76341a4431f8435f71f139e94a9d8c4ea27f1e22f10f767e1acdf1386e",
+            "instanceHashSha256": "4fe52bf0064eb274730a108ba27ba2e22f990ca1b3f08617c1d2f69d638f2639"
           },
           {
             "graphInstanceStableId": "graph-instance:h4:town-market-v1:town-resident-service-loop",
@@ -947,20 +1061,20 @@
               {
                 "connectorStableId": "stub:actual-e5:town-resident-service-loop:egress",
                 "coordinateSpaceCode": "ParentLocalMeters",
-                "localXMeters": -170.0,
-                "localZMeters": -250.0,
-                "rotationDegrees": 221.420146,
+                "localXMeters": 170.0,
+                "localZMeters": -140.72,
+                "rotationDegrees": 125.26795,
                 "widthMeters": 6.0,
                 "directionCode": "Egress",
                 "travelTypeCodes": [
                   "PlayerTraversal"
                 ],
-                "connectorPoseHashSha256": "30810d8a8c90bbc572b5bb6bd10b613981ff09fb39a43e164152d1d951f0a1cf"
+                "connectorPoseHashSha256": "b175b0634ecc72a17c34f181f8025e16bcfe7ec8897476ad711a28a934a1bf2d"
               }
             ],
-            "sourcePatternHashSha256": "db5757498b465de603b4b5adbb3b6bdbd8efc82983f06700cefbad6f00468bed",
+            "sourcePatternHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278",
             "placementHashSha256": "b09a2ab28dd2788a6f2a0e32d26cffa2ad4b36089bd57c916c53926a18999017",
-            "instanceHashSha256": "fa50fd08ac455e00bd396c296d96bfb3695c589347f7573da04a9896bdc13ab9"
+            "instanceHashSha256": "e1b41ca678178e090a17d7e8c0034fa68d28cb2d12a23335b6f111c6e8842ed9"
           }
         ],
         "externalConnectors": [
@@ -1043,6 +1157,32 @@
             "connectorPoseHashSha256": "0e630727d595f73a8749457cd87c804239cd2c56eb50cb696407109901dc21ab"
           },
           {
+            "connectorStableId": "stub:actual-e5:town-market-fulfillment:ingress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": 210.0,
+            "localZMeters": 310.0,
+            "rotationDegrees": 131.82017,
+            "widthMeters": 6.0,
+            "directionCode": "Ingress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "ca089caff7d5956ea93ce2d1ca075ea771bce59305ab8aa5f2d29c28a423b8c3"
+          },
+          {
+            "connectorStableId": "stub:actual-e5:town-market-fulfillment:egress",
+            "coordinateSpaceCode": "ParentLocalMeters",
+            "localXMeters": -250.0,
+            "localZMeters": 730.0,
+            "rotationDegrees": 312.797402,
+            "widthMeters": 6.0,
+            "directionCode": "Egress",
+            "travelTypeCodes": [
+              "PlayerTraversal"
+            ],
+            "connectorPoseHashSha256": "67599a0d772d9ff666e3a0be0abbb7343e478e8f7a9b332532994256dce0a36c"
+          },
+          {
             "connectorStableId": "stub:actual-e5:town-resident-service-loop:ingress",
             "coordinateSpaceCode": "ParentLocalMeters",
             "localXMeters": -1210.0,
@@ -1058,19 +1198,19 @@
           {
             "connectorStableId": "stub:actual-e5:town-resident-service-loop:egress",
             "coordinateSpaceCode": "ParentLocalMeters",
-            "localXMeters": -1130.0,
-            "localZMeters": 230.0,
-            "rotationDegrees": 221.420146,
+            "localXMeters": -790.0,
+            "localZMeters": 339.28,
+            "rotationDegrees": 125.26795,
             "widthMeters": 6.0,
             "directionCode": "Egress",
             "travelTypeCodes": [
               "PlayerTraversal"
             ],
-            "connectorPoseHashSha256": "905861362d79dce271c4983b3a5e7fd473205e1087ca2660e8b650ad6d550622"
+            "connectorPoseHashSha256": "3407c990faeccf53feca936f4b45c38f2379ee06a9d6f49974d9adf6895236d1"
           }
         ],
         "placementHashSha256": "316f550af37ddc055ccc7f5f65ce30e8cced2b786b14003fe776ce1c08c76da6",
-        "instanceHashSha256": "e2e34f4f7b4b1c5d0ab9dbc4a0b62bb6e21eb296104282fc20f4de90cff52ec4"
+        "instanceHashSha256": "8624b989619d02631d45951e2d506be6678cf6e7192990f86e0090b78de435de"
       }
     ],
     "corridorInstances": [
@@ -1320,7 +1460,7 @@
         "corridorInstanceStableId": ""
       }
     ],
-    "worldLayoutHashSha256": "5a60deb9205ec983a2dc11dd417eb23a24488c78ef28ff185953f4674060c603",
+    "worldLayoutHashSha256": "71f8c3726d8819d7dd429845fe4f33f02b0838f5d63f5d3bb9074cdfe68d7923",
     "presentationOnly": true,
     "isOperationalState": false
   },
@@ -1330,12 +1470,12 @@
     "groundingBindingRevision": 2,
     "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
     "worldLayoutRevision": 2,
-    "worldLayoutHashSha256": "5a60deb9205ec983a2dc11dd417eb23a24488c78ef28ff185953f4674060c603",
+    "worldLayoutHashSha256": "71f8c3726d8819d7dd429845fe4f33f02b0838f5d63f5d3bb9074cdfe68d7923",
     "placementAuthorityCode": "ScenarioRelative",
     "worldGroundingStateCode": "NotApplied",
     "e6AnchorStableId": "",
     "groundingEvidenceHashSha256": "",
-    "bindingHashSha256": "55bdbabd139945fa8eb4d7b9bbb160d78c93a8bf001b38d7827ed8498dd69847",
+    "bindingHashSha256": "57e8a2430a5e063034f05a7a3139e8899106ba625d5d1b54544e65d1746eb4be",
     "presentationOnly": true,
     "isOperationalState": false
   },

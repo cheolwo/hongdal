@@ -1,0 +1,246 @@
+{
+  "schemaVersion": "simulation-world-interaction-responsibilities.v1",
+  "revision": "simulation-world-interaction-responsibilities.r4",
+  "lastVerifiedDate": "2026-08-27",
+  "principles": {
+    "oneIntentPerWorldInteraction": true,
+    "onePrimaryAuthorityOutcomePerWorldInteraction": true,
+    "actorBindingDoesNotChangeResponsibility": true,
+    "previewConfirmTaskEffectAreOneResponsibilityLifecycle": true,
+    "atomicConsistencySideEffectsAreAllowed": true,
+    "workflowOrderingIsOwnedOutsideWorldInteraction": true,
+    "delegationAndDelegatedActionAreSeparateResponsibilities": true,
+    "automaticTaskPhaseIsNotWorldInteraction": true,
+    "actorWorkCannotRemainWorldAutomatic": true,
+    "legacyInlineFlowHintsAreNonAuthoritative": true
+  },
+  "responsibilityKindByInteractionKind": {
+    "Command": "ActorIntent",
+    "AutomaticTransition": "AuthorityTransition",
+    "SharedPolicy": "SharedDecisionRule"
+  },
+  "assessmentCodes": [
+    "Atomic",
+    "AtomicBundle",
+    "AlternativeOutcomes",
+    "LegacyCompositeMigrationRequired",
+    "ProceduralStepMigrationRequired",
+    "ActorResponsibilityMigrationRequired"
+  ],
+  "primaryOutcomeCodes": {
+    "WI-ACTOR-01": "ItemAcquired",
+    "WI-ACTOR-02": "ItemEquipmentChanged",
+    "WI-FARM-01": "SoilTilled",
+    "WI-FARM-02": "CultivationStarted",
+    "WI-FARM-03": "CropCareApplied",
+    "WI-FARM-04": "HarvestLotCreated",
+    "WI-FARM-05": "HarvestLotCollected",
+    "WI-FARM-06": "PackageLotCreated",
+    "WI-LOG-01": "CargoTransportReserved",
+    "WI-LOG-02": "CargoDeparted",
+    "WI-LOG-03": "CargoRouteProgressed",
+    "WI-LOG-04": "CargoUnloaded",
+    "WI-LOG-05": "FreightReceived",
+    "WI-001": "StorageEligible",
+    "WI-002": "PutAwayCompleted",
+    "WI-HUB-03": "OutboundRequested",
+    "WI-HUB-04": "StockPicked",
+    "WI-HUB-05": "OutboundCargoPrepared",
+    "WI-HUB-06": "HubCargoLoaded",
+    "WI-MARKET-01": "MarketCargoArrived",
+    "WI-MARKET-02": "MarketFreightReceived",
+    "WI-MARKET-03": "MarketStorageEligible",
+    "WI-MARKET-04": "MarketBackroomStored",
+    "WI-MARKET-05": "DisplayStockReplenished",
+    "WI-ORDER-01": "OrderConfirmed",
+    "WI-ORDER-02": "OrderStockReserved",
+    "WI-ORDER-03": "OrderStockPicked",
+    "WI-ORDER-04": "OrderPacked",
+    "WI-ORDER-05": "OrderReadyForPickup",
+    "WI-ORDER-06": "OrderFulfilled",
+    "WI-ORDER-07": "ResidentConsumed",
+    "WI-NATURE-01": "NatureThreatObserved",
+    "WI-NATURE-02": "PartyRetreatedToSafeCore",
+    "WI-NATURE-03": "NatureRouteRestored",
+    "WI-NATURE-04": "PartyRecovered",
+    "WI-NATURE-05": "AxeAcquired",
+    "WI-NATURE-06": "TreeFelled",
+    "WI-NATURE-07": "CabinBlueprintPlaced",
+    "WI-NATURE-08": "CabinOperational",
+    "WI-NATURE-09": "PlayerEnteredCabin",
+    "WI-NATURE-10": "PlayerLeftCabin",
+    "WI-NATURE-11": "EncounterResolved",
+    "WI-NATURE-12": "WorkCancelled",
+    "WI-NATURE-13": "TimberStored",
+    "WI-NATURE-14": "DawnReached",
+    "WI-NATURE-15": "ExpansionPlanSelected",
+    "WI-NATURE-16": "NatureFieldSupplyPackAdded",
+    "WI-NATURE-17": "NpcFieldSupplyPolicySelected",
+    "WI-NATURE-18": "TimberCollected",
+    "WI-REFLECT-01": "InnerLearningPending",
+    "WI-CARD-01": "MajorArcanaActivated",
+    "WI-CON-01": "AreaBuildingOperational",
+    "WI-CITY-01": "CityDemandConfirmed",
+    "WI-CITY-02": "CityInventoryAllocated",
+    "WI-CITY-03": "CityServiceCompleted",
+    "WI-CITY-04": "CityServiceChoiceAvailable",
+    "WI-WORLD-01": "NpcAssigned",
+    "WI-WORLD-02": "NpcCapabilityGranted",
+    "WI-WORLD-03": "TaskCancelled",
+    "WI-WORLD-04": "FacilityRepaired",
+    "WI-WORLD-05": "RegionDiscovered",
+    "WI-WORLD-06": "TeamRoleCardEquipped",
+    "WI-WORLD-07": "TeamActivityStarted",
+    "WI-WORLD-08": "TurnClosed"
+  },
+  "atomicBundles": [
+    {
+      "worldInteractionId": "WI-FARM-04",
+      "reason": "수확 Lot 생성과 재배 단위 수확 완료는 하나의 수확 원자성 안에서 함께 성립해야 한다."
+    },
+    {
+      "worldInteractionId": "WI-FARM-06",
+      "reason": "포장 Lot 생성과 같은 수량의 운송 Cargo 준비는 하나의 포장 결과를 보존하는 원자적 계보다."
+    },
+    {
+      "worldInteractionId": "WI-002",
+      "reason": "보관 용량 소비·작업 영역 해제·적재 완료는 하나의 적재 원자성을 지킨다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-06",
+      "reason": "나무가 쓰러지는 것과 그 나무에서 목재가 생기는 것은 하나의 벌목 결과다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-08",
+      "reason": "오두막 운영 시작과 승인된 회복·방어 능력 활성화는 같은 건설 완료 원자성이다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-12",
+      "reason": "작업 취소와 그 작업이 소유한 예약·미사용 자원 반환은 함께 성공하거나 함께 실패해야 한다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-13",
+      "reason": "목재 보관과 보관 계보 기록은 동일 자원 이동의 상태와 감사 기록이다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-15",
+      "reason": "확장 계획 선택으로 다음 날 선택 가능 상태가 열리는 것은 같은 결정의 직접 결과다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-18",
+      "reason": "지면 통나무의 수집 완료와 같은 수량의 소지 인벤토리 증가는 하나의 자원 이동으로 함께 성공하거나 함께 실패해야 한다."
+    },
+    {
+      "worldInteractionId": "WI-CARD-01",
+      "reason": "아르카나 활성화·방향 동결·영향 상태 사본 생성은 한 활성화 인스턴스의 불변 원자성이다."
+    },
+    {
+      "worldInteractionId": "WI-WORLD-03",
+      "reason": "업무 취소와 해당 업무가 소유한 예약 해제는 동일 취소 트랜잭션이다."
+    }
+  ],
+  "alternativeOutcomeSets": [
+    {
+      "worldInteractionId": "WI-CITY-02",
+      "outcomeCodes": ["CityInventoryAllocated", "CityInventoryShortage"],
+      "reason": "재고 배정 판정 하나가 성공 또는 부족 중 정확히 하나의 결과를 만든다."
+    },
+    {
+      "worldInteractionId": "WI-CITY-03",
+      "outcomeCodes": ["CityServiceCompleted", "CityServiceDeferred"],
+      "reason": "서비스 처리 하나가 완료 또는 유예 중 정확히 하나의 결과를 만든다."
+    }
+  ],
+  "legacyCompositeMigrations": [
+    {
+      "worldInteractionId": "WI-001",
+      "targetResponsibilities": ["입고 화물 검수 완료", "운송 화물 인수 확정"],
+      "compatibilityBoundary": "기존 WI-001 저장·API·업무 계보는 유지하고 새 실행 판본에서 검수 결과와 인수 전이를 분리한다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-11",
+      "targetResponsibilities": ["황혼 위협 대응 방식 확정", "전투 또는 후퇴 인계", "조우 결과 반영"],
+      "compatibilityBoundary": "기존 전투 저장과 결과 코드를 다시 계산하지 않고 새 활성 조우부터 분리한다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-14",
+      "targetResponsibilities": ["수면 시작", "세계 시간 진행", "수면 종료"],
+      "compatibilityBoundary": "simulation-save.v17 이상 기존 수면 계보는 유지하고 새 저장 판본에서 명령과 자동 시간 전이를 분리한다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-16",
+      "targetResponsibilities": ["현장 보급 꾸러미 제작", "원정에서 보급 효과 사용"],
+      "compatibilityBoundary": "기존 제작 결과는 유지하되 새 판본에서는 재료 보호 효과를 제작 시점이 아니라 사용 WI가 소유한다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-17",
+      "targetResponsibilities": ["현장 보급 제작 업무 위임", "NPC의 현장 보급 꾸러미 제작"],
+      "compatibilityBoundary": "기존 WI-NATURE-17 실행 계보는 유지하고 새 판본에서는 위임과 actor-agnostic 제작 실행을 분리한다."
+    },
+    {
+      "worldInteractionId": "WI-WORLD-07",
+      "targetResponsibilities": ["세계 활동 시작", "세계 활동 종료"],
+      "compatibilityBoundary": "기존 시작·종료 payload와 고유 식별자는 읽기 호환하며 새 명령 계약에서 책임별 식별자를 도입한다."
+    }
+  ],
+  "proceduralStepMigrations": [
+    {
+      "worldInteractionId": "WI-LOG-02",
+      "targetOwnerCode": "TransportTaskPhase",
+      "reason": "농장 출발은 WI-LOG-01 운송 의도가 진행되며 생기는 Task 단계다.",
+      "compatibilityBoundary": "기존 운송 계보와 Event ID는 읽되 새 실행 판본에서는 부모 운송 Task의 단계로 저장한다."
+    },
+    {
+      "worldInteractionId": "WI-LOG-03",
+      "targetOwnerCode": "TransportTaskProgress",
+      "reason": "경로 진행도 갱신은 독립 행위가 아니라 운송 Task의 시간 진행이다.",
+      "compatibilityBoundary": "기존 진행 Tick은 보존하고 새 실행 판본에서는 WI 실행 수를 늘리지 않는다."
+    },
+    {
+      "worldInteractionId": "WI-LOG-04",
+      "targetOwnerCode": "TransportTaskPhase",
+      "reason": "현재 자동 하차는 독립 Actor 의도가 없어 운송 Task의 도착 단계다.",
+      "compatibilityBoundary": "향후 실제 하차 NPC 행동을 만들 때는 별도 ActorIntent WI로 추가하고 기존 자동 계보와 구분한다."
+    },
+    {
+      "worldInteractionId": "WI-LOG-05",
+      "targetOwnerCode": "InboundInspectionEffect",
+      "reason": "현재 화물 인수는 WI-001 검수 완료에 종속된 자동 Effect이며 독립 의도가 없다.",
+      "compatibilityBoundary": "기존 WI-LOG-05 결과는 읽기 호환하고 새 판본에서는 검수 또는 별도 인수 Command의 Effect로 귀속한다."
+    },
+    {
+      "worldInteractionId": "WI-ORDER-02",
+      "targetOwnerCode": "OrderConfirmEffect",
+      "reason": "주문 재고 예약은 현재 주문 확정의 원자적 예약 결과이며 독립 Actor 행동이 아니다.",
+      "compatibilityBoundary": "기존 예약 Event는 보존하고 새 주문 판본에서는 WI-ORDER-01 Confirm 결과에 귀속한다."
+    },
+    {
+      "worldInteractionId": "WI-ORDER-05",
+      "targetOwnerCode": "OrderPackingEffect",
+      "reason": "수령 준비 상태는 포장 완료가 만든 결과 표지이며 독립 행위가 아니다.",
+      "compatibilityBoundary": "기존 ReadyForPickup 계보는 유지하고 새 판본에서는 포장 WI Effect로 귀속한다."
+    }
+  ],
+  "actorResponsibilityMigrations": [
+    {
+      "worldInteractionId": "WI-HUB-04",
+      "targetControlPolicyCode": "NpcRoutine",
+      "reason": "재고 피킹은 시간·공간·Actor를 사용하는 실제 NPC 행동이며 단순 WorldAutomatic 절차가 아니다."
+    },
+    {
+      "worldInteractionId": "WI-HUB-05",
+      "targetControlPolicyCode": "NpcRoutine",
+      "reason": "화물 포장은 피킹과 별개로 실패·취소 가능한 실제 NPC 행동이다."
+    },
+    {
+      "worldInteractionId": "WI-ORDER-03",
+      "targetControlPolicyCode": "NpcRoutine",
+      "reason": "주문 상품 피킹은 담당 NPC의 작업 책임이다."
+    },
+    {
+      "worldInteractionId": "WI-ORDER-04",
+      "targetControlPolicyCode": "NpcRoutine",
+      "reason": "주문 상품 포장은 담당 NPC의 작업 책임이다."
+    }
+  ]
+}

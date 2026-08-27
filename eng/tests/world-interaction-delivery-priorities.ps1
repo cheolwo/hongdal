@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
@@ -28,12 +28,13 @@ if ($catalog -notmatch "public string 실행파동Code" -or
     $catalog -notmatch "public string 목표EvidenceStage" -or
     $catalog -notmatch "public string 개발작업상태Code" -or
     $catalog -notmatch "public string NpcE8정책Code" -or
-    $catalog -notmatch 'ActiveWorldInteractionId = "WI-NATURE-05"' -or
+    $catalog -notmatch 'ActiveWorldInteractionId = "WI-ACTOR-02"' -or
+    $catalog -notmatch 'ActiveEvidenceStage = "E5"' -or
     $catalog -notmatch "WorkInProgressLimit = 1" -or
     $catalog -notmatch "SimulationWI실행우선순위Catalog") {
     throw "WorldInteractionDeliveryPriorityContractShapeInvalid"
 }
-if ($check -notmatch "WorldInteractionDeliveryPrioritiesValid:60") {
+if ($check -notmatch "WorldInteractionDeliveryPrioritiesValid:64") {
     throw "WorldInteractionDeliveryPriorityValidationDidNotComplete"
 }
 

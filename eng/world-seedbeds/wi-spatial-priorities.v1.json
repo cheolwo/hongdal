@@ -1,13 +1,16 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-priorities.v1",
-  "revision": "simulation-world-interaction-spatial-priorities.r1",
-  "worldInteractionCatalogRevision": "simulation-world-interactions.r8",
+  "revision": "simulation-world-interaction-spatial-priorities.r10",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r27",
   "spatialParticipationCodes": [
     "Required",
     "Contextual",
     "NotRequired"
   ],
   "notRequiredWiIds": [
+    "WI-ACTOR-01",
+    "WI-ACTOR-02",
+    "WI-CARD-01",
     "WI-ORDER-01",
     "WI-ORDER-02",
     "WI-WORLD-02",
@@ -38,7 +41,15 @@
         "WI-NATURE-09",
         "WI-NATURE-10",
         "WI-NATURE-11",
-        "WI-NATURE-12"
+        "WI-NATURE-12",
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
+        "WI-NATURE-16",
+        "WI-NATURE-17",
+        "WI-NATURE-18",
+        "WI-REFLECT-01",
+        "WI-CON-01"
       ]
     },
     {

@@ -8,6 +8,10 @@
 @wi WI-NATURE-08
 @wi WI-NATURE-09
 @wi WI-NATURE-10
+@wi WI-NATURE-13
+@wi WI-NATURE-14
+@wi WI-NATURE-15
+@wi WI-CON-01
 @gameplay TemporaryShelter
 @gameplay WeatherWait
 @gameplay Recovery
@@ -21,10 +25,22 @@
 @capability Spatial.ShelterConstructionWorkArea
 @capability Spatial.ShelterEntrance
 @capability Spatial.ShelterInterior
+@capability Spatial.ShelterStorage
+@capability Spatial.StorageInteractionAnchor
+@capability Spatial.ShelterSleep
+@capability Spatial.SleepInteractionAnchor
+@capability Spatial.DawnPlanChoice
+@capability Spatial.DawnPlanChoiceAnchor
+@capability Spatial.AreaBuildingFootprint
+@capability Spatial.AreaBuildingPlacementAllowed
+@capability Spatial.FootprintAvailable
+@capability Spatial.CraftingWorkArea
+@capability Spatial.ActiveWorkReservationContext
 @capacity BuildingSite
 @capacity WorkArea
 @capacity Material
 @capacity ShelterOccupancy
+@capacity ContainerCapacity
 @predecessor h1-stock:nature-trailhead
 @successor h1-stock:nature-exploration-buffer
 @connector TrailInput
@@ -34,7 +50,7 @@
 
 ## 존재 이유
 
-기상·위험·피로로 탐색을 계속하기 어려울 때 잠시 머무는 회복 공간이다.
+기상·위험·피로로 탐색을 계속하기 어려울 때 머물며 획득 자원을 보관하고 안전하게 수면한 뒤 다음 확장 계획을 선택하는 생활 거점 공간이다. 보관량·이동 결과·수면 시간 배율·새벽 도달·계획 확정은 Simulation이 판정하고 H1은 보관·수면·새벽 계획 Anchor와 점유·용량 문맥만 제공한다.
 
 ## 설계 상태
 

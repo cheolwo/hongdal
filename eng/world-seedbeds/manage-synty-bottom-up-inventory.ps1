@@ -106,8 +106,8 @@ foreach ($item in @($catalog.h1Inventory)) {
     $h1Ids[$id] = $true
 }
 Require (@($catalog.h1Inventory).Count -eq 19) "H1InventoryCountMustBe19"
-Require (@($catalog.h1Inventory | Where-Object stateCode -eq "ApprovedReference").Count -eq 5) "H1ApprovedReferenceCountMustBe5"
-Require (@($catalog.h1Inventory | Where-Object stateCode -eq "CandidateForReview").Count -eq 14) "H1CandidateCountMustBe14"
+Require (@($catalog.h1Inventory | Where-Object stateCode -eq "ApprovedReference").Count -eq 6) "H1ApprovedReferenceCountMustBe6"
+Require (@($catalog.h1Inventory | Where-Object stateCode -eq "CandidateForReview").Count -eq 13) "H1CandidateCountMustBe13"
 
 $h2Ids = @{}
 foreach ($item in @($catalog.h2Candidates)) {

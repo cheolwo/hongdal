@@ -3,7 +3,7 @@
 | 계층 | 지식 | 현재 상태 | 다음 보완 |
 | --- | --- | --- | --- |
 | `H1` | `h1-stock:farm-tool-storage` 농기구 보관 공간 | `CandidateForReview` | 도구별 재고 원장은 후속 Simulation 계약이며 현재는 공간 수용 능력만 승인한다. |
-| `H1` | `h1-stock:farm-worker-waiting` 농가 귀환·작업자 대기 공간 | `CandidateForReview` | 휴식은 표현·다음 작업 선택 기능이며 E8 NPC 자율성 권위를 만들지 않는다. |
+| `H1` | `h1-stock:farm-worker-waiting` 농가 귀환·작업자 대기 공간 | `CandidateForReview` | 휴식은 표현·다음 작업 선택 기능이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다. |
 | `H1` | `h1-stock:nature-emergency-retreat` 자연권 긴급 후퇴 길목 | `CandidateForReview` | E2에서 파티 단위 경로 예약과 후퇴 중단 규칙을 확정한다. |
 | `H1` | `h1-stock:nature-incident-trace` 자연권 사건 흔적 조사 구역 | `CandidateForReview` | E2에서 관찰 WI 안의 조사 단계와 원인 계보 판정 단위를 확정한다. |
 | `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | `CandidateForReview` | E2에서 해결된 원인 계보와 복원 자재 예약 단위를 확정한다. |
@@ -17,12 +17,11 @@
 | `H1` | `h1-stock:farm-weather-protection` 농장 기상 보호 적치 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-long-term-storage` Hub 장기 보관 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-market-transfer` Hub–시장 화물 인계 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
-| `H1` | `h1-stock:hub-outbound-staging` Hub 피킹·출고 준비 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:hub-service-maintenance` Hub 시설 정비 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:hub-temporary-staging` Hub 임시 적치 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:hub-town-corridor` Hub–Town 물류 회랑 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:hub-vehicle-yard` Hub 차량 상차·대기 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
-| `H1` | `h1-stock:nature-exploration-buffer` 자연 탐색·완충 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:nature-exploration-buffer` 자연 탐색·완충 공간 | `ExploratoryInventory` | 실제 ResourceNode별 점유와 재생성 해제는 Simulation Core가 검증한다. |
 | `H1` | `h1-stock:nature-farm-edge` 숲 경계형 농장 전환 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
 | `H1` | `h1-stock:nature-trailhead` 자연 탐색 출발지 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:road-facility-access` 도로–시설 진입 전환 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |

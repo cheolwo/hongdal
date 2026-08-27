@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [string[]] $WiIds = @(),
     [string[]] $GameplayCodes = @(),

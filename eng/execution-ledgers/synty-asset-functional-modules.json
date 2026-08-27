@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "synty-asset-functional-modules.v1",
+  "revision": "synty-asset-functional-modules.r2",
+  "unityCatalogRevision": "synty-all-asset-modules.r1",
+  "humanTaxonomyCatalogPath": "eng/execution-ledgers/synty-asset-human-taxonomy.json",
+  "expectedPrefabCount": 2899,
+  "principles": {
+    "sourcePackIsProvenanceNotGameplayModule": true,
+    "everyPrefabHasModuleOrHoldReason": true,
+    "constructionIsSharedStateLayerNotArea": true,
+    "genericIsSharedBase": true,
+    "starterIsPrototypeFallbackOnly": true,
+    "playableLoopSelectsModuleBeforeAssetFamily": true,
+    "humanDesignUsesKoreanTaxonomyAndStableCodes": true,
+    "presentationCannotMutateAuthorityRevision": true
+  },
+  "lifecycleCodes": [
+    "production-ready",
+    "needs-review",
+    "shared-base",
+    "prototype-fallback",
+    "reserved-for-future-loop",
+    "excluded"
+  ],
+  "sourcePacks": [
+    { "packCode": "nature", "expectedPrefabCount": 227, "policyCode": "AreaAndSharedCandidates" },
+    { "packCode": "farm", "expectedPrefabCount": 498, "policyCode": "AreaAndSharedCandidates" },
+    { "packCode": "town", "expectedPrefabCount": 702, "policyCode": "AreaAndSharedCandidates" },
+    { "packCode": "city", "expectedPrefabCount": 335, "policyCode": "AreaAndSharedCandidates" },
+    { "packCode": "construction", "expectedPrefabCount": 584, "policyCode": "SharedConstructionStateLayer" },
+    { "packCode": "generic", "expectedPrefabCount": 495, "policyCode": "SharedBase" },
+    { "packCode": "starter", "expectedPrefabCount": 58, "policyCode": "PrototypeFallbackOnly" }
+  ],
+  "functionalModules": [
+    { "moduleCode": "world-surface", "displayNameKo": "월드 지면", "scopeCode": "Outdoor" },
+    { "moduleCode": "nature-vegetation", "displayNameKo": "자연 식생", "scopeCode": "Outdoor" },
+    { "moduleCode": "exterior-structure", "displayNameKo": "실외 구조물", "scopeCode": "Outdoor" },
+    { "moduleCode": "exterior-functional-prop", "displayNameKo": "실외 기능 소품", "scopeCode": "Outdoor" },
+    { "moduleCode": "world-network", "displayNameKo": "도로·통행망", "scopeCode": "Outdoor" },
+    { "moduleCode": "world-transition", "displayNameKo": "영역 전이", "scopeCode": "Outdoor" },
+    { "moduleCode": "construction-state", "displayNameKo": "건설·복구 표현", "scopeCode": "Shared" },
+    { "moduleCode": "interior-structure", "displayNameKo": "실내 구조", "scopeCode": "Interior" },
+    { "moduleCode": "interior-fixture", "displayNameKo": "실내 설비", "scopeCode": "Interior" },
+    { "moduleCode": "interior-loose-item", "displayNameKo": "실내 소품", "scopeCode": "Interior" },
+    { "moduleCode": "actor-vehicle-tool", "displayNameKo": "인물·차량·도구", "scopeCode": "Shared" },
+    { "moduleCode": "world-feedback-fx", "displayNameKo": "세계 피드백 효과", "scopeCode": "Shared" }
+  ],
+  "placementRoleModuleCodes": {
+    "spatial-base": ["world-surface", "nature-vegetation", "exterior-structure"],
+    "functional-anchor": ["exterior-functional-prop", "actor-vehicle-tool"],
+    "state-overlay": ["construction-state", "world-feedback-fx"],
+    "ambient-detail": ["nature-vegetation", "exterior-functional-prop"],
+    "interior-fixture": ["interior-fixture", "interior-structure"],
+    "interior-loose-item": ["interior-loose-item"],
+    "feedback-fx": ["world-feedback-fx"],
+    "actor": ["actor-vehicle-tool"]
+  },
+  "areaModuleSkeletons": [
+    {
+      "areaCode": "farm",
+      "loopStableIds": ["playable-loop:farm-crop-cycle.v1", "playable-loop:farm-pack-store-return.v1"],
+      "functionalModuleCodes": ["world-surface", "nature-vegetation", "exterior-structure", "exterior-functional-prop", "actor-vehicle-tool", "world-feedback-fx"]
+    },
+    {
+      "areaCode": "town",
+      "loopStableIds": ["playable-loop:town-order-consume-return.v1"],
+      "functionalModuleCodes": ["exterior-structure", "world-network", "interior-structure", "interior-fixture", "interior-loose-item", "actor-vehicle-tool", "world-feedback-fx"]
+    },
+    {
+      "areaCode": "hub",
+      "loopStableIds": ["playable-loop:hub-inbound-putaway.v1", "playable-loop:hub-outbound-ready-return.v1"],
+      "functionalModuleCodes": ["exterior-structure", "world-network", "interior-structure", "interior-fixture", "actor-vehicle-tool", "world-feedback-fx"]
+    },
+    {
+      "areaCode": "city",
+      "loopStableIds": ["playable-loop:city-demand-service-return.v1"],
+      "functionalModuleCodes": ["world-surface", "exterior-structure", "world-network", "world-transition", "exterior-functional-prop", "actor-vehicle-tool", "world-feedback-fx"]
+    }
+  ],
+  "legacyCompositionPolicy": {
+    "statusCode": "LegacyGenerated",
+    "newAuthoringAllowed": false,
+    "readCompatibilityAdapter": "LegacyCompositionAdapter",
+    "removalGateCodes": [
+      "OfficialReferenceCountZero",
+      "TopologyAndClearanceRulesMigrated",
+      "SaveAndSceneCompatibilityVerified",
+      "PlayableLoopModulesRuntimeVerified"
+    ]
+  }
+}

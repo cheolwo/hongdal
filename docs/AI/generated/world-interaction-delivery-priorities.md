@@ -2,10 +2,10 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interaction-delivery-priorities.json`와 WI·폐루프·H 상태 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 실행 우선순위 개정: `world-interaction-delivery-priorities.r4`
-- 전체 WI: `60`
+- 실행 우선순위 개정: `world-interaction-delivery-priorities.r21`
+- 전체 WI: `64`
 - 진행 방식: `SingleWorldInteractionVertical` / 작업 중 한도 `1`
-- 현재 활성 WI: `WI-NATURE-05` / `E6` → `E7`
+- 현재 활성 WI: `WI-ACTOR-02` / `E5` → `E7`
 - Synty H1 설계 재고: `84`
 - E7은 최신 PlayMode·Game View·Hosted 동등성 증거가 있을 때만 승격한다.
 
@@ -13,10 +13,10 @@
 
 | E 단계 | 판정 | 정제·검증 요약 |
 | --- | --- | --- |
-| E4 | Passed | PlayerDriven 주체·도끼 대상·Tool 자원·즉시 시각·안전 빈터 ToolPickupPoint를 승인 H1과 결속했다. |
-| E5 | Passed | 읽기 전용 Preview, 멱등 Confirm, AxeOwned 결과, 후속 벌목 선택, 저장·복원 replay hash를 결정적 Fixture에서 검증했다. |
-| E6 | Passed | 도끼가 없어 벌목을 시작할 수 없는 문제, 안전 빈터에서 조준·왼쪽 입력으로 소유권을 얻는 선택, 즉시 결과와 저장 복원, 현실자료 미적용 경계를 정제했다. |
-| E7 | Partial | canonical SimulationWorldShell 실제 Input System 클릭·저장 재진입, 수동 Game View, LocalProcess와 Hosted HTTP의 replay hash 동등성은 통과했다. Console 오류는 0건이지만 기존 Missing Script 경고 10건과 외부 프로세스 RemoteHost 실행은 남아 있다. |
+| E4 | Passed | PlayerDriven Actor·고유 ItemInstance·8개 Slot·EquipmentRevision을 결속하고 보편 WI의 공간은 NotApplicable로 판정했다. |
+| E5 | Passed | Equip·Unequip·Swap, 장착 Capability, 벌목 허용·차단, v27 저장·Replay와 LocalProcess·RemoteHost 동등성을 확인했다. |
+| E6 | Partial | I 장착 상태창·8개 슬롯·권위 Confirm·손 도끼 표현 코드와 Unity 소비 어셈블리 빌드는 통과했지만 실제 Test Runner와 화면은 차단됐다. |
+| E7 | Pending | 실행 중 Unity Editor 때문에 획득→장착→벌목→해제 차단→저장 재진입의 실제 Test Runner·Play Mode·Game View·Console을 아직 검증하지 못했다. |
 
 ## D1 Nature 행동 폐루프
 
@@ -25,24 +25,28 @@
 
 | 순서 | 한국어 행동명 · 고유 식별자 | 작업 | 역할 | 현재 구현 | 현재 통합 | 다음 관문 | NPC E8 | H 상태 | Synty | 폐루프 |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 벌목 도끼 확보<br>`WI-NATURE-05` | Active | Core | E3 | E6 | E7 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
-| 2 | 나무 벌목 작업 시작<br>`WI-NATURE-06` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
-| 3 | 오두막을 지을 터 선정<br>`WI-NATURE-07` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
-| 4 | 오두막 건설 작업 시작<br>`WI-NATURE-08` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
-| 5 | 진행 중 작업 취소<br>`WI-NATURE-12` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
-| 6 | 오두막 안으로 들어가기<br>`WI-NATURE-09` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
-| 7 | 오두막 밖으로 나가기<br>`WI-NATURE-10` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
-| 8 | 자연 지역 위험 징후 확인<br>`WI-NATURE-01` | Queued | Core | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-twilight-return.v1 |
-| 9 | 황혼 위협 대응 방식 확정<br>`WI-NATURE-11` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-twilight-return.v1 |
-| 10 | 안전 거점으로 긴급 후퇴<br>`WI-NATURE-02` | Queued | Core | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-twilight-return.v1 |
-| 11 | 훼손된 자연 경로 복원<br>`WI-NATURE-03` | Queued | Core | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-twilight-return.v1 |
-| 12 | 탐사대 안전 회복<br>`WI-NATURE-04` | Queued | Core | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-twilight-return.v1 |
-| 13 | 획득 자원 거점 보관<br>`WI-NATURE-13` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-night-day2.v1 |
-| 14 | 오두막에서 수면·새벽 맞기<br>`WI-NATURE-14` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-night-day2.v1 |
-| 15 | 다음 날 거점 확장 계획 선택<br>`WI-NATURE-15` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-night-day2.v1 |
-| 16 | 영역 건물 건설 확정<br>`WI-CON-01` | Queued | Shared | E3 | E5 | E6 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-workbench-foundation.v1<br>playable-loop:nature-building-learning.v1<br>playable-loop:farm-player-placement.v1 |
-| 17 | 현장 보급 꾸러미 제작<br>`WI-NATURE-16` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-field-supply-return.v1 |
-| 18 | 현장 보급 제작 업무 위임<br>`WI-NATURE-17` | Queued | Core | E3 | E4 | E5 | Required | EstablishedH1 | Nature | playable-loop:nature-field-supply-return.v1 |
+| 1 | 물품 획득<br>`WI-ACTOR-01` | Queued | Core | E3 | E5 | E6 | Conditional | NotApplicable | Shared | playable-loop:nature-shelter-foundation.v1 |
+| 2 | 장착 상태 변경<br>`WI-ACTOR-02` | Active | Core | E3 | E5 | E6 | Conditional | NotApplicable | Shared | playable-loop:nature-shelter-foundation.v1 |
+| 3 | 벌목 도끼 획득<br>`WI-NATURE-05` | Queued | Core | E3 | E6 | E7 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
+| 4 | 나무 벌목 작업 시작<br>`WI-NATURE-06` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
+| 5 | 오두막을 지을 터 선정<br>`WI-NATURE-07` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
+| 6 | 오두막 건설 작업 시작<br>`WI-NATURE-08` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
+| 7 | 진행 중 작업 취소<br>`WI-NATURE-12` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
+| 8 | 오두막 안으로 들어가기<br>`WI-NATURE-09` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
+| 9 | 오두막 밖으로 나가기<br>`WI-NATURE-10` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
+| 10 | 자연 지역 위험 징후 확인<br>`WI-NATURE-01` | Queued | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-twilight-return.v1 |
+| 11 | 황혼 위협 대응 방식 확정<br>`WI-NATURE-11` | Queued | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-twilight-return.v1 |
+| 12 | 안전 거점으로 긴급 후퇴<br>`WI-NATURE-02` | Queued | Extension | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-regional-threat-recovery.v1 |
+| 13 | 훼손된 자연 경로 복원<br>`WI-NATURE-03` | Queued | Extension | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-regional-threat-recovery.v1 |
+| 14 | 탐사대 안전 회복<br>`WI-NATURE-04` | Queued | Extension | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-regional-threat-recovery.v1 |
+| 15 | 획득 자원 거점 보관<br>`WI-NATURE-13` | Queued | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-night-day2.v1 |
+| 16 | 오두막에서 수면·새벽 맞기<br>`WI-NATURE-14` | Queued | Core | E3 | E5 | E6 | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-night-day2.v1 |
+| 17 | 다음 날 거점 확장 계획 선택<br>`WI-NATURE-15` | Queued | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-night-day2.v1 |
+| 18 | 영역 건물 건설 확정<br>`WI-CON-01` | Queued | Shared | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Construction | playable-loop:nature-workbench-foundation.v1<br>playable-loop:nature-building-learning.v1<br>playable-loop:farm-player-placement.v1 |
+| 19 | 현장 보급 꾸러미 제작<br>`WI-NATURE-16` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-field-supply-return.v1 |
+| 20 | 현장 보급 제작 업무 위임<br>`WI-NATURE-17` | Queued | Core | E3 | E4 | E5 | Required | EstablishedH1 | Nature | playable-loop:nature-field-supply-return.v1 |
+| 21 | 승인 자료로 거점 성찰 확정<br>`WI-REFLECT-01` | Queued | Extension | E3 | E3 | E4 | NotApplicable | MissingRequired | Nature | playable-loop:nature-base-reflection.v1 |
+| 22 | 벌목 통나무 줍기<br>`WI-NATURE-18` | Queued | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-shelter-foundation.v1 |
 
 ## D2 Farm 독립 생산 폐루프
 

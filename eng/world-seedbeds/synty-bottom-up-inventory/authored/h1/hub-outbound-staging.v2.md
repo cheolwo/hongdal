@@ -13,6 +13,7 @@
 @capability Spatial.PickingWorkArea
 @capability Spatial.Storage
 @capability Spatial.WorkerAccessible
+@capacity WorkArea
 @connector cargo-handoff
 @grammar city:화물 대기 야드
 @grammar city:상하차 Dock

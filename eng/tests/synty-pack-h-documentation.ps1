@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $documentPath = Join-Path $repoRoot 'docs/Architecture/Synty5팩자산-H1-H3연결지도.md'

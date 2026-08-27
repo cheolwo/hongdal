@@ -38,7 +38,7 @@
     "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.nature-water-region.r1",
-  "derivationInputHashSha256": "a47eac38b42b9f28681eae9b26ba98ce2ecf3249b97712ad690237db93147cde",
+  "derivationInputHashSha256": "155e6f8d27b0bc4ccc05ce184d08821de0a7eef20e3f067bb8c316c9d6453dce",
   "authoredDocument": "authored/h4/nature-water-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

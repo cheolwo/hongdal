@@ -1,0 +1,396 @@
+{
+  "schemaVersion": "playable-loop-synty-expression-modules.v1",
+  "revision": "playable-loop-synty-expression-modules.r1",
+  "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "principles": {
+    "playableUnitOwnsExpressionModule": true,
+    "loopMomentAndPlacementRoleReplaceForcedVariantTriples": true,
+    "assetFamilyPrecedesPrefabSelection": true,
+    "selectionIsDeterministic": true,
+    "presentationDoesNotMutateSimulationAuthority": true,
+    "missingCandidateIsExplicitInsteadOfForced": true,
+    "legacyCompositionKeysAreReadOnlyCompatibilityInputs": true
+  },
+  "allowedLoopMomentCodes": [
+    "Entry",
+    "Choice",
+    "Progress",
+    "Success",
+    "FailureRecovery",
+    "Return"
+  ],
+  "allowedPlacementRoleCodes": [
+    "spatial-base",
+    "functional-anchor",
+    "state-overlay",
+    "ambient-detail",
+    "interior-fixture",
+    "interior-loose-item",
+    "feedback-fx",
+    "actor"
+  ],
+  "legacyCompositionPolicy": {
+    "statusCode": "LegacyGenerated",
+    "canonicalForNewWork": false,
+    "newGenerationAllowed": false,
+    "readCompatibilityRequired": true,
+    "forcedVariantCompletenessRequired": false,
+    "cleanupGateCodes": [
+      "NoActivePlayableLoopModuleReadsLegacyCompositionKey",
+      "NoCanonicalSceneOrSeedbedReferencesGeneratedPrefab",
+      "UsefulTopologyAndClearanceRulesMigrated",
+      "CompatibilityTestsPassed"
+    ]
+  },
+  "packPolicies": [
+    {
+      "packCode": "nature",
+      "usagePolicyCode": "ProductionPrimary",
+      "defaultRoles": ["spatial-base", "ambient-detail", "feedback-fx"]
+    },
+    {
+      "packCode": "farm",
+      "usagePolicyCode": "ProductionPrimary",
+      "defaultRoles": ["functional-anchor", "interior-fixture", "interior-loose-item"]
+    },
+    {
+      "packCode": "town",
+      "usagePolicyCode": "ProductionPrimary",
+      "defaultRoles": ["interior-fixture", "interior-loose-item", "functional-anchor"]
+    },
+    {
+      "packCode": "city",
+      "usagePolicyCode": "ProductionPrimary",
+      "defaultRoles": ["spatial-base", "functional-anchor", "ambient-detail"]
+    },
+    {
+      "packCode": "construction",
+      "usagePolicyCode": "SharedStateLayer",
+      "defaultRoles": ["state-overlay", "functional-anchor", "interior-loose-item"]
+    },
+    {
+      "packCode": "generic",
+      "usagePolicyCode": "SharedBasePendingInventory",
+      "defaultRoles": ["spatial-base", "functional-anchor"]
+    },
+    {
+      "packCode": "starter",
+      "usagePolicyCode": "PrototypeFallbackOnly",
+      "defaultRoles": []
+    }
+  ],
+  "sharedModules": [
+    {
+      "moduleStableId": "synty-shared:nature-ground.v1",
+      "displayNameKo": "Nature 공통 지면·식생",
+      "placementRoleCodes": ["spatial-base", "ambient-detail"]
+    },
+    {
+      "moduleStableId": "synty-shared:construction-progress.v1",
+      "displayNameKo": "건설·취소·복구 상태 덧입힘",
+      "placementRoleCodes": ["state-overlay", "functional-anchor"]
+    },
+    {
+      "moduleStableId": "synty-shared:shelter-interior.v1",
+      "displayNameKo": "생활 거점 실내 설비·소품",
+      "placementRoleCodes": ["interior-fixture", "interior-loose-item"]
+    },
+    {
+      "moduleStableId": "synty-shared:nature-atmosphere.v1",
+      "displayNameKo": "Nature 시간대·위협·회복 피드백",
+      "placementRoleCodes": ["feedback-fx", "ambient-detail"]
+    }
+  ],
+  "loopModules": [
+    {
+      "moduleStableId": "synty-loop:nature-shelter-foundation.v1",
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "moduleRevision": "nature-shelter-synty.r1",
+      "sharedModuleRefs": [
+        "synty-shared:nature-ground.v1",
+        "synty-shared:construction-progress.v1"
+      ],
+      "worldInteractionIds": [
+        "WI-ACTOR-01", "WI-NATURE-05", "WI-ACTOR-02", "WI-NATURE-06", "WI-NATURE-18", "WI-NATURE-07",
+        "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-12"
+      ],
+      "requiredHCapabilities": [
+        "ToolAccessible", "HarvestWorkArea", "ShelterBuildingSite", "RecoveryWorkArea"
+      ],
+      "slots": [
+        {
+          "slotStableId": "nature-shelter.tool-pickup",
+          "worldInteractionId": "WI-ACTOR-01",
+          "loopMomentCode": "Choice",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["ToolPickupAvailable"],
+          "assetFamilyIds": ["synty-family:farm:props:axe"]
+        },
+        {
+          "slotStableId": "nature-shelter.tool-choice",
+          "worldInteractionId": "WI-NATURE-05",
+          "loopMomentCode": "Choice",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["ToolChoiceAvailable"],
+          "assetFamilyIds": ["synty-family:farm:props:axe"]
+        },
+        {
+          "slotStableId": "nature-shelter.tool-equipment",
+          "worldInteractionId": "WI-ACTOR-02",
+          "loopMomentCode": "Success",
+          "placementRoleCode": "actor",
+          "authorityStateCodes": ["MainHandToolEquipped"],
+          "assetFamilyIds": ["synty-family:farm:props:axe"]
+        },
+        {
+          "slotStableId": "nature-shelter.harvest-progress",
+          "worldInteractionId": "WI-NATURE-06",
+          "loopMomentCode": "Progress",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["TreeHarvestTaskActive"],
+          "assetFamilyIds": [
+            "synty-family:nature:trees:birch",
+            "synty-family:nature:trees:pine",
+            "synty-family:nature:trees:large"
+          ]
+        },
+        {
+          "slotStableId": "nature-shelter.timber-result",
+          "worldInteractionId": "WI-NATURE-18",
+          "loopMomentCode": "Success",
+          "placementRoleCode": "state-overlay",
+          "authorityStateCodes": ["TimberPickupAvailable"],
+          "assetFamilyIds": ["synty-family:nature:trees:log"]
+        },
+        {
+          "slotStableId": "nature-shelter.site-choice",
+          "worldInteractionId": "WI-NATURE-07",
+          "loopMomentCode": "Choice",
+          "placementRoleCode": "spatial-base",
+          "authorityStateCodes": ["ShelterSiteChoiceAvailable"],
+          "assetFamilyIds": [
+            "synty-family:nature:plants:grass",
+            "synty-family:nature:plants:undergrowth",
+            "synty-family:nature:rocks:small"
+          ]
+        },
+        {
+          "slotStableId": "nature-shelter.build-progress",
+          "worldInteractionId": "WI-NATURE-08",
+          "loopMomentCode": "Progress",
+          "placementRoleCode": "state-overlay",
+          "authorityStateCodes": ["CabinConstructionActive"],
+          "assetFamilyIds": [
+            "synty-family:construction:props:wood-frame",
+            "synty-family:construction:props:plywood-stack",
+            "synty-family:construction:props:scaffold-preset"
+          ]
+        },
+        {
+          "slotStableId": "nature-shelter.enter",
+          "worldInteractionId": "WI-NATURE-09",
+          "loopMomentCode": "Success",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["CabinOperational"],
+          "assetFamilyIds": ["synty-family:farm:buildings:shelter"]
+        },
+        {
+          "slotStableId": "nature-shelter.exit-return",
+          "worldInteractionId": "WI-NATURE-10",
+          "loopMomentCode": "Return",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["NatureSafeChoiceAvailable"],
+          "assetFamilyIds": [
+            "synty-family:nature:props:campfire",
+            "synty-family:nature:props:torchstick"
+          ]
+        },
+        {
+          "slotStableId": "nature-shelter.cancel-recovery",
+          "worldInteractionId": "WI-NATURE-12",
+          "loopMomentCode": "FailureRecovery",
+          "placementRoleCode": "state-overlay",
+          "authorityStateCodes": ["NatureWorkCancelled"],
+          "assetFamilyIds": [
+            "synty-family:construction:props:crate",
+            "synty-family:construction:props:plywood-stack"
+          ]
+        }
+      ]
+    },
+    {
+      "moduleStableId": "synty-loop:nature-twilight-return.v1",
+      "loopStableId": "playable-loop:nature-twilight-return.v1",
+      "moduleRevision": "nature-twilight-synty.r1",
+      "sharedModuleRefs": [
+        "synty-shared:nature-ground.v1",
+        "synty-shared:nature-atmosphere.v1"
+      ],
+      "worldInteractionIds": ["WI-NATURE-01", "WI-NATURE-11"],
+      "requiredHCapabilities": ["ThreatEncounterArea", "ThreatRetreatRoute", "ShelterOccupancy"],
+      "slots": [
+        {
+          "slotStableId": "nature-twilight.warning",
+          "worldInteractionId": "WI-NATURE-01",
+          "loopMomentCode": "Entry",
+          "placementRoleCode": "feedback-fx",
+          "authorityStateCodes": ["TwilightEncounterReady"],
+          "assetFamilyIds": [
+            "synty-family:nature:fx:fireflies",
+            "synty-family:nature:fx:glowing-dust",
+            "synty-family:nature:fx:smoke-light"
+          ]
+        },
+        {
+          "slotStableId": "nature-twilight.encounter",
+          "worldInteractionId": "WI-NATURE-11",
+          "loopMomentCode": "Progress",
+          "placementRoleCode": "actor",
+          "authorityStateCodes": ["ThreatEncounterActive"],
+          "assetFamilyIds": ["synty-family:nature:props:skeleton-ground"]
+        },
+        {
+          "slotStableId": "nature-twilight.recovery-return",
+          "worldInteractionId": "WI-NATURE-11",
+          "loopMomentCode": "Return",
+          "placementRoleCode": "feedback-fx",
+          "authorityStateCodes": ["TwilightThreatResolvedOrRetreated", "NatureSafeChoiceAvailable"],
+          "assetFamilyIds": [
+            "synty-family:nature:fx:fire-small",
+            "synty-family:nature:props:campfire"
+          ]
+        }
+      ]
+    },
+    {
+      "moduleStableId": "synty-loop:nature-night-day2.v1",
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "moduleRevision": "nature-night-day2-synty.r1",
+      "sharedModuleRefs": [
+        "synty-shared:shelter-interior.v1",
+        "synty-shared:nature-atmosphere.v1",
+        "synty-shared:construction-progress.v1"
+      ],
+      "worldInteractionIds": ["WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15"],
+      "requiredHCapabilities": ["ShelterStorage", "ShelterSleep", "DawnPlanChoice"],
+      "slots": [
+        {
+          "slotStableId": "nature-night.storage-empty",
+          "worldInteractionId": "WI-NATURE-13",
+          "loopMomentCode": "Success",
+          "placementRoleCode": "interior-fixture",
+          "authorityStateCodes": ["ShelterStorageAvailable"],
+          "assetFamilyIds": ["synty-family:farm:props:rack"]
+        },
+        {
+          "slotStableId": "nature-night.storage-partial",
+          "worldInteractionId": "WI-NATURE-13",
+          "loopMomentCode": "Success",
+          "placementRoleCode": "interior-loose-item",
+          "authorityStateCodes": ["ShelterStoragePartiallyFilled"],
+          "assetFamilyIds": [
+            "synty-family:farm:props:crate",
+            "synty-family:construction:props:crate"
+          ]
+        },
+        {
+          "slotStableId": "nature-night.storage-full",
+          "worldInteractionId": "WI-NATURE-13",
+          "loopMomentCode": "Success",
+          "placementRoleCode": "interior-loose-item",
+          "authorityStateCodes": ["ShelterStorageFull"],
+          "assetFamilyIds": ["synty-family:construction:props:crate-stack"]
+        },
+        {
+          "slotStableId": "nature-night.sleep",
+          "worldInteractionId": "WI-NATURE-14",
+          "loopMomentCode": "Progress",
+          "placementRoleCode": "interior-fixture",
+          "authorityStateCodes": ["ShelterSleepActive"],
+          "assetFamilyIds": [
+            "synty-family:farm:props:bed",
+            "synty-family:town:props:bed-single"
+          ]
+        },
+        {
+          "slotStableId": "nature-night.dawn-return",
+          "worldInteractionId": "WI-NATURE-14",
+          "loopMomentCode": "Return",
+          "placementRoleCode": "feedback-fx",
+          "authorityStateCodes": ["DawnReached"],
+          "assetFamilyIds": [
+            "synty-family:nature:fx:sunbeams-particle",
+            "synty-family:nature:fx:fire-small"
+          ]
+        },
+        {
+          "slotStableId": "nature-night.day2-workbench-plan",
+          "worldInteractionId": "WI-NATURE-15",
+          "loopMomentCode": "Choice",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["WorkbenchExpansionPlanSelected"],
+          "assetFamilyIds": [
+            "synty-family:farm:props:table",
+            "synty-family:construction:props:toolbox"
+          ]
+        },
+        {
+          "slotStableId": "nature-night.day2-storage-plan",
+          "worldInteractionId": "WI-NATURE-15",
+          "loopMomentCode": "Choice",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["StorageExpansionPlanSelected"],
+          "assetFamilyIds": [
+            "synty-family:farm:props:rack",
+            "synty-family:construction:props:crate-stack"
+          ]
+        },
+        {
+          "slotStableId": "nature-night.day2-barricade-plan",
+          "worldInteractionId": "WI-NATURE-15",
+          "loopMomentCode": "Choice",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["BarricadeExpansionPlanSelected"],
+          "assetFamilyIds": [
+            "synty-family:farm:props:fence-wood",
+            "synty-family:construction:props:barrier"
+          ]
+        }
+      ]
+    },
+    {
+      "moduleStableId": "synty-loop:nature-workbench-foundation.v1",
+      "loopStableId": "playable-loop:nature-workbench-foundation.v1",
+      "moduleRevision": "nature-workbench-synty.r1",
+      "sharedModuleRefs": ["synty-shared:construction-progress.v1"],
+      "worldInteractionIds": ["WI-CON-01", "WI-NATURE-12"],
+      "requiredHCapabilities": ["AreaBuildingPlacementAllowed", "CraftingWorkArea"],
+      "slots": [
+        {
+          "slotStableId": "nature-workbench.build",
+          "worldInteractionId": "WI-CON-01",
+          "loopMomentCode": "Progress",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["NatureWorkbenchConstructionActive", "NatureWorkbenchOperational"],
+          "assetFamilyIds": [
+            "synty-family:farm:props:table",
+            "synty-family:construction:props:wooden-table-top",
+            "synty-family:construction:props:toolbox"
+          ]
+        },
+        {
+          "slotStableId": "nature-workbench.cancel-recovery",
+          "worldInteractionId": "WI-NATURE-12",
+          "loopMomentCode": "FailureRecovery",
+          "placementRoleCode": "state-overlay",
+          "authorityStateCodes": ["NatureWorkCancelled"],
+          "assetFamilyIds": [
+            "synty-family:construction:props:crate",
+            "synty-family:construction:props:plywood-stack"
+          ]
+        }
+      ]
+    }
+  ]
+}

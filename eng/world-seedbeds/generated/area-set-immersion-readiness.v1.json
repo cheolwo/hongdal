@@ -1,8 +1,8 @@
 {
     "schemaVersion":  "simulation-area-set-immersion-readiness.v1",
     "areaSetStableId":  "area-set:sim:pyeongchang:farm-production.v1",
-    "areaSetRevision":  2,
-    "areaSetHashSha256":  "f83b3b6892a56d2b58d1b61e9cc853f02b68dbc760d61f908600a01f077e92f2",
+    "areaSetRevision":  6,
+    "areaSetHashSha256":  "d8d09ae82f249489d12e7a71da8897a89fd861799d6f67e9db03a61c9c198aa9",
     "spatialMaturityCode":  "E5Qualified",
     "immersionMaturityCode":  "ImmersionQualified",
     "freshnessStateCode":  "Current",
@@ -12,13 +12,13 @@
     "immersionPolicyRevision":  "area-set-immersion-policy.r1",
     "questionMatrixRevision":  "farm-immersion-questions.r1",
     "generatorVersion":  "manage-area-set-immersion.ps1.r1",
-    "inputHashSha256":  "20b8167df19210eb2620ef020f2e5ea6296d874087bee727b13f6e541623918c",
+    "inputHashSha256":  "60d6552d95becb2d2c6af733aa41e617de44067c35a1c77f11942f7e86fb1560",
     "h3Audits":  [
                      {
                          "h3StableId":  "h3-candidate:farm-processing-campus",
                          "landscapeGraphStableId":  "landscape-graph:sim:pyeongchang:farm-processing-campus.v1",
-                         "graphRevision":  2,
-                         "graphHashSha256":  "6391a6b89248c4969819670442318a7f3862e8b6210fbedd35a2a0665a861f63",
+                         "graphRevision":  6,
+                         "graphHashSha256":  "f2b1d022e647690f4ab09df7bb2dad0f52b27426045badcb0407590351cd363c",
                          "immersionMaturityCode":  "ImmersionQualified",
                          "freshnessStateCode":  "Current",
                          "h2StableIds":  [
@@ -103,8 +103,8 @@
                      {
                          "h3StableId":  "h3-candidate:highland-farm",
                          "landscapeGraphStableId":  "landscape-graph:sim:pyeongchang:highland-farm.v1",
-                         "graphRevision":  2,
-                         "graphHashSha256":  "439fa5fc6d059bbb9d18da684a17dc2851a82d390a6423d44fcd2c56f5dd8f5e",
+                         "graphRevision":  6,
+                         "graphHashSha256":  "631903942f62a7bf64cfe27c37422a472abfcbd5fea42c43ffdea9f8fee00e75",
                          "immersionMaturityCode":  "ImmersionQualified",
                          "freshnessStateCode":  "Current",
                          "h2StableIds":  [
@@ -180,8 +180,8 @@
                      {
                          "h3StableId":  "h3-candidate:farm-seasonal-production-loop",
                          "landscapeGraphStableId":  "landscape-graph:sim:pyeongchang:farm-seasonal-production-loop.v1",
-                         "graphRevision":  2,
-                         "graphHashSha256":  "b9a366f3d8097da40fc169f99d57c4011c14f68bfaad064b2f7c085805d0fa73",
+                         "graphRevision":  6,
+                         "graphHashSha256":  "e27ffb3085f2fa0d14c2eaa7ff46a90fd42efe1b41dcd94dcd71ab98e1cefda0",
                          "immersionMaturityCode":  "ImmersionQualified",
                          "freshnessStateCode":  "Current",
                          "h2StableIds":  [
@@ -268,8 +268,8 @@
                      {
                          "h3StableId":  "h3-candidate:farm-incident-recovery",
                          "landscapeGraphStableId":  "landscape-graph:sim:pyeongchang:farm-incident-recovery.v1",
-                         "graphRevision":  2,
-                         "graphHashSha256":  "5c95310eb55eb834079f4bf3bc970ce626e73b101f35aa75ced29f6986fafdc2",
+                         "graphRevision":  6,
+                         "graphHashSha256":  "e4e036fb414d28e8b2dea6b275db8230063f8062e93fc33bef862f00207f5fdf",
                          "immersionMaturityCode":  "ImmersionQualified",
                          "freshnessStateCode":  "Current",
                          "h2StableIds":  [
@@ -406,7 +406,7 @@
                                   "evidenceKindCode":  "NongsaroReference",
                                   "sourceStableId":  "public-data:nongsaro-disaster-prevention-module",
                                   "sourceRevision":  "repository-contract.r1",
-                                  "sourceHashSha256":  "70f1a432ecfb6d88a2821fb6fb15cadacbdca682d47dd6003233d5c3b03fa0f6",
+                                  "sourceHashSha256":  "2e3e84a2e2d1dad2414aa5a11ae747f92cabb593f2563630c5f9b9e03535fca0",
                                   "linkStatusCode":  "ContractReference",
                                   "limitationCodes":  [
                                                           "DescriptiveContextOnly",
@@ -419,7 +419,7 @@
                                   "evidenceKindCode":  "NongsaroReference",
                                   "sourceStableId":  "crop-requirement-profile:nongsaro.potato.1",
                                   "sourceRevision":  "1",
-                                  "sourceHashSha256":  "69e57ae06cf2cff3d1d4f31ee47077a7f450f22ee10e13012032a01570216e99",
+                                  "sourceHashSha256":  "95b83148356ba1699c5f412b7956aaf0e8becce4772d01ca660034b7649846cb",
                                   "linkStatusCode":  "ContractReference",
                                   "limitationCodes":  [
                                                           "DescriptiveContextOnly",
@@ -449,5 +449,5 @@
     "publicDataChangesSimulationRules":  false,
     "publicDataMovesSpatialDefinitions":  false,
     "runtimeValidated":  false,
-    "qualificationHashSha256":  "a27d751827c2a6d45b5dd2dd6be7689fcba30a224acbb8bcb105dbe01b933954"
+    "qualificationHashSha256":  "c880165d7ed3150ca0c94bf44c3367932305c0cbc5d9fae2d6d77930103fb5b0"
 }

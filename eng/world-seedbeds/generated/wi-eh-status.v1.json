@@ -2,34 +2,280 @@
   "schemaVersion": "simulation-world-interaction-eh-status.v1",
   "revision": "simulation-world-interaction-eh-status.r1",
   "generatedFrom": {
-    "worldInteractionCatalogRevision": "simulation-world-interactions.r8",
-    "spatialPriorityRevision": "simulation-world-interaction-spatial-priorities.r1",
+    "worldInteractionCatalogRevision": "simulation-world-interactions.r27",
+    "spatialPriorityRevision": "simulation-world-interaction-spatial-priorities.r10",
     "designKnowledgeRevision": "simulation-world-spatial-design-knowledge.r3",
-    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r9",
+    "resourceInventoryRevision": "simulation-world-spatial-resource-inventory.r10",
     "compositionPlanStableId": "wi-spatial-composition-plan:reference-play-01-harvest-shipping.v1",
     "compositionPlanRevision": 2,
     "p2CompositionPlanStableId": "wi-spatial-composition-plan:p2-hub-inbound-storage.v1",
     "p2CompositionPlanRevision": 2
   },
   "summary": {
-    "totalWorldInteractions": 49,
-    "implementationE3Count": 49,
-    "establishedH1Count": 13,
-    "establishedH3Count": 8,
-    "candidateLineageCount": 22,
-    "missingRequiredCount": 0,
-    "notApplicableCount": 6,
-    "officialH1DefinitionCount": 7,
+    "totalWorldInteractions": 64,
+    "implementationE3Count": 60,
+    "establishedH1Count": 14,
+    "establishedH3Count": 15,
+    "candidateLineageCount": 21,
+    "missingRequiredCount": 5,
+    "notApplicableCount": 9,
+    "officialH1DefinitionCount": 8,
     "officialH2DefinitionCount": 0,
     "definedH3Count": 5,
     "definedH4Count": 1
   },
   "items": [
     {
+      "worldInteractionId": "WI-ACTOR-01",
+      "groupCode": "ACTOR",
+      "groupDisplayName": "행위자 공통 물품·장착",
+      "sequence": 1,
+      "title": "물품 획득",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E5",
+      "spatialParticipationCode": "NotRequired",
+      "priorityCode": "P5",
+      "spatialDesignStateCode": "NotApplicable",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [],
+      "lhEngineHandoffStateCode": "NotApplicable",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-ACTOR-02",
+      "groupCode": "ACTOR",
+      "groupDisplayName": "행위자 공통 물품·장착",
+      "sequence": 2,
+      "title": "장착 상태 변경",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E5",
+      "spatialParticipationCode": "NotRequired",
+      "priorityCode": "P5",
+      "spatialDesignStateCode": "NotApplicable",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [],
+      "lhEngineHandoffStateCode": "NotApplicable",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-CARD-01",
+      "groupCode": "CARD",
+      "groupDisplayName": "메이저 아르카나",
+      "sequence": 1,
+      "title": "현재 세계의 메이저 아르카나 활성화",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E4",
+      "spatialParticipationCode": "NotRequired",
+      "priorityCode": "P5",
+      "spatialDesignStateCode": "NotApplicable",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [],
+      "lhEngineHandoffStateCode": "NotApplicable",
+      "warningCodes": [
+        "E4WithoutApprovedH1"
+      ]
+    },
+    {
+      "worldInteractionId": "WI-CITY-01",
+      "groupCode": "CITY",
+      "groupDisplayName": "도심 운영",
+      "sequence": 1,
+      "title": "도심 서비스 수요 확정",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E1",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P5",
+      "spatialDesignStateCode": "MissingRequired",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "UrbanDemandArea"
+      ],
+      "lhEngineHandoffStateCode": "BlockedMissingDesign",
+      "warningCodes": [
+        "RequiredSpatialDesignMissing"
+      ]
+    },
+    {
+      "worldInteractionId": "WI-CITY-02",
+      "groupCode": "CITY",
+      "groupDisplayName": "도심 운영",
+      "sequence": 2,
+      "title": "도심 서비스용 지역 재고 배정",
+      "interactionKindCode": "AutomaticTransition",
+      "implementationEvidenceStage": "E1",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P5",
+      "spatialDesignStateCode": "MissingRequired",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "UrbanSortingArea"
+      ],
+      "lhEngineHandoffStateCode": "BlockedMissingDesign",
+      "warningCodes": [
+        "RequiredSpatialDesignMissing"
+      ]
+    },
+    {
+      "worldInteractionId": "WI-CITY-03",
+      "groupCode": "CITY",
+      "groupDisplayName": "도심 운영",
+      "sequence": 3,
+      "title": "도심 주민 서비스 처리",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E1",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P5",
+      "spatialDesignStateCode": "MissingRequired",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "LastMileHandoffArea"
+      ],
+      "lhEngineHandoffStateCode": "BlockedMissingDesign",
+      "warningCodes": [
+        "RequiredSpatialDesignMissing"
+      ]
+    },
+    {
+      "worldInteractionId": "WI-CITY-04",
+      "groupCode": "CITY",
+      "groupDisplayName": "도심 운영",
+      "sequence": 4,
+      "title": "도심 서비스 결과 확인",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E1",
+      "integrationEvidenceStage": "E1",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P5",
+      "spatialDesignStateCode": "MissingRequired",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "UrbanRecoveryRoute"
+      ],
+      "lhEngineHandoffStateCode": "BlockedMissingDesign",
+      "warningCodes": [
+        "RequiredSpatialDesignMissing"
+      ]
+    },
+    {
+      "worldInteractionId": "WI-CON-01",
+      "groupCode": "CON",
+      "groupDisplayName": "영역 건설",
+      "sequence": 1,
+      "title": "영역 건물 건설 확정",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E7",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "EstablishedH3",
+      "highestEstablishedHLevelCode": "H3",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-home.v1"
+      ],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-shelter"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:산길-바위-길목",
+        "h1-expression:nature:숲-빈터-고사목"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-home-core",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-threat-response",
+        "h2-candidate:nature-trail-shelter"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:nature-trail-network"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region",
+        "h4-blueprint:nature-water-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [
+        "binding:actual-e5:wi-con-01"
+      ],
+      "requiredSpatialCapabilityCodes": [
+        "AreaBuildingPlacementAllowed",
+        "FootprintAvailable"
+      ],
+      "lhEngineHandoffStateCode": "ReadyForActualE5Input",
+      "warningCodes": []
+    },
+    {
       "worldInteractionId": "WI-FARM-01",
       "groupCode": "FARM",
+      "groupDisplayName": "농장 생산",
       "sequence": 1,
-      "title": "밭갈기",
+      "title": "경작지 밭갈이",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -83,8 +329,9 @@
     {
       "worldInteractionId": "WI-FARM-02",
       "groupCode": "FARM",
+      "groupDisplayName": "농장 생산",
       "sequence": 2,
-      "title": "파종",
+      "title": "경작지 씨앗 파종",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -142,8 +389,9 @@
     {
       "worldInteractionId": "WI-FARM-03",
       "groupCode": "FARM",
+      "groupDisplayName": "농장 생산",
       "sequence": 3,
-      "title": "관수·재배 관리",
+      "title": "농작물 생육 관리",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -198,8 +446,9 @@
     {
       "worldInteractionId": "WI-FARM-04",
       "groupCode": "FARM",
+      "groupDisplayName": "농장 생산",
       "sequence": 4,
-      "title": "수확",
+      "title": "익은 농작물 수확",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -260,8 +509,9 @@
     {
       "worldInteractionId": "WI-FARM-05",
       "groupCode": "FARM",
+      "groupDisplayName": "농장 생산",
       "sequence": 5,
-      "title": "수확물 집하",
+      "title": "수확물 집하장 모으기",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -315,8 +565,9 @@
     {
       "worldInteractionId": "WI-FARM-06",
       "groupCode": "FARM",
+      "groupDisplayName": "농장 생산",
       "sequence": 6,
-      "title": "출하 준비·포장",
+      "title": "출하 물량 포장",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -368,8 +619,9 @@
     {
       "worldInteractionId": "WI-001",
       "groupCode": "HUB",
+      "groupDisplayName": "물류 거점 창고",
       "sequence": 1,
-      "title": "진부 Hub 입고검수",
+      "title": "입고 화물 검수",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -393,6 +645,7 @@
         "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-fulfillment",
         "h2-candidate:hub-inbound-storage",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-longterm-cold-storage",
         "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-quarantine-staging",
@@ -422,8 +675,9 @@
     {
       "worldInteractionId": "WI-002",
       "groupCode": "HUB",
+      "groupDisplayName": "물류 거점 창고",
       "sequence": 2,
-      "title": "진부 Hub 창고 적재",
+      "title": "검수 완료 화물 창고 적재",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -447,6 +701,7 @@
         "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-fulfillment",
         "h2-candidate:hub-inbound-storage",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-longterm-cold-storage",
         "h2-candidate:hub-quarantine-staging"
       ],
@@ -475,8 +730,9 @@
     {
       "worldInteractionId": "WI-HUB-03",
       "groupCode": "HUB",
+      "groupDisplayName": "물류 거점 창고",
       "sequence": 3,
-      "title": "출고 요청",
+      "title": "출고 대상 재고 요청",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -484,7 +740,9 @@
       "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
-      "approvedH1DefinitionRefs": [],
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:hub-outbound-staging.v1"
+      ],
       "interactionH1CandidateRefs": [
         "h1-stock:hub-outbound-staging"
       ],
@@ -494,6 +752,7 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:hub-fulfillment",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-outbound-vehicle"
       ],
       "h3CandidateRefs": [
@@ -519,8 +778,9 @@
     {
       "worldInteractionId": "WI-HUB-04",
       "groupCode": "HUB",
+      "groupDisplayName": "물류 거점 창고",
       "sequence": 4,
-      "title": "피킹",
+      "title": "출고 대상 재고 피킹",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -528,7 +788,9 @@
       "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
-      "approvedH1DefinitionRefs": [],
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:hub-outbound-staging.v1"
+      ],
       "interactionH1CandidateRefs": [
         "h1-stock:hub-outbound-staging",
         "h1-stock:hub-temporary-staging"
@@ -540,6 +802,7 @@
       "h2CandidateRefs": [
         "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-fulfillment",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-longterm-cold-storage",
         "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-outbound-vehicle",
@@ -570,8 +833,9 @@
     {
       "worldInteractionId": "WI-HUB-05",
       "groupCode": "HUB",
+      "groupDisplayName": "물류 거점 창고",
       "sequence": 5,
-      "title": "출고 준비",
+      "title": "피킹 화물 포장",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -579,7 +843,9 @@
       "priorityCode": "P4",
       "spatialDesignStateCode": "CandidateLineage",
       "highestEstablishedHLevelCode": "",
-      "approvedH1DefinitionRefs": [],
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:hub-outbound-staging.v1"
+      ],
       "interactionH1CandidateRefs": [
         "h1-stock:hub-outbound-staging",
         "h1-stock:hub-temporary-staging"
@@ -591,6 +857,7 @@
       "h2CandidateRefs": [
         "h2-candidate:hub-emergency-power",
         "h2-candidate:hub-fulfillment",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-longterm-cold-storage",
         "h2-candidate:hub-maintenance-yard",
         "h2-candidate:hub-outbound-vehicle",
@@ -620,8 +887,9 @@
     {
       "worldInteractionId": "WI-HUB-06",
       "groupCode": "HUB",
+      "groupDisplayName": "물류 거점 창고",
       "sequence": 6,
-      "title": "Hub 차량 상차",
+      "title": "출고 차량 상차",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -666,8 +934,9 @@
     {
       "worldInteractionId": "WI-LOG-01",
       "groupCode": "LOG",
+      "groupDisplayName": "영역 간 화물 이동",
       "sequence": 1,
-      "title": "차량 상차 확정",
+      "title": "출하 차량 상차 확정",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -716,8 +985,9 @@
     {
       "worldInteractionId": "WI-LOG-02",
       "groupCode": "LOG",
+      "groupDisplayName": "영역 간 화물 이동",
       "sequence": 2,
-      "title": "Farm 출발",
+      "title": "농장에서 출발",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E6",
@@ -764,8 +1034,9 @@
     {
       "worldInteractionId": "WI-LOG-03",
       "groupCode": "LOG",
+      "groupDisplayName": "영역 간 화물 이동",
       "sequence": 3,
-      "title": "Farm→Hub 화물 이동",
+      "title": "농장에서 물류 거점으로 화물 이동",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -800,8 +1071,9 @@
     {
       "worldInteractionId": "WI-LOG-04",
       "groupCode": "LOG",
+      "groupDisplayName": "영역 간 화물 이동",
       "sequence": 4,
-      "title": "Hub 하차",
+      "title": "물류 거점 도착 화물 하차",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -822,10 +1094,12 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:hub-inbound-storage",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-quarantine-staging"
       ],
       "h3CandidateRefs": [
         "h3-candidate:farm-hub-logistics",
+        "h3-candidate:hub-fulfillment-operations",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -845,8 +1119,9 @@
     {
       "worldInteractionId": "WI-LOG-05",
       "groupCode": "LOG",
+      "groupDisplayName": "영역 간 화물 이동",
       "sequence": 5,
-      "title": "Hub 인수",
+      "title": "물류 거점 도착 화물 인수",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -867,10 +1142,12 @@
       ],
       "h2CandidateRefs": [
         "h2-candidate:hub-inbound-storage",
+        "h2-candidate:hub-internal-warehouse",
         "h2-candidate:hub-quarantine-staging"
       ],
       "h3CandidateRefs": [
         "h3-candidate:farm-hub-logistics",
+        "h3-candidate:hub-fulfillment-operations",
         "h3-candidate:jinbu-hub",
         "h3-candidate:resilient-logistics-hub"
       ],
@@ -889,8 +1166,9 @@
     {
       "worldInteractionId": "WI-MARKET-01",
       "groupCode": "MARKET",
+      "groupDisplayName": "마트 입고·진열",
       "sequence": 1,
-      "title": "Hub→마트 운송",
+      "title": "물류 거점에서 마트로 운송",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -938,8 +1216,9 @@
     {
       "worldInteractionId": "WI-MARKET-02",
       "groupCode": "MARKET",
+      "groupDisplayName": "마트 입고·진열",
       "sequence": 2,
-      "title": "마트 하차·인수",
+      "title": "마트 도착 화물 인수",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -992,8 +1271,9 @@
     {
       "worldInteractionId": "WI-MARKET-03",
       "groupCode": "MARKET",
+      "groupDisplayName": "마트 입고·진열",
       "sequence": 3,
-      "title": "마트 입고검수",
+      "title": "마트 입고 상품 검수",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1036,8 +1316,9 @@
     {
       "worldInteractionId": "WI-MARKET-04",
       "groupCode": "MARKET",
+      "groupDisplayName": "마트 입고·진열",
       "sequence": 4,
-      "title": "마트 후방 적재",
+      "title": "검수 상품 후방 창고 적재",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1081,8 +1362,9 @@
     {
       "worldInteractionId": "WI-MARKET-05",
       "groupCode": "MARKET",
+      "groupDisplayName": "마트 입고·진열",
       "sequence": 5,
-      "title": "진열 보충",
+      "title": "매장 진열대 상품 보충",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1127,16 +1409,19 @@
     {
       "worldInteractionId": "WI-NATURE-01",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 1,
-      "title": "자연권 위협 관찰",
+      "title": "자연 지역 위험 징후 확인",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
-      "integrationEvidenceStage": "E1",
+      "integrationEvidenceStage": "E7",
       "spatialParticipationCode": "Required",
       "priorityCode": "P1",
-      "spatialDesignStateCode": "CandidateLineage",
-      "highestEstablishedHLevelCode": "",
-      "approvedH1DefinitionRefs": [],
+      "spatialDesignStateCode": "EstablishedH3",
+      "highestEstablishedHLevelCode": "H3",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-encounter.v1"
+      ],
       "interactionH1CandidateRefs": [
         "h1-stock:nature-incident-trace",
         "h1-stock:nature-threat-watch"
@@ -1160,20 +1445,23 @@
         "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
-      "e5PlacementCandidateRefs": [],
+      "e5PlacementCandidateRefs": [
+        "binding:actual-e5:wi-nature-01"
+      ],
       "requiredSpatialCapabilityCodes": [
         "ObservationArea",
         "ThreatMonitoringArea",
         "Traversable"
       ],
-      "lhEngineHandoffStateCode": "DesignCandidateOnly",
+      "lhEngineHandoffStateCode": "ReadyForActualE5Input",
       "warningCodes": []
     },
     {
       "worldInteractionId": "WI-NATURE-02",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 2,
-      "title": "자연권 긴급 후퇴",
+      "title": "안전 거점으로 긴급 후퇴",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1216,8 +1504,9 @@
     {
       "worldInteractionId": "WI-NATURE-03",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 3,
-      "title": "자연권 복원",
+      "title": "훼손된 자연 경로 복원",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1259,8 +1548,9 @@
     {
       "worldInteractionId": "WI-NATURE-04",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 4,
-      "title": "파티 회복",
+      "title": "탐사대 안전 회복",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1304,11 +1594,12 @@
     {
       "worldInteractionId": "WI-NATURE-05",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 5,
-      "title": "도끼 획득",
+      "title": "벌목 도끼 획득",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
-      "integrationEvidenceStage": "E4",
+      "integrationEvidenceStage": "E6",
       "spatialParticipationCode": "Required",
       "priorityCode": "P1",
       "spatialDesignStateCode": "EstablishedH1",
@@ -1339,20 +1630,25 @@
         "h4-blueprint:nature-water-region"
       ],
       "graphBindingRefs": [],
-      "e5PlacementCandidateRefs": [],
+      "e5PlacementCandidateRefs": [
+        "spatial:actual-e5:wi-nature-05"
+      ],
       "requiredSpatialCapabilityCodes": [
         "PlayerAccessible",
         "ToolPickupPoint",
         "Traversable"
       ],
       "lhEngineHandoffStateCode": "ReadyForApprovedH1Input",
-      "warningCodes": []
+      "warningCodes": [
+        "E5PlacementReferenceMissing"
+      ]
     },
     {
       "worldInteractionId": "WI-NATURE-06",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 6,
-      "title": "벌목 시작",
+      "title": "나무 벌목 작업 시작",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -1406,8 +1702,9 @@
     {
       "worldInteractionId": "WI-NATURE-07",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 7,
-      "title": "오두막 위치 배치",
+      "title": "오두막을 지을 터 선정",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -1456,8 +1753,9 @@
     {
       "worldInteractionId": "WI-NATURE-08",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 8,
-      "title": "오두막 건설 시작",
+      "title": "오두막 건설 작업 시작",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -1507,8 +1805,9 @@
     {
       "worldInteractionId": "WI-NATURE-09",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 9,
-      "title": "오두막 입장",
+      "title": "오두막 안으로 들어가기",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -1558,8 +1857,9 @@
     {
       "worldInteractionId": "WI-NATURE-10",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 10,
-      "title": "오두막 퇴장",
+      "title": "오두막 밖으로 나가기",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -1609,15 +1909,16 @@
     {
       "worldInteractionId": "WI-NATURE-11",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 11,
-      "title": "황혼 조우 대응",
+      "title": "황혼 위협 대응 방식 확정",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
-      "integrationEvidenceStage": "E4",
+      "integrationEvidenceStage": "E7",
       "spatialParticipationCode": "Required",
       "priorityCode": "P1",
-      "spatialDesignStateCode": "EstablishedH1",
-      "highestEstablishedHLevelCode": "H1",
+      "spatialDesignStateCode": "EstablishedH3",
+      "highestEstablishedHLevelCode": "H3",
       "approvedH1DefinitionRefs": [
         "wi-spatial-seedbed:nature-survival-encounter.v1"
       ],
@@ -1643,20 +1944,23 @@
         "h4-blueprint:nature-home-exploration-region"
       ],
       "graphBindingRefs": [],
-      "e5PlacementCandidateRefs": [],
+      "e5PlacementCandidateRefs": [
+        "binding:actual-e5:wi-nature-11"
+      ],
       "requiredSpatialCapabilityCodes": [
         "EncounterDecisionArea",
         "RetreatRoute",
         "Traversable"
       ],
-      "lhEngineHandoffStateCode": "ReadyForApprovedH1Input",
+      "lhEngineHandoffStateCode": "ReadyForActualE5Input",
       "warningCodes": []
     },
     {
       "worldInteractionId": "WI-NATURE-12",
       "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
       "sequence": 12,
-      "title": "진행 작업 취소",
+      "title": "진행 중 작업 취소",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E4",
@@ -1681,10 +1985,284 @@
       "warningCodes": []
     },
     {
+      "worldInteractionId": "WI-NATURE-13",
+      "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
+      "sequence": 13,
+      "title": "획득 자원 거점 보관",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E7",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "EstablishedH3",
+      "highestEstablishedHLevelCode": "H3",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-home.v1"
+      ],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-shelter"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:산길-바위-길목",
+        "h1-expression:nature:숲-빈터-고사목"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-home-core",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-threat-response",
+        "h2-candidate:nature-trail-shelter"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:nature-trail-network"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region",
+        "h4-blueprint:nature-water-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [
+        "binding:actual-e5:wi-nature-13"
+      ],
+      "requiredSpatialCapabilityCodes": [
+        "ShelterInterior",
+        "StorageInteractionAnchor"
+      ],
+      "lhEngineHandoffStateCode": "ReadyForActualE5Input",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-14",
+      "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
+      "sequence": 14,
+      "title": "오두막에서 수면·새벽 맞기",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E5",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "EstablishedH3",
+      "highestEstablishedHLevelCode": "H3",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-home.v1"
+      ],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-shelter"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:산길-바위-길목",
+        "h1-expression:nature:숲-빈터-고사목"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-home-core",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-threat-response",
+        "h2-candidate:nature-trail-shelter"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:nature-trail-network"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region",
+        "h4-blueprint:nature-water-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [
+        "binding:actual-e5:wi-nature-14"
+      ],
+      "requiredSpatialCapabilityCodes": [
+        "ShelterInterior",
+        "SleepInteractionAnchor"
+      ],
+      "lhEngineHandoffStateCode": "ReadyForActualE5Input",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-15",
+      "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
+      "sequence": 15,
+      "title": "다음 날 거점 확장 계획 선택",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E7",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "EstablishedH3",
+      "highestEstablishedHLevelCode": "H3",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-home.v1"
+      ],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-shelter"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:산길-바위-길목",
+        "h1-expression:nature:숲-빈터-고사목"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:nature-defense-ring",
+        "h2-candidate:nature-home-core",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-threat-response",
+        "h2-candidate:nature-trail-shelter"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:nature-trail-network"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region",
+        "h4-blueprint:nature-water-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [
+        "binding:actual-e5:wi-nature-15"
+      ],
+      "requiredSpatialCapabilityCodes": [
+        "ShelterInterior"
+      ],
+      "lhEngineHandoffStateCode": "ReadyForActualE5Input",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-16",
+      "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
+      "sequence": 16,
+      "title": "현장 보급 꾸러미 제작",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E4",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "EstablishedH1",
+      "highestEstablishedHLevelCode": "H1",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-home.v1"
+      ],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "ActiveWorkReservationContext",
+        "CraftingWorkArea",
+        "ShelterInterior"
+      ],
+      "lhEngineHandoffStateCode": "ReadyForApprovedH1Input",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-17",
+      "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
+      "sequence": 17,
+      "title": "현장 보급 제작 업무 위임",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E4",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "EstablishedH1",
+      "highestEstablishedHLevelCode": "H1",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-home.v1"
+      ],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "ActiveWorkReservationContext",
+        "CraftingWorkArea"
+      ],
+      "lhEngineHandoffStateCode": "ReadyForApprovedH1Input",
+      "warningCodes": []
+    },
+    {
+      "worldInteractionId": "WI-NATURE-18",
+      "groupCode": "NATURE",
+      "groupDisplayName": "자연 탐사·생활 거점",
+      "sequence": 18,
+      "title": "벌목 통나무 줍기",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E7",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "EstablishedH3",
+      "highestEstablishedHLevelCode": "H3",
+      "approvedH1DefinitionRefs": [
+        "wi-spatial-seedbed:nature-survival-encounter.v1"
+      ],
+      "interactionH1CandidateRefs": [
+        "h1-stock:nature-exploration-buffer"
+      ],
+      "expressionH1CandidateRefs": [
+        "h1-expression:nature:산길-바위-길목",
+        "h1-expression:nature:숲-빈터-고사목"
+      ],
+      "h2CandidateRefs": [
+        "h2-candidate:forest-edge-farm",
+        "h2-candidate:nature-restoration-recovery",
+        "h2-candidate:nature-trail-shelter",
+        "h2-candidate:nature-water-buffer"
+      ],
+      "h3CandidateRefs": [
+        "h3-candidate:farm-incident-recovery",
+        "h3-candidate:farm-processing-campus",
+        "h3-candidate:highland-farm",
+        "h3-candidate:nature-exploration-buffer",
+        "h3-candidate:nature-home-encounter-defense",
+        "h3-candidate:nature-threat-recovery",
+        "h3-candidate:nature-town-relief-loop",
+        "h3-candidate:nature-trail-network"
+      ],
+      "h4CandidateRefs": [
+        "h4-blueprint:farm-hub-town-region",
+        "h4-blueprint:farm-production-processing-region",
+        "h4-blueprint:lowrise-market-region",
+        "h4-blueprint:nature-home-exploration-region",
+        "h4-blueprint:nature-water-region"
+      ],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [
+        "binding:actual-e5:wi-nature-18"
+      ],
+      "requiredSpatialCapabilityCodes": [
+        "DroppedTimberPickupAnchor",
+        "WorkerAccessible"
+      ],
+      "lhEngineHandoffStateCode": "ReadyForActualE5Input",
+      "warningCodes": []
+    },
+    {
       "worldInteractionId": "WI-ORDER-01",
       "groupCode": "ORDER",
+      "groupDisplayName": "주민 주문·소비",
       "sequence": 1,
-      "title": "주문 확정",
+      "title": "주민 주문 확정",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1707,8 +2285,9 @@
     {
       "worldInteractionId": "WI-ORDER-02",
       "groupCode": "ORDER",
+      "groupDisplayName": "주민 주문·소비",
       "sequence": 2,
-      "title": "주문 재고 예약",
+      "title": "주문 상품 재고 예약",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1731,8 +2310,9 @@
     {
       "worldInteractionId": "WI-ORDER-03",
       "groupCode": "ORDER",
+      "groupDisplayName": "주민 주문·소비",
       "sequence": 3,
-      "title": "주문 피킹",
+      "title": "주문 상품 피킹",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1775,8 +2355,9 @@
     {
       "worldInteractionId": "WI-ORDER-04",
       "groupCode": "ORDER",
+      "groupDisplayName": "주민 주문·소비",
       "sequence": 4,
-      "title": "주문 포장",
+      "title": "주문 상품 포장",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1818,8 +2399,9 @@
     {
       "worldInteractionId": "WI-ORDER-05",
       "groupCode": "ORDER",
+      "groupDisplayName": "주민 주문·소비",
       "sequence": 5,
-      "title": "수령 준비",
+      "title": "주문 상품 수령 준비",
       "interactionKindCode": "AutomaticTransition",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1867,8 +2449,9 @@
     {
       "worldInteractionId": "WI-ORDER-06",
       "groupCode": "ORDER",
+      "groupDisplayName": "주민 주문·소비",
       "sequence": 6,
-      "title": "주민 수령",
+      "title": "주민 주문 상품 수령",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1917,8 +2500,9 @@
     {
       "worldInteractionId": "WI-ORDER-07",
       "groupCode": "ORDER",
+      "groupDisplayName": "주민 주문·소비",
       "sequence": 7,
-      "title": "주민 소비",
+      "title": "주민 상품 소비",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -1962,10 +2546,41 @@
       "warningCodes": []
     },
     {
+      "worldInteractionId": "WI-REFLECT-01",
+      "groupCode": "REFLECT",
+      "groupDisplayName": "거점 성찰",
+      "sequence": 1,
+      "title": "승인 자료로 거점 성찰 확정",
+      "interactionKindCode": "Command",
+      "implementationEvidenceStage": "E3",
+      "integrationEvidenceStage": "E3",
+      "spatialParticipationCode": "Required",
+      "priorityCode": "P1",
+      "spatialDesignStateCode": "MissingRequired",
+      "highestEstablishedHLevelCode": "",
+      "approvedH1DefinitionRefs": [],
+      "interactionH1CandidateRefs": [],
+      "expressionH1CandidateRefs": [],
+      "h2CandidateRefs": [],
+      "h3CandidateRefs": [],
+      "h4CandidateRefs": [],
+      "graphBindingRefs": [],
+      "e5PlacementCandidateRefs": [],
+      "requiredSpatialCapabilityCodes": [
+        "ReflectionInteractionAnchor",
+        "ShelterInterior"
+      ],
+      "lhEngineHandoffStateCode": "BlockedMissingDesign",
+      "warningCodes": [
+        "RequiredSpatialDesignMissing"
+      ]
+    },
+    {
       "worldInteractionId": "WI-WORLD-01",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 1,
-      "title": "NPC 작업 배정",
+      "title": "NPC에게 반복 업무 배정",
       "interactionKindCode": "SharedPolicy",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2003,8 +2618,9 @@
     {
       "worldInteractionId": "WI-WORLD-02",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 2,
-      "title": "NPC 역량 위임",
+      "title": "NPC에게 업무 역량 위임",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2027,8 +2643,9 @@
     {
       "worldInteractionId": "WI-WORLD-03",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 3,
-      "title": "작업 취소",
+      "title": "진행 중 세계 업무 취소",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2051,8 +2668,9 @@
     {
       "worldInteractionId": "WI-WORLD-04",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 4,
-      "title": "시설 수리",
+      "title": "손상된 시설 수리",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2126,8 +2744,9 @@
     {
       "worldInteractionId": "WI-WORLD-05",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 5,
-      "title": "지역 발견",
+      "title": "새로운 지역 발견",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2205,8 +2824,9 @@
     {
       "worldInteractionId": "WI-WORLD-06",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 6,
-      "title": "역할 카드 장착",
+      "title": "일행 역할 카드 장착",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2229,8 +2849,9 @@
     {
       "worldInteractionId": "WI-WORLD-07",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 7,
-      "title": "활동 시작·종료",
+      "title": "세계 활동 상태 변경",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2294,8 +2915,9 @@
     {
       "worldInteractionId": "WI-WORLD-08",
       "groupCode": "WORLD",
+      "groupDisplayName": "공통 세계 운영",
       "sequence": 8,
-      "title": "턴 마감",
+      "title": "하루 운영 턴 마감",
       "interactionKindCode": "Command",
       "implementationEvidenceStage": "E3",
       "integrationEvidenceStage": "E1",
@@ -2327,5 +2949,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "60d0e84f72eac9377f98722c0bbd4c17ccbd3615ad69d3fb54d59df0a6e1d780"
+  "contentHashSha256": "b27489c1902b04801e818bff4a4a73c6b1205fc954d962e82590444e53e84d8a"
 }

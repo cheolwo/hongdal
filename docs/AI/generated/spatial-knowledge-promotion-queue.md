@@ -11,42 +11,42 @@
 | 5 | `H1` | `h1-stock:hub-long-term-storage` Hub 장기 보관 공간 | 사람 검토 우선 후보 |
 | 6 | `H1` | `h1-stock:hub-temporary-staging` Hub 임시 적치 공간 | 사람 검토 우선 후보 |
 | 7 | `H1` | `h1-stock:nature-emergency-retreat` 자연권 긴급 후퇴 길목 | 사람 검토 우선 후보 |
-| 8 | `H1` | `h1-stock:nature-incident-trace` 자연권 사건 흔적 조사 구역 | 사람 검토 우선 후보 |
-| 9 | `H1` | `h1-stock:nature-lookout` 자연 전망·관찰 공간 | 사람 검토 우선 후보 |
-| 10 | `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | 사람 검토 우선 후보 |
-| 11 | `H1` | `h1-stock:nature-safe-recovery-camp` 자연권 안전 회복 야영지 | 사람 검토 우선 후보 |
-| 12 | `H1` | `h1-stock:nature-shelter` 자연 임시 대피 공간 | 사람 검토 우선 후보 |
-| 13 | `H1` | `h1-stock:nature-threat-watch` 자연권 위협 관찰 초소 | 사람 검토 우선 후보 |
-| 14 | `H1` | `h1-stock:nature-trailhead` 자연 탐색 출발지 | 사람 검토 우선 후보 |
-| 15 | `H1` | `h1-stock:town-neighborhood-service` 근린 서비스 거점 | 사람 검토 우선 후보 |
-| 16 | `H1` | `h1-stock:town-staff-rest` 생활권 직원 휴게 공간 | 사람 검토 우선 후보 |
-| 17 | `H2` | `h2-candidate:farm-hub-corridor` Farm–Hub 회랑 블록 | 2/2 필수 H1 승인 참조 |
-| 18 | `H2` | `h2-candidate:farm-harvest-throughput` 농장 집중 수확·집하 블록 | 2/3 필수 H1 승인 참조 |
-| 19 | `H2` | `h2-candidate:farm-processing-shipping` 농장 작업·출하 블록 | 2/3 필수 H1 승인 참조 |
-| 20 | `H1` | `h1-stock:farm-exposure-inspection` 농장 수확물 노출 점검 공간 | 설계 보완 필요 |
-| 21 | `H1` | `h1-stock:farm-incident-quarantine` 농장 사고 수확물 격리 공간 | 설계 보완 필요 |
-| 22 | `H1` | `h1-stock:farm-loss-recovery` 농장 손실 복구·재작업 공간 | 설계 보완 필요 |
-| 23 | `H1` | `h1-stock:farm-restoration-supply` 농장 자연권 복구 자재 인계 공간 | 설계 보완 필요 |
-| 24 | `H1` | `h1-stock:farm-sorting` 농산물 선별 공간 | 설계 보완 필요 |
-| 25 | `H1` | `h1-stock:farm-washing` 농산물 세척 공간 | 설계 보완 필요 |
-| 26 | `H1` | `h1-stock:farm-weather-protection` 농장 기상 보호 적치 공간 | 설계 보완 필요 |
-| 27 | `H1` | `h1-stock:hub-cold-storage` Hub 저온 보관 공간 | 설계 보완 필요 |
-| 28 | `H1` | `h1-stock:hub-quarantine` Hub 검역·격리 공간 | 설계 보완 필요 |
-| 29 | `H1` | `h1-stock:hub-returns` Hub 반품 처리 공간 | 설계 보완 필요 |
-| 30 | `H1` | `h1-stock:town-cleanup-transfer` 생활권 정화·폐기 인계 공간 | 설계 보완 필요 |
-| 31 | `H1` | `h1-stock:town-contamination-inspection` 생활권 재고 오염 점검 공간 | 설계 보완 필요 |
-| 32 | `H1` | `h1-stock:town-contamination-quarantine` 생활권 오염 재고 격리 공간 | 설계 보완 필요 |
-| 33 | `H1` | `h1-stock:town-nature-relief` 생활권 자연권 지원 인계점 | 설계 보완 필요 |
-| 34 | `H1` | `h1-stock:town-recall-service` 생활권 회수·안내 창구 | 설계 보완 필요 |
-| 35 | `H1` | `h1-stock:town-returns` 마트 반품 접수 공간 | 설계 보완 필요 |
-| 36 | `H1` | `h1-stock:town-waste` 생활권 폐기물 처리 공간 | 설계 보완 필요 |
-| 37 | `H1` | `h1-stock:farm-maintenance-yard` 농장 시설 정비 공간 | 설계 보완 필요 |
-| 38 | `H1` | `h1-stock:hub-market-transfer` Hub–시장 화물 인계 공간 | 설계 보완 필요 |
-| 39 | `H1` | `h1-stock:hub-outbound-staging` Hub 피킹·출고 준비 공간 | 설계 보완 필요 |
-| 40 | `H1` | `h1-stock:hub-service-maintenance` Hub 시설 정비 공간 | 설계 보완 필요 |
-| 41 | `H1` | `h1-stock:hub-town-corridor` Hub–Town 물류 회랑 | 설계 보완 필요 |
-| 42 | `H1` | `h1-stock:hub-vehicle-yard` Hub 차량 상차·대기 공간 | 설계 보완 필요 |
-| 43 | `H1` | `h1-stock:nature-exploration-buffer` 자연 탐색·완충 공간 | 설계 보완 필요 |
+| 8 | `H1` | `h1-stock:nature-exploration-buffer` 자연 탐색·완충 공간 | 사람 검토 우선 후보 |
+| 9 | `H1` | `h1-stock:nature-incident-trace` 자연권 사건 흔적 조사 구역 | 사람 검토 우선 후보 |
+| 10 | `H1` | `h1-stock:nature-lookout` 자연 전망·관찰 공간 | 사람 검토 우선 후보 |
+| 11 | `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | 사람 검토 우선 후보 |
+| 12 | `H1` | `h1-stock:nature-safe-recovery-camp` 자연권 안전 회복 야영지 | 사람 검토 우선 후보 |
+| 13 | `H1` | `h1-stock:nature-shelter` 자연 임시 대피 공간 | 사람 검토 우선 후보 |
+| 14 | `H1` | `h1-stock:nature-threat-watch` 자연권 위협 관찰 초소 | 사람 검토 우선 후보 |
+| 15 | `H1` | `h1-stock:nature-trailhead` 자연 탐색 출발지 | 사람 검토 우선 후보 |
+| 16 | `H1` | `h1-stock:town-neighborhood-service` 근린 서비스 거점 | 사람 검토 우선 후보 |
+| 17 | `H1` | `h1-stock:town-staff-rest` 생활권 직원 휴게 공간 | 사람 검토 우선 후보 |
+| 18 | `H2` | `h2-candidate:farm-hub-corridor` Farm–Hub 회랑 블록 | 2/2 필수 H1 승인 참조 |
+| 19 | `H2` | `h2-candidate:hub-internal-warehouse` Hub 내부 입고·보관·출고 작업 블록 | 2/2 필수 H1 승인 참조 |
+| 20 | `H2` | `h2-candidate:farm-harvest-throughput` 농장 집중 수확·집하 블록 | 2/3 필수 H1 승인 참조 |
+| 21 | `H2` | `h2-candidate:farm-processing-shipping` 농장 작업·출하 블록 | 2/3 필수 H1 승인 참조 |
+| 22 | `H1` | `h1-stock:farm-exposure-inspection` 농장 수확물 노출 점검 공간 | 설계 보완 필요 |
+| 23 | `H1` | `h1-stock:farm-incident-quarantine` 농장 사고 수확물 격리 공간 | 설계 보완 필요 |
+| 24 | `H1` | `h1-stock:farm-loss-recovery` 농장 손실 복구·재작업 공간 | 설계 보완 필요 |
+| 25 | `H1` | `h1-stock:farm-restoration-supply` 농장 자연권 복구 자재 인계 공간 | 설계 보완 필요 |
+| 26 | `H1` | `h1-stock:farm-sorting` 농산물 선별 공간 | 설계 보완 필요 |
+| 27 | `H1` | `h1-stock:farm-washing` 농산물 세척 공간 | 설계 보완 필요 |
+| 28 | `H1` | `h1-stock:farm-weather-protection` 농장 기상 보호 적치 공간 | 설계 보완 필요 |
+| 29 | `H1` | `h1-stock:hub-cold-storage` Hub 저온 보관 공간 | 설계 보완 필요 |
+| 30 | `H1` | `h1-stock:hub-quarantine` Hub 검역·격리 공간 | 설계 보완 필요 |
+| 31 | `H1` | `h1-stock:hub-returns` Hub 반품 처리 공간 | 설계 보완 필요 |
+| 32 | `H1` | `h1-stock:town-cleanup-transfer` 생활권 정화·폐기 인계 공간 | 설계 보완 필요 |
+| 33 | `H1` | `h1-stock:town-contamination-inspection` 생활권 재고 오염 점검 공간 | 설계 보완 필요 |
+| 34 | `H1` | `h1-stock:town-contamination-quarantine` 생활권 오염 재고 격리 공간 | 설계 보완 필요 |
+| 35 | `H1` | `h1-stock:town-nature-relief` 생활권 자연권 지원 인계점 | 설계 보완 필요 |
+| 36 | `H1` | `h1-stock:town-recall-service` 생활권 회수·안내 창구 | 설계 보완 필요 |
+| 37 | `H1` | `h1-stock:town-returns` 마트 반품 접수 공간 | 설계 보완 필요 |
+| 38 | `H1` | `h1-stock:town-waste` 생활권 폐기물 처리 공간 | 설계 보완 필요 |
+| 39 | `H1` | `h1-stock:farm-maintenance-yard` 농장 시설 정비 공간 | 설계 보완 필요 |
+| 40 | `H1` | `h1-stock:hub-market-transfer` Hub–시장 화물 인계 공간 | 설계 보완 필요 |
+| 41 | `H1` | `h1-stock:hub-service-maintenance` Hub 시설 정비 공간 | 설계 보완 필요 |
+| 42 | `H1` | `h1-stock:hub-town-corridor` Hub–Town 물류 회랑 | 설계 보완 필요 |
+| 43 | `H1` | `h1-stock:hub-vehicle-yard` Hub 차량 상차·대기 공간 | 설계 보완 필요 |
 | 44 | `H1` | `h1-stock:nature-farm-edge` 숲 경계형 농장 전환 공간 | 설계 보완 필요 |
 | 45 | `H1` | `h1-stock:road-facility-access` 도로–시설 진입 전환 공간 | 설계 보완 필요 |
 | 46 | `H1` | `h1-stock:town-living-square` 생활권 작은 광장 | 설계 보완 필요 |
@@ -55,20 +55,20 @@
 | 49 | `H1` | `h1-stock:town-order-packing` 주문 포장 작업공간 | 설계 보완 필요 |
 | 50 | `H1` | `h1-stock:town-resident-pickup` 주민 수령 공간 | 설계 보완 필요 |
 | 51 | `H2` | `h2-candidate:highland-production` 고지대 생산 블록 | 1/2 필수 H1 승인 참조 |
-| 52 | `H2` | `h2-candidate:hub-inbound-storage` Hub 입고·창고 블록 | 1/2 필수 H1 승인 참조 |
-| 53 | `H2` | `h2-candidate:farm-irrigation-service` 농장 관수·급수 관리 블록 | 1/3 필수 H1 승인 참조 |
-| 54 | `H2` | `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | 1/3 필수 H1 승인 참조 |
-| 55 | `H2` | `h2-candidate:hub-quarantine-staging` Hub 검역·격리 블록 | 1/3 필수 H1 승인 참조 |
-| 56 | `H2` | `h2-candidate:farm-wash-sort-pack` 세척·선별·포장 블록 | 1/4 필수 H1 승인 참조 |
-| 57 | `H2` | `h2-candidate:farm-incident-containment` 농장 사건 점검·격리 블록 | 0/3 필수 H1 승인 참조 |
-| 58 | `H2` | `h2-candidate:farm-loss-restoration-handoff` 농장 손실 회복·복원 인계 블록 | 0/3 필수 H1 승인 참조 |
-| 59 | `H2` | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | 0/2 필수 H1 승인 참조 |
-| 60 | `H2` | `h2-candidate:farm-worker-support` 농가·작업지원 생활 블록 | 0/3 필수 H1 승인 참조 |
-| 61 | `H2` | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | 0/3 필수 H1 승인 참조 |
-| 62 | `H2` | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | 0/2 필수 H1 승인 참조 |
-| 63 | `H2` | `h2-candidate:hub-longterm-cold-storage` Hub 장기·저온 보관 블록 | 0/2 필수 H1 승인 참조 |
-| 64 | `H2` | `h2-candidate:hub-maintenance-yard` Hub 차량·시설 정비 블록 | 0/2 필수 H1 승인 참조 |
-| 65 | `H2` | `h2-candidate:hub-outbound-vehicle` Hub 출고·차량 블록 | 0/3 필수 H1 승인 참조 |
+| 52 | `H2` | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | 1/2 필수 H1 승인 참조 |
+| 53 | `H2` | `h2-candidate:hub-inbound-storage` Hub 입고·창고 블록 | 1/2 필수 H1 승인 참조 |
+| 54 | `H2` | `h2-candidate:farm-irrigation-service` 농장 관수·급수 관리 블록 | 1/3 필수 H1 승인 참조 |
+| 55 | `H2` | `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | 1/3 필수 H1 승인 참조 |
+| 56 | `H2` | `h2-candidate:hub-outbound-vehicle` Hub 출고·차량 블록 | 1/3 필수 H1 승인 참조 |
+| 57 | `H2` | `h2-candidate:hub-quarantine-staging` Hub 검역·격리 블록 | 1/3 필수 H1 승인 참조 |
+| 58 | `H2` | `h2-candidate:farm-wash-sort-pack` 세척·선별·포장 블록 | 1/4 필수 H1 승인 참조 |
+| 59 | `H2` | `h2-candidate:farm-incident-containment` 농장 사건 점검·격리 블록 | 0/3 필수 H1 승인 참조 |
+| 60 | `H2` | `h2-candidate:farm-loss-restoration-handoff` 농장 손실 회복·복원 인계 블록 | 0/3 필수 H1 승인 참조 |
+| 61 | `H2` | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | 0/2 필수 H1 승인 참조 |
+| 62 | `H2` | `h2-candidate:farm-worker-support` 농가·작업지원 생활 블록 | 0/3 필수 H1 승인 참조 |
+| 63 | `H2` | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | 0/3 필수 H1 승인 참조 |
+| 64 | `H2` | `h2-candidate:hub-longterm-cold-storage` Hub 장기·저온 보관 블록 | 0/2 필수 H1 승인 참조 |
+| 65 | `H2` | `h2-candidate:hub-maintenance-yard` Hub 차량·시설 정비 블록 | 0/2 필수 H1 승인 참조 |
 | 66 | `H2` | `h2-candidate:hub-returns-processing` Hub 반품 처리 블록 | 0/2 필수 H1 승인 참조 |
 | 67 | `H2` | `h2-candidate:hub-town-corridor` Hub–Town 회랑 블록 | 0/3 필수 H1 승인 참조 |
 | 68 | `H2` | `h2-candidate:lowrise-residential` 저층 주거 블록 | 0/2 필수 H1 승인 참조 |

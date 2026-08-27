@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
@@ -17,8 +17,8 @@ $write = & pwsh -NoProfile -File $manager -Mode Write
 $afterHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogPath).Hash
 $afterTicks = (Get-Item -LiteralPath $catalogPath).LastWriteTimeUtc.Ticks
 
-if ($check -notmatch "SpatialDesignKnowledgeValid:H1=52;H2=37;H3=20") { throw "SpatialDesignKnowledgeCheckFailed" }
-if ($write -notmatch "SpatialDesignKnowledgeGenerated:H1=52;H2=37;H3=20") { throw "SpatialDesignKnowledgeWriteFailed" }
+if ($check -notmatch "SpatialDesignKnowledgeValid:H1=52;H2=38;H3=20") { throw "SpatialDesignKnowledgeCheckFailed" }
+if ($write -notmatch "SpatialDesignKnowledgeGenerated:H1=52;H2=38;H3=20") { throw "SpatialDesignKnowledgeWriteFailed" }
 if ($beforeHash -ne $afterHash) { throw "SpatialDesignKnowledgeCatalogHashChangedWithoutInputChange" }
 if ($beforeTicks -ne $afterTicks) { throw "SpatialDesignKnowledgeCatalogWasRewrittenWithoutInputChange" }
 
@@ -28,8 +28,8 @@ $checkV3 = & pwsh -NoProfile -File $managerV3 -Mode Check
 $writeV3 = & pwsh -NoProfile -File $managerV3 -Mode Write
 $afterV3Hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogV3Path).Hash
 $afterV3Ticks = (Get-Item -LiteralPath $catalogV3Path).LastWriteTimeUtc.Ticks
-if ($checkV3 -notmatch "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=84\(52\+32\);H2=37;H3=20;H4=6") { throw "SpatialDesignKnowledgeV3CheckFailed" }
-if ($writeV3 -notmatch "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=84\(52\+32\);H2=37;H3=20;H4=6") { throw "SpatialDesignKnowledgeV3WriteFailed" }
+if ($checkV3 -notmatch "SpatialDesignKnowledgeV3Valid:Grammar=52/156;H1=84\(52\+32\);H2=38;H3=20;H4=6") { throw "SpatialDesignKnowledgeV3CheckFailed" }
+if ($writeV3 -notmatch "SpatialDesignKnowledgeV3Generated:Grammar=52/156;H1=84\(52\+32\);H2=38;H3=20;H4=6") { throw "SpatialDesignKnowledgeV3WriteFailed" }
 if ($beforeV3Hash -ne $afterV3Hash) { throw "SpatialDesignKnowledgeV3CatalogHashChangedWithoutInputChange" }
 if ($beforeV3Ticks -ne $afterV3Ticks) { throw "SpatialDesignKnowledgeV3CatalogWasRewrittenWithoutInputChange" }
 
@@ -133,4 +133,4 @@ foreach ($relation in @($areaSetPriority.interAreaSetRelations)) {
 }
 if (-not [bool] $areaSetPriority.authorityBoundary.h4CandidateIsNotActualAreaSet) { throw "SpatialDesignKnowledgeAreaSetAuthorityBoundaryMissing" }
 
-Write-Output "SpatialDesignKnowledgeTestsPassed:Grammar=52/156;H1=84(52+32);H2=37;H3=20;H4=6;PriorityH2=6;AreaSets=4"
+Write-Output "SpatialDesignKnowledgeTestsPassed:Grammar=52/156;H1=84(52+32);H2=38;H3=20;H4=6;PriorityH2=6;AreaSets=4"

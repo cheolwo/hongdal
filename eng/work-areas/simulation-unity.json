@@ -20,6 +20,8 @@
     "docs/Architecture/SsalddelCodeMetadata.md"
   ],
   "sourceRoots": [
+    "Ssalddel.Interior.Contracts",
+    "Ssalddel.Interior.Domain",
     "Ssalddel.Simulation.Contracts",
     "Ssalddel.Simulation.Domain",
     "Ssalddel.Simulation.Application",

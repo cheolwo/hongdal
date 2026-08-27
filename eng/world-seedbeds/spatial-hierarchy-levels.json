@@ -14,7 +14,7 @@
       "containsLevelCodes": [],
       "definitionSourceTypeCode": "SeedbedCatalog",
       "definitionSourcePath": "eng/world-seedbeds/wi-spatial-seedbeds/catalog.json",
-      "expectedCurrentDefinitionCount": 7,
+      "expectedCurrentDefinitionCount": 8,
       "currentInstancePolicyCode": "Defined",
       "judgmentSurfaceCode": "RecognizedSpatialPart",
       "boundary": "위치 독립적인 공간 부품의 의미·표현 후보·게임 맥락을 식별한다. H2 조합 입력에는 이 인지 수준이면 충분하며, 공식 WI 공간 능력·업무 용량 승인은 필요한 H1에만 별도로 적용한다. 실제 좌표·도로·Block·Graph를 소유하지 않는다."

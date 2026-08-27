@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "simulation-world-interaction-flows.v1",
+  "revision": "simulation-world-interaction-flows.r3",
+  "lastVerifiedDate": "2026-08-27",
+  "principles": {
+    "flowComposesWorldInteractionsWithoutOwningThem": true,
+    "worldInteractionCanParticipateInMultipleFlows": true,
+    "flowOrderDoesNotBecomeWorldInteractionIdentity": true,
+    "optionalAreaConnectorDoesNotCreateAreaDependency": true,
+    "loopsAndBranchesAreExplicit": true
+  },
+  "flowKindCodes": [
+    "IndependentAreaLoop",
+    "OptionalAreaConnector",
+    "BranchingAreaLoop"
+  ],
+  "flows": [
+    {
+      "flowStableId": "wi-flow:farm-production-internal.r1",
+      "title": "농장 내부 생산 흐름",
+      "flowKindCode": "IndependentAreaLoop",
+      "edges": [
+        { "fromWorldInteractionId": "WI-FARM-01", "toWorldInteractionId": "WI-FARM-02" },
+        { "fromWorldInteractionId": "WI-FARM-02", "toWorldInteractionId": "WI-FARM-03" },
+        { "fromWorldInteractionId": "WI-FARM-03", "toWorldInteractionId": "WI-FARM-04" },
+        { "fromWorldInteractionId": "WI-FARM-04", "toWorldInteractionId": "WI-FARM-05" },
+        { "fromWorldInteractionId": "WI-FARM-05", "toWorldInteractionId": "WI-FARM-06" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:farm-hub-transport-optional.r1",
+      "title": "농장과 물류 거점 선택 운송 흐름",
+      "flowKindCode": "OptionalAreaConnector",
+      "edges": [
+        { "fromWorldInteractionId": "WI-FARM-06", "toWorldInteractionId": "WI-LOG-01" },
+        { "fromWorldInteractionId": "WI-LOG-01", "toWorldInteractionId": "WI-LOG-02" },
+        { "fromWorldInteractionId": "WI-LOG-02", "toWorldInteractionId": "WI-LOG-03" },
+        { "fromWorldInteractionId": "WI-LOG-03", "toWorldInteractionId": "WI-LOG-04" },
+        { "fromWorldInteractionId": "WI-LOG-04", "toWorldInteractionId": "WI-LOG-05" },
+        { "fromWorldInteractionId": "WI-LOG-05", "toWorldInteractionId": "WI-001" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:hub-warehouse-internal.r1",
+      "title": "물류 거점 내부 창고 흐름",
+      "flowKindCode": "IndependentAreaLoop",
+      "edges": [
+        { "fromWorldInteractionId": "WI-001", "toWorldInteractionId": "WI-002" },
+        { "fromWorldInteractionId": "WI-002", "toWorldInteractionId": "WI-HUB-03" },
+        { "fromWorldInteractionId": "WI-HUB-03", "toWorldInteractionId": "WI-HUB-04" },
+        { "fromWorldInteractionId": "WI-HUB-04", "toWorldInteractionId": "WI-HUB-05" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:hub-market-connector-optional.r1",
+      "title": "물류 거점과 마트 선택 연결 흐름",
+      "flowKindCode": "OptionalAreaConnector",
+      "edges": [
+        { "fromWorldInteractionId": "WI-HUB-05", "toWorldInteractionId": "WI-HUB-06" },
+        { "fromWorldInteractionId": "WI-HUB-06", "toWorldInteractionId": "WI-MARKET-01" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:market-stock-internal.r1",
+      "title": "마트 내부 입고·진열 흐름",
+      "flowKindCode": "IndependentAreaLoop",
+      "edges": [
+        { "fromWorldInteractionId": "WI-MARKET-01", "toWorldInteractionId": "WI-MARKET-02" },
+        { "fromWorldInteractionId": "WI-MARKET-02", "toWorldInteractionId": "WI-MARKET-03" },
+        { "fromWorldInteractionId": "WI-MARKET-03", "toWorldInteractionId": "WI-MARKET-04" },
+        { "fromWorldInteractionId": "WI-MARKET-04", "toWorldInteractionId": "WI-MARKET-05" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:market-order-connector-optional.r1",
+      "title": "마트 진열과 주민 주문 선택 연결 흐름",
+      "flowKindCode": "OptionalAreaConnector",
+      "edges": [
+        { "fromWorldInteractionId": "WI-MARKET-05", "toWorldInteractionId": "WI-ORDER-01" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:resident-order-consumption.r1",
+      "title": "주민 주문·소비 내부 흐름",
+      "flowKindCode": "IndependentAreaLoop",
+      "edges": [
+        { "fromWorldInteractionId": "WI-ORDER-01", "toWorldInteractionId": "WI-ORDER-02" },
+        { "fromWorldInteractionId": "WI-ORDER-02", "toWorldInteractionId": "WI-ORDER-03" },
+        { "fromWorldInteractionId": "WI-ORDER-03", "toWorldInteractionId": "WI-ORDER-04" },
+        { "fromWorldInteractionId": "WI-ORDER-04", "toWorldInteractionId": "WI-ORDER-05" },
+        { "fromWorldInteractionId": "WI-ORDER-05", "toWorldInteractionId": "WI-ORDER-06" },
+        { "fromWorldInteractionId": "WI-ORDER-06", "toWorldInteractionId": "WI-ORDER-07" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:nature-threat-recovery.r1",
+      "title": "자연 위협 관찰·대응·회복 흐름",
+      "flowKindCode": "BranchingAreaLoop",
+      "edges": [
+        { "fromWorldInteractionId": "WI-NATURE-01", "toWorldInteractionId": "WI-NATURE-02" },
+        { "fromWorldInteractionId": "WI-NATURE-01", "toWorldInteractionId": "WI-NATURE-03" },
+        { "fromWorldInteractionId": "WI-NATURE-01", "toWorldInteractionId": "WI-NATURE-11" },
+        { "fromWorldInteractionId": "WI-NATURE-02", "toWorldInteractionId": "WI-NATURE-04" },
+        { "fromWorldInteractionId": "WI-NATURE-03", "toWorldInteractionId": "WI-NATURE-04" },
+        { "fromWorldInteractionId": "WI-NATURE-11", "toWorldInteractionId": "WI-NATURE-04" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:nature-home-survival.r1",
+      "title": "자연 생활 거점 생존 흐름",
+      "flowKindCode": "BranchingAreaLoop",
+      "edges": [
+        { "fromWorldInteractionId": "WI-NATURE-05", "toWorldInteractionId": "WI-ACTOR-02" },
+        { "fromWorldInteractionId": "WI-ACTOR-02", "toWorldInteractionId": "WI-NATURE-06" },
+        { "fromWorldInteractionId": "WI-NATURE-06", "toWorldInteractionId": "WI-NATURE-18" },
+        { "fromWorldInteractionId": "WI-NATURE-06", "toWorldInteractionId": "WI-NATURE-06" },
+        { "fromWorldInteractionId": "WI-NATURE-06", "toWorldInteractionId": "WI-NATURE-07" },
+        { "fromWorldInteractionId": "WI-NATURE-06", "toWorldInteractionId": "WI-NATURE-12" },
+        { "fromWorldInteractionId": "WI-NATURE-07", "toWorldInteractionId": "WI-NATURE-08" },
+        { "fromWorldInteractionId": "WI-NATURE-08", "toWorldInteractionId": "WI-NATURE-09" },
+        { "fromWorldInteractionId": "WI-NATURE-08", "toWorldInteractionId": "WI-NATURE-12" },
+        { "fromWorldInteractionId": "WI-NATURE-08", "toWorldInteractionId": "WI-NATURE-13" },
+        { "fromWorldInteractionId": "WI-NATURE-09", "toWorldInteractionId": "WI-NATURE-10" },
+        { "fromWorldInteractionId": "WI-NATURE-09", "toWorldInteractionId": "WI-NATURE-13" },
+        { "fromWorldInteractionId": "WI-NATURE-10", "toWorldInteractionId": "WI-NATURE-09" },
+        { "fromWorldInteractionId": "WI-NATURE-11", "toWorldInteractionId": "WI-NATURE-14" },
+        { "fromWorldInteractionId": "WI-NATURE-11", "toWorldInteractionId": "WI-NATURE-17" },
+        { "fromWorldInteractionId": "WI-NATURE-13", "toWorldInteractionId": "WI-NATURE-11" },
+        { "fromWorldInteractionId": "WI-NATURE-13", "toWorldInteractionId": "WI-NATURE-14" },
+        { "fromWorldInteractionId": "WI-NATURE-13", "toWorldInteractionId": "WI-NATURE-17" },
+        { "fromWorldInteractionId": "WI-NATURE-14", "toWorldInteractionId": "WI-NATURE-15" },
+        { "fromWorldInteractionId": "WI-NATURE-15", "toWorldInteractionId": "WI-CON-01" },
+        { "fromWorldInteractionId": "WI-NATURE-17", "toWorldInteractionId": "WI-NATURE-06" },
+        { "fromWorldInteractionId": "WI-NATURE-18", "toWorldInteractionId": "WI-NATURE-06" },
+        { "fromWorldInteractionId": "WI-NATURE-18", "toWorldInteractionId": "WI-NATURE-07" }
+      ]
+    },
+    {
+      "flowStableId": "wi-flow:city-service-internal.r1",
+      "title": "도심 서비스 내부 흐름",
+      "flowKindCode": "IndependentAreaLoop",
+      "edges": [
+        { "fromWorldInteractionId": "WI-CITY-01", "toWorldInteractionId": "WI-CITY-02" },
+        { "fromWorldInteractionId": "WI-CITY-02", "toWorldInteractionId": "WI-CITY-03" },
+        { "fromWorldInteractionId": "WI-CITY-03", "toWorldInteractionId": "WI-CITY-04" }
+      ]
+    }
+  ]
+}

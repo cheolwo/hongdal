@@ -1,7 +1,7 @@
 {
   "schemaVersion": "world-interaction-delivery-priorities.v1",
-  "revision": "world-interaction-delivery-priorities.r4",
-  "lastVerifiedDate": "2026-08-25",
+  "revision": "world-interaction-delivery-priorities.r21",
+  "lastVerifiedDate": "2026-08-27",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "wiEhStatusPath": "eng/world-seedbeds/generated/wi-eh-status.v1.json",
@@ -10,62 +10,45 @@
   "workInProgressLimit": 1,
   "defaultIndividualTargetEvidenceStage": "E7",
   "activeWork": {
-    "worldInteractionId": "WI-NATURE-05",
+    "worldInteractionId": "WI-ACTOR-02",
     "workStateCode": "Active",
-    "currentEvidenceStage": "E6",
+    "currentEvidenceStage": "E5",
     "targetEvidenceStage": "E7",
-    "startedReason": "플레이 시작점·승인 H1·Synty 도끼 표현과 Local 입력 골격이 준비된 첫 행동 단위다.",
+    "startedReason": "도구별 WI를 늘리기 전에 보편 장착 계약을 닫고 Nature 도끼의 획득→장착→벌목 입력 흐름을 현재 revision에서 재검증한다.",
     "stageReviews": [
       {
         "stageCode": "E4",
         "resultCode": "Passed",
-        "summary": "PlayerDriven 주체·도끼 대상·Tool 자원·즉시 시각·안전 빈터 ToolPickupPoint를 승인 H1과 결속했다.",
-        "evidenceRefs": [
-          "wi-spatial-seedbed:nature-survival-home.v1",
-          "spatial:actual-e5:wi-nature-05",
-          "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"
-        ]
+        "summary": "PlayerDriven Actor·고유 ItemInstance·8개 Slot·EquipmentRevision을 결속하고 보편 WI의 공간은 NotApplicable로 판정했다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json", "docs/Architecture/플레이어중심게임개발업무구조.md"]
       },
       {
         "stageCode": "E5",
         "resultCode": "Passed",
-        "summary": "읽기 전용 Preview, 멱등 Confirm, AxeOwned 결과, 후속 벌목 선택, 저장·복원 replay hash를 결정적 Fixture에서 검증했다.",
-        "evidenceRefs": [
-          "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs",
-          "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs",
-          "artifacts/local/validation/wi-nature-05-server-targeted"
-        ]
+        "summary": "Equip·Unequip·Swap, 장착 Capability, 벌목 허용·차단, v27 저장·Replay와 LocalProcess·RemoteHost 동등성을 확인했다.",
+        "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs", "eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"]
       },
       {
         "stageCode": "E6",
-        "resultCode": "Passed",
-        "summary": "도끼가 없어 벌목을 시작할 수 없는 문제, 안전 빈터에서 조준·왼쪽 입력으로 소유권을 얻는 선택, 즉시 결과와 저장 복원, 현실자료 미적용 경계를 정제했다.",
-        "evidenceRefs": [
-          "docs/Architecture/Nature생존생활거점세로조각.md",
-          "Assets/Synty/PolygonGeneric/Prefabs/Weapons/SM_Gen_Wep_Axe_01.prefab",
-          "asset:synty:polygon-generic:sm-gen-wep-axe-01"
-        ],
+        "resultCode": "Partial",
+        "summary": "I 장착 상태창·8개 슬롯·권위 Confirm·손 도끼 표현 코드와 Unity 소비 어셈블리 빌드는 통과했지만 실제 Test Runner와 화면은 차단됐다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json", "docs/Architecture/플레이어중심게임개발업무구조.md"],
         "refinement": {
-          "playerQuestion": "도끼가 없는 플레이어가 첫 벌목 전에 무엇을 보고 선택해야 하는가?",
-          "answer": "안전 빈터의 Synty 도끼를 직접 발견하고 도달 거리 안에서 조준한 뒤 왼쪽 버튼으로 확보한다.",
-          "costAndRisk": "자원 비용과 지속 Task는 없지만 도끼를 찾고 접근해야 하며 중복 획득과 오래된 revision은 차단된다.",
-          "feedback": "도끼 보유 상태, 기본 도끼 획득 안내, 공간에서 도끼 표현 제거로 결과를 즉시 읽는다.",
-          "returnOrNextChoice": "저장·재진입 후 보유 상태를 유지하고 WI-NATURE-06 벌목 시작을 다음 선택으로 연다.",
+          "playerQuestion": "획득한 도끼가 아직 장착되지 않았고 장착 뒤에만 벌목할 수 있음을 상태창과 세계 표현에서 이해할 수 있는가?",
+          "answer": "I 상태창에서 Inventory와 8개 슬롯을 나누고 MainHand Confirm 뒤 손 도끼와 벌목 능력을 함께 갱신한다.",
+          "costAndRisk": "Unity는 장착 결과나 능력을 계산하지 않고 Simulation 상태 사본을 표시한다.",
+          "feedback": "장착 전 벌목 차단 이유, 장착 슬롯, 손 도구와 해제 뒤 능력 상실을 구분한다.",
+          "returnOrNextChoice": "도끼를 장착해 벌목으로 진행하거나 해제·교체해 다른 도구 선택으로 돌아간다.",
           "realityGroundingCode": "NotApplied",
           "authorityCode": "SimulationCore",
-          "presentationBoundary": "Synty 자산은 표현 근거이며 도끼 효율이나 권위 규칙을 결정하지 않는다."
+          "presentationBoundary": "상태창·손 도구 GameObject는 EquipmentRevision과 Capability를 변경하지 않는다."
         }
       },
       {
         "stageCode": "E7",
-        "resultCode": "Partial",
-        "summary": "canonical SimulationWorldShell 실제 Input System 클릭·저장 재진입, 수동 Game View, LocalProcess와 Hosted HTTP의 replay hash 동등성은 통과했다. Console 오류는 0건이지만 기존 Missing Script 경고 10건과 외부 프로세스 RemoteHost 실행은 남아 있다.",
-        "evidenceRefs": [
-          "Assets/Ssalddel/Tests/PlayMode/Nature도끼확보E7PlayModeTests.cs",
-          "artifacts/local/validation/wi-nature-05-unity-playmode.xml",
-          "artifacts/local/validation/wi-nature-05-host-parity/wi-nature-05-host-parity.trx",
-          "Documentation/Changes/2026-08-25-wi-nature-05-e7/README.md"
-        ]
+        "resultCode": "Pending",
+        "summary": "실행 중 Unity Editor 때문에 획득→장착→벌목→해제 차단→저장 재진입의 실제 Test Runner·Play Mode·Game View·Console을 아직 검증하지 못했다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"]
       }
     ]
   },
@@ -104,6 +87,8 @@
       "WI-WORLD-02"
     ],
     "conditionalCodes": [
+      "WI-ACTOR-01",
+      "WI-ACTOR-02",
       "WI-FARM-01",
       "WI-FARM-02",
       "WI-FARM-03",
@@ -112,7 +97,7 @@
       "WI-FARM-06",
       "WI-WORLD-04"
     ],
-    "rule": "신뢰 Actor가 NpcActor인 WI는 E7 직후 WI별 E8 앵커를 닫는다. PlayerOrNpc WI는 NPC 실행 경로를 실제 활성화할 때만 E8을 요구한다."
+    "rule": "신뢰 Actor가 NpcActor인 WI도 먼저 소속 PlayableUnit의 E7을 닫는다. E8은 WI별 NPC 앵커가 아니라 그 PlayableUnit 전체의 반복 안정성을 검증하고, 다른 Core와의 NPC 생활 연속성은 E9 조화 후보에서 요구한다."
   },
   "principles": {
     "everyWorldInteractionAssignedExactlyOnce": true,
@@ -135,7 +120,7 @@
       "order": 1,
       "title": "Nature 행동 폐루프",
       "areaCode": "Nature",
-      "expectedWorldInteractionCount": 18,
+      "expectedWorldInteractionCount": 22,
       "entryRule": "현재 E5 황혼 대응부터 시작해 생활거점·Day2·현장 보급을 순서대로 닫는다.",
       "exitRule": "Nature 필수 Core가 E7 PlayClosed이고 선택 Extension의 상태가 별도로 표시된다."
     },
@@ -186,24 +171,28 @@
     }
   ],
   "items": [
-    { "worldInteractionId": "WI-NATURE-01", "deliveryWaveCode": "D1", "orderInWave": 8, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-02", "deliveryWaveCode": "D1", "orderInWave": 10, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-03", "deliveryWaveCode": "D1", "orderInWave": 11, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-04", "deliveryWaveCode": "D1", "orderInWave": 12, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-11", "deliveryWaveCode": "D1", "orderInWave": 9, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-05", "deliveryWaveCode": "D1", "orderInWave": 1, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-06", "deliveryWaveCode": "D1", "orderInWave": 2, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-07", "deliveryWaveCode": "D1", "orderInWave": 3, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },
-    { "worldInteractionId": "WI-NATURE-08", "deliveryWaveCode": "D1", "orderInWave": 4, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },
-    { "worldInteractionId": "WI-NATURE-09", "deliveryWaveCode": "D1", "orderInWave": 6, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-10", "deliveryWaveCode": "D1", "orderInWave": 7, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-12", "deliveryWaveCode": "D1", "orderInWave": 5, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },
-    { "worldInteractionId": "WI-NATURE-13", "deliveryWaveCode": "D1", "orderInWave": 13, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-night-day2.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-14", "deliveryWaveCode": "D1", "orderInWave": 14, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-night-day2.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-15", "deliveryWaveCode": "D1", "orderInWave": 15, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-night-day2.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-16", "deliveryWaveCode": "D1", "orderInWave": 17, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-field-supply-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-17", "deliveryWaveCode": "D1", "orderInWave": 18, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-field-supply-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-CON-01", "deliveryWaveCode": "D1", "orderInWave": 16, "completionRoleCode": "Shared", "playableLoopRefs": ["playable-loop:nature-workbench-foundation.v1", "playable-loop:nature-building-learning.v1", "playable-loop:farm-player-placement.v1"], "syntyTrackCode": "Construction" },
+    { "worldInteractionId": "WI-ACTOR-01", "deliveryWaveCode": "D1", "orderInWave": 1, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Shared" },
+    { "worldInteractionId": "WI-ACTOR-02", "deliveryWaveCode": "D1", "orderInWave": 2, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Shared" },
+    { "worldInteractionId": "WI-NATURE-01", "deliveryWaveCode": "D1", "orderInWave": 10, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-02", "deliveryWaveCode": "D1", "orderInWave": 12, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-03", "deliveryWaveCode": "D1", "orderInWave": 13, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-04", "deliveryWaveCode": "D1", "orderInWave": 14, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-11", "deliveryWaveCode": "D1", "orderInWave": 11, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-05", "deliveryWaveCode": "D1", "orderInWave": 3, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-06", "deliveryWaveCode": "D1", "orderInWave": 4, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-07", "deliveryWaveCode": "D1", "orderInWave": 5, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },
+    { "worldInteractionId": "WI-NATURE-08", "deliveryWaveCode": "D1", "orderInWave": 6, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },
+    { "worldInteractionId": "WI-NATURE-09", "deliveryWaveCode": "D1", "orderInWave": 8, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-10", "deliveryWaveCode": "D1", "orderInWave": 9, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-12", "deliveryWaveCode": "D1", "orderInWave": 7, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },
+    { "worldInteractionId": "WI-NATURE-13", "deliveryWaveCode": "D1", "orderInWave": 15, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-night-day2.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-14", "deliveryWaveCode": "D1", "orderInWave": 16, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-night-day2.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-15", "deliveryWaveCode": "D1", "orderInWave": 17, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-night-day2.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-16", "deliveryWaveCode": "D1", "orderInWave": 19, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-field-supply-return.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-17", "deliveryWaveCode": "D1", "orderInWave": 20, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-field-supply-return.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-18", "deliveryWaveCode": "D1", "orderInWave": 22, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-REFLECT-01", "deliveryWaveCode": "D1", "orderInWave": 21, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-base-reflection.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-CON-01", "deliveryWaveCode": "D1", "orderInWave": 18, "completionRoleCode": "Shared", "playableLoopRefs": ["playable-loop:nature-workbench-foundation.v1", "playable-loop:nature-building-learning.v1", "playable-loop:farm-player-placement.v1"], "syntyTrackCode": "Construction" },
 
     { "worldInteractionId": "WI-FARM-01", "deliveryWaveCode": "D2", "orderInWave": 1, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:farm-crop-cycle.v1"], "syntyTrackCode": "Farm" },
     { "worldInteractionId": "WI-FARM-02", "deliveryWaveCode": "D2", "orderInWave": 2, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:farm-crop-cycle.v1"], "syntyTrackCode": "Farm" },

@@ -2,19 +2,19 @@
   "schemaVersion": "simulation-world-theory-spatial-factory-output.v1",
   "revision": "simulation-world-theory-spatial-factory-output.r3",
   "policyRevision": "simulation-world-theory-spatial-factory-policy.r4",
-  "patternNamingRevision": "simulation-world-h-pattern-naming.r8",
+  "patternNamingRevision": "simulation-world-h-pattern-naming.r9",
   "semanticRelationRevision": "simulation-world-semantic-spatial-relations.r2",
   "generatedAtRuleCode": "DeterministicNoWallClock",
   "counts": {
     "h1Inputs": 52,
-    "h2TheoryQualified": 37,
+    "h2TheoryQualified": 38,
     "h3TheoryQualified": 20,
     "e5TheoryQualifiedAreaSets": 4,
     "theoryWorldQualified": 1,
     "authoredH2RecipesReused": 6,
-    "derivedH2Recipes": 31,
+    "derivedH2Recipes": 32,
     "authoredH2LayoutsReused": 6,
-    "derivedH2Layouts": 31,
+    "derivedH2Layouts": 32,
     "queuedExpansionOrRepairItems": 3,
     "semanticGapItems": 3
   },
@@ -1859,6 +1859,7 @@
           "z": 28.0,
           "wiIds": [
             "WI-NATURE-06",
+            "WI-NATURE-18",
             "WI-WORLD-05",
             "WI-WORLD-07"
           ],
@@ -1993,13 +1994,14 @@
         "WI-FARM-03",
         "WI-FARM-04",
         "WI-NATURE-06",
+        "WI-NATURE-18",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
       "anticipatedGameplayCodes": [
         "TimberHarvest"
       ],
-      "theoryHashSha256": "0ce7efa674fdbb760e00b57cb4b10c98d4b0d4bd6b261805bab5306f77bba960"
+      "theoryHashSha256": "f2d0d9ea433fece500104babc322ad6c3d9004863343599bfb7763a7c51eaf40"
     },
     {
       "h2StableId": "h2-candidate:highland-production",
@@ -2425,7 +2427,9 @@
             "HubOutboundStagingArea",
             "HubPickingArea"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "WorkArea"
+          ]
         },
         {
           "nodeId": "h1-hub-temporary-staging",
@@ -2536,7 +2540,7 @@
         "InboundStaging",
         "OutboundStaging"
       ],
-      "theoryHashSha256": "f0ba411d8eab45a4e70c98d4f1b6710f159887d155bd81629dd84ac1f32b3039"
+      "theoryHashSha256": "c118ab50fd575e4e93f34cc4ccb050e155ee552ab6bf87ab4a9b81e5f1af90b6"
     },
     {
       "h2StableId": "h2-candidate:hub-inbound-storage",
@@ -2706,6 +2710,182 @@
       ],
       "anticipatedGameplayCodes": [],
       "theoryHashSha256": "bbb0041090deeadab895e384145fdf7f54f954c98b41f36271622fc83ecf9190"
+    },
+    {
+      "h2StableId": "h2-candidate:hub-internal-warehouse",
+      "patternCode": "CITY-H2-WAREHOUSE-01",
+      "displayNameKo": "Hub 입고·보관·출고 통합 블록",
+      "spatialDisplayNameKo": "Hub 입고·보관·출고 통합 블록",
+      "gameplayProfileNameKo": "시티 허브 창고 패턴 01 — 내부 업무 폐루프형",
+      "leadPackCode": "City",
+      "supportPackCodes": [],
+      "compositionModeCode": "SinglePack",
+      "patternFamilyCode": "Warehouse",
+      "patternSequence": 1,
+      "resourceKindCode": "BlockPattern",
+      "title": "Hub 내부 입고·보관·출고 작업 블록",
+      "theoryStateCode": "TheoryQualified",
+      "structureQualificationCode": "StructureQualified",
+      "closureStateCode": "Closed",
+      "topologyCode": "ModifiedGrid",
+      "recipeSourceCode": "DerivedTheoryRecipe",
+      "placementContract": {
+        "resourceKindCode": "BlockPattern",
+        "placementUnitCode": "H2Block",
+        "placeableAsUnit": true,
+        "localCoordinateSystemCode": "LocalMeters",
+        "spatialFormCode": "StreetBlock",
+        "referenceBoundsMeters": {
+          "minimumX": -80.0,
+          "minimumZ": -80.0,
+          "maximumX": 80.0,
+          "maximumZ": 0.0,
+          "width": 160.0,
+          "depth": 80.0
+        },
+        "allowedRotationStepDegrees": 90,
+        "sizeVariantCodes": [
+          "Compact",
+          "Standard",
+          "Expanded"
+        ],
+        "connectionRoleCodes": [
+          "Egress",
+          "Ingress"
+        ]
+      },
+      "nodes": [
+        {
+          "nodeId": "h1-hub-outbound-staging",
+          "h1Ref": "h1-stock:hub-outbound-staging",
+          "x": 40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-HUB-03",
+            "WI-HUB-04",
+            "WI-HUB-05"
+          ],
+          "spatialRoleCodes": [
+            "HubOutboundStagingArea",
+            "HubPickingArea"
+          ],
+          "capacityConceptCodes": [
+            "WorkArea"
+          ]
+        },
+        {
+          "nodeId": "h1-hub-receiving-storage",
+          "h1Ref": "h1-stock:hub-receiving-storage",
+          "x": -40.0,
+          "z": -40.0,
+          "wiIds": [
+            "WI-001",
+            "WI-002",
+            "WI-LOG-04",
+            "WI-LOG-05"
+          ],
+          "spatialRoleCodes": [
+            "HubInspectionArea",
+            "HubStorageArea",
+            "HubUnloadingArea"
+          ],
+          "capacityConceptCodes": []
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "relation:h2-hub-internal-warehouse:e48be1d5a3a3b262",
+          "fromNodeId": "h1-hub-receiving-storage",
+          "toNodeId": "h1-hub-outbound-staging",
+          "relationCode": "CargoLogistics",
+          "relationDirectionCode": "Directed"
+        }
+      ],
+      "connectors": [
+        {
+          "connectorId": "connector:h2:hub-internal-warehouse:egress",
+          "roleCode": "Egress",
+          "attachedNodeId": "h1-hub-outbound-staging",
+          "directionCode": "Output",
+          "movementKindCodes": [
+            "CargoLogistics",
+            "PlayerTraversal",
+            "WorkTraversal"
+          ]
+        },
+        {
+          "connectorId": "connector:h2:hub-internal-warehouse:ingress",
+          "roleCode": "Ingress",
+          "attachedNodeId": "h1-hub-receiving-storage",
+          "directionCode": "Input",
+          "movementKindCodes": [
+            "CargoLogistics",
+            "PlayerTraversal",
+            "WorkTraversal"
+          ]
+        }
+      ],
+      "semanticRelations": [
+        {
+          "relationStableId": "relation:h2-hub-internal-warehouse:e48be1d5a3a3b262",
+          "relationCode": "h1-flow-1",
+          "fromRef": "h1-stock:hub-receiving-storage",
+          "fromConnectorRoleCode": "Output",
+          "toRef": "h1-stock:hub-outbound-staging",
+          "toConnectorRoleCode": "Input",
+          "relationKindCode": "CargoLogistics",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "exposedConnectors": [
+        {
+          "connectorStableId": "connector:h2:hub-internal-warehouse:egress",
+          "roleCode": "Egress",
+          "directionCode": "Output",
+          "movementKindCodes": [
+            "CargoLogistics",
+            "PlayerTraversal",
+            "WorkTraversal"
+          ],
+          "sourceChildRef": "h1-stock:hub-outbound-staging",
+          "sourceChildConnectorRoleCode": "Output",
+          "sourceChildConnectorStableId": "connector:h1:hub-outbound-staging:output"
+        },
+        {
+          "connectorStableId": "connector:h2:hub-internal-warehouse:ingress",
+          "roleCode": "Ingress",
+          "directionCode": "Input",
+          "movementKindCodes": [
+            "CargoLogistics",
+            "PlayerTraversal",
+            "WorkTraversal"
+          ],
+          "sourceChildRef": "h1-stock:hub-receiving-storage",
+          "sourceChildConnectorRoleCode": "Input",
+          "sourceChildConnectorStableId": "connector:h1:hub-receiving-storage:input"
+        }
+      ],
+      "flowRequirements": [
+        {
+          "flowRequirementStableId": "flow:h2:hub-internal-warehouse:ingress-egress",
+          "fromConnectorRoleCode": "Ingress",
+          "toConnectorRoleCode": "Egress",
+          "movementKindCode": "CargoLogistics"
+        }
+      ],
+      "unresolvedSemanticRelations": [],
+      "gameplayWiIds": [
+        "WI-001",
+        "WI-002",
+        "WI-HUB-03",
+        "WI-HUB-04",
+        "WI-HUB-05",
+        "WI-LOG-04",
+        "WI-LOG-05"
+      ],
+      "anticipatedGameplayCodes": [],
+      "theoryHashSha256": "0e259c0f2f2024c954d6abfb0ddb0c473af1a60402b76f4cd4de1c52b97d6bcf"
     },
     {
       "h2StableId": "h2-candidate:hub-longterm-cold-storage",
@@ -3108,7 +3288,9 @@
             "HubOutboundStagingArea",
             "HubPickingArea"
           ],
-          "capacityConceptCodes": []
+          "capacityConceptCodes": [
+            "WorkArea"
+          ]
         },
         {
           "nodeId": "h1-hub-vehicle-yard",
@@ -3236,7 +3418,7 @@
         "WI-MARKET-02"
       ],
       "anticipatedGameplayCodes": [],
-      "theoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
+      "theoryHashSha256": "e8d0e8b4db713adb3de88da78fb6018f7a26a2e0feedc3bdf23bb7a770bd3166"
     },
     {
       "h2StableId": "h2-candidate:hub-quarantine-staging",
@@ -4313,10 +4495,14 @@
           "x": -40.0,
           "z": 69.28,
           "wiIds": [
+            "WI-CON-01",
             "WI-NATURE-07",
             "WI-NATURE-08",
             "WI-NATURE-09",
             "WI-NATURE-10",
+            "WI-NATURE-13",
+            "WI-NATURE-14",
+            "WI-NATURE-15",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
@@ -4324,6 +4510,7 @@
           ],
           "capacityConceptCodes": [
             "BuildingSite",
+            "ContainerCapacity",
             "Material",
             "ShelterOccupancy",
             "WorkArea"
@@ -4452,12 +4639,16 @@
       ],
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
+        "WI-CON-01",
         "WI-NATURE-01",
         "WI-NATURE-04",
         "WI-NATURE-07",
         "WI-NATURE-08",
         "WI-NATURE-09",
         "WI-NATURE-10",
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
         "WI-WORLD-07"
       ],
       "anticipatedGameplayCodes": [
@@ -4471,7 +4662,7 @@
         "ThreatDebrief",
         "WeatherWait"
       ],
-      "theoryHashSha256": "220d38e430ac020f99bfeaa12d843b97c970badbeca733173321b5a06eccdb93"
+      "theoryHashSha256": "8aa2d37828fe0c21a1dd18486b540878afd6db16aa94ae5366f6e7786763d1dc"
     },
     {
       "h2StableId": "h2-candidate:nature-encounter-route",
@@ -4759,10 +4950,14 @@
           "x": -40.0,
           "z": 69.28,
           "wiIds": [
+            "WI-CON-01",
             "WI-NATURE-07",
             "WI-NATURE-08",
             "WI-NATURE-09",
             "WI-NATURE-10",
+            "WI-NATURE-13",
+            "WI-NATURE-14",
+            "WI-NATURE-15",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
@@ -4770,6 +4965,7 @@
           ],
           "capacityConceptCodes": [
             "BuildingSite",
+            "ContainerCapacity",
             "Material",
             "ShelterOccupancy",
             "WorkArea"
@@ -4900,12 +5096,16 @@
       ],
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
+        "WI-CON-01",
         "WI-NATURE-04",
         "WI-NATURE-05",
         "WI-NATURE-07",
         "WI-NATURE-08",
         "WI-NATURE-09",
         "WI-NATURE-10",
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
@@ -4920,7 +5120,7 @@
         "TrailStart",
         "WeatherWait"
       ],
-      "theoryHashSha256": "45a5874f29c694c5478205104ec578b4bb97079fbe04a9b7a6b3db1427c34759"
+      "theoryHashSha256": "c3308a264433db2a947cfa3a0bd4967bcf8075cf1120e0cb0567f523a40721ba"
     },
     {
       "h2StableId": "h2-candidate:nature-restoration-recovery",
@@ -5596,10 +5796,14 @@
           "x": 80.0,
           "z": -28.0,
           "wiIds": [
+            "WI-CON-01",
             "WI-NATURE-07",
             "WI-NATURE-08",
             "WI-NATURE-09",
             "WI-NATURE-10",
+            "WI-NATURE-13",
+            "WI-NATURE-14",
+            "WI-NATURE-15",
             "WI-WORLD-07"
           ],
           "spatialRoleCodes": [
@@ -5607,6 +5811,7 @@
           ],
           "capacityConceptCodes": [
             "BuildingSite",
+            "ContainerCapacity",
             "Material",
             "ShelterOccupancy",
             "WorkArea"
@@ -5737,11 +5942,15 @@
       ],
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
+        "WI-CON-01",
         "WI-NATURE-05",
         "WI-NATURE-07",
         "WI-NATURE-08",
         "WI-NATURE-09",
         "WI-NATURE-10",
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
@@ -5755,7 +5964,7 @@
         "TrailStart",
         "WeatherWait"
       ],
-      "theoryHashSha256": "2717cb75c737286e40998fe0f18c95f1bcab939ecbba47fb28b4d6fa7c1e13cb"
+      "theoryHashSha256": "838bec9f25cae78523e69dff7bd29ac4bf0c892eee3e41f0b921a107fa469e4b"
     },
     {
       "h2StableId": "h2-candidate:nature-water-buffer",
@@ -5808,6 +6017,7 @@
           "z": -28.0,
           "wiIds": [
             "WI-NATURE-06",
+            "WI-NATURE-18",
             "WI-WORLD-05",
             "WI-WORLD-07"
           ],
@@ -5924,13 +6134,14 @@
       "unresolvedSemanticRelations": [],
       "gameplayWiIds": [
         "WI-NATURE-06",
+        "WI-NATURE-18",
         "WI-WORLD-05",
         "WI-WORLD-07"
       ],
       "anticipatedGameplayCodes": [
         "TimberHarvest"
       ],
-      "theoryHashSha256": "205066d97f74eaad23ee763b6cfa37a6b70b767feab839f08556ef140acddccd"
+      "theoryHashSha256": "c3bc76e82dd10c950cea7f2ab281f1235d3ae1ee8a36446163a64186bc4fd752"
     },
     {
       "h2StableId": "h2-candidate:town-contamination-control",
@@ -8594,7 +8805,7 @@
           "h2DisplayNameKo": "숲 가장자리 경작지 블록",
           "x": 420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "0ce7efa674fdbb760e00b57cb4b10c98d4b0d4bd6b261805bab5306f77bba960"
+          "h2TheoryHashSha256": "f2d0d9ea433fece500104babc322ad6c3d9004863343599bfb7763a7c51eaf40"
         },
         {
           "nodeId": "h2-highland-production",
@@ -8731,7 +8942,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "856747014e2d06d827a079b436159a0f7ba791e5676285497f4c94f29f34aecf"
+      "theoryHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6"
     },
     {
       "h3StableId": "h3-candidate:hub-fulfillment-operations",
@@ -8784,7 +8995,7 @@
           "h2DisplayNameKo": "Hub 피킹·출고준비 작업 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "f0ba411d8eab45a4e70c98d4f1b6710f159887d155bd81629dd84ac1f32b3039"
+          "h2TheoryHashSha256": "c118ab50fd575e4e93f34cc4ccb050e155ee552ab6bf87ab4a9b81e5f1af90b6"
         },
         {
           "nodeId": "h2-hub-longterm-cold-storage",
@@ -8802,7 +9013,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
+          "h2TheoryHashSha256": "e8d0e8b4db713adb3de88da78fb6018f7a26a2e0feedc3bdf23bb7a770bd3166"
         }
       ],
       "edges": [
@@ -8978,7 +9189,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
+      "theoryHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590"
     },
     {
       "h3StableId": "h3-candidate:hub-maintenance-emergency-loop",
@@ -9049,7 +9260,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": -210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
+          "h2TheoryHashSha256": "e8d0e8b4db713adb3de88da78fb6018f7a26a2e0feedc3bdf23bb7a770bd3166"
         }
       ],
       "edges": [
@@ -9225,7 +9436,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
+      "theoryHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992"
     },
     {
       "h3StableId": "h3-candidate:hub-town-logistics",
@@ -9280,7 +9491,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": -420.0,
           "z": 0.0,
-          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
+          "h2TheoryHashSha256": "e8d0e8b4db713adb3de88da78fb6018f7a26a2e0feedc3bdf23bb7a770bd3166"
         },
         {
           "nodeId": "h2-hub-town-corridor",
@@ -9458,7 +9669,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "b1882fea91efcf4701256180c13769d804abd4a47c98329a6134bd4d75b5270e"
+      "theoryHashSha256": "3c30f82f2ec2d701e836b5f26c12cdf621665cc9179c6f98ac7e954d071e07e6"
     },
     {
       "h3StableId": "h3-candidate:jinbu-hub",
@@ -9519,7 +9730,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": 210.0,
           "z": -210.0,
-          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
+          "h2TheoryHashSha256": "e8d0e8b4db713adb3de88da78fb6018f7a26a2e0feedc3bdf23bb7a770bd3166"
         }
       ],
       "edges": [
@@ -9653,7 +9864,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
+      "theoryHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6"
     },
     {
       "h3StableId": "h3-candidate:lowrise-market-town",
@@ -9908,7 +10119,7 @@
           "h2DisplayNameKo": "숲 가장자리 경작지 블록",
           "x": 210.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "0ce7efa674fdbb760e00b57cb4b10c98d4b0d4bd6b261805bab5306f77bba960"
+          "h2TheoryHashSha256": "f2d0d9ea433fece500104babc322ad6c3d9004863343599bfb7763a7c51eaf40"
         },
         {
           "nodeId": "h2-nature-water-buffer",
@@ -9917,7 +10128,7 @@
           "h2DisplayNameKo": "산림·수변 완충지 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "205066d97f74eaad23ee763b6cfa37a6b70b767feab839f08556ef140acddccd"
+          "h2TheoryHashSha256": "c3bc76e82dd10c950cea7f2ab281f1235d3ae1ee8a36446163a64186bc4fd752"
         }
       ],
       "edges": [
@@ -10059,7 +10270,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "30746db6ea9946fa536e103f7d80e6cd6a7f988714a4fa0c1ff06f0a27d9698b"
+      "theoryHashSha256": "c565daa0c20b99fa04735ae64a852c89538a4e49da203c0f23868e51234a90df"
     },
     {
       "h3StableId": "h3-candidate:nature-home-encounter-defense",
@@ -10113,7 +10324,7 @@
           "h2DisplayNameKo": "방어환·야영지 블록",
           "x": 420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "220d38e430ac020f99bfeaa12d843b97c970badbeca733173321b5a06eccdb93"
+          "h2TheoryHashSha256": "8aa2d37828fe0c21a1dd18486b540878afd6db16aa94ae5366f6e7786763d1dc"
         },
         {
           "nodeId": "h2-nature-encounter-route",
@@ -10131,7 +10342,7 @@
           "h2DisplayNameKo": "안전 생활핵·보급 거점 블록",
           "x": -420.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "45a5874f29c694c5478205104ec578b4bb97079fbe04a9b7a6b3db1427c34759"
+          "h2TheoryHashSha256": "c3308a264433db2a947cfa3a0bd4967bcf8075cf1120e0cb0567f523a40721ba"
         }
       ],
       "edges": [
@@ -10367,7 +10578,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "4a67ab5e5ebd3eae7174a4c829a32d2de2e9e5878aa6c5445b59c4555c57fa3c"
+      "theoryHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41"
     },
     {
       "h3StableId": "h3-candidate:nature-threat-recovery",
@@ -10964,7 +11175,7 @@
           "h2DisplayNameKo": "탐색로·대피 쉼터 블록",
           "x": -210.0,
           "z": -147.0,
-          "h2TheoryHashSha256": "2717cb75c737286e40998fe0f18c95f1bcab939ecbba47fb28b4d6fa7c1e13cb"
+          "h2TheoryHashSha256": "838bec9f25cae78523e69dff7bd29ac4bf0c892eee3e41f0b921a107fa469e4b"
         },
         {
           "nodeId": "h2-nature-water-buffer",
@@ -10973,7 +11184,7 @@
           "h2DisplayNameKo": "산림·수변 완충지 블록",
           "x": 210.0,
           "z": 147.0,
-          "h2TheoryHashSha256": "205066d97f74eaad23ee763b6cfa37a6b70b767feab839f08556ef140acddccd"
+          "h2TheoryHashSha256": "c3bc76e82dd10c950cea7f2ab281f1235d3ae1ee8a36446163a64186bc4fd752"
         }
       ],
       "edges": [
@@ -11141,7 +11352,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "3688c13f9275c4175b6678bca269eadb079a31c9c91aa5bf82b3b7417b871c32"
+      "theoryHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d"
     },
     {
       "h3StableId": "h3-candidate:resilient-logistics-hub",
@@ -11214,7 +11425,7 @@
           "h2DisplayNameKo": "Hub 출고장·차량 대기 블록",
           "x": 210.0,
           "z": 210.0,
-          "h2TheoryHashSha256": "78ac2e7f7ea55f6c0952e75a0ec90e14d3d67a7d8da015dc7b3f82780856fb48"
+          "h2TheoryHashSha256": "e8d0e8b4db713adb3de88da78fb6018f7a26a2e0feedc3bdf23bb7a770bd3166"
         },
         {
           "nodeId": "h2-hub-quarantine-staging",
@@ -11417,7 +11628,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
+      "theoryHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5"
     },
     {
       "h3StableId": "h3-candidate:town-contamination-relief",
@@ -12270,7 +12481,7 @@
           "h3DisplayNameKo": "고지대 경작지·숲경계 구역",
           "x": -480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "856747014e2d06d827a079b436159a0f7ba791e5676285497f4c94f29f34aecf"
+          "h3TheoryHashSha256": "08dde21aa5d6b4c7ea5cffbe9d2531b8655003ca9978369b3a2c4316a5ed3ef6"
         }
       ],
       "graphRelations": [
@@ -12353,7 +12564,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "89852db21f218158ca6ddb8d9201687b2630a72355c78c86d6911c38b02a864d"
+      "theoryHashSha256": "96fb5a0bf52ee66f84068da0f9a0d3d11bd4d8cc07e8e9bc1bc00592a199e8cf"
     },
     {
       "areaSetStableId": "area-set:theory:logistics-hub-region",
@@ -12376,7 +12587,7 @@
           "h3DisplayNameKo": "Hub 보관·피킹·상차 운영 구역",
           "x": 480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
+          "h3TheoryHashSha256": "2403ee2ccf36859bfc67f3ce6fce37c4145a2798781664c7cc71b29cca576590"
         },
         {
           "graphInstanceStableId": "graph:theory:hub-maintenance-emergency-loop",
@@ -12385,7 +12596,7 @@
           "h3DisplayNameKo": "Hub 정비고·비상전력 구역",
           "x": -480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
+          "h3TheoryHashSha256": "b2ff4c5fa2c7fb19b0f07a51e0a3f60f0b15e12867dd5d1357b51d3184e43992"
         },
         {
           "graphInstanceStableId": "graph:theory:jinbu-hub",
@@ -12394,7 +12605,7 @@
           "h3DisplayNameKo": "Hub 입고장·창고·출고장 구역",
           "x": -480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
+          "h3TheoryHashSha256": "ed40e0d54781c6370dcf7fb862f851435d46de3ae51a75e1db4faa8c7569dde6"
         },
         {
           "graphInstanceStableId": "graph:theory:resilient-logistics-hub",
@@ -12403,7 +12614,7 @@
           "h3DisplayNameKo": "Hub 검역장·저온창고 구역",
           "x": 480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
+          "h3TheoryHashSha256": "79796dfa9f0b6f34ae4805eaab0903ec1a2e736b79c9a35d82b40e20d984f1c5"
         }
       ],
       "graphRelations": [
@@ -12503,7 +12714,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "8874d65180d8ac52de68c973adfc6b0bfe072dd64fb06f9e8157a685c989989b"
+      "theoryHashSha256": "937cc2523811d2383ac435a34e2c6c04f7830490e832966e085ede61a5a417b5"
     },
     {
       "areaSetStableId": "area-set:theory:lowrise-market-region",
@@ -12678,7 +12889,7 @@
           "h3DisplayNameKo": "생활핵·조우로·방어환 구역",
           "x": -480.0,
           "z": 480.0,
-          "h3TheoryHashSha256": "4a67ab5e5ebd3eae7174a4c829a32d2de2e9e5878aa6c5445b59c4555c57fa3c"
+          "h3TheoryHashSha256": "1a582ec92eb0bec4bad78d061f17de524b1269a3d225ca78288cb1061742fb41"
         },
         {
           "graphInstanceStableId": "graph:theory:nature-threat-recovery",
@@ -12696,7 +12907,7 @@
           "h3DisplayNameKo": "탐색로·대피망 구역",
           "x": 480.0,
           "z": -480.0,
-          "h3TheoryHashSha256": "3688c13f9275c4175b6678bca269eadb079a31c9c91aa5bf82b3b7417b871c32"
+          "h3TheoryHashSha256": "07081e8e826f180d748211f2d9d4a3f65df48a0b6303096d8b84235ee279c45d"
         }
       ],
       "graphRelations": [
@@ -12758,7 +12969,7 @@
         }
       ],
       "unresolvedSemanticRelations": [],
-      "theoryHashSha256": "a1c17673d189a66caf589cfeb6f04aa28d60b2d881bb25fbf47c678581e50f56"
+      "theoryHashSha256": "5c0fbd02bf590ecc24ec6717d483f0e38c0a1443d60e6474738928f2e966b617"
     }
   ],
   "theoryWorld": {

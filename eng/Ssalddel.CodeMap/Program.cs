@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Interior.Contracts;
+using Ssalddel.Interior.Domain;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
@@ -20,6 +22,8 @@ var manifest = JsonSerializer.Deserialize<WorkAreaManifest>(
 
 var assemblies = new[]
 {
+    typeof(I실내공간조립Engine).Assembly,
+    typeof(DeterministicInteriorLayoutEngine).Assembly,
     typeof(경영SimulationSession생성Request).Assembly,
     typeof(경영SimulationSessionAggregate).Assembly,
     typeof(경영SimulationSession생명주기Service).Assembly,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-gameplay-led-h-policy.v1",
-  "revision": "simulation-world-gameplay-led-h-policy.r7",
+  "revision": "simulation-world-gameplay-led-h-policy.r8",
   "title": "게임 기획 주도 H 공간 재고 정책",
   "principle": "게임 기획이 H 재고의 범위를 통제하고, H가 WI가 일어날 공간을 제공하며, E가 그 결합의 검증 깊이를 기록한다.",
   "areaSetPriorityPath": "eng/world-seedbeds/synty-bottom-up-inventory/area-set-composition-priorities.v1.json",
@@ -126,8 +126,8 @@
       "priorityCode": "E-P4",
       "title": "Nature 생활·탐사·사건 공간 모판 재검증",
       "evidenceTrackCode": "Integration",
-      "targetStageCode": "E4",
-      "wiIds": ["WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12"],
+      "targetStageCode": "E7",
+      "wiIds": ["WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-18", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12"],
       "completionStateCode": "SeedbedValidated"
     },
     {
