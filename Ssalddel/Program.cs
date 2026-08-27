@@ -234,6 +234,7 @@ builder.Services.AddAgriculturalFisheriesInformationModule();
 builder.Services.AddHongikAcademyContentMapModule();
 builder.Services.AddSsalddelHttpClients();
 builder.Services.AddApifyAmazonProductResearch(builder.Configuration);
+builder.Services.AddApifyInteriorProductObservation(builder.Configuration);
 builder.Services.AddApifySocialMediaResearch(builder.Configuration);
 builder.Services.AddApifyYouTubeContentCollection(builder.Configuration);
 builder.Services.AddFreeSocialMediaResearch(builder.Configuration);

@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.Interior.Contracts\Ssalddel.Interior.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.Interior.Domain\Ssalddel.Interior.Domain.csproj" />
     <ProjectReference Include="..\Ssalddel.Community\Ssalddel.Community.csproj" />
     <ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
     <ProjectReference Include="..\Ssalddel.Domain\Ssalddel.Domain.csproj" />
