@@ -55,7 +55,7 @@ public sealed class SimulationWorldInteractionMaturityTests
     }
 
     [Fact]
-    public void 공통E단계Module은_E1부터E9까지_한국어역할을노출한다()
+    public void 공통E단계Module은_E1부터E10까지_현재증거주체역할을노출한다()
     {
         var expected = new[]
         {
@@ -66,8 +66,9 @@ public sealed class SimulationWorldInteractionMaturityTests
             (SsalddelEvidenceStage.E5, "E5세계발현Module", typeof(IE5세계발현Module)),
             (SsalddelEvidenceStage.E6, "E6세계정제Module", typeof(IE6세계정제Module)),
             (SsalddelEvidenceStage.E7, "E7플레이경험폐루프Module", typeof(IE7플레이경험폐루프Module)),
-            (SsalddelEvidenceStage.E8, "E8생활연속성Module", typeof(IE8생활연속성Module)),
-            (SsalddelEvidenceStage.E9, "E9변화봉투Module", typeof(IE9변화봉투Module)),
+            (SsalddelEvidenceStage.E8, "E8영역폐루프조화Module", typeof(IE8영역폐루프조화Module)),
+            (SsalddelEvidenceStage.E9, "E9사람통합플레이개선Module", typeof(IE9사람통합플레이개선Module)),
+            (SsalddelEvidenceStage.E10, "E10제한운영검증Module", typeof(IE10제한운영검증Module)),
         };
 
         Assert.Equal(expected.Select(item => (item.Item1, item.Item2)),
@@ -75,6 +76,55 @@ public sealed class SimulationWorldInteractionMaturityTests
                 (item.EvidenceStage, item.TechnicalName)));
         Assert.All(expected, item =>
             Assert.Contains(typeof(IE단계Module), item.Item3.GetInterfaces()));
+
+        Assert.Contains(typeof(IE단계Module),
+            typeof(IE8생활연속성Module).GetInterfaces());
+        Assert.Contains(typeof(IE단계Module),
+            typeof(IE9변화봉투Module).GetInterfaces());
+        Assert.Equal(new[] { "NPC 생활세계 폐루프", "변화 적응형 세계" },
+            SsalddelLegacyEvidenceStageDefinitionCatalog.E8AndE9
+                .Select(value => value.KoreanName));
+    }
+
+    [Fact]
+    public void E단계Handle은_증거모델과주체를함께요구한다()
+    {
+        var unit = new SsalddelEvidenceStageHandle(
+            SsalddelEvidenceModelRevisions.Current,
+            SsalddelEvidenceStage.E7,
+            SsalddelEvidenceSubjectKind.PlayableUnit);
+        var harmony = new SsalddelEvidenceStageHandle(
+            SsalddelEvidenceModelRevisions.Current,
+            SsalddelEvidenceStage.E8,
+            SsalddelEvidenceSubjectKind.AreaHarmonySet);
+
+        Assert.Equal(SsalddelEvidenceStage.E7, unit.EvidenceStage);
+        Assert.Equal(SsalddelEvidenceSubjectKind.AreaHarmonySet,
+            harmony.SubjectKind);
+        Assert.Throws<ArgumentException>(() => new SsalddelEvidenceStageHandle(
+            "", SsalddelEvidenceStage.E8,
+            SsalddelEvidenceSubjectKind.AreaHarmonySet));
+        Assert.Throws<ArgumentException>(() => new SsalddelEvidenceStageHandle(
+            SsalddelEvidenceModelRevisions.Current,
+            SsalddelEvidenceStage.E8,
+            SsalddelEvidenceSubjectKind.PlayableUnit));
+        Assert.Throws<ArgumentException>(() => new SsalddelEvidenceStageHandle(
+            SsalddelEvidenceModelRevisions.Current,
+            SsalddelEvidenceStage.E9,
+            SsalddelEvidenceSubjectKind.AreaHarmonySet));
+
+        var human = new SsalddelEvidenceStageHandle(
+            SsalddelEvidenceModelRevisions.Current,
+            SsalddelEvidenceStage.E9,
+            SsalddelEvidenceSubjectKind.HumanPlaytestCampaign);
+        var operation = new SsalddelEvidenceStageHandle(
+            SsalddelEvidenceModelRevisions.Current,
+            SsalddelEvidenceStage.E10,
+            SsalddelEvidenceSubjectKind.LimitedOperationWindow);
+        Assert.Equal(SsalddelEvidenceSubjectKind.HumanPlaytestCampaign,
+            human.SubjectKind);
+        Assert.Equal(SsalddelEvidenceSubjectKind.LimitedOperationWindow,
+            operation.SubjectKind);
     }
 
     [Fact]
@@ -103,6 +153,16 @@ public sealed class SimulationWorldInteractionMaturityTests
 
         Assert.Equal(SimulationWorldInteractionMaturityStateCodes.ContextBound,
             result.StateCode);
+        Assert.Equal("익은 농작물 수확", result.WorldInteractionName);
+        Assert.Equal("농장 생산 · 익은 농작물 수확 (WI-FARM-04)",
+            result.WorldInteractionDisplayName);
+        Assert.Equal("ActorIntent", result.ResponsibilityKindCode);
+        Assert.Equal("HarvestLotCreated", result.PrimaryOutcomeCode);
+        Assert.Equal("AtomicBundle",
+            result.SingleResponsibilityAssessmentCode);
+        Assert.Equal(SimulationWI음양Codes.Yang,
+            result.음양분류Code);
+        Assert.Equal("Fixed", result.음양판정방식Code);
         Assert.Empty(result.MissingContextCodes);
     }
 
@@ -201,6 +261,81 @@ public sealed class SimulationWorldInteractionMaturityTests
     }
 
     [Fact]
+    public void WI_64개는_발생원과별개로_원천과조작정책을_분류한다()
+    {
+        using var document = JsonDocument.Parse(File.ReadAllText(
+            SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog));
+        var items = document.RootElement.GetProperty("items")
+            .EnumerateArray().ToArray();
+
+        Assert.Equal(64, items.Length);
+        Assert.All(items, item =>
+        {
+            Assert.Contains(item.GetProperty("originCode").GetString(),
+                SimulationWorldInteractionOriginCodes.All);
+            Assert.Contains(item.GetProperty("controlPolicyCode").GetString(),
+                SimulationWorldInteractionControlPolicyCodes.All);
+        });
+        Assert.All(items.Where(item =>
+            (item.GetProperty("groupCode").GetString()
+                is "HUB" or "MARKET" or "ORDER" or "LOG" or "CITY")
+            && item.GetProperty("kind").GetString() == "Command"), item =>
+            Assert.Equal(SimulationWorldInteractionControlPolicyCodes.NpcRoutine,
+                item.GetProperty("controlPolicyCode").GetString()));
+        Assert.All(items.Where(item => item.GetProperty("groupCode").GetString()
+            == "FARM"), item => Assert.Equal(
+                SimulationWorldInteractionControlPolicyCodes.PlayerOrNpc,
+                item.GetProperty("controlPolicyCode").GetString()));
+    }
+
+    [Fact]
+    public void WI_64개는_절차단계대신_한국어기능명과단일책임을노출한다()
+    {
+        using var document = JsonDocument.Parse(File.ReadAllText(
+            SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog));
+        var root = document.RootElement;
+        var items = root.GetProperty("items").EnumerateArray().ToArray();
+
+        Assert.Equal(64, Simulation세계상호작용이름Catalog.All.Count);
+        Assert.Equal(64, items.Length);
+        foreach (var item in items)
+        {
+            var id = item.GetProperty("id").GetString()!;
+            var title = item.GetProperty("title").GetString()!;
+            var groupCode = item.GetProperty("groupCode").GetString()!;
+            var groupName = root.GetProperty("groupDisplayNames")
+                .GetProperty(groupCode).GetString()!;
+            var sequence = item.GetProperty("sequence").GetInt32();
+            var definition = Assert.IsType<Simulation세계상호작용이름Definition>(
+                Simulation세계상호작용이름Catalog.Find(id));
+
+            Assert.Matches("[가-힣]", title);
+            Assert.Equal(title, definition.한국어기능명);
+            Assert.Equal(groupName, definition.한국어작업군명);
+            Assert.Equal(sequence, definition.대장순번);
+            Assert.False(string.IsNullOrWhiteSpace(definition.책임종류코드));
+            Assert.False(string.IsNullOrWhiteSpace(definition.주요결과코드));
+            Assert.False(string.IsNullOrWhiteSpace(definition.단일책임판정코드));
+            Assert.Equal($"{groupName} · {title} ({id})",
+                definition.한국어표시명);
+        }
+
+        Assert.Equal("LegacyCompositeMigrationRequired",
+            Simulation세계상호작용이름Catalog.Find("WI-NATURE-11")!
+                .단일책임판정코드);
+        Assert.Equal("ProceduralStepMigrationRequired",
+            Simulation세계상호작용이름Catalog.Find("WI-LOG-03")!
+                .단일책임판정코드);
+        Assert.Equal("ActorResponsibilityMigrationRequired",
+            Simulation세계상호작용이름Catalog.Find("WI-HUB-04")!
+                .단일책임판정코드);
+
+        Assert.Equal("알 수 없는 세계 상호작용 (WI-UNKNOWN-01)",
+            Simulation세계상호작용이름Catalog
+                .한국어표시명("WI-UNKNOWN-01"));
+    }
+
+    [Fact]
     public void 허용되지않은발생원은_실행인스턴스에서거부된다()
     {
         var invocation = SimulationWorldInteractionMaturityService.FromWorldDerived(
@@ -232,6 +367,119 @@ public sealed class SimulationWorldInteractionMaturityTests
         Assert.Equal(source.TriggerSourceCode, restored!.TriggerSourceCode);
         Assert.Equal(source.InitiatorStableId, restored.InitiatorStableId);
         Assert.Equal(source.ActorStableId, restored.ActorStableId);
+    }
+
+    [Fact]
+    public void 같은양WI도_실제수행주체에따라_플레이어와NPC사분면이갈린다()
+    {
+        var player = SimulationWorldInteractionMaturityService.FromPlayer(
+            "WI-FARM-04", "player:1", "actor:player:1");
+        var npc = SimulationWorldInteractionMaturityService.FromNpc(
+            "WI-FARM-04", "npc:worker:1", "actor:npc:worker:1");
+
+        Assert.Equal(SimulationWI사분면Codes.YangPlayer,
+            player.음양주체분류.사분면Code);
+        Assert.Equal("++", player.음양주체분류.사분면기호);
+        Assert.Equal(SimulationWI사분면Codes.YangNpc,
+            npc.음양주체분류.사분면Code);
+        Assert.Equal("+-", npc.음양주체분류.사분면기호);
+    }
+
+    [Fact]
+    public void 발생원이플레이어여도_NPC가수행하면_두번째부호는NPC다()
+    {
+        var delegated = SimulationWorldInteractionMaturityService
+            .FromPlayerDelegatedToNpc(
+                "WI-ORDER-01", "player:manager:1", "npc:clerk:1");
+
+        Assert.Equal(
+            SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
+            delegated.TriggerSourceCode);
+        Assert.Equal(SimulationWI수행주체Codes.NpcActor,
+            delegated.음양주체분류.수행주체Code);
+        Assert.Equal(SimulationWI사분면Codes.YinNpc,
+            delegated.음양주체분류.사분면Code);
+        Assert.Equal("--", delegated.음양주체분류.사분면기호);
+    }
+
+    [Fact]
+    public void Actor전환대상도_신뢰NpcActor가있으면_발생원과무관하게NPC부호다()
+    {
+        var delegated = SimulationWorldInteractionMaturityService
+            .FromPlayerDelegatedToNpc(
+                "WI-HUB-04", "player:manager:1", "npc:picker:1");
+
+        Assert.Equal(
+            SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
+            delegated.TriggerSourceCode);
+        Assert.Equal(SimulationWI사분면Codes.YangNpc,
+            delegated.음양주체분류.사분면Code);
+        Assert.Equal("+-", delegated.음양주체분류.사분면기호);
+    }
+
+    [Fact]
+    public void 음WI의플레이어실행과_자동전이는_사분면포함여부가갈린다()
+    {
+        var player = SimulationWorldInteractionMaturityService.FromPlayer(
+            "WI-NATURE-15", "player:1", "actor:player:1");
+        var automatic = SimulationWorldInteractionMaturityService
+            .FromWorldDerived("WI-CITY-02", "rule:city-allocation.r1");
+
+        Assert.Equal(SimulationWI사분면Codes.YinPlayer,
+            player.음양주체분류.사분면Code);
+        Assert.Equal("-+", player.음양주체분류.사분면기호);
+        Assert.Equal(SimulationWI사분면Codes.NotApplicable,
+            automatic.음양주체분류.사분면Code);
+        Assert.Empty(automatic.음양주체분류.사분면기호);
+    }
+
+    [Fact]
+    public void 문맥형WI는_승인된PlayableLoop에서만_음양을확정한다()
+    {
+        var approved = SimulationWorldInteractionMaturityService.FromPlayer(
+            "WI-NATURE-03", "player:1", "actor:player:1",
+            "playable-loop:nature-twilight-return.v1");
+        var missing = SimulationWorldInteractionMaturityService.FromPlayer(
+            "WI-NATURE-03", "player:1", "actor:player:1");
+
+        Assert.Equal(SimulationWI사분면Codes.YangPlayer,
+            approved.음양주체분류.사분면Code);
+        Assert.Equal("++", approved.음양주체분류.사분면기호);
+        Assert.Equal(SimulationWI사분면Codes.Unclassified,
+            missing.음양주체분류.사분면Code);
+    }
+
+    [Fact]
+    public void 실행중음양사분면Snapshot변조는_E5검토에서거부된다()
+    {
+        var invocation = SimulationWorldInteractionMaturityService.FromPlayer(
+            "WI-NATURE-03", "player:1", "actor:player:1",
+            "playable-loop:nature-twilight-return.v1");
+        invocation.음양주체분류.사분면Code =
+            SimulationWI사분면Codes.YinPlayer;
+
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            service.ReviewE5(new SimulationWorldInteractionE5ManifestationReviewRequest
+            {
+                Definition = new SimulationWorldInteractionDefinitionContext
+                {
+                    WorldInteractionId = "WI-NATURE-03",
+                    AllowedTriggerSourceCodes = new[]
+                    {
+                        SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
+                    },
+                    RequiredContextCodes = Array.Empty<string>(),
+                    SpatialApplicabilityCode =
+                        SimulationWorldInteractionSpatialEvidenceCodes.Required,
+                },
+                E4StateCode =
+                    SimulationWorldInteractionMaturityStateCodes.ContextBound,
+                Invocation = invocation,
+                SpatialEvidenceStateCode =
+                    SimulationWorldInteractionSpatialEvidenceCodes.Bound,
+            }));
+
+        Assert.Equal("WorldInteractionPolaritySnapshotInvalid", error.Message);
     }
 
     [Fact]

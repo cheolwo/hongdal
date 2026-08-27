@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Ssalddel.Simulation.Contracts;
+using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Application
 {
@@ -130,6 +131,12 @@ namespace Ssalddel.Simulation.Application
                 {
                     var card = state.Cards.Single(value => value.CardCopyStableId ==
                         slot.CardCopyStableId);
+                    if (loadout.CombatControlModeCode ==
+                        SimulationTeamRoleCardCodes.ObserverOperation)
+                    {
+                        AddObserverModifier(values, state, card, loadout, slot.SlotCode);
+                        continue;
+                    }
                     foreach (var role in card.ActivityRoleCodes.OrderBy(value => value,
                                  StringComparer.Ordinal))
                     {
@@ -172,6 +179,50 @@ namespace Ssalddel.Simulation.Application
             }
             return values.OrderBy(value => value.CardCopyStableId, StringComparer.Ordinal)
                 .ThenBy(value => value.ModifierCode, StringComparer.Ordinal).ToArray();
+        }
+
+        private static void AddObserverModifier(
+            ICollection<SimulationBattleCardModifierSnapshot> target,
+            SimulationTeamRoleCardStateSnapshot state,
+            SimulationTeamRoleCardSnapshot card,
+            SimulationCombatCardLoadoutSnapshot loadout,
+            string slotCode)
+        {
+            var expectedSlot = card.CardDefinitionStableId switch
+            {
+                SimulationLocalCombatCodes.FocusedAssaultCardDefinition
+                    or SimulationLocalCombatCodes.CautiousDefenseCardDefinition
+                    => SimulationTeamRoleCardCodes.ObserverTactic,
+                SimulationLocalCombatCodes.WeaknessObservationCardDefinition
+                    or SimulationLocalCombatCodes.CabinCoverCardDefinition
+                    => SimulationTeamRoleCardCodes.ObserverSupport,
+                SimulationLocalCombatCodes.FieldRecoveryCardDefinition
+                    or SimulationLocalCombatCodes.SafeRetreatCardDefinition
+                    => SimulationTeamRoleCardCodes.ObserverEmergency,
+                _ => string.Empty,
+            };
+            if (slotCode != expectedSlot)
+                throw new SimulationContractException(
+                    "SimulationObserverCombatCardSlotInvalid");
+            var (modifierCode, basisPoints) = card.CardDefinitionStableId switch
+            {
+                SimulationLocalCombatCodes.FocusedAssaultCardDefinition
+                    => (SimulationLocalCombatCodes.ObserverFocusedAssault, 1500),
+                SimulationLocalCombatCodes.CautiousDefenseCardDefinition
+                    => (SimulationLocalCombatCodes.ObserverCautiousDefense, -2000),
+                SimulationLocalCombatCodes.WeaknessObservationCardDefinition
+                    => (SimulationLocalCombatCodes.ObserverWeaknessObservation, 0),
+                SimulationLocalCombatCodes.CabinCoverCardDefinition
+                    => (SimulationLocalCombatCodes.ObserverCabinCover, -1500),
+                SimulationLocalCombatCodes.FieldRecoveryCardDefinition
+                    => (SimulationLocalCombatCodes.ObserverFieldRecovery,
+                        SimulationLocalCombatCodes.ObserverRecoveryPermille),
+                SimulationLocalCombatCodes.SafeRetreatCardDefinition
+                    => (SimulationLocalCombatCodes.ObserverSafeRetreat, 0),
+                _ => throw new SimulationContractException(
+                    "SimulationObserverCombatCardDefinitionInvalid"),
+            };
+            Add(target, state, card, loadout, modifierCode, basisPoints);
         }
 
         private static void Add(ICollection<SimulationBattleCardModifierSnapshot> target,

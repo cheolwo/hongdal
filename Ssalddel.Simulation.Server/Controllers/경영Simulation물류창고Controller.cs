@@ -96,4 +96,17 @@ public sealed class 경영Simulation물류창고Controller(
         string sessionStableId,
         [FromBody] SimulationSupplyChainWorkConfirmRequest request)
         => Ok(service.ConfirmSupplyChainWork(sessionStableId, request));
+
+    [HttpGet("/api/simulation/v1/sessions/{sessionStableId}/npc-routine-work")]
+    public ActionResult<SimulationNpcRoutineWorkProjection[]> GetNpcRoutineWork(
+        string sessionStableId,
+        [FromQuery] string areaCode = "Hub")
+        => Ok(service.GetNpcRoutineWork(sessionStableId, areaCode));
+
+    [HttpGet("/api/simulation/v1/sessions/{sessionStableId}/spatial-composition")]
+    public ActionResult<SimulationSpatialCompositionStateSnapshot>
+        GetSpatialComposition(
+            string sessionStableId,
+            [FromQuery] string areaCode = "Hub")
+        => Ok(service.GetSpatialComposition(sessionStableId, areaCode));
 }

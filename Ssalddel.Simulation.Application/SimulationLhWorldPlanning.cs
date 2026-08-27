@@ -9,8 +9,8 @@ using Ssalddel.Simulation.Contracts;
 namespace Ssalddel.Simulation.Application
 {
     /// <summary>
-    /// 플레이어 주변에서 먼저 준비할 L3 셀과 준비 순서를 계산한다.
-    /// 셀 안의 H 의미·배치·현실 공간자료는 알지 않는다.
+    /// 플레이어 주변에서 먼저 준비할 실행 셀과 준비 순서를 계산한다.
+    /// 현재 계약의 L3 셀 키는 호환 Adapter이며 계산 자체는 H 의미를 알지 않는다.
     /// </summary>
     [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
         Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
@@ -50,7 +50,8 @@ namespace Ssalddel.Simulation.Application
             SimulationLhCellPreviewRequest request,
             SimulationLhWorldProfileResponse profile)
         {
-            if (!SimulationLhWorldService.TryParseL3CellKey(
+            ValidateWindowPolicy(profile);
+            if (!SimulationLhWorldGrid.TryParseL3CellKey(
                     request.FocusL3CellKey, out var focusX, out var focusY))
                 throw new ArgumentException("SimulationLhFocusCellInvalid", nameof(request));
             if (!SimulationLhWorldGrid.IsInsideApprovedCoverage(focusX, focusY))
@@ -65,7 +66,7 @@ namespace Ssalddel.Simulation.Application
             for (var x = focusX - profile.PrefetchRadius;
                  x <= focusX + profile.PrefetchRadius; x++)
             {
-                var cellKey = SimulationLhWorldService.L3CellKey(x, y);
+                var cellKey = SimulationLhWorldGrid.L3CellKey(x, y);
                 if (!SimulationLhWorldGrid.IsInsideApprovedCoverage(x, y))
                 {
                     outside.Add(cellKey);
@@ -100,6 +101,19 @@ namespace Ssalddel.Simulation.Application
             };
         }
 
+        private static void ValidateWindowPolicy(SimulationLhWorldProfileResponse profile)
+        {
+            if (profile == null
+                || profile.DetailRadius < 0
+                || profile.ActiveRadius < profile.DetailRadius
+                || profile.PrefetchRadius < profile.ActiveRadius
+                || profile.MaxConcurrentPreparations < 1
+                || profile.BoundaryPrefetchFraction <= 0d
+                || profile.BoundaryPrefetchFraction > .5d)
+                throw new ArgumentException("SimulationDynamicMapWindowPolicyInvalid",
+                    nameof(profile));
+        }
+
         private static (int X, int Y) DirectionVector(string directionCode)
             => directionCode switch
             {
@@ -116,7 +130,7 @@ namespace Ssalddel.Simulation.Application
     }
 
     /// <summary>
-    /// 스트리밍 범위 계산기가 고른 L3 셀 안에 들어갈 H 의미와 배치를 공급한다.
+    /// 스트리밍 범위 계산기가 고른 실행 셀 안에 들어갈 H 의미와 배치를 공급한다.
     /// 실제 E5·E6 공급자는 이 경계를 구현하고 스트리밍 실행기는 그대로 재사용한다.
     /// </summary>
     public interface ISimulationLhCellContentSource
@@ -340,8 +354,8 @@ namespace Ssalddel.Simulation.Application
         private static SimulationLhConnectorResponse Connector(
             int x, int y, int neighborX, int neighborY, string side)
         {
-            var cell = SimulationLhWorldService.L3CellKey(x, y);
-            var neighbor = SimulationLhWorldService.L3CellKey(neighborX, neighborY);
+            var cell = SimulationLhWorldGrid.L3CellKey(x, y);
+            var neighbor = SimulationLhWorldGrid.L3CellKey(neighborX, neighborY);
             var pair = new[] { cell, neighbor }
                 .OrderBy(value => value, StringComparer.Ordinal).ToArray();
             var boundaryHash = Hash(pair[0] + "|" + pair[1] + "|connector.v1");
@@ -419,6 +433,22 @@ namespace Ssalddel.Simulation.Application
 
     internal static class SimulationLhWorldGrid
     {
+        public static string L3CellKey(int x, int y)
+            => $"kr5186:l3:{x}:{y}";
+
+        public static bool TryParseL3CellKey(string cellKey, out int x, out int y)
+        {
+            x = 0;
+            y = 0;
+            var parts = (cellKey ?? string.Empty).Split(':');
+            if (parts.Length != 4 || parts[0] != "kr5186" || parts[1] != "l3")
+                return false;
+            return int.TryParse(parts[2], NumberStyles.Integer,
+                       CultureInfo.InvariantCulture, out x)
+                   && int.TryParse(parts[3], NumberStyles.Integer,
+                       CultureInfo.InvariantCulture, out y);
+        }
+
         public static bool IsInsideApprovedCoverage(int x, int y)
             => x >= SimulationLhWorldService.MinimumL3X
                && x <= SimulationLhWorldService.MaximumL3X

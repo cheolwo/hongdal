@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ssalddel.Interior.Contracts\Ssalddel.Interior.Contracts.csproj" />
     <ProjectReference Include="..\Ssalddel.Simulation.Contracts\Ssalddel.Simulation.Contracts.csproj" />
     <ProjectReference Include="..\Ssalddel.Unity\Ssalddel.Unity.csproj" />
   </ItemGroup>

@@ -7,22 +7,29 @@ namespace Ssalddel.Simulation.Contracts
         public const string WorkforceDelegate = "Simulation.WorkforceDelegate";
         public const string WarehouseInboundInspection = "Warehouse.InboundInspection";
         public const string WarehouseStorageMove = "Warehouse.StorageMove";
+        public const string WarehouseOutboundPreparation = "Warehouse.OutboundPreparation";
         public const string FreightTransport = "Freight.Transport";
         public const string RestaurantIngredientReceive = "Restaurant.IngredientReceive";
         public const string RestaurantCooking = "Restaurant.Cooking";
+        public const string NatureFieldSupplyPreparation =
+            "Nature.FieldSupplyPreparation";
     }
 
     public static class SimulationNpcActionCodes
     {
         public const string WarehouseInboundInspection = "WarehouseInboundInspection";
         public const string WarehouseStorageMove = "WarehouseStorageMove";
+        public const string WarehouseOutboundFlow = "WarehouseOutboundFlow";
         public const string FreightTransport = "FreightTransport";
         public const string RestaurantIngredientReceive = "RestaurantIngredientReceive";
         public const string RestaurantCooking = "RestaurantCooking";
+        public const string NatureFieldSupplyPreparation =
+            "NatureFieldSupplyPreparation";
     }
 
     public static class SimulationNpcActionPhaseCodes
     {
+        public const string Candidate = "Candidate";
         public const string Scheduled = "Scheduled";
         public const string Navigating = "Navigating";
         public const string Working = "Working";
@@ -61,6 +68,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationNpcCapabilityGrantInitialRequest>();
         public SimulationNpcWorkPolicyInitialRequest[] Policies { get; set; }
             = Array.Empty<SimulationNpcWorkPolicyInitialRequest>();
+        public SimulationNpcFacilityInventoryInitialRequest[] Inventories { get; set; }
+            = Array.Empty<SimulationNpcFacilityInventoryInitialRequest>();
     }
 
     public sealed class SimulationNpcOrganizationInitialRequest
@@ -132,6 +141,19 @@ namespace Ssalddel.Simulation.Contracts
         public int Priority { get; set; } = 100;
         public string PreferredActorStableId { get; set; } = string.Empty;
         public bool AutoDelegationEnabled { get; set; }
+    }
+
+    public sealed class SimulationNpcFacilityInventoryInitialRequest
+    {
+        public string InventoryStableId { get; set; } = string.Empty;
+        public string LotStableId { get; set; } = string.Empty;
+        public string FacilityStableId { get; set; } = string.Empty;
+        public string ProductStableId { get; set; } = string.Empty;
+        public string StateCode { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public string UnitCode { get; set; } = string.Empty;
+        public int UpdatedTick { get; set; }
+        public string[] SourceStableIds { get; set; } = Array.Empty<string>();
     }
 
     public sealed class SimulationNpcOrganizationSnapshot

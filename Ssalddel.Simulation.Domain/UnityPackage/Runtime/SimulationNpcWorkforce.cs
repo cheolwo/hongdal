@@ -158,6 +158,24 @@ namespace Ssalddel.Simulation.Domain
                     SourceStableIds = NormalizeIds(policy.SourceStableIds),
                 });
             }
+
+            foreach (var inventory in request.Inventories)
+            {
+                npcFacilityInventories.Add(inventory.InventoryStableId.Trim(),
+                    new SimulationNpcFacilityInventorySnapshot
+                    {
+                        InventoryStableId = inventory.InventoryStableId.Trim(),
+                        LotStableId = inventory.LotStableId.Trim(),
+                        FacilityStableId = inventory.FacilityStableId.Trim(),
+                        ProductStableId = inventory.ProductStableId.Trim(),
+                        StateCode = inventory.StateCode.Trim(),
+                        Quantity = inventory.Quantity,
+                        UnitCode = inventory.UnitCode.Trim(),
+                        UpdatedTick = inventory.UpdatedTick,
+                        Revision = 1,
+                        SourceStableIds = NormalizeIds(inventory.SourceStableIds),
+                    });
+            }
         }
 
         private void ResolveNpcPreviewAssignment(SimulationTaskPlanSnapshot taskPlan)
@@ -417,7 +435,8 @@ namespace Ssalddel.Simulation.Domain
             => npcTaskAssignments.Values.Count(value =>
                 string.Equals(value.ActorStableId, actorStableId, StringComparison.Ordinal)
                 && value.PhaseCode != SimulationNpcActionPhaseCodes.Completed
-                && value.PhaseCode != SimulationNpcActionPhaseCodes.Blocked);
+                && value.PhaseCode != SimulationNpcActionPhaseCodes.Blocked
+                && value.PhaseCode != SimulationNpcActionPhaseCodes.Cancelled);
 
         private static int SkillScore(SimulationNpcActorSnapshot actor, string capabilityCode)
             => actor.Skills.FirstOrDefault(value =>
@@ -489,7 +508,27 @@ namespace Ssalddel.Simulation.Domain
             foreach (var lotStableId in task.InputLotStableIds)
             {
                 var inventoryStableId = "npc-inventory:" + task.FacilityStableId + ":" + lotStableId;
-                if (npcFacilityInventories.ContainsKey(inventoryStableId)) continue;
+                var existing = npcFacilityInventories.Values.FirstOrDefault(
+                    value => string.Equals(value.FacilityStableId,
+                                 task.FacilityStableId, StringComparison.Ordinal)
+                             && string.Equals(value.LotStableId, lotStableId,
+                                 StringComparison.Ordinal));
+                if (existing != null)
+                {
+                    if (string.Equals(existing.StateCode,
+                            SimulationNpcInventoryStateCodes.PendingInspection,
+                            StringComparison.Ordinal)
+                        && !string.Equals(existing.SourceTaskStableId,
+                            task.TaskStableId, StringComparison.Ordinal))
+                    {
+                        existing.SourceTaskStableId = task.TaskStableId;
+                        existing.UpdatedTick = CurrentTick;
+                        existing.Revision++;
+                        existing.SourceStableIds = MergeSources(
+                            existing.SourceStableIds, task.SourceStableIds);
+                    }
+                    continue;
+                }
                 npcFacilityInventories.Add(inventoryStableId, new SimulationNpcFacilityInventorySnapshot
                 {
                     InventoryStableId = inventoryStableId,
@@ -620,6 +659,14 @@ namespace Ssalddel.Simulation.Domain
         private decimal CalculateNpcActionProgress(SimulationNpcTaskAssignmentSnapshot assignment)
         {
             if (assignment.PhaseCode == SimulationNpcActionPhaseCodes.Completed) return 1m;
+            if (assignment.PhaseCode == SimulationNpcActionPhaseCodes.Working
+                && string.Equals(assignment.ActionCode,
+                    SimulationNpcActionCodes.NatureFieldSupplyPreparation,
+                    StringComparison.Ordinal)
+                && IsNatureNpcFieldSupplyWork)
+                return Math.Min(.999m,
+                    (decimal)natureActiveWork!.CompletedWorkSeconds
+                    / Math.Max(1, natureActiveWork.RequiredWorkSeconds));
             if (assignment.PhaseCode != SimulationNpcActionPhaseCodes.Working
                 || !tasks.TryGetValue(assignment.TaskStableId, out var task)) return 0m;
             var workStartsAt = task.ScheduledStartTick + assignment.TravelDurationTicks;
@@ -819,9 +866,24 @@ namespace Ssalddel.Simulation.Domain
                     ActionVisualKey = value.ActionVisualKey,
                     SourceStableIds = value.SourceStableIds.ToArray(),
                 }).ToArray(),
+                Inventories = source.Inventories.Select(value =>
+                    new SimulationNpcFacilityInventoryInitialRequest
+                    {
+                        InventoryStableId = value.InventoryStableId,
+                        LotStableId = value.LotStableId,
+                        FacilityStableId = value.FacilityStableId,
+                        ProductStableId = value.ProductStableId,
+                        StateCode = value.StateCode,
+                        Quantity = value.Quantity,
+                        UnitCode = value.UnitCode,
+                        UpdatedTick = value.UpdatedTick,
+                        SourceStableIds = value.SourceStableIds.ToArray(),
+                    }).ToArray(),
             };
 
-        internal static string BuildNpcWorkforcePayloadKey(SimulationNpcWorkforceInitialStateRequest? request)
+        internal static string BuildNpcWorkforcePayloadKey(
+            SimulationNpcWorkforceInitialStateRequest? request,
+            bool includeInitialInventories = false)
         {
             if (request == null) return "none";
             var normalized = CloneNpcWorkforceInitialState(request)!;
@@ -851,6 +913,16 @@ namespace Ssalddel.Simulation.Domain
                         + value.TravelDurationTicks.ToString(CultureInfo.InvariantCulture) + "|"
                         + value.WorkDurationTicks.ToString(CultureInfo.InvariantCulture) + "|"
                         + value.InteractionPointKey + "|" + value.ActionVisualKey)),
+                includeInitialInventories
+                    ? string.Join("\u001f", normalized.Inventories.OrderBy(
+                            value => value.InventoryStableId, StringComparer.Ordinal)
+                        .Select(value => value.InventoryStableId + "|" + value.LotStableId + "|"
+                            + value.FacilityStableId + "|" + value.ProductStableId + "|"
+                            + value.StateCode + "|"
+                            + value.Quantity.ToString(CultureInfo.InvariantCulture) + "|"
+                            + value.UnitCode + "|"
+                            + value.UpdatedTick.ToString(CultureInfo.InvariantCulture)))
+                    : string.Empty,
             });
         }
 
@@ -881,7 +953,8 @@ namespace Ssalddel.Simulation.Domain
         {
             if (request == null) return;
             if (request.Organizations == null || request.Actors == null
-                || request.CapabilityGrants == null || request.Policies == null)
+                || request.CapabilityGrants == null || request.Policies == null
+                || request.Inventories == null)
                 throw new SimulationContractException("SimulationNpcWorkforceInvalid");
 
             var organizationIds = new HashSet<string>(StringComparer.Ordinal);
@@ -954,6 +1027,34 @@ namespace Ssalddel.Simulation.Domain
                     RequireStableId(policy.PreferredActorStableId, "SimulationNpcPreferredActorStableIdInvalid");
                 if (!policyIds.Add(policy.PolicyStableId.Trim()))
                     throw new SimulationContractException("SimulationNpcPolicyDuplicate");
+            }
+
+            var inventoryIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var inventory in request.Inventories)
+            {
+                if (inventory == null)
+                    throw new SimulationContractException(
+                        "SimulationNpcInitialInventoryInvalid");
+                RequireStableId(inventory.InventoryStableId,
+                    "SimulationNpcInitialInventoryStableIdInvalid");
+                RequireStableId(inventory.LotStableId,
+                    "SimulationNpcInitialInventoryLotInvalid");
+                RequireStableId(inventory.FacilityStableId,
+                    "SimulationNpcInitialInventoryFacilityInvalid");
+                RequireStableId(inventory.ProductStableId,
+                    "SimulationNpcInitialInventoryProductInvalid");
+                RequireStableId(inventory.StateCode,
+                    "SimulationNpcInitialInventoryStateInvalid");
+                RequireStableId(inventory.UnitCode,
+                    "SimulationNpcInitialInventoryUnitInvalid");
+                ValidateIds(inventory.SourceStableIds, true,
+                    "SimulationNpcInitialInventorySourcesInvalid");
+                if (inventory.Quantity <= 0m || inventory.UpdatedTick < 0)
+                    throw new SimulationContractException(
+                        "SimulationNpcInitialInventoryQuantityInvalid");
+                if (!inventoryIds.Add(inventory.InventoryStableId.Trim()))
+                    throw new SimulationContractException(
+                        "SimulationNpcInitialInventoryDuplicate");
             }
 
             foreach (var actor in request.Actors)

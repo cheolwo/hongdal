@@ -108,6 +108,10 @@ namespace Ssalddel.Simulation.Application
             Create(SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId,
                 nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
                 nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
+            Create(SimulationNatureSurvivalCodes
+                    .CollectDroppedTimberWorldInteractionId,
+                nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
+                nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
             Create(SimulationNatureSurvivalCodes.PlaceCabinBlueprintWorldInteractionId,
                 nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
                 nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
@@ -124,6 +128,25 @@ namespace Ssalddel.Simulation.Application
                 nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
                 nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
             Create(SimulationNatureSurvivalCodes.CancelActiveWorkWorldInteractionId,
+                nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
+                nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
+            Create(SimulationNatureSurvivalCodes.StoreAtCabinWorldInteractionId,
+                nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
+                nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
+            Create(SimulationNatureSurvivalCodes.SleepInCabinWorldInteractionId,
+                nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
+                nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
+            Create(SimulationNatureSurvivalCodes.SelectExpansionPlanWorldInteractionId,
+                nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
+                nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
+            Create(SimulationNatureSurvivalCodes.PrepareFieldSupplyWorldInteractionId,
+                nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
+                nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
+            Create(SimulationNatureSurvivalCodes
+                    .PrepareFieldSupplyDelegatedWorldInteractionId,
+                nameof(ISimulationSessionRuntime.GetNpcRoutineWorkAsync),
+                nameof(ISimulationNatureSurvivalRuntime.AdvanceRealtimeAsync)),
+            Create(Simulation영역건물발전Codes.ConstructionWorldInteractionId,
                 nameof(ISimulationNatureSurvivalRuntime.PreviewAsync),
                 nameof(ISimulationNatureSurvivalRuntime.ConfirmAsync)),
         };
@@ -149,10 +172,9 @@ namespace Ssalddel.Simulation.Application
     {
     }
 
-    [SsalddelEvidenceResponsibility(
-        SsalddelEvidenceStage.E9,
-        "WI 변경 봉투와 하위 영향 범위를 검토한다.",
-        Boundary = "변경 영향과 재검증 범위를 다루며 E9 달성을 주장하지 않는다.")]
+    [SsalddelEvidenceCoverageExclusion(
+        SsalddelEvidenceCoverageExclusionCategory.CompatibilityFacade,
+        "구판 E9 수직 작업 명세의 변경 봉투를 읽기 위해 보존하며 현재 E9 사람 검증 책임이 아니다.")]
     public interface I세계상호작용E9변화봉투Module :
         I세계상호작용E단계Module, IE9변화봉투Module
     {

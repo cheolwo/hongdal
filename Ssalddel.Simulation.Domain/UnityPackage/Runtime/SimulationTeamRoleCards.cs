@@ -420,7 +420,9 @@ namespace Ssalddel.Simulation.Domain
                 || string.IsNullOrWhiteSpace(request.RequestingActorStableId)
                 || string.IsNullOrWhiteSpace(request.TargetActorStableId)
                 || !ValidControlMode(request.CombatControlModeCode)
-                || request.Slots == null || request.Slots.Length > 2
+                || request.Slots == null || request.Slots.Length >
+                    (request.CombatControlModeCode ==
+                        SimulationTeamRoleCardCodes.ObserverOperation ? 3 : 2)
                 || request.Slots.Any(value => value == null
                     || !ValidSlot(value.SlotCode)
                     || string.IsNullOrWhiteSpace(value.CardCopyStableId))
@@ -434,11 +436,15 @@ namespace Ssalddel.Simulation.Domain
 
         private static bool ValidSlot(string slot)
             => slot == SimulationTeamRoleCardCodes.Primary
-               || slot == SimulationTeamRoleCardCodes.Support;
+               || slot == SimulationTeamRoleCardCodes.Support
+               || slot == SimulationTeamRoleCardCodes.ObserverTactic
+               || slot == SimulationTeamRoleCardCodes.ObserverSupport
+               || slot == SimulationTeamRoleCardCodes.ObserverEmergency;
 
         private static bool ValidControlMode(string mode)
             => mode == SimulationTeamRoleCardCodes.DirectAction
-               || mode == SimulationTeamRoleCardCodes.TacticalCommand;
+               || mode == SimulationTeamRoleCardCodes.TacticalCommand
+               || mode == SimulationTeamRoleCardCodes.ObserverOperation;
 
         private static void ValidateInitialCombatLoadouts(
             SimulationTeamRoleCardInitialState initial)
@@ -449,7 +455,9 @@ namespace Ssalddel.Simulation.Domain
                     || !initial.MemberActorStableIds.Contains(value.ActorStableId,
                         StringComparer.Ordinal)
                     || !ValidControlMode(value.CombatControlModeCode)
-                    || value.Slots == null || value.Slots.Length > 2
+                    || value.Slots == null || value.Slots.Length >
+                        (value.CombatControlModeCode ==
+                            SimulationTeamRoleCardCodes.ObserverOperation ? 3 : 2)
                     || value.Slots.Any(slot => slot == null
                         || !ValidSlot(slot.SlotCode)
                         || !initial.Cards.Any(card => card.CardCopyStableId ==

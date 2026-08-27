@@ -1,5 +1,6 @@
 using System.Reflection;
 using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Tests;
 
@@ -62,15 +63,17 @@ public sealed class WorldInteractionDownwardModuleSkeletonTests
     }
 
     [Fact]
-    public void WI실행머리대장은_PreviewConfirm과_E9부터E1모듈을_함께가리킨다()
+    public void WI실행머리대장은_권위연산과_E9부터E1모듈을_함께가리킨다()
     {
         var expectedWiIds = new[]
         {
             "WI-FARM-04", "WI-FARM-05", "WI-FARM-06",
             "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03",
             "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06",
-            "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09",
+            "WI-NATURE-18", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09",
             "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-12",
+            "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15",
+            "WI-NATURE-16", "WI-NATURE-17", "WI-CON-01",
         };
         var expectedModuleNames = new[]
         {
@@ -88,6 +91,7 @@ public sealed class WorldInteractionDownwardModuleSkeletonTests
             .GetMethods()
             .Concat(typeof(ISimulationNatureWorldInteractionRuntime).GetMethods())
             .Concat(typeof(ISimulationNatureSurvivalRuntime).GetMethods())
+            .Concat(typeof(ISimulationSessionRuntime).GetMethods())
             .Select(method => method.Name)
             .ToHashSet(StringComparer.Ordinal);
 
@@ -98,8 +102,17 @@ public sealed class WorldInteractionDownwardModuleSkeletonTests
         {
             Assert.Contains(head.PreviewMethodName, runtimeMethodNames);
             Assert.Contains(head.ConfirmMethodName, runtimeMethodNames);
-            Assert.StartsWith("Preview", head.PreviewMethodName);
-            Assert.StartsWith("Confirm", head.ConfirmMethodName);
+            if (head.WorldInteractionId == SimulationNatureSurvivalCodes
+                .PrepareFieldSupplyDelegatedWorldInteractionId)
+            {
+                Assert.StartsWith("Get", head.PreviewMethodName);
+                Assert.StartsWith("Advance", head.ConfirmMethodName);
+            }
+            else
+            {
+                Assert.StartsWith("Preview", head.PreviewMethodName);
+                Assert.StartsWith("Confirm", head.ConfirmMethodName);
+            }
             Assert.Equal(expectedModuleNames, head.DownwardModuleTechnicalNames);
         });
     }

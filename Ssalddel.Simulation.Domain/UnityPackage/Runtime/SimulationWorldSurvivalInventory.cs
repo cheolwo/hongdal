@@ -557,6 +557,7 @@ namespace Ssalddel.Simulation.Domain
                 || HasAppliedFarmSurvivalCommand(commandId)
                 || HasAppliedCollectibleCardCommand(commandId)
                 || HasAppliedNatureSurvivalCommand(commandId)
+                || HasAppliedActorEquipmentCommand(commandId)
                 || appliedRegionalIncidentResponseCommands.ContainsKey(commandId);
 
         private static bool CanAcquire(

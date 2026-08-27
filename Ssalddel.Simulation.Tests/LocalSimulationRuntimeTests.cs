@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
+using Ssalddel.WorkflowRules;
 
 namespace Ssalddel.Simulation.Tests;
 
@@ -29,6 +30,7 @@ public sealed class LocalSimulationRuntimeTests
             Assert.Same(runtime, runtime.Logistics);
             Assert.Same(runtime, runtime.FarmWorldInteractions);
             Assert.Same(runtime, runtime.NatureWorldInteractions);
+            Assert.Same(runtime, runtime.Battles);
             Assert.IsAssignableFrom<ISimulationRuntimeModules>(runtime);
             Assert.IsAssignableFrom<ISimulationWorldInteractionRuntime>(
                 runtime.WorldInteractions);
@@ -113,7 +115,7 @@ public sealed class LocalSimulationRuntimeTests
 
             Assert.NotEqual(firstSave.SaveStableId, secondSave.SaveStableId);
             var secondPackage = slotStore.Read("slot-01").Package;
-            Assert.Equal(SimulationSaveSchemaVersions.V15,
+            Assert.Equal(SimulationSaveSchemaVersions.V23,
                 secondPackage.SchemaVersion);
             Assert.Equal(2, secondPackage.WorldInteractionManifestations.Length);
             Assert.Equal(new[]
@@ -159,7 +161,7 @@ public sealed class LocalSimulationRuntimeTests
             Assert.Contains("SpatialEvidence",
                 completedHarvestEvidence.MissingEvidenceCodes);
             var verified = await runtime.Sessions.VerifySlotAsync("slot-01");
-            Assert.Equal(SimulationSaveSchemaVersions.V15,
+            Assert.Equal(SimulationSaveSchemaVersions.V23,
                 verified.Restore.SchemaVersion);
 
             var tampered = SimulationSaveReplayCloner.ClonePackage(secondPackage);
@@ -199,6 +201,15 @@ public sealed class LocalSimulationRuntimeTests
             var slotStore = new FileSimulationLocalSaveSlotStore(savesRoot);
             using var runtime = CreateRuntime(slotStore);
             var created = await runtime.Sessions.CreateAsync(CreateRequest());
+
+            var opportunities = await runtime.Nature
+                .GetPlayerOpportunitiesAsync(created.SessionStableId);
+            var needs = await runtime.Nature.GetAreaNeedsAsync(
+                created.SessionStableId);
+            Assert.Contains(opportunities, value => value.PlayerActivityTrackCode ==
+                Simulation플레이어활동경로Codes.FieldExpedition);
+            Assert.Equal(2, needs.Length);
+            Assert.False(runtime.Descriptor.RequiresNetwork);
 
             var preview = await runtime.Nature.PreviewAsync(
                 created.SessionStableId,
@@ -275,7 +286,7 @@ public sealed class LocalSimulationRuntimeTests
                 });
 
             var package = slotStore.Read("slot-cancelled").Package;
-            Assert.Equal(SimulationSaveSchemaVersions.V15, package.SchemaVersion);
+            Assert.Equal(SimulationSaveSchemaVersions.V23, package.SchemaVersion);
             Assert.Contains(package.WorldInteractionManifestations, value =>
                 value.WorldInteractionId ==
                     SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId
@@ -355,6 +366,147 @@ public sealed class LocalSimulationRuntimeTests
             Assert.Equal(preview.NextTurnNumber,
                 (await runtime.Gameplay.GetTurnClosingContextAsync(
                     created.SessionStableId)).TurnNumber);
+        }
+        finally
+        {
+            if (Directory.Exists(savesRoot)) Directory.Delete(savesRoot, true);
+        }
+    }
+
+    [Fact]
+    public async Task LocalRuntime_관찰운영전투를_HTTP없이_완료하고_슬롯에복원한다()
+    {
+        var savesRoot = Path.Combine(Path.GetTempPath(),
+            "ssalddel-local-battle-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var slotStore = new FileSimulationLocalSaveSlotStore(savesRoot);
+            using var runtime = CreateRuntime(slotStore);
+            var request = CreateRequest();
+            request.ClientRequestId = Guid.Parse(
+                "70e70e70-e700-4700-8700-70e70e70e700");
+            request.ScenarioSeed = 1;
+            request.NatureSurvival!.ProfileRevision =
+                SimulationNatureSurvivalCodes.ProfileRevisionR2;
+            var created = await runtime.Sessions.CreateAsync(request);
+            var axe = await runtime.Nature.ConfirmAsync(created.SessionStableId,
+                new SimulationNatureSurvivalCommandRequest
+                {
+                    CommandId = "command:local-battle:axe",
+                    ExpectedRevision = created.Revision,
+                    PlayerStableId = "player:solo",
+                    ActionCode = SimulationNatureSurvivalCodes.AcquireAxe,
+                    TargetStableId = SimulationNatureSurvivalCodes.AxePickupStableId,
+                });
+            var harvest = await runtime.Nature.ConfirmAsync(created.SessionStableId,
+                new SimulationNatureSurvivalCommandRequest
+                {
+                    CommandId = "command:local-battle:harvest",
+                    ExpectedRevision = axe.Revision,
+                    PlayerStableId = "player:solo",
+                    ActionCode = SimulationNatureSurvivalCodes.BeginHarvest,
+                    TargetStableId = "resource:nature-tree:01",
+                });
+            var finishedHarvest = await runtime.Nature.AdvanceRealtimeAsync(
+                created.SessionStableId,
+                new SimulationNatureSurvivalClockAdvanceRequest
+                {
+                    CommandId = "command:local-battle:harvest-hold",
+                    ExpectedRevision = harvest.Revision,
+                    ElapsedRealtimeSeconds = NatureSurvivalRules.HarvestWorkSeconds,
+                    WorkInputHeld = true,
+                });
+            var revision = finishedHarvest.Revision;
+            var elapsed = (await runtime.Nature.GetAsync(created.SessionStableId))
+                .ElapsedSecondsInCycle;
+            var clockSequence = 0;
+            while (elapsed <= NatureSurvivalRules.DaylightEndsAtSecond)
+            {
+                var advanced = await runtime.Nature.AdvanceRealtimeAsync(
+                    created.SessionStableId,
+                    new SimulationNatureSurvivalClockAdvanceRequest
+                    {
+                        CommandId = "command:local-battle:clock:" + clockSequence++,
+                        ExpectedRevision = revision,
+                        ElapsedRealtimeSeconds = Math.Min(60,
+                            NatureSurvivalRules.DaylightEndsAtSecond + 1 - elapsed),
+                    });
+                revision = advanced.Revision;
+                elapsed = (await runtime.Nature.GetAsync(created.SessionStableId))
+                    .ElapsedSecondsInCycle;
+            }
+            var nature = await runtime.Nature.GetAsync(created.SessionStableId);
+            Assert.NotNull(nature.Encounter);
+            var linked = await runtime.Nature.ConfirmAsync(created.SessionStableId,
+                new SimulationNatureSurvivalCommandRequest
+                {
+                    CommandId = "command:local-battle:link",
+                    ExpectedRevision = revision,
+                    PlayerStableId = "player:solo",
+                    ActionCode = SimulationNatureSurvivalCodes.ResolveEncounter,
+                    TargetStableId = nature.Encounter!.EncounterStableId,
+                    ChoiceCode = SimulationNatureSurvivalCodes.Fight,
+                });
+            var preview = await runtime.Battles.PreviewBattleAsync(
+                created.SessionStableId, new SimulationBattleCreatePreviewRequest
+                {
+                    ExpectedWorldRevision = linked.Revision,
+                    EncounterStableId = nature.Encounter.EncounterStableId,
+                    RequestingActorStableId = "player:solo",
+                });
+            Assert.True(preview.CanConfirm);
+            var battle = await runtime.Battles.ConfirmBattleAsync(
+                created.SessionStableId, new SimulationBattleCreateConfirmRequest
+                {
+                    CommandId = "command:local-battle:create",
+                    ExpectedWorldRevision = linked.Revision,
+                    EncounterStableId = nature.Encounter.EncounterStableId,
+                    RequestingActorStableId = "player:solo",
+                    ExpectedBattleWorldContextHashSha256 =
+                        preview.LocalWorldContext.ContextHashSha256,
+                });
+            battle = await runtime.Battles.ConfirmBattleControlModeAsync(
+                created.SessionStableId, battle.BattleStableId,
+                new SimulationLocalCombatControlModeConfirmRequest
+                {
+                    CommandId = "command:local-battle:observer",
+                    ExpectedBattleRevision = battle.BattleRevision,
+                    RequestingActorStableId = "player:solo",
+                    ControlModeCode = SimulationLocalCombatCodes.ObserverOperation,
+                    ExpectedCardLoadoutHashSha256 = battle.LocalCombat
+                        .FrozenCardLoadoutHashSha256,
+                });
+            var sequence = 0;
+            while (battle.PhaseCode == SimulationBattleInstanceCodes.Active)
+                battle = await runtime.Battles.AdvanceBattleAsync(
+                    created.SessionStableId, battle.BattleStableId,
+                    new SimulationBattleAdvanceRequest
+                    {
+                        CommandId = "command:local-battle:tick:" + sequence++,
+                        ExpectedBattleRevision = battle.BattleRevision,
+                        CombatTickCount = 5,
+                    });
+
+            Assert.True(battle.Outcome!.UsedDeterministicAutoCommand);
+            Assert.Equal(SimulationNatureSurvivalCodes.Victory,
+                (await runtime.Nature.GetAsync(created.SessionStableId))
+                .LastCombatResultCode);
+            var session = await runtime.Sessions.GetAsync(created.SessionStableId);
+            var saved = await runtime.Sessions.SaveSlotAsync(created.SessionStableId,
+                new SimulationLocalSaveSlotRequest
+                {
+                    SlotStableId = "slot-local-observer-battle",
+                    ExpectedRevision = session.Revision,
+                });
+            Assert.Equal(SimulationSaveSchemaVersions.V23,
+                slotStore.Read("slot-local-observer-battle").Package.SchemaVersion);
+
+            using var restoredRuntime = CreateRuntime(slotStore);
+            var restored = await restoredRuntime.Sessions.LoadSlotAsync(
+                "slot-local-observer-battle");
+            Assert.Equal(saved.ReplayHash, restored.Restore.ReplayHash);
+            Assert.Equal(SimulationNatureSurvivalCodes.Victory,
+                restored.Restore.Session.NatureSurvival.LastCombatResultCode);
         }
         finally
         {

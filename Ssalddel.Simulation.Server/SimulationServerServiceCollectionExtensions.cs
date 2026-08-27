@@ -191,6 +191,7 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddScoped<SimulationWorld지역표현요약Service>();
         services.AddScoped<SimulationWorldExplorationService>();
         services.AddSingleton<SimulationWorldSurvivalInventoryService>();
+        services.AddSingleton<SimulationActorEquipmentService>();
         services.AddSingleton<I세계상호작용실행Pipeline,
             세계상호작용실행Pipeline>();
         services.AddSingleton<SimulationNatureSurvivalService>();

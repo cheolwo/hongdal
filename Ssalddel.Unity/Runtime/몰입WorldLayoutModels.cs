@@ -174,6 +174,125 @@ namespace Ssalddel.Unity.ImmersiveWorld
         }
     }
 
+    public static class Nature위협관찰CueCodes
+    {
+        public const string ThreatRouteMarker = "NatureThreatRouteMarker";
+        public const string SafeCoreMarker = "NatureSafeCoreMarker";
+        public const string ThreatToSafeCoreAxis = "NatureThreatToSafeCoreAxis";
+        public const string ObserveThreatRoute = "NatureObserveThreatRoute";
+        public const string ThreatWarning = "NatureThreatWarning";
+        public const string ObservationOnly = "ObservationOnly";
+        public const string EmergencyRetreat = "EmergencyRetreat";
+        public const string NatureRestoration = "NatureRestoration";
+        public const string ThreatResponse = "ThreatResponse";
+    }
+
+    public sealed class Nature위협관찰ChoicePresentation
+    {
+        public string WorldInteractionId { get; set; } = string.Empty;
+        public string ChoiceCode { get; set; } = string.Empty;
+        public bool IsAvailable { get; set; }
+    }
+
+    public sealed class Nature위협관찰PreviewApiModel
+    {
+        public string NatureRouteCode { get; set; } = string.Empty;
+        public int EffectivePressure { get; set; }
+        public string PressureLevelCode { get; set; } = string.Empty;
+        public string[] NextWorldInteractionIds { get; set; } = Array.Empty<string>();
+        public bool CanConfirm { get; set; }
+        public string[] BlockingReasonCodes { get; set; } = Array.Empty<string>();
+        public bool SimulationOnly { get; set; } = true;
+        public bool IsOperationalState { get; set; }
+    }
+
+    public sealed class Nature위협관찰PresentationDecision
+    {
+        public string NatureRouteCode { get; set; } = string.Empty;
+        public string PressureLevelCode { get; set; } = string.Empty;
+        public int EffectivePressure { get; set; }
+        public string ThreatDirectionCode { get; set; } = string.Empty;
+        public string SafeCoreDirectionCode { get; set; } = string.Empty;
+        public string ThreatMarkerCueCode { get; set; } = string.Empty;
+        public string SafeCoreMarkerCueCode { get; set; } = string.Empty;
+        public string CameraCueCode { get; set; } = string.Empty;
+        public string AnimationCueCode { get; set; } = string.Empty;
+        public string SoundCueCode { get; set; } = string.Empty;
+        public string ScopeBoundaryCode { get; set; } = string.Empty;
+        public Nature위협관찰ChoicePresentation[] NextChoices { get; set; }
+            = Array.Empty<Nature위협관찰ChoicePresentation>();
+        public bool CanConfirmObservation { get; set; }
+        public string[] BlockingReasonCodes { get; set; } = Array.Empty<string>();
+        public bool ChangesWorldState { get; set; }
+        public bool PresentationOnly { get; set; }
+    }
+
+    /// <summary>
+    /// WI-NATURE-01의 권위 Preview를 위협 방향·압력·안전 거점 신호로 번역한다.
+    /// 관찰 이후 후퇴·복원 경로만 표시하며 전투 참여 방식은 WI-NATURE-11이 소유한다.
+    /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E6,
+        "위협 관찰의 플레이어 질문·신호·다음 선택을 정제한다.",
+        Boundary = "카메라·애니메이션·음향 Cue는 관찰 Confirm이나 위협 결과를 확정하지 않는다.")]
+    public static class Nature위협관찰PresentationPolicy
+    {
+        public static Nature위협관찰PresentationDecision Evaluate(
+            Nature위협관찰PreviewApiModel preview,
+            string threatDirectionCode,
+            string safeCoreDirectionCode)
+        {
+            if (preview == null) throw new ArgumentNullException(nameof(preview));
+            var localBlocks = new List<string>();
+            if (!preview.SimulationOnly || preview.IsOperationalState)
+                localBlocks.Add("SimulationOnlyThreatObservationRequired");
+            if (string.IsNullOrWhiteSpace(preview.NatureRouteCode))
+                localBlocks.Add("NatureThreatRoutePresentationMissing");
+            if (string.IsNullOrWhiteSpace(threatDirectionCode))
+                localBlocks.Add("NatureThreatDirectionMissing");
+            if (string.IsNullOrWhiteSpace(safeCoreDirectionCode))
+                localBlocks.Add("NatureSafeCoreDirectionMissing");
+            var blocks = (preview.BlockingReasonCodes ?? Array.Empty<string>())
+                .Concat(localBlocks).Distinct(StringComparer.Ordinal).ToArray();
+            var available = preview.CanConfirm && blocks.Length == 0;
+            var warning = !string.Equals(preview.PressureLevelCode,
+                "Stable", StringComparison.Ordinal);
+            var choices = (preview.NextWorldInteractionIds ?? Array.Empty<string>())
+                .Where(value => value == "WI-NATURE-02" || value == "WI-NATURE-03"
+                    || value == "WI-NATURE-11")
+                .Distinct(StringComparer.Ordinal)
+                .Select(value => new Nature위협관찰ChoicePresentation
+                {
+                    WorldInteractionId = value,
+                    ChoiceCode = value == "WI-NATURE-02"
+                        ? Nature위협관찰CueCodes.EmergencyRetreat
+                        : value == "WI-NATURE-03"
+                            ? Nature위협관찰CueCodes.NatureRestoration
+                            : Nature위협관찰CueCodes.ThreatResponse,
+                    IsAvailable = available,
+                }).ToArray();
+            return new Nature위협관찰PresentationDecision
+            {
+                NatureRouteCode = preview.NatureRouteCode,
+                PressureLevelCode = preview.PressureLevelCode,
+                EffectivePressure = preview.EffectivePressure,
+                ThreatDirectionCode = threatDirectionCode?.Trim() ?? string.Empty,
+                SafeCoreDirectionCode = safeCoreDirectionCode?.Trim() ?? string.Empty,
+                ThreatMarkerCueCode = Nature위협관찰CueCodes.ThreatRouteMarker,
+                SafeCoreMarkerCueCode = Nature위협관찰CueCodes.SafeCoreMarker,
+                CameraCueCode = Nature위협관찰CueCodes.ThreatToSafeCoreAxis,
+                AnimationCueCode = Nature위협관찰CueCodes.ObserveThreatRoute,
+                SoundCueCode = warning ? Nature위협관찰CueCodes.ThreatWarning : string.Empty,
+                ScopeBoundaryCode = Nature위협관찰CueCodes.ObservationOnly,
+                NextChoices = choices,
+                CanConfirmObservation = available,
+                BlockingReasonCodes = blocks,
+                ChangesWorldState = false,
+                PresentationOnly = true,
+            };
+        }
+    }
+
     public sealed class 몰입WorldTransitionSnapshot
     {
         public string ActiveInstanceStableId { get; set; } = string.Empty;

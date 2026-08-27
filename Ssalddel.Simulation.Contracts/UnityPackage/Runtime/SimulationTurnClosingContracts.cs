@@ -72,6 +72,8 @@ namespace Ssalddel.Simulation.Contracts
         public string[] SelectedCardStableIds { get; set; } = Array.Empty<string>();
         public Simulation타로CardSelectionRequest? SelectedTarotCard { get; set; }
             = null;
+        public bool DeactivateActiveMajorArcana { get; set; }
+            = false;
     }
 
     public sealed class SimulationTurnClosingPreviewSnapshot
@@ -85,6 +87,10 @@ namespace Ssalddel.Simulation.Contracts
         public int PendingTaskCount { get; set; }
         public SimulationTurnCardSnapshot[] SelectedCards { get; set; }
             = Array.Empty<SimulationTurnCardSnapshot>();
+        public Simulation메이저아르카나방향판정Snapshot? MajorArcanaDirectionDecision
+            { get; set; }
+        public bool DeactivatesActiveMajorArcana { get; set; }
+            = false;
         public string[] BlockReasonCodes { get; set; } = Array.Empty<string>();
     }
 
@@ -105,6 +111,10 @@ namespace Ssalddel.Simulation.Contracts
         public long ResultingRevision { get; set; }
         public SimulationTurnCardSnapshot[] SelectedCards { get; set; }
             = Array.Empty<SimulationTurnCardSnapshot>();
+        public Simulation메이저아르카나방향판정Snapshot? MajorArcanaDirectionDecision
+            { get; set; }
+        public bool DeactivatedActiveMajorArcana { get; set; }
+            = false;
     }
 
     public sealed class SimulationActiveTurnCardEffectSnapshot

@@ -19,6 +19,82 @@ public enum SsalddelEvidenceStage
     E7 = 7,
     E8 = 8,
     E9 = 9,
+    E10 = 10,
+}
+
+public enum SsalddelEvidenceSubjectKind
+{
+    Unspecified = 0,
+    PlayableUnit = 1,
+    AreaHarmonySet = 2,
+    WorldHarmonySet = 3,
+    HumanPlaytestCampaign = 4,
+    LimitedOperationWindow = 5,
+    LimitedOperationCandidate = LimitedOperationWindow,
+}
+
+public static class SsalddelEvidenceModelRevisions
+{
+    public const string LegacyChangeAdaptiveR10 = "legacy-change-adaptive.r10";
+    public const string HorizontalHarmonyR1 = "horizontal-harmony-evidence.r1";
+    public const string HorizontalDualCycleR2 = "horizontal-dual-cycle-evidence.r2";
+    public const string Current = HorizontalDualCycleR2;
+}
+
+public sealed record SsalddelEvidenceStageHandle
+{
+    public SsalddelEvidenceStageHandle(
+        string evidenceModelRevision,
+        SsalddelEvidenceStage evidenceStage,
+        SsalddelEvidenceSubjectKind subjectKind)
+    {
+        if (string.IsNullOrWhiteSpace(evidenceModelRevision))
+            throw new ArgumentException("E 증거 모델 판본은 비어 있을 수 없습니다.",
+                nameof(evidenceModelRevision));
+        if (evidenceStage == SsalddelEvidenceStage.Unspecified)
+            throw new ArgumentOutOfRangeException(nameof(evidenceStage));
+        if (subjectKind == SsalddelEvidenceSubjectKind.Unspecified)
+            throw new ArgumentOutOfRangeException(nameof(subjectKind));
+
+        var normalizedRevision = evidenceModelRevision.Trim();
+        if (string.Equals(normalizedRevision,
+                SsalddelEvidenceModelRevisions.Current,
+                StringComparison.Ordinal))
+            ValidateCurrentSubject(evidenceStage, subjectKind);
+
+        EvidenceModelRevision = normalizedRevision;
+        EvidenceStage = evidenceStage;
+        SubjectKind = subjectKind;
+    }
+
+    public string EvidenceModelRevision { get; }
+    public SsalddelEvidenceStage EvidenceStage { get; }
+    public SsalddelEvidenceSubjectKind SubjectKind { get; }
+
+    private static void ValidateCurrentSubject(
+        SsalddelEvidenceStage evidenceStage,
+        SsalddelEvidenceSubjectKind subjectKind)
+    {
+        var valid = evidenceStage switch
+        {
+            >= SsalddelEvidenceStage.E1 and <= SsalddelEvidenceStage.E7
+                => subjectKind == SsalddelEvidenceSubjectKind.PlayableUnit,
+            SsalddelEvidenceStage.E8
+                => subjectKind is SsalddelEvidenceSubjectKind.AreaHarmonySet
+                    or SsalddelEvidenceSubjectKind.WorldHarmonySet,
+            SsalddelEvidenceStage.E9
+                => subjectKind ==
+                    SsalddelEvidenceSubjectKind.HumanPlaytestCampaign,
+            SsalddelEvidenceStage.E10
+                => subjectKind ==
+                    SsalddelEvidenceSubjectKind.LimitedOperationWindow,
+            _ => false,
+        };
+        if (!valid)
+            throw new ArgumentException(
+                "현재 증거 모델의 E 단계와 판정 주체가 일치하지 않습니다.",
+                nameof(subjectKind));
+    }
 }
 
 public enum SsalddelEvidenceResponsibilityRole
@@ -164,12 +240,12 @@ public static class SsalddelEvidenceSubmoduleDefinitionCatalog
 }
 
 /// <summary>
-/// E1~E9를 특정 기능의 완료 선언이 아니라 반복 가능한 코드 책임으로 표현하는
+/// E1~E10을 특정 기능의 완료 선언이 아니라 반복 가능한 코드 책임으로 표현하는
 /// 공통 모듈 머리다. 도메인별 모듈은 필요한 단계 인터페이스만 상속한다.
 /// </summary>
 [SsalddelEvidenceCoverageExclusion(
     SsalddelEvidenceCoverageExclusionCategory.TechnicalHelper,
-    "E1~E9 공통 모듈 인터페이스가 공유하는 기술 기반이다.")]
+    "E1~E10 공통 모듈 인터페이스가 공유하는 기술 기반이다.")]
 public interface IE단계Module
 {
     SsalddelEvidenceStage EvidenceStage { get; }
@@ -205,17 +281,40 @@ public interface IE6세계정제Module : IE단계Module { }
     Boundary = "모듈 타입 존재는 E7 증거 완료가 아니다.")]
 public interface IE7플레이경험폐루프Module : IE단계Module { }
 [SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E8,
-    "생활 연속성 검토 책임의 공통 모듈 이름을 제공한다.",
+    "둘 이상의 E7 폐루프가 영역 안에서 조화를 이루는지 검토할 공통 모듈 이름을 제공한다.",
     Boundary = "모듈 타입 존재는 E8 증거 완료가 아니다.")]
-public interface IE8생활연속성Module : IE단계Module { }
+public interface IE8영역폐루프조화Module : IE단계Module { }
 [SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E9,
-    "변화 봉투 검토 책임의 공통 모듈 이름을 제공한다.",
+    "E8 조화본을 사람이 반복 플레이하며 개선하는 책임의 공통 모듈 이름을 제공한다.",
     Boundary = "모듈 타입 존재는 E9 증거 완료가 아니다.")]
+public interface IE9사람통합플레이개선Module : IE단계Module { }
+[SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E10,
+    "승인된 후보 빌드의 제한 운영을 검증하는 책임의 공통 모듈 이름을 제공한다.",
+    Boundary = "모듈 타입 존재는 E10 증거 완료나 운영 권한 부여가 아니다.")]
+public interface IE10제한운영검증Module : IE단계Module { }
+
+[SsalddelEvidenceResponsibility(SsalddelEvidenceStage.E8,
+    "NPC 판단·이동·WI·결과·다음 판단이 영역 폐루프 사이에서 이어지는지 검토한다.",
+    Role = SsalddelEvidenceResponsibilityRole.Secondary,
+    Boundary = "NPC가 관련된 E8 조화 묶음의 조건 모듈이며 단독 E8 증거가 아니다.")]
+[SsalddelEvidenceCoverageExclusion(
+    SsalddelEvidenceCoverageExclusionCategory.CompatibilityFacade,
+    "구판 E8 기술 이름을 보존하며 현재 E8에서는 NPC 조건 모듈로만 사용한다.")]
+public interface IE8생활연속성Module : IE단계Module { }
+
+[SsalddelEvidenceCoverageExclusion(
+    SsalddelEvidenceCoverageExclusionCategory.CompatibilityFacade,
+    "구판 legacy-change-adaptive.r10의 E9 변화 봉투 이름을 읽기 위해 보존한다.")]
 public interface IE9변화봉투Module : IE단계Module { }
+
+[SsalddelEvidenceCoverageExclusion(
+    SsalddelEvidenceCoverageExclusionCategory.NoGameMaturityResponsibility,
+    "Revision·Migration·Save/API 호환과 rollback을 검토하는 횡단 책임이며 E 단계가 아니다.")]
+public interface I변경영향검토Module { }
 
 /// <summary>
 /// Unity Editor처럼 JSON 원장에 직접 접근하지 않는 소비자를 위한 컴파일 투영이다.
-/// Hongdal 코드 지도 검증이 E9 모듈 JSON과 모든 값을 대조한다.
+/// Hongdal 코드 지도 검증이 현재 E 책임 모듈 JSON과 모든 값을 대조한다.
 /// </summary>
 public static class SsalddelEvidenceStageDefinitionCatalog
 {
@@ -237,9 +336,23 @@ public static class SsalddelEvidenceStageDefinitionCatalog
             new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E7,
                 "G2", "플레이 경험 폐루프", "E7플레이경험폐루프Module"),
             new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E8,
-                "G3", "생활 연속성", "E8생활연속성Module"),
+                "G3", "영역 폐루프 조화", "E8영역폐루프조화Module"),
             new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E9,
-                "G4", "변화 봉투", "E9변화봉투Module"),
+                "G4", "사람 통합 플레이 개선", "E9사람통합플레이개선Module"),
+            new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E10,
+                "G5", "제한 운영 검증", "E10제한운영검증Module"),
+        };
+}
+
+public static class SsalddelLegacyEvidenceStageDefinitionCatalog
+{
+    public static IReadOnlyList<SsalddelEvidenceStageDefinition> E8AndE9 { get; }
+        = new[]
+        {
+            new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E8,
+                "G3", "NPC 생활세계 폐루프", "E8생활연속성Module"),
+            new SsalddelEvidenceStageDefinition(SsalddelEvidenceStage.E9,
+                "G4", "변화 적응형 세계", "E9변화봉투Module"),
         };
 }
 
@@ -256,7 +369,7 @@ public sealed class SsalddelEvidenceResponsibilityAttribute : Attribute
     {
         if (evidenceStage == SsalddelEvidenceStage.Unspecified)
             throw new ArgumentOutOfRangeException(nameof(evidenceStage),
-                "E 책임 단계는 E1~E9 중 하나여야 합니다.");
+                "E 책임 단계는 E1~E10 중 하나여야 합니다.");
         if (string.IsNullOrWhiteSpace(responsibility))
             throw new ArgumentException("E 책임 설명은 비어 있을 수 없습니다.",
                 nameof(responsibility));

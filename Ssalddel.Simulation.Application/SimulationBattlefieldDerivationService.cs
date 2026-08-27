@@ -8,20 +8,6 @@ using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Application
 {
-    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
-        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
-        "구성 요소의 공통 Core·Application 또는 Adapter 실행 경계를 제공한다.",
-        Boundary = "실행 경계는 실제 권위 위치와 E 단계 달성 증거를 분리한다.")]
-    public interface ISimulationBattlefieldDerivationService
-    {
-        SimulationBattlefieldDerivationSnapshot Derive(
-            string sessionStableId,
-            string encounterStableId,
-            string areaStableId,
-            long capturedWorldRevision,
-            bool natureEncounter);
-    }
-
     /// <summary>
     /// H5 생활세계를 전투 좌표로 확대하지 않고, 조우 주변의 지역 사실을
     /// 불변 문맥으로 채취해 독립 BattleLocalMeters 전장 계획을 만든다.

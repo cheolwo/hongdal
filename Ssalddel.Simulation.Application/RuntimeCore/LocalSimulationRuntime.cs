@@ -20,7 +20,7 @@ namespace Ssalddel.Simulation.Application
     public sealed class LocalSimulationRuntime : ISimulationRuntimeModules,
         ISimulationSessionRuntime, ISimulationNatureSurvivalRuntime,
         ISimulationSessionGameplayRuntime, ISimulationWorldInteractionRuntime,
-        IDisposable
+        ISimulationBattleRuntime, ISimulationActorEquipmentRuntime, IDisposable
     {
         private readonly SemaphoreSlim commandGate = new SemaphoreSlim(1, 1);
         private readonly ISimulationSessionSaveStore saveStore;
@@ -30,12 +30,17 @@ namespace Ssalddel.Simulation.Application
         private readonly SimulationNatureSurvivalService nature;
         private readonly SimulationFarmSurvivalService farm;
         private readonly SimulationRegionalIncidentService regionalIncidents;
+        private readonly InMemorySimulationTeamObservationPolicyStore battlePolicies;
+        private readonly SimulationBattleInstanceService battles;
+        private readonly ISimulationPlayableLoopEngineTraceSink engineTraceSink;
 
         public LocalSimulationRuntime(
             I경영SimulationSessionStore sessionStore,
             ISimulationSessionSaveStore sessionSaveStore,
             ISimulationLocalSaveSlotStore localSaveSlotStore,
-            ISimulationBattleWorldReconciler? battleReconciler = null)
+            ISimulationBattleWorldReconciler? battleReconciler = null,
+            SimulationBattleInstanceService? battleService = null,
+            ISimulationPlayableLoopEngineTraceSink? playableLoopEngineTraceSink = null)
         {
             this.sessionStore = sessionStore
                 ?? throw new ArgumentNullException(nameof(sessionStore));
@@ -43,13 +48,25 @@ namespace Ssalddel.Simulation.Application
                 ?? throw new ArgumentNullException(nameof(sessionSaveStore));
             slotStore = localSaveSlotStore
                 ?? throw new ArgumentNullException(nameof(localSaveSlotStore));
+            engineTraceSink = playableLoopEngineTraceSink
+                ?? new InMemorySimulationPlayableLoopEngineTraceSink();
 
+            battlePolicies = new InMemorySimulationTeamObservationPolicyStore();
+            battles = battleService ?? new SimulationBattleInstanceService(
+                sessionStore, battlePolicies, new LocalSimulationBattleInstanceStore());
             var sessions = new 경영SimulationSessionAccessor(sessionStore);
             lifecycle = new 경영SimulationSession생명주기Service(
-                sessions, saveStore, battleReconciler);
-            nature = new SimulationNatureSurvivalService(sessionStore);
-            farm = new SimulationFarmSurvivalService(sessionStore);
-            regionalIncidents = new SimulationRegionalIncidentService(sessions);
+                sessions, saveStore, battleReconciler ?? battles);
+            var worldInteractionPipeline = new 세계상호작용실행Pipeline(
+                engineTraceSink);
+            nature = new SimulationNatureSurvivalService(sessionStore,
+                worldInteractionPipeline,
+                authorityLocationCode:
+                    SimulationAuthorityLocation.LocalProcess.ToString());
+            farm = new SimulationFarmSurvivalService(sessionStore,
+                worldInteractionPipeline: worldInteractionPipeline);
+            regionalIncidents = new SimulationRegionalIncidentService(sessions,
+                worldInteractionPipeline);
         }
 
         public SimulationRuntimeDescriptor Descriptor { get; } = new()
@@ -69,6 +86,48 @@ namespace Ssalddel.Simulation.Application
         public ISimulationLogisticsRuntime Logistics => this;
         public ISimulationFarmWorldInteractionRuntime FarmWorldInteractions => this;
         public ISimulationNatureWorldInteractionRuntime NatureWorldInteractions => this;
+        public ISimulationBattleRuntime Battles => this;
+        public ISimulationActorEquipmentRuntime ActorEquipment => this;
+
+        public ValueTask<SimulationActorEquipmentStateSnapshot>
+            GetActorEquipmentAsync(string sessionStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .GetActorEquipmentState(), cancellationToken);
+
+        public ValueTask<SimulationActorItemAcquirePreviewSnapshot>
+            PreviewActorItemAcquireAsync(string sessionStableId,
+                SimulationActorItemAcquirePreviewRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .PreviewActorItemAcquire(request), cancellationToken);
+
+        public ValueTask<SimulationActorEquipmentStateSnapshot>
+            ConfirmActorItemAcquireAsync(string sessionStableId,
+                SimulationActorItemAcquireConfirmRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .ConfirmActorItemAcquire(request), cancellationToken);
+
+        public ValueTask<SimulationActorEquipmentChangePreviewSnapshot>
+            PreviewActorEquipmentChangeAsync(string sessionStableId,
+                SimulationActorEquipmentChangePreviewRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .PreviewActorEquipmentChange(request), cancellationToken);
+
+        public ValueTask<SimulationActorEquipmentStateSnapshot>
+            ConfirmActorEquipmentChangeAsync(string sessionStableId,
+                SimulationActorEquipmentChangeConfirmRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .ConfirmActorEquipmentChange(request), cancellationToken);
+
+        public SimulationPlayableLoopEngineTraceEntry[]
+            GetPlayableLoopEngineTrace(string playableLoopStableId,
+                string worldInteractionId, string commandId)
+            => engineTraceSink.Snapshot(playableLoopStableId,
+                worldInteractionId, commandId);
 
         public ValueTask<경영SimulationSessionSnapshot> CreateAsync(
             경영SimulationSession생성Request request,
@@ -87,6 +146,12 @@ namespace Ssalddel.Simulation.Application
             => ExecuteAsync(() => lifecycle.Advance(sessionStableId, request),
                 cancellationToken);
 
+        public ValueTask<SimulationNpcRoutineWorkProjection[]>
+            GetNpcRoutineWorkAsync(string sessionStableId, string areaCode,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .GetNpcRoutineWork(areaCode), cancellationToken);
+
         public ValueTask<SimulationSpatialCompositionStateSnapshot>
             GetSpatialCompositionAsync(string sessionStableId, string areaCode,
                 CancellationToken cancellationToken = default)
@@ -98,6 +163,24 @@ namespace Ssalddel.Simulation.Application
             string sessionStableId,
             CancellationToken cancellationToken)
             => ExecuteAsync(() => nature.Get(sessionStableId), cancellationToken);
+
+        public ValueTask<Simulation영역건물발전Snapshot>
+            GetBuildingProgressionAsync(string sessionStableId, string areaCode,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => nature.GetBuildingProgression(
+                sessionStableId, areaCode), cancellationToken);
+
+        public ValueTask<Simulation플레이어기회Snapshot[]>
+            GetPlayerOpportunitiesAsync(string sessionStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => nature.GetPlayerOpportunities(sessionStableId),
+                cancellationToken);
+
+        public ValueTask<Simulation영역수요Snapshot[]>
+            GetAreaNeedsAsync(string sessionStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => nature.GetAreaNeeds(sessionStableId),
+                cancellationToken);
 
         public ValueTask<SimulationNatureSurvivalActionPreviewSnapshot> PreviewAsync(
             string sessionStableId,
@@ -125,6 +208,12 @@ namespace Ssalddel.Simulation.Application
                 CancellationToken cancellationToken = default)
             => ExecuteAsync(() => RequireSession(sessionStableId)
                 .GetTurnClosingContext(), cancellationToken);
+
+        public ValueTask<SimulationTownNpcLifeStateSnapshot>
+            GetTownNpcLifeStateAsync(string sessionStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .GetTownNpcLifeState(), cancellationToken);
 
         public ValueTask<SimulationTurnClosingPreviewSnapshot>
             PreviewTurnClosingAsync(string sessionStableId,
@@ -275,6 +364,71 @@ namespace Ssalddel.Simulation.Application
             => ExecuteAsync(() => regionalIncidents.ConfirmPartyRecovery(
                 sessionStableId, request), cancellationToken);
 
+        public ValueTask<SimulationBattleCreatePreviewSnapshot> PreviewBattleAsync(
+            string sessionStableId, SimulationBattleCreatePreviewRequest request,
+            CancellationToken cancellationToken = default)
+            => ExecuteAsync(() =>
+            {
+                EnsureLocalBattlePolicy(sessionStableId,
+                    request.RequestingActorStableId);
+                return battles.PreviewCreate(sessionStableId, request);
+            }, cancellationToken);
+
+        public ValueTask<SimulationBattleInstanceSnapshot> ConfirmBattleAsync(
+            string sessionStableId, SimulationBattleCreateConfirmRequest request,
+            CancellationToken cancellationToken = default)
+            => ExecuteAsync(() =>
+            {
+                EnsureLocalBattlePolicy(sessionStableId,
+                    request.RequestingActorStableId);
+                return battles.ConfirmCreate(sessionStableId, request);
+            }, cancellationToken);
+
+        public ValueTask<SimulationBattleInstanceSnapshot>
+            ConfirmBattleControlModeAsync(string sessionStableId,
+                string battleStableId,
+                SimulationLocalCombatControlModeConfirmRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() =>
+            {
+                EnsureLocalBattlePolicy(sessionStableId,
+                    request.RequestingActorStableId);
+                return battles.ConfirmLocalControlMode(sessionStableId,
+                    battleStableId, request);
+            }, cancellationToken);
+
+        public ValueTask<SimulationBattleInstanceSnapshot> ConfirmBattleActionAsync(
+            string sessionStableId, string battleStableId,
+            SimulationLocalCombatActionConfirmRequest request,
+            CancellationToken cancellationToken = default)
+            => ExecuteAsync(() =>
+            {
+                EnsureLocalBattlePolicy(sessionStableId,
+                    request.RequestingActorStableId);
+                return battles.ConfirmLocalAction(sessionStableId,
+                    battleStableId, request);
+            }, cancellationToken);
+
+        public ValueTask<SimulationBattleInstanceSnapshot>
+            ConfirmObserverInterventionAsync(string sessionStableId,
+                string battleStableId,
+                SimulationLocalCombatObserverInterventionConfirmRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() =>
+            {
+                EnsureLocalBattlePolicy(sessionStableId,
+                    request.RequestingActorStableId);
+                return battles.ConfirmObserverIntervention(sessionStableId,
+                    battleStableId, request);
+            }, cancellationToken);
+
+        public ValueTask<SimulationBattleInstanceSnapshot> AdvanceBattleAsync(
+            string sessionStableId, string battleStableId,
+            SimulationBattleAdvanceRequest request,
+            CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => battles.Advance(sessionStableId,
+                battleStableId, request), cancellationToken);
+
         public ValueTask<SimulationLocalSaveSlotResult> SaveSlotAsync(
             string sessionStableId,
             SimulationLocalSaveSlotRequest request,
@@ -291,6 +445,8 @@ namespace Ssalddel.Simulation.Application
                         SaveStableId = saveStableId,
                         ExpectedRevision = request.ExpectedRevision,
                         LhWorldState = request.LhWorldState,
+                        WorldAssetPlacementState =
+                            request.WorldAssetPlacementState,
                     });
                 slotStore.Write(slotStableId, package);
                 return new SimulationLocalSaveSlotResult
@@ -364,6 +520,29 @@ namespace Ssalddel.Simulation.Application
                 throw new SimulationContractException("SimulationSessionStableIdMissing");
             return sessionStore.Find(sessionStableId.Trim())
                 ?? throw new SimulationNotFoundException("SimulationSessionNotFound");
+        }
+
+        private void EnsureLocalBattlePolicy(string sessionStableId,
+            string actorStableId)
+        {
+            if (string.IsNullOrWhiteSpace(sessionStableId)
+                || string.IsNullOrWhiteSpace(actorStableId))
+                throw new SimulationContractException(
+                    "SimulationBattleActorInvalid");
+            battlePolicies.Replace(new SimulationTeamObservationPolicySnapshot
+            {
+                SessionStableId = sessionStableId.Trim(),
+                TeamStableId = "team:local-player:" + actorStableId.Trim(),
+                Revision = RequireSession(sessionStableId).Revision,
+                MembersCanObserve = true,
+                MemberActorStableIds = new[] { actorStableId.Trim() },
+                AllowedViewModeCodes = new[]
+                {
+                    "FirstPerson", "TacticalThirdPerson", "ObserverOperation",
+                },
+                SimulationOnly = true,
+                IsOperationalState = false,
+            });
         }
 
         public void Dispose() => commandGate.Dispose();

@@ -27,6 +27,12 @@ namespace Ssalddel.Simulation.Domain
             ValidateSupplyChainWork(request.Work);
             lock (gate)
             {
+                if (IsNpcRoutineControlEnabled
+                    && string.Equals(request.Work.ActionCode,
+                        SimulationSupplyChainActionCodes.WarehouseOutboundFlow,
+                        StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationNpcRoutineDirectControlForbidden");
                 var validation = CreateSupplyChainDecisionRequest(request.Work, true);
                 var block = validation.BlockReasonCodes.FirstOrDefault();
                 if (block != null && !appliedDecisionCommands.ContainsKey(request.CommandId))
@@ -168,6 +174,8 @@ namespace Ssalddel.Simulation.Domain
                     inventory.StateCode = SimulationNpcInventoryStateCodes.Picked;
                     inventory.UpdatedTick = currentTick;
                     inventory.Revision++;
+                    ObserveNpcRoutineSupplyChainTransition(task, inventory,
+                        "WI-HUB-04");
                 }
                 if (currentTick >= task.ExpectedEndTick
                     && inventory.StateCode == SimulationNpcInventoryStateCodes.Picked)
@@ -176,6 +184,8 @@ namespace Ssalddel.Simulation.Domain
                     inventory.UpdatedTick = task.ExpectedEndTick;
                     inventory.Revision++;
                     RegisterWarehouseOutboundAllocation(inventory, task);
+                    ObserveNpcRoutineSupplyChainTransition(task, inventory,
+                        "WI-HUB-05");
                 }
                 return;
             }

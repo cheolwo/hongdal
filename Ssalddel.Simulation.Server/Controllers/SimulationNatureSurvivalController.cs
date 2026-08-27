@@ -21,6 +21,27 @@ public sealed class SimulationNatureSurvivalController(
     public ActionResult<SimulationNatureSurvivalStateSnapshot> Get(string sessionStableId)
         => Execute(() => service.Get(sessionStableId));
 
+    [HttpGet("player-opportunities")]
+    [ProducesResponseType(typeof(Simulation플레이어기회Snapshot[]),
+        StatusCodes.Status200OK)]
+    public ActionResult<Simulation플레이어기회Snapshot[]> GetPlayerOpportunities(
+        string sessionStableId)
+        => Execute(() => service.GetPlayerOpportunities(sessionStableId));
+
+    [HttpGet("area-needs")]
+    [ProducesResponseType(typeof(Simulation영역수요Snapshot[]),
+        StatusCodes.Status200OK)]
+    public ActionResult<Simulation영역수요Snapshot[]> GetAreaNeeds(
+        string sessionStableId)
+        => Execute(() => service.GetAreaNeeds(sessionStableId));
+
+    [HttpGet("building-progression/{areaCode}")]
+    [ProducesResponseType(typeof(Simulation영역건물발전Snapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<Simulation영역건물발전Snapshot> GetBuildingProgression(
+        string sessionStableId, string areaCode)
+        => Execute(() => service.GetBuildingProgression(sessionStableId, areaCode));
+
     [HttpPost("previews")]
     [ProducesResponseType(typeof(SimulationNatureSurvivalActionPreviewSnapshot),
         StatusCodes.Status200OK)]

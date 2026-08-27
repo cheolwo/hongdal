@@ -86,6 +86,14 @@ namespace Ssalddel.Simulation.Domain
         private bool localHostileTelegraphActive;
         private int localHostileTelegraphOpenedCombatTick;
         private string localControlModeCode = SimulationLocalCombatCodes.DirectAction;
+        private string localRuleRevision = SimulationLocalCombatCodes.RuleRevision;
+        private bool localParticipationModeLocked;
+        private bool localObserverTacticalPauseActive;
+        private bool localObserverInterventionConsumed;
+        private string localObserverActivatedCardCopyStableId = string.Empty;
+        private string localObserverActivatedModifierCode = string.Empty;
+        private int localObserverAutomaticActionCount;
+        private SimulationLocalCombatPerformanceSnapshot localPerformance = new();
 
         public SimulationBattleInstanceSnapshot ConfirmLocalControlMode(
             SimulationLocalCombatControlModeConfirmRequest request)
@@ -102,8 +110,42 @@ namespace Ssalddel.Simulation.Domain
                         request.ControlModeCode.Trim()), () =>
                     {
                         RequireLocalCommander(request.RequestingActorStableId);
+                        if (localParticipationModeLocked || combatTick != 0
+                            || localCombatActions.Count != 0)
+                            throw new SimulationConflictException(
+                                "SimulationLocalCombatParticipationModeLocked");
+                        if (!string.IsNullOrWhiteSpace(
+                                request.ExpectedCardLoadoutHashSha256)
+                            && !string.Equals(request.ExpectedCardLoadoutHashSha256.Trim(),
+                                context.UnitRoster.CardModifierHashSha256,
+                                StringComparison.Ordinal))
+                            throw new SimulationConflictException(
+                                "SimulationLocalCombatCardLoadoutChanged");
                         localControlModeCode = request.ControlModeCode.Trim();
+                        localParticipationModeLocked = true;
                     });
+            }
+        }
+
+        public SimulationBattleInstanceSnapshot ConfirmObserverIntervention(
+            SimulationLocalCombatObserverInterventionConfirmRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.CommandId)
+                || string.IsNullOrWhiteSpace(request.RequestingActorStableId)
+                || (request.ActionCode !=
+                        SimulationLocalCombatCodes.PauseObserverIntervention
+                    && request.ActionCode !=
+                        SimulationLocalCombatCodes.ActivateObserverCard
+                    && request.ActionCode !=
+                        SimulationLocalCombatCodes.SkipObserverIntervention))
+                throw new SimulationContractException(
+                    "SimulationLocalCombatObserverInterventionInvalid");
+            lock (gate)
+            {
+                return Apply(request.CommandId, request.ExpectedBattleRevision,
+                    string.Join("~", request.RequestingActorStableId.Trim(),
+                        request.ActionCode.Trim(), request.CardCopyStableId?.Trim()
+                            ?? string.Empty), () => ResolveObserverIntervention(request));
             }
         }
 
@@ -273,6 +315,10 @@ namespace Ssalddel.Simulation.Domain
                 request.CombatTickCount.ToString(CultureInfo.InvariantCulture), () =>
                 {
                     EnsureLocalActive();
+                    if (localObserverTacticalPauseActive)
+                        throw new SimulationConflictException(
+                            "SimulationLocalCombatObserverTacticalPauseActive");
+                    localParticipationModeLocked = true;
                     for (var i = 0; i < request.CombatTickCount
                         && phaseCode == SimulationBattleInstanceCodes.Active; i++)
                     {
@@ -291,6 +337,7 @@ namespace Ssalddel.Simulation.Domain
         private void ResolveLocalAction(SimulationLocalCombatActionConfirmRequest request)
         {
             RequireLocalCommander(request.RequestingActorStableId);
+            localParticipationModeLocked = true;
             var actor = PlayerActor();
             if (actor.NextActionCombatTick > combatTick)
                 throw new SimulationConflictException("SimulationLocalCombatActionCooldown");
@@ -377,7 +424,11 @@ namespace Ssalddel.Simulation.Domain
 
         private void ResolveLocalAiTick()
         {
-            if (localControlModeCode == SimulationLocalCombatCodes.DirectAction)
+            if (localControlModeCode == SimulationLocalCombatCodes.ObserverOperation)
+                ResolveObserverPlayerAiTick();
+
+            if (localControlModeCode == SimulationLocalCombatCodes.DirectAction
+                || localControlModeCode == SimulationLocalCombatCodes.ObserverOperation)
             foreach (var companion in localCombatActors.Where(value =>
                          value.SideCode == SimulationLocalCombatCodes.Companion
                          && value.StateCode == SimulationLocalCombatCodes.Active))
@@ -414,6 +465,8 @@ namespace Ssalddel.Simulation.Domain
                     : recent?.ActionCode == SimulationLocalCombatCodes.HoldPosition
                         ? ApplyControlCardModifier(player.ActorStableId, 45, true,
                             true, out _) : 80;
+                if (localControlModeCode == SimulationLocalCombatCodes.ObserverOperation)
+                    damage = ApplyObserverIncomingDamage(damage);
                 player.HealthPermille = Math.Max(0, player.HealthPermille - damage);
                 AddLocalAction("ai:" + combatTick + ":" + hostile.ActorStableId,
                     hostile.ActorStableId, player.ActorStableId,
@@ -451,8 +504,10 @@ namespace Ssalddel.Simulation.Domain
                 RecoverableInjuryCount = Math.Max(injured, victory ? 0 : 1),
                 SecurityDelta = victory ? 1 : retreated ? -1 : -2,
                 MoraleDelta = victory ? 1 : -2,
-                UsedDeterministicAutoCommand = false,
+                UsedDeterministicAutoCommand = localControlModeCode ==
+                    SimulationLocalCombatCodes.ObserverOperation,
             };
+            localPerformance = CalculateDirectPerformance(victory);
             semanticEffects.Clear();
             semanticEffects.AddRange(BuildSemanticEffects(outcome));
             phaseCode = SimulationBattleInstanceCodes.Completed;
@@ -532,6 +587,236 @@ namespace Ssalddel.Simulation.Domain
             .Select(value => value.ModifierCode).Distinct(StringComparer.Ordinal)
             .OrderBy(value => value, StringComparer.Ordinal).ToArray();
 
+        private void ResolveObserverPlayerAiTick()
+        {
+            var player = PlayerActor();
+            if (player.StateCode != SimulationLocalCombatCodes.Active
+                || player.NextActionCombatTick > combatTick) return;
+            var modifiers = ObserverModifiers();
+            var cautious = modifiers.Any(value => value.ModifierCode ==
+                SimulationLocalCombatCodes.ObserverCautiousDefense);
+            if (localHostileTelegraphActive && cautious && combatTick % 10 == 0)
+            {
+                player.StaminaPermille = Math.Max(0, player.StaminaPermille - 50);
+                AddLocalAction("ai:" + combatTick + ":observer:guard",
+                    player.ActorStableId, string.Empty, SimulationLocalCombatCodes.Guard,
+                    "ObserverGuardWindowOpened", 0, -50, 0,
+                    new[] { SimulationLocalCombatCodes.ObserverCautiousDefense });
+                player.NextActionCombatTick = combatTick
+                    + SimulationLocalCombatCodes.DefaultActionCooldownTicks;
+                localObserverAutomaticActionCount++;
+                return;
+            }
+
+            var target = SelectObserverTarget(modifiers);
+            if (target == null) return;
+            if (target.RangeBandCode == SimulationLocalCombatCodes.Far)
+            {
+                target.RangeBandCode = SimulationLocalCombatCodes.Near;
+                AddLocalAction("ai:" + combatTick + ":observer:approach",
+                    player.ActorStableId, target.ActorStableId,
+                    SimulationLocalCombatCodes.Approach, "ObserverRangeClosed",
+                    0, 0, 0, ObserverModifierCodes(modifiers));
+            }
+            else
+            {
+                var damage = ApplyObserverOutgoingDamage(200);
+                target.HealthPermille = Math.Max(0, target.HealthPermille - damage);
+                if (target.HealthPermille == 0)
+                    target.StateCode = SimulationLocalCombatCodes.Defeated;
+                AddLocalAction("ai:" + combatTick + ":observer:attack",
+                    player.ActorStableId, target.ActorStableId,
+                    SimulationLocalCombatCodes.BasicAttack,
+                    target.StateCode == SimulationLocalCombatCodes.Defeated
+                        ? "TargetDefeated" : "ObserverHit", -damage, 0, 0,
+                    ObserverModifierCodes(modifiers));
+            }
+            player.NextActionCombatTick = combatTick
+                + SimulationLocalCombatCodes.DefaultActionCooldownTicks;
+            localObserverAutomaticActionCount++;
+        }
+
+        private SimulationLocalCombatActorSnapshot? SelectObserverTarget(
+            SimulationBattleCardModifierSnapshot[] modifiers)
+        {
+            var targets = localCombatActors.Where(value => value.SideCode ==
+                    SimulationLocalCombatCodes.Hostile
+                && value.StateCode == SimulationLocalCombatCodes.Active);
+            return modifiers.Any(value => value.ModifierCode ==
+                    SimulationLocalCombatCodes.ObserverWeaknessObservation)
+                ? targets.OrderBy(value => value.HealthPermille)
+                    .ThenBy(value => value.ActorStableId, StringComparer.Ordinal)
+                    .FirstOrDefault()
+                : targets.OrderBy(value => value.ActorStableId,
+                    StringComparer.Ordinal).FirstOrDefault();
+        }
+
+        private int ApplyObserverOutgoingDamage(int baseValue)
+        {
+            var codes = ObserverModifiers().Select(value => value.ModifierCode).ToArray();
+            var basisPoints = 0;
+            if (codes.Contains(SimulationLocalCombatCodes.ObserverFocusedAssault,
+                    StringComparer.Ordinal)) basisPoints += 1500;
+            if (codes.Contains(SimulationLocalCombatCodes.ObserverCautiousDefense,
+                    StringComparer.Ordinal)) basisPoints -= 1000;
+            return ApplyBasisPoints(baseValue, basisPoints);
+        }
+
+        private int ApplyObserverIncomingDamage(int baseValue)
+        {
+            var codes = ObserverModifiers().Select(value => value.ModifierCode).ToArray();
+            var basisPoints = 0;
+            if (codes.Contains(SimulationLocalCombatCodes.ObserverFocusedAssault,
+                    StringComparer.Ordinal)) basisPoints += 1000;
+            if (codes.Contains(SimulationLocalCombatCodes.ObserverCautiousDefense,
+                    StringComparer.Ordinal)) basisPoints -= 2000;
+            if (codes.Contains(SimulationLocalCombatCodes.ObserverCabinCover,
+                    StringComparer.Ordinal)
+                && context.ScaleReasonCodes.Contains("CabinDefenseApplied",
+                    StringComparer.Ordinal)) basisPoints -= 1500;
+            return ApplyBasisPoints(baseValue, basisPoints);
+        }
+
+        private static int ApplyBasisPoints(int baseValue, int basisPoints)
+        {
+            var clamped = Math.Max(-3000, Math.Min(3000, basisPoints));
+            return Math.Max(1, (int)Math.Round(baseValue *
+                (10000m + clamped) / 10000m, MidpointRounding.AwayFromZero));
+        }
+
+        private SimulationBattleCardModifierSnapshot[] ObserverModifiers()
+            => context.UnitRoster.CardModifiers.Where(value =>
+                    value.ApplicableControlModeCode ==
+                        SimulationLocalCombatCodes.ObserverOperation
+                    && value.ActorStableId == PlayerActor().ActorStableId)
+                .OrderBy(value => value.CardCopyStableId, StringComparer.Ordinal)
+                .ThenBy(value => value.ModifierCode, StringComparer.Ordinal).ToArray();
+
+        private static string[] ObserverModifierCodes(
+            IEnumerable<SimulationBattleCardModifierSnapshot> values)
+            => values.Select(value => value.ModifierCode)
+                .Distinct(StringComparer.Ordinal).OrderBy(value => value,
+                    StringComparer.Ordinal).ToArray();
+
+        private void ResolveObserverIntervention(
+            SimulationLocalCombatObserverInterventionConfirmRequest request)
+        {
+            if (context.CombatSpaceCode != SimulationLocalCombatCodes.WorldLocal
+                || phaseCode != SimulationBattleInstanceCodes.Active
+                || localControlModeCode != SimulationLocalCombatCodes.ObserverOperation
+                || !IsCommander(request.RequestingActorStableId))
+                throw new SimulationConflictException(
+                    "SimulationLocalCombatObserverInterventionUnavailable");
+            localParticipationModeLocked = true;
+            if (localObserverInterventionConsumed)
+                throw new SimulationConflictException(
+                    "SimulationLocalCombatObserverInterventionConsumed");
+            if (request.ActionCode ==
+                SimulationLocalCombatCodes.PauseObserverIntervention)
+            {
+                if (localObserverTacticalPauseActive)
+                    throw new SimulationConflictException(
+                        "SimulationLocalCombatObserverTacticalPauseActive");
+                localObserverTacticalPauseActive = true;
+                localStateCode = SimulationLocalCombatCodes.ObserverPaused;
+                return;
+            }
+            if (!localObserverTacticalPauseActive)
+                throw new SimulationConflictException(
+                    "SimulationLocalCombatObserverTacticalPauseRequired");
+
+            if (request.ActionCode ==
+                SimulationLocalCombatCodes.SkipObserverIntervention)
+            {
+                localObserverInterventionConsumed = true;
+                localObserverTacticalPauseActive = false;
+                localStateCode = SimulationLocalCombatCodes.Active;
+                AddLocalAction(request.CommandId, PlayerActor().ActorStableId,
+                    string.Empty, request.ActionCode, "ObserverInterventionSkipped",
+                    0, 0, 0, Array.Empty<string>());
+                return;
+            }
+
+            var modifier = ObserverModifiers().SingleOrDefault(value =>
+                value.CardCopyStableId == request.CardCopyStableId?.Trim()
+                && (value.ModifierCode ==
+                        SimulationLocalCombatCodes.ObserverFieldRecovery
+                    || value.ModifierCode ==
+                        SimulationLocalCombatCodes.ObserverSafeRetreat));
+            if (modifier == null)
+                throw new SimulationConflictException(
+                    "SimulationLocalCombatObserverEmergencyCardUnavailable");
+            localObserverInterventionConsumed = true;
+            localObserverTacticalPauseActive = false;
+            localObserverActivatedCardCopyStableId = modifier.CardCopyStableId;
+            localObserverActivatedModifierCode = modifier.ModifierCode;
+            var player = PlayerActor();
+            if (modifier.ModifierCode ==
+                SimulationLocalCombatCodes.ObserverSafeRetreat)
+            {
+                player.StateCode = SimulationLocalCombatCodes.Retreated;
+                player.RangeBandCode = SimulationLocalCombatCodes.RetreatBoundary;
+                localStateCode = SimulationLocalCombatCodes.Retreated;
+                AddLocalAction(request.CommandId, player.ActorStableId, string.Empty,
+                    request.ActionCode, "ObserverSafeRetreatApplied", 0, 0, 0,
+                    new[] { modifier.ModifierCode });
+                ResolveLocalOutcome(false, true);
+                return;
+            }
+            var before = player.HealthPermille;
+            player.HealthPermille = Math.Min(1000, player.HealthPermille
+                + SimulationLocalCombatCodes.ObserverRecoveryPermille);
+            localStateCode = SimulationLocalCombatCodes.Active;
+            AddLocalAction(request.CommandId, player.ActorStableId,
+                player.ActorStableId, request.ActionCode,
+                "ObserverFieldRecoveryApplied", player.HealthPermille - before,
+                0, 0, new[] { modifier.ModifierCode });
+        }
+
+        private SimulationLocalCombatPerformanceSnapshot CalculateDirectPerformance(
+            bool victory)
+        {
+            var player = PlayerActor();
+            var hostileCount = localCombatActors.Count(value => value.SideCode ==
+                SimulationLocalCombatCodes.Hostile);
+            var defenses = localCombatActions.Count(value =>
+                value.ActorStableId == player.ActorStableId
+                && (value.ActionCode == SimulationLocalCombatCodes.Guard
+                    || value.ActionCode == SimulationLocalCombatCodes.Dodge
+                       && value.ResultCode == "DodgeSucceeded"
+                    || value.ActionCode == SimulationLocalCombatCodes.Counter
+                       && value.ReactionOffsetMs <= 200));
+            var healthScore = Math.Max(0, Math.Min(500, player.HealthPermille / 2));
+            var defenseScore = Math.Min(250, defenses * 50);
+            var speedScore = Math.Max(0, 250 - Math.Max(0,
+                combatTick - hostileCount * 20) * 5);
+            var total = Math.Max(0, Math.Min(1000,
+                healthScore + defenseScore + speedScore));
+            var grade = victory && localControlModeCode ==
+                SimulationLocalCombatCodes.DirectAction
+                ? total >= SimulationLocalCombatCodes.PerformanceGradeSThreshold
+                    ? SimulationLocalCombatCodes.GradeS
+                    : total >= SimulationLocalCombatCodes.PerformanceGradeAThreshold
+                        ? SimulationLocalCombatCodes.GradeA
+                        : SimulationLocalCombatCodes.GradeB
+                : string.Empty;
+            return new SimulationLocalCombatPerformanceSnapshot
+            {
+                IsFinal = true,
+                FinalHealthPermille = player.HealthPermille,
+                SuccessfulDefenseCount = defenses,
+                ElapsedCombatTicks = combatTick,
+                HostileCount = hostileCount,
+                HealthScore = healthScore,
+                DefenseScore = defenseScore,
+                SpeedScore = speedScore,
+                TotalScore = total,
+                GradeCode = grade,
+                RewardBonusQuantity = grade == SimulationLocalCombatCodes.GradeS ? 2
+                    : grade == SimulationLocalCombatCodes.GradeA ? 1 : 0,
+            };
+        }
+
         private void AddLocalAction(string commandId, string actorId, string targetId,
             string actionCode, string resultCode, int healthDelta, int staminaDelta,
             int reactionOffsetMs, string[] appliedCardModifierCodes)
@@ -560,6 +845,8 @@ namespace Ssalddel.Simulation.Domain
         {
             var allowed = localControlModeCode == SimulationLocalCombatCodes.DirectAction
                 ? action != SimulationLocalCombatCodes.HoldPosition
+                : localControlModeCode == SimulationLocalCombatCodes.ObserverOperation
+                    ? false
                 : action == SimulationLocalCombatCodes.BasicAttack
                   || action == SimulationLocalCombatCodes.Approach
                   || action == SimulationLocalCombatCodes.Retreat
@@ -571,7 +858,8 @@ namespace Ssalddel.Simulation.Domain
 
         private static bool KnownControlMode(string value) =>
             value == SimulationLocalCombatCodes.DirectAction
-            || value == SimulationLocalCombatCodes.TacticalCommand;
+            || value == SimulationLocalCombatCodes.TacticalCommand
+            || value == SimulationLocalCombatCodes.ObserverOperation;
 
         private static bool KnownLocalAction(string value) => new[]
         {
@@ -597,6 +885,7 @@ namespace Ssalddel.Simulation.Domain
 
         private SimulationLocalCombatStateSnapshot CreateLocalCombatSnapshot() => new()
         {
+            RuleRevision = localRuleRevision,
             FrozenWorldTick = context.StartedWorldTick,
             FrozenWorldRevision = context.StartedWorldRevision,
             StateCode = localStateCode,
@@ -610,6 +899,25 @@ namespace Ssalddel.Simulation.Domain
             EscalationReasonCodes = localEscalationReasons.ToArray(),
             HostileTelegraphActive = localHostileTelegraphActive,
             HostileTelegraphOpenedCombatTick = localHostileTelegraphOpenedCombatTick,
+            ParticipationModeLocked = localParticipationModeLocked,
+            FrozenCardLoadoutHashSha256 = context.UnitRoster.CardModifierHashSha256,
+            ObserverOperation = new SimulationLocalCombatObserverOperationSnapshot
+            {
+                TacticalPauseActive = localObserverTacticalPauseActive,
+                InterventionOpportunityConsumed = localObserverInterventionConsumed,
+                ActivatedCardCopyStableId = localObserverActivatedCardCopyStableId,
+                ActivatedModifierCode = localObserverActivatedModifierCode,
+                AutomaticActionCount = localObserverAutomaticActionCount,
+                AvailableEmergencyCardCopyStableIds = ObserverModifiers()
+                    .Where(value => value.ModifierCode ==
+                            SimulationLocalCombatCodes.ObserverFieldRecovery
+                        || value.ModifierCode ==
+                            SimulationLocalCombatCodes.ObserverSafeRetreat)
+                    .Select(value => value.CardCopyStableId)
+                    .Distinct(StringComparer.Ordinal)
+                    .OrderBy(value => value, StringComparer.Ordinal).ToArray(),
+            },
+            Performance = CloneLocalPerformance(localPerformance),
         };
 
         private void RestoreLocalCombat(SimulationLocalCombatStateSnapshot value)
@@ -617,6 +925,9 @@ namespace Ssalddel.Simulation.Domain
             localCombatActors.Clear();
             localCombatActions.Clear();
             if (value == null) return;
+            localRuleRevision = string.IsNullOrWhiteSpace(value.RuleRevision)
+                ? SimulationLocalCombatCodes.RuleRevisionR2
+                : value.RuleRevision;
             localCombatActors.AddRange((value.Actors ?? Array.Empty<SimulationLocalCombatActorSnapshot>())
                 .Select(CloneLocalActor));
             localCombatActions.AddRange((value.Actions ?? Array.Empty<SimulationLocalCombatActionSnapshot>())
@@ -630,6 +941,18 @@ namespace Ssalddel.Simulation.Domain
                 ?? Array.Empty<string>();
             localHostileTelegraphActive = value.HostileTelegraphActive;
             localHostileTelegraphOpenedCombatTick = value.HostileTelegraphOpenedCombatTick;
+            localParticipationModeLocked = value.ParticipationModeLocked;
+            localObserverTacticalPauseActive = value.ObserverOperation?.TacticalPauseActive
+                ?? false;
+            localObserverInterventionConsumed = value.ObserverOperation?.InterventionOpportunityConsumed
+                ?? false;
+            localObserverActivatedCardCopyStableId =
+                value.ObserverOperation?.ActivatedCardCopyStableId ?? string.Empty;
+            localObserverActivatedModifierCode =
+                value.ObserverOperation?.ActivatedModifierCode ?? string.Empty;
+            localObserverAutomaticActionCount = value.ObserverOperation?.AutomaticActionCount
+                ?? 0;
+            localPerformance = CloneLocalPerformance(value.Performance);
         }
 
         private static SimulationLocalCombatStateSnapshot CloneLocalCombat(
@@ -655,6 +978,46 @@ namespace Ssalddel.Simulation.Domain
                 HostileTelegraphActive = value?.HostileTelegraphActive ?? false,
                 HostileTelegraphOpenedCombatTick =
                     value?.HostileTelegraphOpenedCombatTick ?? 0,
+                ParticipationModeLocked = value?.ParticipationModeLocked ?? false,
+                FrozenCardLoadoutHashSha256 = value?.FrozenCardLoadoutHashSha256
+                    ?? string.Empty,
+                ObserverOperation = new SimulationLocalCombatObserverOperationSnapshot
+                {
+                    PolicyRevision = value?.ObserverOperation?.PolicyRevision
+                        ?? "observer-combat-policy.r1",
+                    TacticalPauseActive = value?.ObserverOperation?.TacticalPauseActive
+                        ?? false,
+                    InterventionOpportunityConsumed =
+                        value?.ObserverOperation?.InterventionOpportunityConsumed
+                        ?? false,
+                    ActivatedCardCopyStableId =
+                        value?.ObserverOperation?.ActivatedCardCopyStableId ?? string.Empty,
+                    ActivatedModifierCode = value?.ObserverOperation?.ActivatedModifierCode
+                        ?? string.Empty,
+                    AutomaticActionCount = value?.ObserverOperation?.AutomaticActionCount
+                        ?? 0,
+                    AvailableEmergencyCardCopyStableIds = value?.ObserverOperation?
+                        .AvailableEmergencyCardCopyStableIds?.ToArray()
+                        ?? Array.Empty<string>(),
+                },
+                Performance = CloneLocalPerformance(value?.Performance),
+            };
+
+        private static SimulationLocalCombatPerformanceSnapshot CloneLocalPerformance(
+            SimulationLocalCombatPerformanceSnapshot? value) => new()
+            {
+                RuleRevision = value?.RuleRevision ?? "direct-combat-performance.r1",
+                IsFinal = value?.IsFinal ?? false,
+                FinalHealthPermille = value?.FinalHealthPermille ?? 0,
+                SuccessfulDefenseCount = value?.SuccessfulDefenseCount ?? 0,
+                ElapsedCombatTicks = value?.ElapsedCombatTicks ?? 0,
+                HostileCount = value?.HostileCount ?? 0,
+                HealthScore = value?.HealthScore ?? 0,
+                DefenseScore = value?.DefenseScore ?? 0,
+                SpeedScore = value?.SpeedScore ?? 0,
+                TotalScore = value?.TotalScore ?? 0,
+                GradeCode = value?.GradeCode ?? string.Empty,
+                RewardBonusQuantity = value?.RewardBonusQuantity ?? 0,
             };
 
         private static SimulationLocalCombatActorSnapshot CloneLocalActor(
@@ -752,6 +1115,33 @@ namespace Ssalddel.Simulation.Domain
                          StringComparer.Ordinal)) AddCanonical(target, reason);
             AddCanonical(target, value.HostileTelegraphActive);
             AddCanonical(target, value.HostileTelegraphOpenedCombatTick);
+            if (value.RuleRevision == SimulationLocalCombatCodes.RuleRevisionR3)
+            {
+                AddCanonical(target, value.ParticipationModeLocked);
+                AddCanonical(target, value.FrozenCardLoadoutHashSha256);
+                AddCanonical(target, value.ObserverOperation.TacticalPauseActive);
+                AddCanonical(target, value.ObserverOperation.PolicyRevision);
+                AddCanonical(target, value.ObserverOperation.InterventionOpportunityConsumed);
+                AddCanonical(target, value.ObserverOperation.ActivatedCardCopyStableId);
+                AddCanonical(target, value.ObserverOperation.ActivatedModifierCode);
+                AddCanonical(target, value.ObserverOperation.AutomaticActionCount);
+                foreach (var card in value.ObserverOperation
+                             .AvailableEmergencyCardCopyStableIds.OrderBy(item => item,
+                                 StringComparer.Ordinal))
+                    AddCanonical(target, card);
+                AddCanonical(target, value.Performance.RuleRevision);
+                AddCanonical(target, value.Performance.IsFinal);
+                AddCanonical(target, value.Performance.FinalHealthPermille);
+                AddCanonical(target, value.Performance.SuccessfulDefenseCount);
+                AddCanonical(target, value.Performance.ElapsedCombatTicks);
+                AddCanonical(target, value.Performance.HostileCount);
+                AddCanonical(target, value.Performance.HealthScore);
+                AddCanonical(target, value.Performance.DefenseScore);
+                AddCanonical(target, value.Performance.SpeedScore);
+                AddCanonical(target, value.Performance.TotalScore);
+                AddCanonical(target, value.Performance.GradeCode);
+                AddCanonical(target, value.Performance.RewardBonusQuantity);
+            }
         }
     }
 }

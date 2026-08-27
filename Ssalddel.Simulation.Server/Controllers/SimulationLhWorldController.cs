@@ -25,6 +25,9 @@ public sealed class SimulationLhWorldController(
     SimulationLhWorldService lhWorld,
     경영SimulationSessionService sessions) : ControllerBase
 {
+    private static readonly SimulationNatureWorldCellAssemblyEngine
+        NatureWorldCellAssembly = new();
+
     [HttpPost("cells/preview")]
     [ProducesResponseType(typeof(SimulationLhCellPreviewResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(SimulationErrorResponse), StatusCodes.Status400BadRequest)]
@@ -40,13 +43,22 @@ public sealed class SimulationLhWorldController(
             });
         try
         {
-            return Ok(lhWorld.Preview(
+            var preview = lhWorld.Preview(
                 request,
                 (state.WorldContext.GameDate.Date
                     - state.WorldContext.GameDateStartsOn.Date).Days + 1,
                 state.WorldContext.WorldTick,
                 state.WorldContext.WorldRevision,
-                state.AreaAccess));
+                state.AreaAccess);
+            var nature = state.NatureSurvival;
+            foreach (var cell in preview.Cells)
+                cell.WorldAssetAssembly = NatureWorldCellAssembly.Compose(
+                    cell, nature, preview.WorldRevision,
+                    cell.CellX == SimulationNatureWorldCellAssemblyEngine
+                        .DefaultNatureOwnerL3X
+                    && cell.CellY == SimulationNatureWorldCellAssemblyEngine
+                        .DefaultNatureOwnerL3Y);
+            return Ok(preview);
         }
         catch (ArgumentException exception)
         {

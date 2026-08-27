@@ -37,6 +37,17 @@ namespace Ssalddel.Simulation.Domain
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 if (HasAppliedTaskCancelCommand(request.CommandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
+                EnsureNpcRoutineDirectControlAllowed(request.Preview);
+                return ConfirmDecisionCore(request, false, AppendDecisionConfirmCommand);
+            }
+        }
+
+        internal 경영SimulationSessionSnapshot ReplayDecision(
+            SimulationDecisionConfirmRequest request)
+        {
+            ValidateDecisionConfirm(request);
+            lock (gate)
+            {
                 return ConfirmDecisionCore(request, false, AppendDecisionConfirmCommand);
             }
         }
@@ -152,6 +163,7 @@ namespace Ssalddel.Simulation.Domain
                 RegisterSimulationSpatialReservations(task, spatialReservationsToRegister);
                 decisions.Add(decision.DecisionStableId, decision);
                 tasks.Add(task.TaskStableId, task);
+                RegisterNpcRoutineExecutionForTask(task);
                 ApplyCoopConstructionTaskReservation(task, coopReservation);
                 foreach (var effect in pendingEffects)
                     effects.Add(effect.EffectStableId, effect);

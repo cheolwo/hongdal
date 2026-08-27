@@ -17,17 +17,32 @@ namespace Ssalddel.Simulation.Application
     {
         private readonly I경영SimulationSessionStore store;
         private readonly I세계상호작용실행Pipeline worldInteractions;
+        private readonly string authorityLocationCode;
 
         public SimulationNatureSurvivalService(I경영SimulationSessionStore store,
-            I세계상호작용실행Pipeline? worldInteractionPipeline = null)
+            I세계상호작용실행Pipeline? worldInteractionPipeline = null,
+            string authorityLocationCode = "RemoteHost")
         {
             this.store = store ?? throw new ArgumentNullException(nameof(store));
             worldInteractions = worldInteractionPipeline
                 ?? new 세계상호작용실행Pipeline();
+            this.authorityLocationCode = string.IsNullOrWhiteSpace(
+                authorityLocationCode) ? "Unknown" : authorityLocationCode.Trim();
         }
 
         public SimulationNatureSurvivalStateSnapshot Get(string sessionStableId)
             => Find(sessionStableId).GetNatureSurvivalState();
+
+        public Simulation플레이어기회Snapshot[] GetPlayerOpportunities(
+            string sessionStableId)
+            => Find(sessionStableId).GetNaturePlayerOpportunities();
+
+        public Simulation영역수요Snapshot[] GetAreaNeeds(string sessionStableId)
+            => Find(sessionStableId).GetNatureAreaNeeds();
+
+        public Simulation영역건물발전Snapshot GetBuildingProgression(
+            string sessionStableId, string areaCode)
+            => Find(sessionStableId).GetAreaBuildingProgression(areaCode);
 
         public SimulationNatureSurvivalActionPreviewSnapshot Preview(
             string sessionStableId,
@@ -38,6 +53,9 @@ namespace Ssalddel.Simulation.Application
             string sessionStableId,
             SimulationNatureSurvivalCommandRequest request)
         {
+            if (request.AuthoritativeRewardBonusQuantity != 0)
+                throw new SimulationContractException(
+                    "SimulationNatureCombatRewardBonusServerOnly");
             var aggregate = Find(sessionStableId);
             var preview = aggregate.PreviewNatureSurvivalAction(
                 new SimulationNatureSurvivalActionPreviewRequest
@@ -53,19 +71,37 @@ namespace Ssalddel.Simulation.Application
                 });
             var wiId = SimulationNatureSurvivalCodes.WorldInteractionIdForAction(
                 request.ActionCode);
-            var immediateResult = request.ActionCode is
+            var startsLinkedCombat = request.ActionCode ==
+                    SimulationNatureSurvivalCodes.ResolveEncounter
+                && request.ChoiceCode == SimulationNatureSurvivalCodes.Fight
+                && SimulationNatureSurvivalCodes.IsR2(
+                    aggregate.GetNatureSurvivalState().ProfileRevision);
+            var immediateResult = !startsLinkedCombat && request.ActionCode is
                 SimulationNatureSurvivalCodes.AcquireAxe
                 or SimulationNatureSurvivalCodes.PlaceCabinBlueprint
                 or SimulationNatureSurvivalCodes.EnterCabin
                 or SimulationNatureSurvivalCodes.LeaveCabin
                 or SimulationNatureSurvivalCodes.ResolveEncounter
-                or SimulationNatureSurvivalCodes.CancelActiveWork;
+                or SimulationNatureSurvivalCodes.CancelActiveWork
+                or SimulationNatureSurvivalCodes.StoreAtCabin
+                or SimulationNatureSurvivalCodes.SleepInCabin
+                or SimulationNatureSurvivalCodes.SelectExpansionPlan
+                or SimulationNatureSurvivalCodes.CollectDroppedTimber;
             var successor = request.ActionCode switch
             {
                 SimulationNatureSurvivalCodes.AcquireAxe =>
                     SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId,
+                SimulationNatureSurvivalCodes.BeginHarvest when
+                    SimulationNatureSurvivalCodes.IsR5(
+                        aggregate.GetNatureSurvivalState().ProfileRevision) =>
+                    SimulationNatureSurvivalCodes
+                        .CollectDroppedTimberWorldInteractionId,
                 SimulationNatureSurvivalCodes.BeginHarvest =>
-                    SimulationNatureSurvivalCodes.PlaceCabinBlueprintWorldInteractionId,
+                    SimulationNatureSurvivalCodes
+                        .PlaceCabinBlueprintWorldInteractionId,
+                SimulationNatureSurvivalCodes.CollectDroppedTimber =>
+                    SimulationNatureSurvivalCodes
+                        .PlaceCabinBlueprintWorldInteractionId,
                 SimulationNatureSurvivalCodes.PlaceCabinBlueprint =>
                     SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId,
                 SimulationNatureSurvivalCodes.BeginCabinBuild =>
@@ -76,10 +112,19 @@ namespace Ssalddel.Simulation.Application
                     SimulationNatureSurvivalCodes.EnterCabinWorldInteractionId,
                 SimulationNatureSurvivalCodes.CancelActiveWork =>
                     "NatureSafeChoice",
+                SimulationNatureSurvivalCodes.StoreAtCabin =>
+                    SimulationNatureSurvivalCodes.ResolveEncounterWorldInteractionId,
+                SimulationNatureSurvivalCodes.SleepInCabin =>
+                    SimulationNatureSurvivalCodes.SelectExpansionPlanWorldInteractionId,
+                SimulationNatureSurvivalCodes.SelectExpansionPlan =>
+                    "Day2Ready",
+                SimulationNatureSurvivalCodes.BeginBuildingConstruction =>
+                    Simulation영역건물발전Codes.ConstructionWorldInteractionId,
+                SimulationNatureSurvivalCodes.PrepareFieldSupply =>
+                    SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId,
                 _ => "WI-NATURE-04",
             };
-            return worldInteractions.ExecutePlayerDriven(aggregate,
-                new 세계상호작용실행Context
+            var context = new 세계상호작용실행Context
                 {
                     WorldInteractionId = wiId,
                     CommandId = request.CommandId,
@@ -92,6 +137,23 @@ namespace Ssalddel.Simulation.Application
                         request.TargetStableId, request.ChoiceCode,
                     }.Concat(preview.SpatialEvidenceReferenceIds).ToArray(),
                     TimeReferenceId = "simulation-time:nature-realtime",
+                    PlayableLoopStableId = request.ActionCode switch
+                    {
+                        SimulationNatureSurvivalCodes.PlaceCabinBlueprint or
+                        SimulationNatureSurvivalCodes.BeginCabinBuild or
+                        SimulationNatureSurvivalCodes.CollectDroppedTimber =>
+                            "playable-loop:nature-shelter-foundation.v1",
+                        SimulationNatureSurvivalCodes.BeginBuildingConstruction =>
+                            "playable-loop:nature-building-learning.v1",
+                        SimulationNatureSurvivalCodes.PrepareFieldSupply =>
+                            "playable-loop:nature-field-supply-return.v1",
+                        SimulationNatureSurvivalCodes.StoreAtCabin or
+                        SimulationNatureSurvivalCodes.SleepInCabin or
+                        SimulationNatureSurvivalCodes.SelectExpansionPlan =>
+                            "playable-loop:nature-night-day2.v1",
+                        _ => string.Empty,
+                    },
+                    AuthorityLocationCode = authorityLocationCode,
                     SpatialEvidenceStateCode =
                         preview.SpatialEvidenceStateCode,
                     SpatialEvidenceReferenceIds =
@@ -105,7 +167,11 @@ namespace Ssalddel.Simulation.Application
                         ? new[] { request.ActionCode + ":Confirmed" }
                         : Array.Empty<string>(),
                     SuccessorOrReturnCodes = new[] { successor },
-                }, () => aggregate.ConfirmNatureSurvivalAction(request));
+                };
+            worldInteractions.RecordPreview(context, aggregate.Revision,
+                preview.CanConfirm, preview.BlockReasonCodes);
+            return worldInteractions.ExecutePlayerDriven(aggregate, context,
+                () => aggregate.ConfirmNatureSurvivalAction(request));
         }
 
         public 경영SimulationSessionSnapshot AdvanceClock(

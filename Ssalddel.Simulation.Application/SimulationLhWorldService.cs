@@ -78,7 +78,7 @@ namespace Ssalddel.Simulation.Application
 
         public SimulationLhWorldService()
             : this(new SimulationLhWindowPlanner(),
-                new ScenarioProceduralSimulationLhCellContentSource(), null)
+                new SimulationSeparatedLhCellContentSource(), null)
         {
         }
 
@@ -234,20 +234,11 @@ namespace Ssalddel.Simulation.Application
             };
         }
 
-        public static string L3CellKey(int x, int y) => $"kr5186:l3:{x}:{y}";
+        public static string L3CellKey(int x, int y)
+            => SimulationLhWorldGrid.L3CellKey(x, y);
 
         public static bool TryParseL3CellKey(string cellKey, out int x, out int y)
-        {
-            x = 0;
-            y = 0;
-            var parts = (cellKey ?? string.Empty).Split(':');
-            if (parts.Length != 4 || parts[0] != "kr5186" || parts[1] != "l3")
-                return false;
-            return int.TryParse(parts[2], NumberStyles.Integer,
-                       CultureInfo.InvariantCulture, out x)
-                   && int.TryParse(parts[3], NumberStyles.Integer,
-                       CultureInfo.InvariantCulture, out y);
-        }
+            => SimulationLhWorldGrid.TryParseL3CellKey(cellKey, out x, out y);
 
         private static void ValidateRequest(
             SimulationLhCellPreviewRequest request, long worldRevision)

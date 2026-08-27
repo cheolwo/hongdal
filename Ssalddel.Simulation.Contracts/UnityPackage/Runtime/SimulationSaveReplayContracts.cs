@@ -20,6 +20,18 @@ namespace Ssalddel.Simulation.Contracts
         public const string V13 = "simulation-save.v13";
         public const string V14 = "simulation-save.v14";
         public const string V15 = "simulation-save.v15";
+        public const string V16 = "simulation-save.v16";
+        public const string V17 = "simulation-save.v17";
+        public const string V18 = "simulation-save.v18";
+        public const string V19 = "simulation-save.v19";
+        public const string V20 = "simulation-save.v20";
+        public const string V21 = "simulation-save.v21";
+        public const string V22 = "simulation-save.v22";
+        public const string V23 = "simulation-save.v23";
+        public const string V24 = "simulation-save.v24";
+        public const string V25 = "simulation-save.v25";
+        public const string V26 = "simulation-save.v26";
+        public const string V27 = "simulation-save.v27";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -59,6 +71,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string IntegratedWorldEffectEnqueued = "IntegratedWorldEffectEnqueued";
         public const string NatureSurvivalActionConfirm = "NatureSurvivalActionConfirm";
         public const string NatureSurvivalClockAdvance = "NatureSurvivalClockAdvance";
+        public const string ActorItemAcquireConfirm = "ActorItemAcquireConfirm";
+        public const string ActorEquipmentChangeConfirm = "ActorEquipmentChangeConfirm";
     }
 
     [SsalddelCodeMetadata(
@@ -79,6 +93,8 @@ namespace Ssalddel.Simulation.Contracts
         public string SaveStableId { get; set; } = string.Empty;
         public long ExpectedRevision { get; set; }
         public SimulationLhWorldStateSnapshot? LhWorldState { get; set; }
+        public SimulationWorldAssetPlacementStateSnapshot?
+            WorldAssetPlacementState { get; set; }
     }
 
     public sealed class SimulationSessionRestoreRequest
@@ -136,6 +152,10 @@ namespace Ssalddel.Simulation.Contracts
             { get; set; }
         public SimulationNatureSurvivalClockAdvanceRequest? NatureSurvivalClockAdvanceRequest
             { get; set; }
+        public SimulationActorItemAcquireConfirmRequest? ActorItemAcquireConfirmRequest
+            { get; set; }
+        public SimulationActorEquipmentChangeConfirmRequest?
+            ActorEquipmentChangeConfirmRequest { get; set; }
         public SimulationWorldInteractionInvocationRecord? WorldInteractionInvocation
             { get; set; }
     }
@@ -157,6 +177,10 @@ namespace Ssalddel.Simulation.Contracts
         public string ReplayHashAlgorithmCode { get; set; }
             = SimulationReplayHashAlgorithmCodes.Sha256;
         public string ReplayHash { get; set; } = string.Empty;
+        public string WorldAssetPlacementBaseSchemaVersion { get; set; }
+            = string.Empty;
+        public string ActorEquipmentBaseSchemaVersion { get; set; }
+            = string.Empty;
         public 경영SimulationSession생성Request SessionCreateRequest { get; set; }
             = new 경영SimulationSession생성Request();
         public 경영SimulationSessionSnapshot Snapshot { get; set; }
@@ -173,6 +197,13 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationRealityContextSnapshot? RealityContext { get; set; }
         public SimulationWorldInteractionManifestationRecord[] WorldInteractionManifestations
             { get; set; } = Array.Empty<SimulationWorldInteractionManifestationRecord>();
+        public SimulationSpatialCompositionStateSnapshot? SpatialComposition
+            { get; set; }
+        public SpatialCompositionGraphHandle? SpatialCompositionHandle
+            { get; set; }
+        public SimulationWorldAssetPlacementStateSnapshot?
+            WorldAssetPlacement { get; set; }
+        public SimulationActorEquipmentStateSnapshot? ActorEquipment { get; set; }
     }
 
     public sealed class SimulationSessionRestoreResult

@@ -47,6 +47,23 @@ namespace Ssalddel.Simulation.Application
             return new SimulationWorldInteractionE4ContextReviewResult
             {
                 WorldInteractionId = definition.WorldInteractionId,
+                WorldInteractionName = Simulation세계상호작용이름Catalog
+                    .한국어기능명(definition.WorldInteractionId),
+                WorldInteractionDisplayName = Simulation세계상호작용이름Catalog
+                    .한국어표시명(definition.WorldInteractionId),
+                ResponsibilityKindCode = Simulation세계상호작용이름Catalog
+                    .책임종류코드(definition.WorldInteractionId),
+                PrimaryOutcomeCode = Simulation세계상호작용이름Catalog
+                    .주요결과코드(definition.WorldInteractionId),
+                SingleResponsibilityAssessmentCode =
+                    Simulation세계상호작용이름Catalog
+                        .단일책임판정코드(definition.WorldInteractionId),
+                음양분류Code = Simulation세계상호작용이름Catalog
+                    .음양분류Code(definition.WorldInteractionId),
+                음양판정방식Code = Simulation세계상호작용이름Catalog
+                    .음양판정방식Code(definition.WorldInteractionId),
+                실행우선순위 = SimulationWI실행우선순위Catalog
+                    .Find(definition.WorldInteractionId),
                 StateCode = state,
                 AllowedTriggerSourceCodes = definition.AllowedTriggerSourceCodes,
                 BoundTriggerSourceCodes = boundTriggers,
@@ -101,6 +118,21 @@ namespace Ssalddel.Simulation.Application
             return new SimulationWorldInteractionE5ManifestationReviewResult
             {
                 WorldInteractionId = definition.WorldInteractionId,
+                WorldInteractionName = Simulation세계상호작용이름Catalog
+                    .한국어기능명(definition.WorldInteractionId),
+                WorldInteractionDisplayName = Simulation세계상호작용이름Catalog
+                    .한국어표시명(definition.WorldInteractionId),
+                ResponsibilityKindCode = Simulation세계상호작용이름Catalog
+                    .책임종류코드(definition.WorldInteractionId),
+                PrimaryOutcomeCode = Simulation세계상호작용이름Catalog
+                    .주요결과코드(definition.WorldInteractionId),
+                SingleResponsibilityAssessmentCode =
+                    Simulation세계상호작용이름Catalog
+                        .단일책임판정코드(definition.WorldInteractionId),
+                음양주체분류 = request.Invocation?.음양주체분류
+                    ?? new SimulationWI음양주체분류Snapshot(),
+                실행우선순위 = SimulationWI실행우선순위Catalog
+                    .Find(definition.WorldInteractionId),
                 StateCode = state,
                 TriggerSourceCode = request.Invocation?.TriggerSourceCode
                     ?? string.Empty,
@@ -110,34 +142,55 @@ namespace Ssalddel.Simulation.Application
         }
 
         public static SimulationWorldInteractionInvocationRecord FromPlayer(
-            string worldInteractionId, string playerStableId, string actorStableId)
+            string worldInteractionId, string playerStableId, string actorStableId,
+            string playableLoopStableId = "")
             => CreateInvocation(worldInteractionId,
                 SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
-                playerStableId, actorStableId, Array.Empty<string>());
+                playerStableId, actorStableId,
+                SimulationWI수행주체Codes.PlayerActor,
+                playableLoopStableId, Array.Empty<string>());
 
         public static SimulationWorldInteractionInvocationRecord FromNpc(
-            string worldInteractionId, string npcStableId, string actorStableId)
+            string worldInteractionId, string npcStableId, string actorStableId,
+            string playableLoopStableId = "")
             => CreateInvocation(worldInteractionId,
                 SimulationWorldInteractionTriggerSourceCodes.NpcDriven,
-                npcStableId, actorStableId, Array.Empty<string>());
+                npcStableId, actorStableId,
+                SimulationWI수행주체Codes.NpcActor,
+                playableLoopStableId, Array.Empty<string>());
+
+        public static SimulationWorldInteractionInvocationRecord
+            FromPlayerDelegatedToNpc(
+                string worldInteractionId, string playerStableId,
+                string npcActorStableId, string playableLoopStableId = "")
+            => CreateInvocation(worldInteractionId,
+                SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
+                playerStableId, npcActorStableId,
+                SimulationWI수행주체Codes.NpcActor,
+                playableLoopStableId, Array.Empty<string>());
 
         public static SimulationWorldInteractionInvocationRecord FromData(
             string worldInteractionId, string evaluatorStableId,
             params string[] sourceReferenceIds)
             => CreateInvocation(worldInteractionId,
                 SimulationWorldInteractionTriggerSourceCodes.DataDriven,
-                evaluatorStableId, string.Empty, sourceReferenceIds);
+                evaluatorStableId, string.Empty,
+                SimulationWI수행주체Codes.NotApplicable,
+                string.Empty, sourceReferenceIds);
 
         public static SimulationWorldInteractionInvocationRecord FromWorldDerived(
             string worldInteractionId, string evaluatorStableId,
             params string[] sourceReferenceIds)
             => CreateInvocation(worldInteractionId,
                 SimulationWorldInteractionTriggerSourceCodes.WorldDerived,
-                evaluatorStableId, string.Empty, sourceReferenceIds);
+                evaluatorStableId, string.Empty,
+                SimulationWI수행주체Codes.NotApplicable,
+                string.Empty, sourceReferenceIds);
 
         private static SimulationWorldInteractionInvocationRecord CreateInvocation(
             string worldInteractionId, string triggerSourceCode,
             string initiatorStableId, string actorStableId,
+            string actorCode, string playableLoopStableId,
             IEnumerable<string> sourceReferenceIds)
         {
             RequireStableId(worldInteractionId, "WorldInteractionIdInvalid");
@@ -145,11 +198,15 @@ namespace Ssalddel.Simulation.Application
                 "WorldInteractionInitiatorStableIdInvalid");
             return new SimulationWorldInteractionInvocationRecord
             {
+                PayloadCode = "WorldInteractionInvocation.v2",
                 WorldInteractionId = worldInteractionId.Trim(),
                 TriggerSourceCode = triggerSourceCode,
                 InitiatorStableId = initiatorStableId.Trim(),
                 ActorStableId = actorStableId?.Trim() ?? string.Empty,
                 SourceReferenceIds = Normalize(sourceReferenceIds),
+                음양주체분류 = SimulationWI음양주체사분면Rules.Resolve(
+                    worldInteractionId, actorCode, triggerSourceCode,
+                    playableLoopStableId),
             };
         }
 
@@ -191,6 +248,14 @@ namespace Ssalddel.Simulation.Application
                     "WorldInteractionTriggerSourceNotAllowed");
             RequireStableId(invocation.InitiatorStableId,
                 "WorldInteractionInitiatorStableIdInvalid");
+            if (string.Equals(invocation.PayloadCode,
+                    "WorldInteractionInvocation.v2", StringComparison.Ordinal)
+                && !SimulationWI음양주체사분면Rules.Matches(
+                    invocation.WorldInteractionId,
+                    invocation.TriggerSourceCode,
+                    invocation.음양주체분류))
+                throw new InvalidOperationException(
+                    "WorldInteractionPolaritySnapshotInvalid");
         }
 
         private static void ValidateSpatialEvidence(

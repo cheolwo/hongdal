@@ -7,6 +7,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string Storage = "Spatial.Storage";
         public const string CargoAccessible = "Spatial.CargoAccessible";
         public const string WorkerAccessible = "Spatial.WorkerAccessible";
+        public const string DroppedTimberPickupAnchor =
+            "Spatial.DroppedTimberPickupAnchor";
         public const string InspectionWorkArea = "Spatial.InspectionWorkArea";
         public const string LoadingWorkArea = "Spatial.LoadingWorkArea";
         public const string CropProduction = "Spatial.CropProduction";
@@ -21,6 +23,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string CargoRoute = "Spatial.CargoRoute";
         public const string UnloadingWorkArea = "Spatial.UnloadingWorkArea";
         public const string PickingWorkArea = "Spatial.PickingWorkArea";
+        public const string OutboundStagingArea =
+            "Spatial.OutboundStagingArea";
         public const string DisplayArea = "Spatial.DisplayArea";
         public const string CustomerAccessible = "Spatial.CustomerAccessible";
         public const string PickupArea = "Spatial.PickupArea";

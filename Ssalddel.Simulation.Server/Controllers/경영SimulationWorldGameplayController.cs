@@ -32,6 +32,12 @@ public sealed class 경영SimulationWorldGameplayController(
         => Execute<SimulationNatureMindStateSnapshot>(() =>
             Ok(service.GetNatureMindState(sessionStableId)));
 
+    [HttpGet("{sessionStableId}/town-npc-life")]
+    public ActionResult<SimulationTownNpcLifeStateSnapshot> GetTownNpcLife(
+        string sessionStableId)
+        => Execute<SimulationTownNpcLifeStateSnapshot>(() =>
+            Ok(service.GetTownNpcLifeState(sessionStableId)));
+
     [HttpGet("{sessionStableId}/nature-minds/{playerStableId}/farm-interpretation")]
     public ActionResult<SimulationNatureFarmInterpretationSnapshot>
         GetNatureFarmInterpretation(string sessionStableId, string playerStableId)

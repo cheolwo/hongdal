@@ -20,6 +20,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string BattleSnapshot = "BattleSnapshot";
         public const string ConceptInformation = "ConceptInformation";
         public const string ResearchSeedbed = "ResearchSeedbed";
+        public const string CollectibleReward = "CollectibleReward";
     }
 
     public static class SimulationCardAuthorityCodes
@@ -47,6 +48,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string Season = "Season";
         public const string Region = "Region";
         public const string Incident = "Incident";
+        public const string UntilReplaced = "UntilReplaced";
     }
 
     public static class SimulationTarotMetaLayerCodes
@@ -195,6 +197,10 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationCardContextRelationSnapshot>();
         public SimulationTarotIncidentEvaluationSnapshot[] IncidentEvaluations { get; set; }
             = Array.Empty<SimulationTarotIncidentEvaluationSnapshot>();
+        public Simulation메이저아르카나활성Snapshot[] MajorArcanaActivations { get; set; }
+            = Array.Empty<Simulation메이저아르카나활성Snapshot>();
+        public Simulation상위아르카나방향상속Snapshot[] OrientationInheritances { get; set; }
+            = Array.Empty<Simulation상위아르카나방향상속Snapshot>();
         public string ContextStateHashSha256 { get; set; } = string.Empty;
     }
 }

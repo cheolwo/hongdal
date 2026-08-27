@@ -41,6 +41,9 @@ namespace Ssalddel.Simulation.Application
         public SimulationNatureMindStateSnapshot GetNatureMindState(
             string sessionStableId)
             => worldGameplay.GetNatureMindState(sessionStableId);
+        public SimulationTownNpcLifeStateSnapshot GetTownNpcLifeState(
+            string sessionStableId)
+            => worldGameplay.GetTownNpcLifeState(sessionStableId);
         public SimulationNatureFarmInterpretationSnapshot GetNatureFarmInterpretation(
             string sessionStableId, string playerStableId)
             => worldGameplay.GetNatureFarmInterpretation(sessionStableId, playerStableId);
@@ -209,6 +212,9 @@ namespace Ssalddel.Simulation.Application
         public 경영SimulationSessionSnapshot ConfirmSupplyChainWork(
             string sessionStableId, SimulationSupplyChainWorkConfirmRequest request)
             => logistics.ConfirmSupplyChainWork(sessionStableId, request);
+        public SimulationNpcRoutineWorkProjection[] GetNpcRoutineWork(
+            string sessionStableId, string areaCode)
+            => logistics.GetNpcRoutineWork(sessionStableId, areaCode);
         public SimulationSpatialCompositionStateSnapshot GetSpatialComposition(
             string sessionStableId, string areaCode)
             => logistics.GetSpatialComposition(sessionStableId, areaCode);

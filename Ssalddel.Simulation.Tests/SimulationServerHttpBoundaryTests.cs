@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ssalddel.Simulation.Contracts;
+using Ssalddel.Simulation.Domain;
 
 namespace Ssalddel.Simulation.Tests;
 
@@ -41,9 +42,9 @@ public sealed class SimulationServerHttpBoundaryTests
         var hash = Convert.ToHexString(SHA256.HashData(
                 Encoding.UTF8.GetBytes(string.Join("\n", manifest))))
             .ToLowerInvariant();
-        Assert.Equal(155, manifest.Length);
+        Assert.Equal(167, manifest.Length);
         Assert.Equal(
-            "827a8edc77ef5e908dc9daa75f26af99a4e9f2de7f2ef41f01c9d547010a8f5c",
+            "7c37e1fe3e6163ef85b5f756d83c2a205b27ab4c7fb0d6ab3fc1eb2e370ae38c",
             hash);
     }
 
@@ -180,6 +181,43 @@ public sealed class SimulationServerHttpBoundaryTests
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         Assert.NotNull(error);
         Assert.Equal("SimulationCreateRequestPayloadConflict", error.ErrorCode);
+    }
+
+    [Fact]
+    public async Task 상향식_H공간구성은_서버조회에서도_같은GraphHash를_반환한다()
+    {
+        using var factory = CreateFactory(enabled: true);
+        using var client = factory.CreateClient();
+        var request = CreateValidRequest();
+        request.NpcRoutineControlRevision =
+            SimulationNpcRoutineControlRevisionCodes.R1;
+        request.SpatialCompositionRuleRevision =
+            SimulationSpatialCompositionCodes.RuleRevision;
+        request.SpatialWorld =
+            PyeongchangSimulation공간상호작용Fixture.Create();
+        request.NpcWorkforce = PyeongchangSimulationNpcWorkforceFixture
+            .CreateHubOutboundReadyFixture();
+
+        using var createdResponse = await client.PostAsJsonAsync(
+            "/api/simulation/v1/sessions", request);
+        createdResponse.EnsureSuccessStatusCode();
+        var created = await createdResponse.Content
+            .ReadFromJsonAsync<경영SimulationSessionSnapshot>();
+        Assert.NotNull(created);
+
+        using var graphResponse = await client.GetAsync(
+            $"/api/simulation/v1/sessions/{created!.SessionStableId}"
+            + "/spatial-composition?areaCode=Hub");
+        graphResponse.EnsureSuccessStatusCode();
+        var graph = await graphResponse.Content
+            .ReadFromJsonAsync<SimulationSpatialCompositionStateSnapshot>();
+
+        Assert.NotNull(graph);
+        Assert.Equal(64, graph!.GraphHashSha256.Length);
+        Assert.Equal(SimulationSpatialCompositionCodes.Qualified,
+            graph.Assessments.Single(value => value.TargetDefinitionStableId ==
+                PyeongchangHubSpatialCompositionCodes.InternalWarehouseH2)
+                .StateCode);
     }
 
     private static WebApplicationFactory<Program> CreateFactory(bool enabled)

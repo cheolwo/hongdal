@@ -92,6 +92,10 @@ namespace Ssalddel.Simulation.Domain
                     ResultingWorldTick = CurrentTick,
                     ResultingRevision = Revision,
                     SelectedCards = preview.SelectedCards.Select(CloneTurnCard).ToArray(),
+                    MajorArcanaDirectionDecision = preview.MajorArcanaDirectionDecision == null
+                        ? null : CloneDirectionDecision(preview.MajorArcanaDirectionDecision),
+                    DeactivatedActiveMajorArcana =
+                        preview.DeactivatesActiveMajorArcana,
                 };
                 turnClosings.Add(closing);
                 activeTurnCardEffects = preview.SelectedCards.Select(card =>
@@ -143,6 +147,13 @@ namespace Ssalddel.Simulation.Domain
             {
                 throw new SimulationContractException("SimulationTurnCardSelectionLimitExceeded");
             }
+            if (request.DeactivateActiveMajorArcana
+                && (request.SelectedCardStableIds.Length > 0
+                    || request.SelectedTarotCard != null))
+            {
+                throw new SimulationContractException(
+                    "SimulationMajorArcanaDeactivationSelectionConflict");
+            }
             foreach (var cardStableId in request.SelectedCardStableIds)
                 RequireStableId(cardStableId, "SimulationTurnCardStableIdInvalid");
             if (request.SelectedCardStableIds.Distinct(StringComparer.Ordinal).Count()
@@ -156,7 +167,8 @@ namespace Ssalddel.Simulation.Domain
                     "SimulationTarotOfferStableIdInvalid");
                 RequireStableId(request.SelectedTarotCard.CardStableId,
                     "SimulationTurnCardStableIdInvalid");
-                if (request.SelectedTarotCard.OrientationCode
+                if (request.SelectedTarotCard.OrientationCode.Length > 0
+                    && request.SelectedTarotCard.OrientationCode
                         != Simulation타로카드방향Codes.Upright
                     && request.SelectedTarotCard.OrientationCode
                         != Simulation타로카드방향Codes.Reversed)
@@ -186,6 +198,19 @@ namespace Ssalddel.Simulation.Domain
                 + string.Join(",", request.SelectedCardStableIds.Select(value => value.Trim()))
                 + "|" + (tarot?.OfferStableId.Trim() ?? string.Empty)
                 + "|" + (tarot?.CardStableId.Trim() ?? string.Empty)
+                + "|" + (tarot?.OrientationCode ?? string.Empty)
+                + "|" + request.DeactivateActiveMajorArcana;
+        }
+
+        internal static string BuildLegacyTurnClosingPayloadKey(
+            SimulationTurnClosingPreviewRequest request)
+        {
+            ValidateTurnClosingPreviewRequest(request);
+            var tarot = request.SelectedTarotCard;
+            return request.ExpectedRevision + "|"
+                + string.Join(",", request.SelectedCardStableIds.Select(value => value.Trim()))
+                + "|" + (tarot?.OfferStableId.Trim() ?? string.Empty)
+                + "|" + (tarot?.CardStableId.Trim() ?? string.Empty)
                 + "|" + (tarot?.OrientationCode ?? string.Empty);
         }
 
@@ -195,6 +220,14 @@ namespace Ssalddel.Simulation.Domain
             var available = CreateAvailableTurnCards()
                 .ToDictionary(value => value.CardStableId, StringComparer.Ordinal);
             var selected = new List<SimulationTurnCardSnapshot>();
+            if (request.DeactivateActiveMajorArcana
+                && !tarotContextState.MajorArcanaActivations.Any(value =>
+                    value.StateCode == Simulation메이저아르카나활성상태Codes.Active))
+            {
+                throw new SimulationConflictException(
+                    "SimulationMajorArcanaActivationMissing");
+            }
+            Simulation메이저아르카나방향판정Snapshot? directionDecision = null;
             foreach (var stableId in request.SelectedCardStableIds)
             {
                 if (!available.TryGetValue(stableId.Trim(), out var card))
@@ -209,14 +242,25 @@ namespace Ssalddel.Simulation.Domain
                 if (offer == null)
                     throw new SimulationConflictException("SimulationTarotOfferUnavailable");
                 if (offer.Card.CardStableId != selection.CardStableId.Trim()
-                    || offer.OrientationCode != selection.OrientationCode)
+                    || (!UsesContextualArcana
+                        && offer.OrientationCode != selection.OrientationCode)
+                    || (UsesContextualArcana
+                        && selection.OrientationCode.Length > 0))
                 {
                     throw new SimulationConflictException("SimulationTarotOfferMismatch");
                 }
                 var card = CloneTurnCard(offer.Card);
                 card.CardCopyStableId = offer.CardCopyStableId;
                 card.OfferStableId = offer.OfferStableId;
-                card.OrientationCode = offer.OrientationCode;
+                if (UsesContextualArcana)
+                {
+                    directionDecision = ResolveContextualArcanaDirectionDecision();
+                    card.OrientationCode = directionDecision.DirectionCode;
+                }
+                else
+                {
+                    card.OrientationCode = offer.OrientationCode;
+                }
                 selected.Add(card);
             }
 
@@ -231,6 +275,8 @@ namespace Ssalddel.Simulation.Domain
                 NextGameDate = GameDateStartsOn.AddDays(CurrentTick + 1),
                 PendingTaskCount = CountPendingTasks(),
                 SelectedCards = selected.ToArray(),
+                MajorArcanaDirectionDecision = directionDecision,
+                DeactivatesActiveMajorArcana = request.DeactivateActiveMajorArcana,
                 BlockReasonCodes = CurrentTick < DurationTicks
                     ? Array.Empty<string>()
                     : new[] { "SimulationDurationCompleted" },
@@ -307,12 +353,19 @@ namespace Ssalddel.Simulation.Domain
         }
 
         private Simulation타로DrawSnapshot CreateTarotDraw()
-            => new Simulation타로카드뽑기().Draw(
+        {
+            var draw = new Simulation타로카드뽑기().Draw(
                 ScenarioSeed,
                 CurrentTick + 1,
                 turnClosings.SelectMany(value => value.SelectedCards)
                     .Where(value => value.CardKindCode == SimulationTurnCardKindCodes.Tarot)
                     .Select(value => value.OfferStableId));
+            if (UsesContextualArcana)
+            {
+                foreach (var offer in draw.Offers) offer.OrientationCode = string.Empty;
+            }
+            return draw;
+        }
 
         public static void ValidateCultureCard(SimulationTurnCardSnapshot card)
         {
@@ -377,6 +430,9 @@ namespace Ssalddel.Simulation.Domain
                 ResultingWorldTick = source.ResultingWorldTick,
                 ResultingRevision = source.ResultingRevision,
                 SelectedCards = source.SelectedCards.Select(CloneTurnCard).ToArray(),
+                MajorArcanaDirectionDecision = source.MajorArcanaDirectionDecision == null
+                    ? null : CloneDirectionDecision(source.MajorArcanaDirectionDecision),
+                DeactivatedActiveMajorArcana = source.DeactivatedActiveMajorArcana,
             };
 
         internal static SimulationActiveTurnCardEffectSnapshot CloneActiveTurnCardEffect(

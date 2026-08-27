@@ -9,6 +9,80 @@ namespace Ssalddel.Unity.Tests;
 public sealed class 몰입WorldLayoutTests
 {
     [Fact]
+    public void 위협관찰은_권위Preview를_방향압력안전거점과_후퇴복원선택으로표현한다()
+    {
+        var decision = Nature위협관찰PresentationPolicy.Evaluate(
+            new Nature위협관찰PreviewApiModel
+            {
+                NatureRouteCode = "highland-ridge-a",
+                EffectivePressure = 7,
+                PressureLevelCode = "Threatened",
+                NextWorldInteractionIds = new[] { "WI-NATURE-02", "WI-NATURE-03" },
+                CanConfirm = true,
+                SimulationOnly = true,
+                IsOperationalState = false,
+            }, "NorthEast", "SouthWest");
+
+        Assert.True(decision.CanConfirmObservation);
+        Assert.Equal("NorthEast", decision.ThreatDirectionCode);
+        Assert.Equal("SouthWest", decision.SafeCoreDirectionCode);
+        Assert.Equal(Nature위협관찰CueCodes.ThreatWarning, decision.SoundCueCode);
+        Assert.Equal(Nature위협관찰CueCodes.ObservationOnly,
+            decision.ScopeBoundaryCode);
+        Assert.Equal(new[] { "WI-NATURE-02", "WI-NATURE-03" },
+            decision.NextChoices.Select(value => value.WorldInteractionId));
+        Assert.All(decision.NextChoices, value => Assert.True(value.IsAvailable));
+        Assert.False(decision.ChangesWorldState);
+        Assert.True(decision.PresentationOnly);
+    }
+
+    [Fact]
+    public void 위협관찰표현은_전투대응WI만인계하고_참여방식을발명하지않는다()
+    {
+        var decision = Nature위협관찰PresentationPolicy.Evaluate(
+            new Nature위협관찰PreviewApiModel
+            {
+                NatureRouteCode = "highland-ridge-a",
+                PressureLevelCode = "Warning",
+                NextWorldInteractionIds = new[]
+                {
+                    "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-11",
+                },
+                CanConfirm = true,
+                SimulationOnly = true,
+            }, "East", "West");
+
+        var response = Assert.Single(decision.NextChoices,
+            value => value.WorldInteractionId == "WI-NATURE-11");
+        Assert.Equal(Nature위협관찰CueCodes.ThreatResponse, response.ChoiceCode);
+        Assert.Equal(Nature위협관찰CueCodes.ObservationOnly,
+            decision.ScopeBoundaryCode);
+    }
+
+    [Fact]
+    public void 운영상태나_누락된방향은_위협관찰입력만차단하고_상태를바꾸지않는다()
+    {
+        var decision = Nature위협관찰PresentationPolicy.Evaluate(
+            new Nature위협관찰PreviewApiModel
+            {
+                NatureRouteCode = "highland-ridge-a",
+                PressureLevelCode = "Stable",
+                NextWorldInteractionIds = new[] { "WI-NATURE-02" },
+                CanConfirm = true,
+                SimulationOnly = false,
+                IsOperationalState = true,
+            }, string.Empty, "South");
+
+        Assert.False(decision.CanConfirmObservation);
+        Assert.Empty(decision.SoundCueCode);
+        Assert.Contains("SimulationOnlyThreatObservationRequired",
+            decision.BlockingReasonCodes);
+        Assert.Contains("NatureThreatDirectionMissing", decision.BlockingReasonCodes);
+        Assert.All(decision.NextChoices, value => Assert.False(value.IsAvailable));
+        Assert.False(decision.ChangesWorldState);
+    }
+
+    [Fact]
     public void 자연권압력경고는_Apocalypse팩이없어도보이고_몬스터대체표현은생기지않는다()
     {
         var gate = 몰입World자산GatePolicy.Evaluate(Array.Empty<string>());

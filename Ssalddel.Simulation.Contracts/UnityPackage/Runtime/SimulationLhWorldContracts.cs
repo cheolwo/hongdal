@@ -166,6 +166,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationLhPlacementResponse>();
         public SimulationLhConnectorResponse[] Connectors { get; set; }
             = Array.Empty<SimulationLhConnectorResponse>();
+        public SimulationWorldCellAssemblyResponse? WorldAssetAssembly
+            { get; set; }
         public string[] RequiredCapabilityCodes { get; set; } = Array.Empty<string>();
         public bool PlayerTraversalRequired { get; set; }
         public bool PresentationOnly { get; set; } = true;

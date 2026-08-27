@@ -8,6 +8,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Ssalddel.Interior.Domain;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
@@ -363,7 +364,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             packingConfirmed.WorldRevision));
 
         var finalHarvestLot = Assert.Single(packed.FarmSurvival!.HarvestLots);
-        var packageLot = Assert.Single(packed.FarmSurvival.PackageLots);
+        var packageLot = Assert.Single(packed.FarmSurvival!.PackageLots);
         Assert.Equal(Simulation수확Lot상태Codes.PackedForShipment,
             finalHarvestLot.StateCode);
         Assert.Equal(Simulation포장Lot상태Codes.PreparedForShipment,
@@ -380,7 +381,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
     }
 
     [Fact]
-    public void WI_FARM_04는_공통Pipeline에서_Tick결과까지V15증거로완료한다()
+    public void WI_FARM_04는_공통Pipeline에서_Tick결과와V23음양증거까지완료한다()
     {
         var store = new InMemory경영SimulationSessionStore();
         var session = store.CreateOrGet(CreateRequest());
@@ -398,8 +399,14 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
                 SaveStableId = "save:wi-farm:pipeline-before-tick",
                 ExpectedRevision = confirmed.Revision,
             });
-        Assert.Equal(SimulationSaveSchemaVersions.V15,
+        Assert.Equal(SimulationSaveSchemaVersions.V23,
             beforeTick.SchemaVersion);
+        var invocation = Assert.Single(beforeTick.CommandLog,
+            value => value.WorldInteractionInvocation != null)
+            .WorldInteractionInvocation!;
+        Assert.Equal(SimulationWI사분면Codes.YangPlayer,
+            invocation.음양주체분류.사분면Code);
+        Assert.Equal("++", invocation.음양주체분류.사분면기호);
         Assert.Equal(
             SimulationWorldInteractionMaturityStateCodes.ManifestationPartial,
             Assert.Single(beforeTick.WorldInteractionManifestations).StateCode);
@@ -431,6 +438,369 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
         Assert.Equal(saved.ReplayHash, restoredSave.ReplayHash);
         Assert.Equal(SimulationWorldInteractionMaturityStateCodes.Manifested,
             Assert.Single(restoredSave.WorldInteractionManifestations).StateCode);
+
+        var tampered = JsonSerializer.Deserialize<SimulationSessionSavePackage>(
+            JsonSerializer.Serialize(saved))!;
+        Assert.Single(tampered.CommandLog,
+                value => value.WorldInteractionInvocation != null)
+            .WorldInteractionInvocation!.음양주체분류.사분면기호 = "--";
+        var error = Assert.Throws<SimulationContractException>(() =>
+            SimulationSessionReplay.Restore(tampered));
+        Assert.Equal("SimulationSavePackageInvalid", error.Message);
+    }
+
+    [Fact]
+    public void Hub출고루틴은_NPC가_결정적으로_WI03_04_05를_완료한다()
+    {
+        var session = new 경영SimulationSessionAggregate(
+            CreateHubNpcRoutineRequest());
+        var putAwayCompleted = session.Snapshot();
+        var inventory = Assert.Single(putAwayCompleted.NpcFacilityInventories);
+
+        var candidate = Assert.Single(session.GetNpcRoutineWork("Hub"));
+        Assert.Equal("WI-HUB-03", candidate.WorldInteractionId);
+        Assert.Equal(SimulationNpcActionPhaseCodes.Candidate, candidate.PhaseCode);
+        Assert.Equal(SimulationWorldInteractionOriginCodes.OperationsDerived,
+            candidate.OriginCode);
+        Assert.Equal(SimulationWorldInteractionControlPolicyCodes.NpcRoutine,
+            candidate.ControlPolicyCode);
+
+        var direct = Assert.Throws<SimulationConflictException>(() =>
+            session.ConfirmSupplyChainWork(new SimulationSupplyChainWorkConfirmRequest
+            {
+                CommandId = "command:wi-hub:direct-forbidden",
+                ExpectedRevision = putAwayCompleted.Revision,
+                Work = SupplyChainWork(inventory,
+                    SimulationSupplyChainActionCodes.WarehouseOutboundFlow,
+                    PyeongchangSimulation공간StableIds.진부Hub피킹공간, 2),
+            }));
+        Assert.Equal("SimulationNpcRoutineDirectControlForbidden", direct.ErrorCode);
+
+        var scheduled = session.Advance(Tick(
+            "command:npc-routine:hub-outbound:start", putAwayCompleted.Revision));
+        Assert.Equal(SimulationNpcInventoryStateCodes.OutboundRequested,
+            Assert.Single(scheduled.NpcFacilityInventories).StateCode);
+        var assignment = scheduled.NpcTaskAssignments.Single(value =>
+            value.ActionCode == SimulationNpcActionCodes.WarehouseOutboundFlow);
+        Assert.Equal(PyeongchangSimulationNpcStableIds.진부출고준비담당,
+            assignment.ActorStableId);
+        var started = Assert.Single(scheduled.NpcRoutineExecutions);
+        Assert.Equal("WI-HUB-03", started.WorldInteractionId);
+        Assert.Equal(SimulationWorldInteractionTriggerSourceCodes.NpcDriven,
+            started.TriggerSourceCode);
+
+        var picked = session.Advance(Tick(
+            "command:npc-routine:hub-outbound:pick", scheduled.Revision));
+        Assert.Equal(SimulationNpcInventoryStateCodes.Picked,
+            Assert.Single(picked.NpcFacilityInventories).StateCode);
+        var completed = session.Advance(Tick(
+            "command:npc-routine:hub-outbound:ready", picked.Revision));
+        Assert.Equal(SimulationNpcInventoryStateCodes.OutboundReady,
+            Assert.Single(completed.NpcFacilityInventories).StateCode);
+        Assert.Equal(new[] { "WI-HUB-03", "WI-HUB-04", "WI-HUB-05" },
+            completed.NpcRoutineExecutions.Select(value =>
+                value.WorldInteractionId).ToArray());
+        Assert.Equal(SimulationWorldInteractionTriggerSourceCodes.WorldDerived,
+            completed.NpcRoutineExecutions.Single(value =>
+                value.WorldInteractionId == "WI-HUB-05").TriggerSourceCode);
+        Assert.All(completed.NpcRoutineExecutions.Where(value =>
+            value.WorldInteractionId is "WI-HUB-04" or "WI-HUB-05"), value =>
+            Assert.Equal(SimulationWI사분면Codes.NotApplicable,
+                value.음양주체분류.사분면Code));
+        Assert.DoesNotContain(completed.Tasks, value =>
+            value.ActionCode == SimulationNpcActionCodes.FreightTransport);
+    }
+
+    [Fact]
+    public void Hub전체루틴은_감자300KGM을_검수부터_출고준비까지_NPC가완료한다()
+    {
+        var session = new 경영SimulationSessionAggregate(
+            CreateHubNpcFullRoutineRequest());
+        var current = session.Snapshot();
+        var states = new List<string>
+        {
+            Assert.Single(current.NpcFacilityInventories).StateCode,
+        };
+        Assert.Equal("WI-001",
+            Assert.Single(session.GetNpcRoutineWork("Hub")).WorldInteractionId);
+
+        for (var tick = 1; tick <= 15; tick++)
+        {
+            current = session.Advance(Tick(
+                "command:npc-routine:hub-full:" + tick, current.Revision));
+            states.Add(Assert.Single(current.NpcFacilityInventories).StateCode);
+            if (states[^1] == SimulationNpcInventoryStateCodes.OutboundReady)
+                break;
+        }
+
+        Assert.Equal(SimulationNpcInventoryStateCodes.OutboundReady,
+            states[^1]);
+        Assert.Contains(SimulationNpcInventoryStateCodes.PendingInspection,
+            states);
+        Assert.Contains(SimulationNpcInventoryStateCodes.StorageEligible,
+            states);
+        Assert.Contains(SimulationNpcInventoryStateCodes.PutAwayCompleted,
+            states);
+        Assert.Contains(SimulationNpcInventoryStateCodes.OutboundRequested,
+            states);
+        Assert.Contains(SimulationNpcInventoryStateCodes.Picked, states);
+        Assert.Equal(300m,
+            Assert.Single(current.NpcFacilityInventories).Quantity);
+        Assert.Equal("KGM",
+            Assert.Single(current.NpcFacilityInventories).UnitCode);
+        Assert.Equal(new[]
+            {
+                "WI-001", "WI-002", "WI-HUB-03", "WI-HUB-04", "WI-HUB-05",
+            }, current.NpcRoutineExecutions.Select(value =>
+                value.WorldInteractionId).ToArray());
+        Assert.Equal(3, current.NpcWorkRecords.Count(value =>
+            value.ActionCode is
+                SimulationNpcActionCodes.WarehouseInboundInspection
+                or SimulationNpcActionCodes.WarehouseStorageMove
+                or SimulationNpcActionCodes.WarehouseOutboundFlow));
+        Assert.DoesNotContain(current.Tasks, value =>
+            value.ActionCode == SimulationNpcActionCodes.FreightTransport);
+    }
+
+    [Fact]
+    public void Hub정밀배치상태사본은_v22에서_동결되고_같은hash로재생된다()
+    {
+        var plan = new DeterministicInteriorLayoutEngine().Generate(
+            HubWarehouseInteriorGrammar.CreateRequest());
+        var request = CreateHubNpcFullRoutineRequest();
+        request.InteriorPlanHandles = new[]
+        {
+            new SimulationInteriorPlanHandleSnapshot
+            {
+                SchemaVersion = plan.SchemaVersion,
+                BuildingPlacementStableId = plan.BuildingPlacementStableId,
+                H1StableId = plan.H1StableId,
+                InteriorDefinitionRevision = plan.InteriorDefinitionRevision,
+                ReferenceCatalogRevision = plan.ReferenceCatalogRevision,
+                ReferenceCatalogHashSha256 =
+                    plan.ReferenceCatalogHashSha256,
+                PlacementControlRuleRevision =
+                    plan.PlacementControlRuleRevision,
+                VisualMetricCatalogRevision =
+                    plan.VisualMetricCatalogRevision,
+                VisualMetricCatalogHashSha256 =
+                    plan.VisualMetricCatalogHashSha256,
+                AdjustmentRevision = plan.AdjustmentRevision,
+                InteriorPlacementPlanHashSha256 =
+                    plan.InteriorPlacementPlanHashSha256,
+            },
+        };
+        var expectedPlanHash = plan.InteriorPlacementPlanHashSha256;
+        var session = new 경영SimulationSessionAggregate(request);
+
+        request.InteriorPlanHandles[0].InteriorPlacementPlanHashSha256 =
+            new string('f', 64);
+        var retryConflict = Assert.Throws<SimulationConflictException>(() =>
+            session.EnsureSameCreationRequest(request));
+        Assert.Equal("SimulationCreateRequestPayloadConflict",
+            retryConflict.ErrorCode);
+        var current = session.Snapshot();
+        for (var tick = 1; tick <= 15; tick++)
+        {
+            current = session.Advance(Tick(
+                "command:npc-routine:hub-save-v22:" + tick,
+                current.Revision));
+            if (Assert.Single(current.NpcFacilityInventories).StateCode
+                == SimulationNpcInventoryStateCodes.OutboundReady)
+                break;
+        }
+
+        var saved = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:npc-routine:hub-precision-placement",
+            ExpectedRevision = current.Revision,
+        });
+        Assert.Equal(SimulationSaveSchemaVersions.V23, saved.SchemaVersion);
+        Assert.Null(saved.SpatialComposition);
+        Assert.Equal(expectedPlanHash, Assert.Single(
+            saved.SessionCreateRequest.InteriorPlanHandles)
+            .InteriorPlacementPlanHashSha256);
+        Assert.Equal(expectedPlanHash, Assert.Single(
+            saved.Snapshot.InteriorPlanHandles)
+            .InteriorPlacementPlanHashSha256);
+
+        var restored = SimulationSessionReplay.Restore(saved);
+        var replayed = restored.CreateSavePackage(
+            new SimulationSessionSaveRequest
+            {
+                SaveStableId = saved.SaveStableId,
+                ExpectedRevision = restored.Revision,
+            });
+        Assert.Equal(saved.ReplayHash, replayed.ReplayHash);
+        Assert.Equal(expectedPlanHash, Assert.Single(
+            replayed.Snapshot.InteriorPlanHandles)
+            .InteriorPlacementPlanHashSha256);
+        Assert.Equal(SimulationNpcInventoryStateCodes.OutboundReady,
+            Assert.Single(replayed.Snapshot.NpcFacilityInventories).StateCode);
+    }
+
+    [Fact]
+    public void Hub전체루틴의_적재는_플레이어직접확정을거부한다()
+    {
+        var session = new 경영SimulationSessionAggregate(
+            CreateHubNpcFullRoutineRequest());
+        var current = session.Snapshot();
+        while (Assert.Single(current.NpcFacilityInventories).StateCode
+               != SimulationNpcInventoryStateCodes.StorageEligible)
+        {
+            current = session.Advance(Tick(
+                "command:npc-routine:hub-to-storage:" + current.CurrentTick,
+                current.Revision));
+        }
+        var inventory = Assert.Single(current.NpcFacilityInventories);
+
+        var error = Assert.Throws<SimulationConflictException>(() =>
+            session.ConfirmWarehousePutAway(
+                new SimulationWarehousePutAwayConfirmRequest
+                {
+                    CommandId = "command:hub-put-away:player-forbidden",
+                    ExpectedRevision = current.Revision,
+                    PutAway = new SimulationWarehousePutAwayPreviewRequest
+                    {
+                        InventoryStableId = inventory.InventoryStableId,
+                        InventoryRevision = inventory.Revision,
+                        ActorStableId = Player,
+                        PreferredSpatialStableId =
+                            PyeongchangSimulation공간StableIds.진부Hub창고공간,
+                        PutAwayDurationTicks = 2,
+                        SourceStableIds = new[] { "source:test.player-direct" },
+                    },
+                }));
+        Assert.Equal("SimulationNpcRoutineDirectControlForbidden",
+            error.ErrorCode);
+    }
+
+    [Fact]
+    public void Hub_NPC루틴_v23은_계보와_음양사분면_hash를_저장재생한다()
+    {
+        var session = new 경영SimulationSessionAggregate(
+            CreateHubNpcRoutineRequest());
+        var current = session.Snapshot();
+        current = session.Advance(Tick(
+            "command:npc-routine-save:start", current.Revision));
+        current = session.Advance(Tick(
+            "command:npc-routine-save:pick", current.Revision));
+        current = session.Advance(Tick(
+            "command:npc-routine-save:ready", current.Revision));
+
+        var saved = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:npc-routine:hub-outbound",
+            ExpectedRevision = current.Revision,
+        });
+        Assert.Equal(SimulationSaveSchemaVersions.V23, saved.SchemaVersion);
+        Assert.Contains(saved.Snapshot.NpcRoutineExecutions, value =>
+            value.음양주체분류.사분면Code ==
+            SimulationWI사분면Codes.YinNpc
+            && value.음양주체분류.사분면기호 == "--");
+
+        var restored = SimulationSessionReplay.Restore(saved);
+        var replayed = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = saved.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(saved.ReplayHash, replayed.ReplayHash);
+        Assert.Equal(saved.Snapshot.NpcRoutineExecutions.Select(value =>
+                value.ExecutionStableId),
+            replayed.Snapshot.NpcRoutineExecutions.Select(value =>
+                value.ExecutionStableId));
+
+        var legacyV21 = SimulationSaveReplayCloner.ClonePackage(saved);
+        legacyV21.SchemaVersion = SimulationSaveSchemaVersions.V21;
+        legacyV21.ReplayHash = SimulationReplayHasher.Calculate(legacyV21);
+        var restoredV21 = SimulationSessionReplay.Restore(legacyV21);
+        Assert.Equal(legacyV21.SavedWorldRevision, restoredV21.Revision);
+
+        var legacyV22 = SimulationSaveReplayCloner.ClonePackage(saved);
+        legacyV22.SchemaVersion = SimulationSaveSchemaVersions.V22;
+        var v22HashBefore = SimulationReplayHasher.Calculate(legacyV22);
+        legacyV22.Snapshot.NpcRoutineExecutions[0]
+            .음양주체분류.사분면기호 = "tampered-but-ignored-by-v22";
+        Assert.Equal(v22HashBefore,
+            SimulationReplayHasher.Calculate(legacyV22));
+    }
+
+    [Fact]
+    public void Hub_NPC루틴은_정책중지와_담당자부재를_차단상태로보존한다()
+    {
+        var policyOffSession = new 경영SimulationSessionAggregate(
+            CreateHubNpcRoutineRequest());
+        var putAway = policyOffSession.Snapshot();
+        var policyOff = policyOffSession.UpdateNpcPolicy(
+            new SimulationNpcPolicyChangeRequest
+            {
+                CommandId = "command:npc-routine:policy-off",
+                ExpectedRevision = putAway.Revision,
+                PolicyStableId = PyeongchangSimulationNpcStableIds.진부출고준비정책,
+                AutomationEnabled = false,
+                Priority = 80,
+                PreferredActorStableId =
+                    PyeongchangSimulationNpcStableIds.진부출고준비담당,
+                AutoDelegationEnabled = false,
+            });
+        var stopped = Assert.Single(policyOffSession.GetNpcRoutineWork("Hub"));
+        Assert.Equal(SimulationNpcActionPhaseCodes.Blocked, stopped.PhaseCode);
+        Assert.Contains("SimulationNpcAutomationDisabled", stopped.BlockReasonCodes);
+        var afterStoppedTick = policyOffSession.Advance(Tick(
+            "command:npc-routine:policy-off:tick", policyOff.Revision));
+        Assert.DoesNotContain(afterStoppedTick.Tasks, value =>
+            value.ActionCode == SimulationNpcActionCodes.WarehouseOutboundFlow);
+
+        var noActorRequest = CreateHubNpcRoutineRequest();
+        var workforce = noActorRequest.NpcWorkforce!;
+        workforce.Actors = workforce.Actors.Where(value => value.ActorStableId !=
+            PyeongchangSimulationNpcStableIds.진부출고준비담당).ToArray();
+        workforce.CapabilityGrants = workforce.CapabilityGrants.Where(value =>
+            value.ActorStableId != PyeongchangSimulationNpcStableIds
+                .진부출고준비담당).ToArray();
+        workforce.Policies.Single(value => value.PolicyStableId ==
+            PyeongchangSimulationNpcStableIds.진부출고준비정책)
+            .PreferredActorStableId = string.Empty;
+        var noActorSession = new 경영SimulationSessionAggregate(noActorRequest);
+        var ready = noActorSession.Snapshot();
+        noActorSession.Advance(Tick("command:npc-routine:no-actor:tick",
+            ready.Revision));
+
+        var blocked = Assert.Single(noActorSession.GetNpcRoutineWork("Hub"));
+        Assert.Equal(SimulationNpcActionPhaseCodes.Blocked, blocked.PhaseCode);
+        Assert.Contains("SimulationNpcEligibleActorMissing",
+            blocked.BlockReasonCodes);
+        Assert.NotEmpty(blocked.TaskStableId);
+    }
+
+    [Fact]
+    public void Hub_NPC루틴는_완료전_플레이어예외취소를_허용한다()
+    {
+        var session = new 경영SimulationSessionAggregate(
+            CreateHubNpcRoutineRequest());
+        var ready = session.Snapshot();
+        var scheduled = session.Advance(Tick(
+            "command:npc-routine:cancel:start", ready.Revision));
+        var task = scheduled.Tasks.Single(value =>
+            value.ActionCode == SimulationNpcActionCodes.WarehouseOutboundFlow);
+        var projection = Assert.Single(session.GetNpcRoutineWork("Hub"));
+        Assert.Contains(
+            SimulationNpcRoutinePlayerInterventionCodes.CancelBeforeCompletion,
+            projection.AllowedPlayerInterventionCodes);
+
+        var cancelled = session.CancelTask(task.TaskStableId,
+            new SimulationTaskCancelRequest
+            {
+                CommandId = "command:npc-routine:cancel",
+                ExpectedRevision = scheduled.Revision,
+                ReasonCode = "PlayerExceptionIntervention",
+            });
+        Assert.Equal(SimulationTaskStateCodes.Cancelled,
+            cancelled.Tasks.Single(value => value.TaskStableId ==
+                task.TaskStableId).StateCode);
+        Assert.Equal(SimulationNpcInventoryStateCodes.PutAwayCompleted,
+            Assert.Single(cancelled.NpcFacilityInventories).StateCode);
     }
 
     [Fact]
@@ -675,6 +1045,75 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
     }
 
     [Fact]
+    public async System.Threading.Tasks.Task NPC루틴조회는_Hosted_HTTP와_같은계약을사용한다()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var request = CreateRequest(npcRoutineControlRevision:
+            SimulationNpcRoutineControlRevisionCodes.R1);
+        request.ClientRequestId = Guid.Parse(
+            "E760D074-88B1-4B31-94F3-A6080CE16822");
+        var created = await Post<경영SimulationSessionSnapshot>(client,
+            "/api/simulation/v1/sessions", request, HttpStatusCode.Created);
+
+        var projection = await Get<SimulationNpcRoutineWorkProjection[]>(client,
+            $"/api/simulation/v1/sessions/{created.SessionStableId}"
+            + "/npc-routine-work?areaCode=Hub");
+
+        Assert.Empty(projection);
+        Assert.Equal(SimulationNpcRoutineControlRevisionCodes.R1,
+            created.NpcRoutineControlRevision);
+        Assert.False(created.IsOperationalState);
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task SoloLocalProcess도_같은_NPC루틴_Core와조회계약을사용한다()
+    {
+        using var runtime = new LocalSimulationRuntime(
+            new InMemory경영SimulationSessionStore(),
+            new InMemorySimulationSessionSaveStore(),
+            new 사용하지않는NpcRoutineLocalSaveSlotStore());
+        var created = await runtime.Sessions.CreateAsync(
+            CreateHubNpcRoutineRequest());
+
+        var before = await runtime.Sessions.GetNpcRoutineWorkAsync(
+            created.SessionStableId, "Hub");
+        var advanced = await runtime.Sessions.AdvanceWorldTickAsync(
+            created.SessionStableId,
+            Tick("command:local:npc-routine:start", created.Revision));
+        var after = await runtime.Sessions.GetNpcRoutineWorkAsync(
+            created.SessionStableId, "Hub");
+
+        var hostedStore = new InMemory경영SimulationSessionStore();
+        var hosted = new 경영SimulationSessionService(hostedStore,
+            new InMemorySimulationSessionSaveStore());
+        var hostedCreated = hosted.Create(CreateHubNpcRoutineRequest());
+        hosted.Advance(hostedCreated.SessionStableId,
+            Tick("command:hosted:npc-routine:start",
+                hostedCreated.Revision));
+        var hostedAfter = hosted.GetNpcRoutineWork(
+            hostedCreated.SessionStableId, "Hub");
+
+        Assert.Equal(SimulationAuthorityLocation.LocalProcess,
+            runtime.Descriptor.AuthorityLocation);
+        Assert.False(runtime.Descriptor.RequiresNetwork);
+        Assert.Equal(SimulationNpcActionPhaseCodes.Candidate,
+            Assert.Single(before).PhaseCode);
+        Assert.Equal(SimulationNpcInventoryStateCodes.OutboundRequested,
+            Assert.Single(advanced.NpcFacilityInventories).StateCode);
+        var localProjection = Assert.Single(after);
+        var hostedProjection = Assert.Single(hostedAfter);
+        Assert.Equal("WI-HUB-03", localProjection.WorldInteractionId);
+        Assert.Equal(localProjection.음양주체분류.사분면Code,
+            hostedProjection.음양주체분류.사분면Code);
+        Assert.Equal(localProjection.음양주체분류.사분면기호,
+            hostedProjection.음양주체분류.사분면기호);
+        Assert.Equal(SimulationWI사분면Codes.YinNpc,
+            localProjection.음양주체분류.사분면Code);
+        Assert.Equal("--", localProjection.음양주체분류.사분면기호);
+    }
+
+    [Fact]
     public async System.Threading.Tasks.Task 감자생산부터_Hub보관까지_시험HTTP경계를왕복한다()
     {
         using var factory = CreateFactory();
@@ -800,7 +1239,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             });
         Assert.False(string.IsNullOrWhiteSpace(save.ReplayHash));
         Assert.Equal(current.Revision, save.Snapshot.Revision);
-        Assert.Equal(SimulationSaveSchemaVersions.V15, save.SchemaVersion);
+        Assert.Equal(SimulationSaveSchemaVersions.V23, save.SchemaVersion);
         Assert.Contains(save.WorldInteractionManifestations, value =>
             value.WorldInteractionId == "WI-FARM-04");
         Assert.Contains(save.WorldInteractionManifestations, value =>
@@ -1247,8 +1686,28 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             TickCount = 1,
         };
 
+    private static 경영SimulationSession생성Request CreateHubNpcRoutineRequest()
+    {
+        var request = CreateRequest(npcRoutineControlRevision:
+            SimulationNpcRoutineControlRevisionCodes.R1);
+        request.NpcWorkforce =
+            PyeongchangSimulationNpcWorkforceFixture.CreateHubOutboundReadyFixture();
+        return request;
+    }
+
+    private static 경영SimulationSession생성Request
+        CreateHubNpcFullRoutineRequest()
+    {
+        var request = CreateRequest(npcRoutineControlRevision:
+            SimulationNpcRoutineControlRevisionCodes.R2);
+        request.NpcWorkforce = PyeongchangSimulationNpcWorkforceFixture
+            .CreateHubWarehouseFullLoopFixture();
+        return request;
+    }
+
     private static 경영SimulationSession생성Request CreateRequest(
-        Simulation공간세계InitialStateRequest? spatialWorld = null)
+        Simulation공간세계InitialStateRequest? spatialWorld = null,
+        string npcRoutineControlRevision = "")
         => new()
         {
             ClientRequestId = Guid.Parse("4D73AB1E-7E22-4BE5-B638-807CB45C2AA1"),
@@ -1256,6 +1715,7 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
             ScenarioDataRevision = "fixture.r1",
             ScenarioSeed = 300,
             RuleRevision = "world-interaction.farm-supply.r1",
+            NpcRoutineControlRevision = npcRoutineControlRevision,
             DurationTicks = 30,
             WorldContext = new SimulationWorldContext생성Request
             {
@@ -1414,4 +1874,15 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
                 },
             },
         };
+
+    private sealed class 사용하지않는NpcRoutineLocalSaveSlotStore
+        : ISimulationLocalSaveSlotStore
+    {
+        public void Write(string slotStableId,
+            SimulationSessionSavePackage package)
+            => throw new NotSupportedException();
+
+        public SimulationLocalSaveSlotPackage Read(string slotStableId)
+            => throw new NotSupportedException();
+    }
 }

@@ -33,6 +33,12 @@ namespace Ssalddel.Simulation.Contracts
         /// 클라이언트는 원 관측값이나 의미 신호를 제출하지 않는다.
         /// </summary>
         public string RealityContextProfileStableId { get; set; } = string.Empty;
+        public string TarotOrientationPolicyCode { get; set; } = string.Empty;
+        public string TownNpcLifeProfileStableId { get; set; } = string.Empty;
+        /// <summary>
+        /// 비어 있으면 기존 직접 Confirm 호환, r1이면 운영 파생 WI의 NPC 루틴 통제를 사용한다.
+        /// </summary>
+        public string NpcRoutineControlRevision { get; set; } = string.Empty;
         public string SpatialCompositionRuleRevision { get; set; }
             = string.Empty;
         public int DurationTicks { get; set; } = 28;
@@ -42,12 +48,16 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationNpcWorkforceInitialStateRequest? NpcWorkforce { get; set; }
         public Simulation공간세계InitialStateRequest? SpatialWorld { get; set; }
         public SimulationWorldInventoryInitialStateRequest? WorldInventory { get; set; }
+        public SimulationActorEquipmentInitialStateRequest? ActorEquipment { get; set; }
         public SimulationSurvivalTarotInitialStateRequest? SurvivalTarot { get; set; }
         public SimulationFarmSurvivalInitialStateRequest? FarmSurvival { get; set; }
         public SimulationTeamRoleCardInitialState? TeamRoleCards { get; set; }
         public SimulationIntegratedWorldInitialStateRequest? IntegratedWorld { get; set; }
         public SimulationNatureMindInitialStateRequest? NatureMind { get; set; }
         public SimulationNatureSurvivalInitialStateRequest? NatureSurvival { get; set; }
+        public SimulationAtmosphereInitialStateRequest? Atmosphere { get; set; }
+        public SimulationInteriorPlanHandleSnapshot[] InteriorPlanHandles { get; set; }
+            = Array.Empty<SimulationInteriorPlanHandleSnapshot>();
     }
 
     public sealed class SimulationWorldContext생성Request
@@ -73,6 +83,9 @@ namespace Ssalddel.Simulation.Contracts
         public string ScenarioDataRevision { get; set; } = string.Empty;
         public int ScenarioSeed { get; set; }
         public string RuleRevision { get; set; } = string.Empty;
+        public string NpcRoutineControlRevision { get; set; } = string.Empty;
+        public SimulationInteriorPlanHandleSnapshot[] InteriorPlanHandles { get; set; }
+            = Array.Empty<SimulationInteriorPlanHandleSnapshot>();
         public int CurrentTick { get; set; }
         public int DurationTicks { get; set; }
         public long Revision { get; set; }
@@ -135,6 +148,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationNpcActionProjection>();
         public SimulationNpcFacilityInventorySnapshot[] NpcFacilityInventories { get; set; }
             = Array.Empty<SimulationNpcFacilityInventorySnapshot>();
+        public SimulationNpcRoutineExecutionSnapshot[] NpcRoutineExecutions { get; set; }
+            = Array.Empty<SimulationNpcRoutineExecutionSnapshot>();
         public Simulation공간정의Snapshot[] SpatialDefinitions { get; set; }
             = Array.Empty<Simulation공간정의Snapshot>();
         public Simulation공간실행상태Snapshot[] SpatialRuntimeStates { get; set; }
@@ -168,6 +183,12 @@ namespace Ssalddel.Simulation.Contracts
             = new SimulationIntegratedWorldSnapshot();
         public SimulationNatureSurvivalStateSnapshot NatureSurvival { get; set; }
             = new SimulationNatureSurvivalStateSnapshot();
+        public SimulationActorEquipmentStateSnapshot ActorEquipment { get; set; }
+            = new SimulationActorEquipmentStateSnapshot();
+        public SimulationAtmosphereStateSnapshot Atmosphere { get; set; }
+            = new SimulationAtmosphereStateSnapshot();
+        public SimulationTownNpcLifeStateSnapshot TownNpcLife { get; set; }
+            = new SimulationTownNpcLifeStateSnapshot();
     }
 
     public sealed class SimulationWorldContextSnapshot

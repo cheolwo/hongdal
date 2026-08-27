@@ -80,6 +80,8 @@ namespace Ssalddel.Simulation.Domain
             RuleRevision = request.RuleRevision.Trim();
             RealityContextProfileStableId = (request.RealityContextProfileStableId
                 ?? string.Empty).Trim();
+            NpcRoutineControlRevision = (request.NpcRoutineControlRevision
+                ?? string.Empty).Trim();
             SpatialCompositionRuleRevision =
                 (request.SpatialCompositionRuleRevision ?? string.Empty).Trim();
             DurationTicks = request.DurationTicks;
@@ -97,11 +99,16 @@ namespace Ssalddel.Simulation.Domain
             InitializeCollectibleCardRewards();
             InitializeIntegratedWorld(request.IntegratedWorld);
             InitializeNatureMind(request.NatureMind);
+            InitializeArcanaTownLife(request.TarotOrientationPolicyCode,
+                request.TownNpcLifeProfileStableId);
             InitializeNatureSurvival(request.NatureSurvival);
+            InitializeActorEquipment(request.ActorEquipment);
+            InitializeWorldAtmosphere(request.Atmosphere);
             InitializeAreaAccess(request.FarmSurvival != null);
             InitializeHostedWorld();
             InitializeCoopConstruction();
             InitializeRealityContext(frozenRealityContext);
+            InitializeInteriorPlanHandles(request.InteriorPlanHandles);
             InitializeSpatialComposition();
         }
 
@@ -112,6 +119,7 @@ namespace Ssalddel.Simulation.Domain
         public int ScenarioSeed { get; }
         public string RuleRevision { get; }
         public string RealityContextProfileStableId { get; }
+        public string NpcRoutineControlRevision { get; }
         public string SpatialCompositionRuleRevision { get; }
         public int CurrentTick { get; private set; }
         public int DurationTicks { get; }
@@ -138,7 +146,8 @@ namespace Ssalddel.Simulation.Domain
                     || HasAppliedNpcPolicyCommand(request.CommandId)
                     || HasAppliedFarmSurvivalCommand(request.CommandId)
                     || HasAppliedCollectibleCardCommand(request.CommandId)
-                    || HasAppliedNatureSurvivalCommand(request.CommandId))
+                    || HasAppliedNatureSurvivalCommand(request.CommandId)
+                    || HasAppliedActorEquipmentCommand(request.CommandId))
                     throw new SimulationConflictException("SimulationCommandKindConflict");
                 if (appliedCommands.TryGetValue(request.CommandId, out var applied))
                 {
@@ -175,10 +184,12 @@ namespace Ssalddel.Simulation.Domain
         {
             var previousTick = CurrentTick;
             CurrentTick += tickCount;
+            EvaluateNpcRoutineWork();
             AdvanceNpcWorkforce(CurrentTick);
             AdvanceDecisionWork(CurrentTick);
             ExpireActiveTurnCardEffects();
             ExpireTarotContext();
+            AdvanceTownNpcLife(previousTick, CurrentTick);
             AdvanceFarmSurvival(previousTick, CurrentTick);
             AdvanceRegionalIncidents(CurrentTick);
             AdvanceIntegratedWorld(CurrentTick);
@@ -199,9 +210,21 @@ namespace Ssalddel.Simulation.Domain
                 || !string.Equals(RealityContextProfileStableId,
                     (request.RealityContextProfileStableId ?? string.Empty).Trim(),
                     StringComparison.Ordinal)
+                || !string.Equals(NpcRoutineControlRevision,
+                    (request.NpcRoutineControlRevision ?? string.Empty).Trim(),
+                    StringComparison.Ordinal)
                 || !string.Equals(SpatialCompositionRuleRevision,
                     (request.SpatialCompositionRuleRevision
-                     ?? string.Empty).Trim(),
+                     ?? string.Empty).Trim(), StringComparison.Ordinal)
+                || !InteriorPlanHandlesEqual(interiorPlanHandles,
+                    request.InteriorPlanHandles)
+                || !string.Equals(tarotOrientationPolicyCode,
+                    string.IsNullOrWhiteSpace(request.TarotOrientationPolicyCode)
+                        ? Simulation타로방향결정정책Codes.SeededHash
+                        : request.TarotOrientationPolicyCode.Trim(),
+                    StringComparison.Ordinal)
+                || !string.Equals(townNpcLifeProfileStableId,
+                    (request.TownNpcLifeProfileStableId ?? string.Empty).Trim(),
                     StringComparison.Ordinal)
                 || !string.Equals(realityContext?.InputHashSha256,
                     frozenRealityContext?.InputHashSha256, StringComparison.Ordinal)
@@ -215,8 +238,10 @@ namespace Ssalddel.Simulation.Domain
                     BuildSettlementPayloadKey(request.Settlement),
                     StringComparison.Ordinal)
                 || !string.Equals(
-                    BuildNpcWorkforcePayloadKey(npcWorkforceCreationState),
-                    BuildNpcWorkforcePayloadKey(request.NpcWorkforce),
+                    BuildNpcWorkforcePayloadKey(npcWorkforceCreationState,
+                        IsNpcRoutineControlEnabled),
+                    BuildNpcWorkforcePayloadKey(request.NpcWorkforce,
+                        IsNpcRoutineControlEnabled),
                     StringComparison.Ordinal)
                 || !string.Equals(
                     BuildSimulationSpatialPayloadKey(spatialWorldCreationState),
@@ -247,6 +272,13 @@ namespace Ssalddel.Simulation.Domain
                     StringComparison.Ordinal)
                 || !string.Equals(natureSurvivalInitialPayloadKey,
                     BuildNatureSurvivalInitialPayloadKey(request.NatureSurvival),
+                    StringComparison.Ordinal)
+                || !string.Equals(actorEquipmentInitialPayloadKey,
+                    BuildActorEquipmentInitialPayloadKey(request.ActorEquipment),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    BuildWorldAtmosphereInitialPayloadKey(atmosphereCreationState),
+                    BuildWorldAtmosphereInitialPayloadKey(request.Atmosphere),
                     StringComparison.Ordinal))
             {
                 throw new SimulationConflictException("SimulationCreateRequestPayloadConflict");
@@ -262,6 +294,8 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioDataRevision = ScenarioDataRevision,
                 ScenarioSeed = ScenarioSeed,
                 RuleRevision = RuleRevision,
+                NpcRoutineControlRevision = NpcRoutineControlRevision,
+                InteriorPlanHandles = CreateInteriorPlanHandleSnapshots(),
                 CurrentTick = CurrentTick,
                 DurationTicks = DurationTicks,
                 Revision = Revision,
@@ -299,6 +333,7 @@ namespace Ssalddel.Simulation.Domain
                 TurnClosings = CreateTurnClosingSnapshots(),
                 ActiveTurnCardEffects = CreateActiveTurnCardEffectSnapshots(),
                 TarotContext = CreateTarotContextSnapshot(),
+                TownNpcLife = CreateTownNpcLifeStateSnapshot(),
                 NpcOrganizations = CreateNpcOrganizationSnapshots(),
                 NpcActors = CreateNpcActorSnapshots(),
                 NpcCapabilityGrants = CreateNpcCapabilityGrantSnapshots(),
@@ -307,6 +342,7 @@ namespace Ssalddel.Simulation.Domain
                 NpcWorkRecords = CreateNpcWorkRecordSnapshots(),
                 NpcActionProjections = CreateNpcActionProjections(),
                 NpcFacilityInventories = CreateNpcFacilityInventorySnapshots(),
+                NpcRoutineExecutions = CreateNpcRoutineExecutionSnapshots(),
                 SpatialDefinitions = CreateSimulationSpatialDefinitionSnapshots(),
                 SpatialRuntimeStates = CreateSimulationSpatialRuntimeSnapshots(),
                 SpatialReservations = CreateSimulationSpatialReservationSnapshots(),
@@ -326,6 +362,8 @@ namespace Ssalddel.Simulation.Domain
                 CoopConstruction = CreateCoopConstructionStateSnapshot(),
                 IntegratedWorld = CreateIntegratedWorldSnapshot(),
                 NatureSurvival = CreateNatureSurvivalStateSnapshot(),
+                ActorEquipment = CreateActorEquipmentStateSnapshot(),
+                Atmosphere = CreateWorldAtmosphereStateSnapshot(),
             };
 
         internal static 경영SimulationSessionSnapshot Clone(경영SimulationSessionSnapshot source)
@@ -337,6 +375,9 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioDataRevision = source.ScenarioDataRevision,
                 ScenarioSeed = source.ScenarioSeed,
                 RuleRevision = source.RuleRevision,
+                NpcRoutineControlRevision = source.NpcRoutineControlRevision,
+                InteriorPlanHandles = CloneInteriorPlanHandles(
+                    source.InteriorPlanHandles),
                 CurrentTick = source.CurrentTick,
                 DurationTicks = source.DurationTicks,
                 Revision = source.Revision,
@@ -381,6 +422,7 @@ namespace Ssalddel.Simulation.Domain
                 ActiveTurnCardEffects = source.ActiveTurnCardEffects
                     .Select(CloneActiveTurnCardEffect).ToArray(),
                 TarotContext = CloneTarotContext(source.TarotContext),
+                TownNpcLife = CloneTownNpcLifeState(source.TownNpcLife),
                 NpcOrganizations = source.NpcOrganizations.Select(CloneNpcOrganization).ToArray(),
                 NpcActors = source.NpcActors.Select(CloneNpcActor).ToArray(),
                 NpcCapabilityGrants = source.NpcCapabilityGrants.Select(CloneNpcCapabilityGrant).ToArray(),
@@ -389,6 +431,9 @@ namespace Ssalddel.Simulation.Domain
                 NpcWorkRecords = source.NpcWorkRecords.Select(CloneNpcWorkRecord).ToArray(),
                 NpcActionProjections = source.NpcActionProjections.Select(CloneNpcActionProjection).ToArray(),
                 NpcFacilityInventories = source.NpcFacilityInventories.Select(CloneNpcFacilityInventory).ToArray(),
+                NpcRoutineExecutions = (source.NpcRoutineExecutions
+                        ?? Array.Empty<SimulationNpcRoutineExecutionSnapshot>())
+                    .Select(CloneNpcRoutineExecution).ToArray(),
                 SpatialDefinitions = source.SpatialDefinitions.Select(CloneSpatialDefinition).ToArray(),
                 SpatialRuntimeStates = source.SpatialRuntimeStates.Select(CloneSpatialRuntime).ToArray(),
                 SpatialReservations = source.SpatialReservations.Select(CloneSpatialReservation).ToArray(),
@@ -430,6 +475,11 @@ namespace Ssalddel.Simulation.Domain
                 CoopConstruction = CloneCoopConstructionState(source.CoopConstruction),
                 IntegratedWorld = CloneIntegratedWorldSnapshot(source.IntegratedWorld),
                 NatureSurvival = CloneNatureSurvivalState(source.NatureSurvival),
+                ActorEquipment = source.ActorEquipment == null
+                    ? new SimulationActorEquipmentStateSnapshot()
+                    : CloneActorEquipmentState(source.ActorEquipment),
+                Atmosphere = CloneWorldAtmosphereState(source.Atmosphere
+                    ?? new SimulationAtmosphereStateSnapshot()),
             };
 
         internal static void ValidateCreate(경영SimulationSession생성Request request)
@@ -443,6 +493,10 @@ namespace Ssalddel.Simulation.Domain
             if (!string.IsNullOrWhiteSpace(request.RealityContextProfileStableId))
                 RequireStableId(request.RealityContextProfileStableId,
                     "SimulationRealityContextProfileStableIdInvalid");
+            if (!SimulationNpcRoutineControlRevisionCodes.IsKnown(
+                    request.NpcRoutineControlRevision ?? string.Empty))
+                throw new SimulationContractException(
+                    "SimulationNpcRoutineControlRevisionInvalid");
             if (!string.IsNullOrWhiteSpace(
                     request.SpatialCompositionRuleRevision)
                 && !string.Equals(request.SpatialCompositionRuleRevision,
@@ -463,12 +517,24 @@ namespace Ssalddel.Simulation.Domain
                 throw new SimulationContractException("SimulationGameDateStartsOnInvalid");
             ValidateSettlementInitialState(request.Settlement, request.WorldContext.SettlementStableId);
             ValidateNpcWorkforceInitialState(request.NpcWorkforce);
+            if ((request.NpcWorkforce?.Inventories?.Length ?? 0) > 0
+                && !string.Equals(request.NpcRoutineControlRevision,
+                    SimulationNpcRoutineControlRevisionCodes.R1,
+                    StringComparison.Ordinal)
+                && !string.Equals(request.NpcRoutineControlRevision,
+                    SimulationNpcRoutineControlRevisionCodes.R2,
+                    StringComparison.Ordinal))
+                throw new SimulationContractException(
+                    "SimulationNpcInitialInventoryRequiresRoutineControl");
             ValidateSimulationSpatialInitialState(request.SpatialWorld);
             ValidateWorldInventoryInitialState(request.WorldInventory);
             ValidateSurvivalTarotInitialState(request.SurvivalTarot);
             ValidateFarmSurvivalInitialState(request.FarmSurvival);
             ValidateTeamRoleCardInitialState(request.TeamRoleCards);
             ValidateNatureSurvivalInitialState(request.NatureSurvival);
+            ValidateWorldAtmosphereInitialState(request.Atmosphere,
+                request.NatureSurvival);
+            ValidateInteriorPlanHandles(request.InteriorPlanHandles);
         }
 
         internal static void ValidateAdvance(경영SimulationTick진행Request request)

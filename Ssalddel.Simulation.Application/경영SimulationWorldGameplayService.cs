@@ -35,6 +35,10 @@ namespace Ssalddel.Simulation.Application
             string sessionStableId)
             => sessions.Require(sessionStableId).GetNatureMindState();
 
+        public SimulationTownNpcLifeStateSnapshot GetTownNpcLifeState(
+            string sessionStableId)
+            => sessions.Require(sessionStableId).GetTownNpcLifeState();
+
         public SimulationNatureFarmInterpretationSnapshot GetNatureFarmInterpretation(
             string sessionStableId, string playerStableId)
             => sessions.Require(sessionStableId)

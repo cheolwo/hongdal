@@ -9,6 +9,11 @@ using Xunit;
 
 namespace Ssalddel.Simulation.Tests;
 
+[Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+    Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+    "공간 조립 상태와 LocalProcess·RemoteHost 결과의 회귀 동등성을 검증한다.",
+    SubmoduleKey = Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceSubmoduleKeys.E3로컬원격동등성,
+    Boundary = "자동 회귀 시험이며 실제 Scene 배치나 Play Mode·Game View 증거를 대신하지 않는다.")]
 public sealed class SimulationSpatialCompositionSessionBindingTests
 {
     [Fact]

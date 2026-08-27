@@ -74,6 +74,10 @@ namespace Ssalddel.Simulation.Application
             SimulationSupplyChainWorkConfirmRequest request)
             => sessions.Require(sessionStableId).ConfirmSupplyChainWork(request);
 
+        public SimulationNpcRoutineWorkProjection[] GetNpcRoutineWork(
+            string sessionStableId, string areaCode)
+            => sessions.Require(sessionStableId).GetNpcRoutineWork(areaCode);
+
         public SimulationSpatialCompositionStateSnapshot GetSpatialComposition(
             string sessionStableId, string areaCode)
             => sessions.Require(sessionStableId).GetSpatialComposition(areaCode);

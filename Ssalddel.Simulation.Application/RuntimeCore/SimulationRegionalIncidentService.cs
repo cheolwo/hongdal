@@ -120,6 +120,8 @@ namespace Ssalddel.Simulation.Application
                     TargetStableId = "nature-route:" + natureRouteCode,
                     SourceReferenceIds = new[] { natureRouteCode },
                     TimeReferenceId = "simulation-time:world-tick",
+                    PlayableLoopStableId =
+                        "playable-loop:nature-twilight-return.v1",
                     SpatialEvidenceStateCode =
                         SimulationWorldInteractionSpatialEvidenceCodes.Bound,
                     SpatialEvidenceReferenceIds = new[]

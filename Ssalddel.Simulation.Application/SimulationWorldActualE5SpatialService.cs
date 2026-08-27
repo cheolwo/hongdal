@@ -135,16 +135,16 @@ namespace Ssalddel.Simulation.Application
             Require(interaction.SchemaVersion == "simulation-world-interaction-graph-binding.v2"
                     && interaction.NetworkStableId == root.Network.NetworkStableId,
                 "ActualE5InteractionCatalogInvalid");
-            Require(interaction.Bindings.Length == 37
+            Require(interaction.Bindings.Length == 42
                     && interaction.ContextualBindings.Length == 6
-                    && interaction.NonSpatialWiIds.Length == 6
-                    && interaction.PendingE5WiIds.Length == 0,
+                    && interaction.NonSpatialWiIds.Length == 9
+                    && interaction.PendingE5WiIds.Length == 7,
                 "ActualE5InteractionPartitionInvalid");
             Require(interaction.Bindings.Select(item => item.WorldInteractionId)
                     .Concat(interaction.ContextualBindings.Select(item => item.WorldInteractionId))
                     .Concat(interaction.NonSpatialWiIds)
                     .Concat(interaction.PendingE5WiIds)
-                    .Distinct(StringComparer.Ordinal).Count() == 49,
+                    .Distinct(StringComparer.Ordinal).Count() == 64,
                 "ActualE5InteractionCoverageInvalid");
         }
 

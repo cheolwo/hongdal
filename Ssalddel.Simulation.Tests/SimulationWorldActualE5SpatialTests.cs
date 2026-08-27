@@ -42,19 +42,23 @@ public sealed class SimulationWorldActualE5SpatialTests
     }
 
     [Fact]
-    public async Task 마흔아홉개WI를_직접37_문맥6_비공간6으로완전분류한다()
+    public async Task 예순네개WI를_직접42_문맥6_비공간9_E5대기7로분류한다()
     {
         var service = new SimulationWorld상호작용NetworkService(Reader());
 
         var result = await service.EvaluateAsync(PyeongchangAreaSetStableIds.ActualNetwork);
 
-        Assert.Equal(SimulationWorld상호작용Graph상태Codes.Ready,
+        Assert.Equal(SimulationWorld상호작용Graph상태Codes.Partial,
             result.OverallStatusCode);
-        Assert.Equal(49, result.TotalWorldInteractionCount);
-        Assert.Equal(37, result.DirectBindings.Length);
+        Assert.Equal(64, result.TotalWorldInteractionCount);
+        Assert.Equal(42, result.DirectBindings.Length);
         Assert.Equal(6, result.ContextualBindings.Length);
-        Assert.Equal(6, result.NonSpatialBindings.Length);
-        Assert.Empty(result.PendingE5WiIds);
+        Assert.Equal(9, result.NonSpatialBindings.Length);
+        Assert.Equal(new[]
+        {
+            "WI-CITY-01", "WI-CITY-02", "WI-CITY-03", "WI-CITY-04",
+            "WI-NATURE-16", "WI-NATURE-17", "WI-REFLECT-01",
+        }, result.PendingE5WiIds);
         Assert.Equal(19, result.GraphAudits.Length);
         Assert.All(result.DirectBindings, item =>
         {
@@ -149,7 +153,42 @@ public sealed class SimulationWorldActualE5SpatialTests
     }
 
     [Fact]
-    public async Task WorldStream_API에서_Network와마흔아홉개WI준비도를조회한다()
+    public async Task Nature위협감지는_승인된E5관찰공간과결정적용량으로세션에공급된다()
+    {
+        var service = new SimulationWorld상호작용NetworkService(Reader());
+
+        var world = await service.ResolveSpatialWorldAsync(
+            PyeongchangAreaSetStableIds.ActualNetwork,
+            PyeongchangAreaSetStableIds.NatureAreaSet,
+            new[] { "WI-NATURE-01" });
+
+        var definition = Assert.Single(world.Definitions);
+        Assert.Equal("spatial:actual-e5:wi-nature-01", definition.SpatialStableId);
+        Assert.Equal(Simulation공간근거종류Codes.LandscapeGraph,
+            definition.EvidenceKindCode);
+        Assert.Equal(new[]
+        {
+            "Spatial.ObservationArea",
+            "Spatial.ThreatMonitoringArea",
+            "Spatial.Traversable",
+        }, definition.CapabilityCodes);
+        Assert.Contains(definition.BaseCapacities, item =>
+            item.CapacityCode == "WorkArea" && item.Quantity == 1m
+            && item.UnitCode == "slot");
+        Assert.Contains(definition.BaseCapacities, item =>
+            item.CapacityCode == "Actor" && item.Quantity == 1m
+            && item.UnitCode == "player");
+        Assert.Contains(definition.BaseCapacities, item =>
+            item.CapacityCode == "MonitoredThreatRoute" && item.Quantity == 1m
+            && item.UnitCode == "route");
+        Assert.Contains("wi-spatial-seedbed:nature-survival-encounter.v1",
+            definition.SourceStableIds);
+        Assert.Contains(definition.SourceStableIds,
+            item => item.StartsWith("binding-sha256:", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task WorldStream_API에서_Network와예순개WI준비도를조회한다()
     {
         using var factory = new WebApplicationFactory<Program>();
         using var client = factory.CreateClient();
@@ -168,9 +207,9 @@ public sealed class SimulationWorldActualE5SpatialTests
         var readiness = await readinessResponse.Content
             .ReadFromJsonAsync<SimulationWorld상호작용Network준비도Response>();
         Assert.Equal(4, network!.AreaSets.Length);
-        Assert.Equal(49, readiness!.TotalWorldInteractionCount);
-        Assert.Empty(readiness.PendingE5WiIds);
-        Assert.Equal(SimulationWorld상호작용Graph상태Codes.Ready,
+        Assert.Equal(64, readiness!.TotalWorldInteractionCount);
+        Assert.Equal(7, readiness.PendingE5WiIds.Length);
+        Assert.Equal(SimulationWorld상호작용Graph상태Codes.Partial,
             readiness.OverallStatusCode);
     }
 

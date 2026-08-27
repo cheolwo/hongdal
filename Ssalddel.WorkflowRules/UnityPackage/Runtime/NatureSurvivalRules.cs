@@ -22,6 +22,40 @@ namespace Ssalddel.WorkflowRules
         public const int TreeRegrowthCycleCount = 3;
         public const int CabinStorageCapacity = 20;
         public const int FirstDuskEncounterChancePermille = 650;
+        public const int SleepNightTimeMultiplier = 6;
+        public const int WorkbenchTimberCost = 4;
+        public const int StorageRackTimberCost = 6;
+        public const int PalisadeTimberCost = 8;
+        public const int ExpansionRebuildPartCost = 1;
+
+        public static int NoiseThreatTier(int noiseEventCount)
+        {
+            if (noiseEventCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(noiseEventCount));
+            if (noiseEventCount == 0) return 0;
+            if (noiseEventCount <= 2) return 1;
+            if (noiseEventCount <= 4) return 2;
+            return 3;
+        }
+
+        public static int EffectiveThreatTier(int noiseEventCount,
+            bool cabinDefenseAvailable)
+            => Math.Max(0, NoiseThreatTier(noiseEventCount)
+                - (cabinDefenseAvailable ? 1 : 0));
+
+        public static int EncounterHostileCount(int noiseEventCount,
+            bool cabinDefenseAvailable)
+            => noiseEventCount <= 0 ? 0 : Math.Max(1,
+                EffectiveThreatTier(noiseEventCount, cabinDefenseAvailable));
+
+        public static int ExpansionTimberCost(string planCode)
+            => planCode switch
+            {
+                "Workbench" => WorkbenchTimberCost,
+                "StorageRack" => StorageRackTimberCost,
+                "Palisade" => PalisadeTimberCost,
+                _ => throw new ArgumentOutOfRangeException(nameof(planCode)),
+            };
 
         public static NatureSurvivalClockProjection AdvanceClock(
             int cycleIndex,
@@ -92,6 +126,18 @@ namespace Ssalddel.WorkflowRules
                 var roll = ((hash[0] << 8) | hash[1]) % 1_000;
                 return roll < FirstDuskEncounterChancePermille;
             }
+        }
+
+        public static bool ShouldTriggerDuskEncounter(
+            int scenarioSeed,
+            string sessionStableId,
+            int cycleIndex,
+            int noiseEventCount)
+        {
+            if (cycleIndex < 0) throw new ArgumentOutOfRangeException(nameof(cycleIndex));
+            if (noiseEventCount <= 0) return false;
+            return cycleIndex == 0 || RollFirstDuskEncounter(
+                scenarioSeed, sessionStableId, cycleIndex, noiseEventCount);
         }
     }
 }

@@ -795,6 +795,7 @@ namespace Ssalddel.Simulation.Domain
                         Simulation공간능력Codes.Storage,
                         Simulation공간능력Codes.WorkerAccessible,
                         Simulation공간능력Codes.PickingWorkArea,
+                        Simulation공간능력Codes.OutboundStagingArea,
                     },
                     new[] { Capacity(Simulation공간용량Codes.WorkArea, 1m, "slot") });
             }

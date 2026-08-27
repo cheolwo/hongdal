@@ -69,6 +69,133 @@ namespace Ssalddel.Simulation.Domain
                 },
             };
 
+        /// <summary>
+        /// 승인된 actual-e5-regional-gameplay.r1의 WI-NATURE-01 결속을
+        /// LocalProcess와 RemoteHost 시작 Fixture에 동일하게 공급한다.
+        /// 생성 catalog가 바뀌면 hash 회귀가 이 고정 스냅샷의 갱신을 요구한다.
+        /// </summary>
+        public static Simulation공간세계InitialStateRequest
+            CreateNatureTwilightActualE5Observation()
+            => new Simulation공간세계InitialStateRequest
+            {
+                Definitions = new[]
+                {
+                    new Simulation공간정의InitialRequest
+                    {
+                        SpatialStableId = SimulationNatureSurvivalCodes
+                            .ActualE5SpatialStableId("WI-NATURE-01"),
+                        FacilityStableId = "facility:actual-e5:nature-home.v1",
+                        AreaStableId = "area:actual-e5:nature-home.v1",
+                        AreaSetStableId =
+                            "area-set:sim:pyeongchang:nature-home.v1",
+                        LandscapeGraphStableId = "landscape-graph:sim:"
+                            + "pyeongchang:nature-threat-recovery.v1",
+                        LandscapeNodeStableId = "node:actual-e5:nature-threat-"
+                            + "recovery:space:nature-threat-response:"
+                            + "nature-incident-trace",
+                        EvidenceKindCode =
+                            Simulation공간근거종류Codes.LandscapeGraph,
+                        AccessStateCode =
+                            Simulation공간접근상태Codes.Available,
+                        CapabilityCodes = new[]
+                        {
+                            Simulation공간능력Codes.ObservationArea,
+                            Simulation공간능력Codes.ThreatMonitoringArea,
+                            Simulation공간능력Codes.Traversable,
+                        },
+                        BaseCapacities = new[]
+                        {
+                            Capacity("WorkArea", 1m, "slot"),
+                            Capacity("Actor", 1m, "player"),
+                            Capacity("MonitoredThreatRoute", 1m, "route"),
+                        },
+                        DefinitionRevision = "graph:4;binding:"
+                            + "actual-e5-regional-gameplay.r1",
+                        DefinitionHashSha256 = "291d4248d7510fddf0a2bec2667bb9"
+                            + "e7decb5dd77e8d5555912755acffbd88a7",
+                        SourceStableIds = new[]
+                        {
+                            "source:user-approved-plan:farm-immersive-living-region.r2",
+                            "h1-stock:nature-incident-trace",
+                            "h2-candidate:nature-threat-response",
+                            "h3-candidate:nature-threat-recovery",
+                            "wi-spatial-seedbed:nature-survival-encounter.v1",
+                            "landscape-graph:sim:pyeongchang:nature-threat-recovery.v1",
+                            "node:actual-e5:nature-threat-recovery:space:nature-threat-response:nature-incident-trace",
+                            "graph-sha256:5658ade82761d62763443afa86763690e7860500fb98e87a4a8f68e38f657935",
+                            "binding-sha256:ad13c3cec36dbb42227c74f120b41a9094dccba4098b3c1ae86111508178ff86",
+                        },
+                    },
+                },
+            };
+
+        /// <summary>
+        /// 승인된 actual-e5-regional-gameplay.r2의 WI-NATURE-18 결속을
+        /// 벌목 결과물 획득 Fixture에 고정한다.
+        /// </summary>
+        public static Simulation공간세계InitialStateRequest
+            CreateNatureDroppedTimberActualE5()
+            => new Simulation공간세계InitialStateRequest
+            {
+                Definitions = new[]
+                {
+                    new Simulation공간정의InitialRequest
+                    {
+                        SpatialStableId = SimulationNatureSurvivalCodes
+                            .ActualE5SpatialStableId("WI-NATURE-18"),
+                        FacilityStableId = "facility:actual-e5:nature-home.v1",
+                        AreaStableId = "area:actual-e5:nature-home.v1",
+                        AreaSetStableId =
+                            "area-set:sim:pyeongchang:nature-home.v1",
+                        LandscapeGraphStableId = "landscape-graph:sim:"
+                            + "pyeongchang:nature-trail-network.v1",
+                        LandscapeNodeStableId = "node:actual-e5:nature-trail-"
+                            + "network:space:nature-water-buffer:"
+                            + "nature-exploration-buffer",
+                        EvidenceKindCode =
+                            Simulation공간근거종류Codes.LandscapeGraph,
+                        AccessStateCode =
+                            Simulation공간접근상태Codes.Available,
+                        CapabilityCodes = new[]
+                        {
+                            Simulation공간능력Codes.DroppedTimberPickupAnchor,
+                            Simulation공간능력Codes.WorkerAccessible,
+                        },
+                        BaseCapacities = new[]
+                        {
+                            Capacity("WorkArea", 1m, "slot"),
+                            Capacity("ResourceNode", 3m, "tree"),
+                            Capacity("Actor", 1m, "player"),
+                            Capacity("Tool", 1m, "EA"),
+                            Capacity("DroppedTimber", 3m, "bundle"),
+                        },
+                        DefinitionRevision = "graph:6;binding:"
+                            + "actual-e5-regional-gameplay.r2",
+                        DefinitionHashSha256 =
+                            "dadfd49a18841c7628602637e2aa3e48"
+                            + "e6d170c0c609eae35533413579a0a485",
+                        SourceStableIds = new[]
+                        {
+                            "source:user-approved-plan:farm-immersive-living-region.r2",
+                            "h1-stock:nature-exploration-buffer",
+                            "h2-candidate:nature-water-buffer",
+                            "h3-candidate:nature-trail-network",
+                            "wi-spatial-seedbed:nature-survival-encounter.v1",
+                            "graph-sha256:dadfd49a18841c7628602637e2aa3e48e6d170c0c609eae35533413579a0a485",
+                        },
+                    },
+                },
+            };
+
+        private static Simulation공간용량Snapshot Capacity(string code,
+            decimal quantity, string unitCode)
+            => new Simulation공간용량Snapshot
+            {
+                CapacityCode = code,
+                Quantity = quantity,
+                UnitCode = unitCode,
+            };
+
         public static Simulation공간세계InitialStateRequest CreateNatureThreatResponse(
             string sourceStableId = "scenario:pyeongchang-nature-threat-response.v1")
         {
@@ -281,6 +408,7 @@ namespace Ssalddel.Simulation.Domain
                         Simulation공간능력Codes.Storage,
                         Simulation공간능력Codes.WorkerAccessible,
                         Simulation공간능력Codes.PickingWorkArea,
+                        Simulation공간능력Codes.OutboundStagingArea,
                     }, workArea, '9', sourceStableId),
                 ScenarioDefinition(PyeongchangSimulation공간StableIds.진부Hub출고상차공간,
                     PyeongchangSimulationWorldStableIds.진부Hub시설,

@@ -9,6 +9,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string NatureThreatObserved = "NatureThreatObserved";
         public const string ThreatObserved = "ThreatObserved";
         public const string NatureHomeFacility = "facility:nature-home";
+        public const string NatureHomeTwilightRoute = "NatureHomeTwilight";
         public const string PressurePointUnit = "pressure-point";
         public const string EmergencyRetreat = "EmergencyRetreat";
         public const string EmergencyRetreatTask = "NatureEmergencyRetreatTask";

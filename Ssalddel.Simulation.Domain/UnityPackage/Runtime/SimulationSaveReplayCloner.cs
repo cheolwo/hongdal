@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.IO;
+using System.Runtime.Serialization;
 using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Domain
@@ -20,6 +22,10 @@ namespace Ssalddel.Simulation.Domain
                 SavedWorldRevision = source.SavedWorldRevision,
                 ReplayHashAlgorithmCode = source.ReplayHashAlgorithmCode,
                 ReplayHash = source.ReplayHash,
+                WorldAssetPlacementBaseSchemaVersion =
+                    source.WorldAssetPlacementBaseSchemaVersion,
+                ActorEquipmentBaseSchemaVersion =
+                    source.ActorEquipmentBaseSchemaVersion,
                 SessionCreateRequest = CloneCreateRequest(source.SessionCreateRequest),
                 Snapshot = 경영SimulationSessionAggregate.Clone(source.Snapshot),
                 WorldInventory = 경영SimulationSessionAggregate.CloneWorldInventory(
@@ -37,7 +43,44 @@ namespace Ssalddel.Simulation.Domain
                         ?? Array.Empty<SimulationWorldInteractionManifestationRecord>())
                     .Select(경영SimulationSessionAggregate
                         .CloneWorldInteractionManifestation).ToArray(),
+                SpatialComposition = source.SpatialComposition == null
+                    ? null : SimulationSpatialCompositionSnapshots.Clone(
+                        source.SpatialComposition),
+                SpatialCompositionHandle = source.SpatialCompositionHandle == null
+                    ? null : new SpatialCompositionGraphHandle
+                    {
+                        SchemaVersion = source.SpatialCompositionHandle.SchemaVersion,
+                        AreaCode = source.SpatialCompositionHandle.AreaCode,
+                        AreaSetStableId = source.SpatialCompositionHandle.AreaSetStableId,
+                        RuleCatalogRevision = source.SpatialCompositionHandle
+                            .RuleCatalogRevision,
+                        RuleCatalogHashSha256 = source.SpatialCompositionHandle
+                            .RuleCatalogHashSha256,
+                        SourceWorldRevision = source.SpatialCompositionHandle
+                            .SourceWorldRevision,
+                        GraphHashSha256 = source.SpatialCompositionHandle
+                            .GraphHashSha256,
+                    },
+                WorldAssetPlacement = CloneWorldAssetPlacementState(
+                    source.WorldAssetPlacement),
+                ActorEquipment = source.ActorEquipment == null ? null
+                    : 경영SimulationSessionAggregate.CloneActorEquipmentState(
+                        source.ActorEquipment),
             };
+
+        public static SimulationWorldAssetPlacementStateSnapshot?
+            CloneWorldAssetPlacementState(
+                SimulationWorldAssetPlacementStateSnapshot? source)
+        {
+            if (source == null) return null;
+            var serializer = new DataContractSerializer(
+                typeof(SimulationWorldAssetPlacementStateSnapshot));
+            using var stream = new MemoryStream();
+            serializer.WriteObject(stream, source);
+            stream.Position = 0;
+            return (SimulationWorldAssetPlacementStateSnapshot?)
+                serializer.ReadObject(stream);
+        }
 
         public static SimulationLhWorldStateSnapshot? CloneLhWorld(
             SimulationLhWorldStateSnapshot? source)
@@ -78,6 +121,11 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioSeed = source.ScenarioSeed,
                 RuleRevision = source.RuleRevision,
                 RealityContextProfileStableId = source.RealityContextProfileStableId,
+                NpcRoutineControlRevision = source.NpcRoutineControlRevision,
+                SpatialCompositionRuleRevision =
+                    source.SpatialCompositionRuleRevision,
+                TarotOrientationPolicyCode = source.TarotOrientationPolicyCode,
+                TownNpcLifeProfileStableId = source.TownNpcLifeProfileStableId,
                 DurationTicks = source.DurationTicks,
                 WorldContext = new SimulationWorldContext생성Request
                 {
@@ -93,6 +141,8 @@ namespace Ssalddel.Simulation.Domain
                     source.SpatialWorld),
                 WorldInventory = 경영SimulationSessionAggregate.CloneWorldInventoryInitialState(
                     source.WorldInventory),
+                ActorEquipment = 경영SimulationSessionAggregate
+                    .CloneActorEquipmentInitialState(source.ActorEquipment),
                 SurvivalTarot = 경영SimulationSessionAggregate.CloneSurvivalTarotInitialState(
                     source.SurvivalTarot),
                 FarmSurvival = 경영SimulationSessionAggregate.CloneFarmSurvivalInitialState(
@@ -105,6 +155,10 @@ namespace Ssalddel.Simulation.Domain
                     .CloneNatureMindInitialState(source.NatureMind),
                 NatureSurvival = 경영SimulationSessionAggregate
                     .CloneNatureSurvivalInitialState(source.NatureSurvival),
+                Atmosphere = 경영SimulationSessionAggregate
+                    .CloneWorldAtmosphereInitialState(source.Atmosphere),
+                InteriorPlanHandles = 경영SimulationSessionAggregate
+                    .CloneInteriorPlanHandles(source.InteriorPlanHandles),
             };
 
         public static SimulationCommandLogEntrySnapshot CloneCommand(
@@ -223,6 +277,14 @@ namespace Ssalddel.Simulation.Domain
                     source.NatureSurvivalClockAdvanceRequest == null ? null
                         : CloneNatureSurvivalClockRequest(
                             source.NatureSurvivalClockAdvanceRequest),
+                ActorItemAcquireConfirmRequest =
+                    source.ActorItemAcquireConfirmRequest == null ? null
+                        : CloneActorItemAcquireConfirmRequest(
+                            source.ActorItemAcquireConfirmRequest),
+                ActorEquipmentChangeConfirmRequest =
+                    source.ActorEquipmentChangeConfirmRequest == null ? null
+                        : CloneActorEquipmentChangeConfirmRequest(
+                            source.ActorEquipmentChangeConfirmRequest),
                 WorldInteractionInvocation = source.WorldInteractionInvocation == null
                     ? null
                     : 경영SimulationSessionAggregate.CloneWorldInteractionInvocation(
@@ -242,6 +304,8 @@ namespace Ssalddel.Simulation.Domain
                 LocalX = source.LocalX,
                 LocalZ = source.LocalZ,
                 YawDegrees = source.YawDegrees,
+                AuthoritativeRewardBonusQuantity =
+                    source.AuthoritativeRewardBonusQuantity,
             };
 
         public static SimulationNatureSurvivalClockAdvanceRequest
@@ -254,6 +318,35 @@ namespace Ssalddel.Simulation.Domain
                 ElapsedRealtimeSeconds = source.ElapsedRealtimeSeconds,
                 WorkInputHeld = source.WorkInputHeld,
                 PauseReasonCode = source.PauseReasonCode,
+            };
+
+        public static SimulationActorItemAcquireConfirmRequest
+            CloneActorItemAcquireConfirmRequest(
+                SimulationActorItemAcquireConfirmRequest source)
+            => new SimulationActorItemAcquireConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedEquipmentRevision = source.ExpectedEquipmentRevision,
+                ActorStableId = source.ActorStableId,
+                ItemInstanceStableId = source.ItemInstanceStableId,
+                SpecializationWorldInteractionId =
+                    source.SpecializationWorldInteractionId,
+            };
+
+        public static SimulationActorEquipmentChangeConfirmRequest
+            CloneActorEquipmentChangeConfirmRequest(
+                SimulationActorEquipmentChangeConfirmRequest source)
+            => new SimulationActorEquipmentChangeConfirmRequest
+            {
+                CommandId = source.CommandId,
+                ExpectedEquipmentRevision = source.ExpectedEquipmentRevision,
+                ActorStableId = source.ActorStableId,
+                OperationCode = source.OperationCode,
+                ItemInstanceStableId = source.ItemInstanceStableId,
+                SlotCode = source.SlotCode,
+                SwapItemInstanceStableId = source.SwapItemInstanceStableId,
+                SpecializationWorldInteractionId =
+                    source.SpecializationWorldInteractionId,
             };
 
         public static SimulationRegionalIncidentResponseConfirmRequest
@@ -496,6 +589,8 @@ namespace Ssalddel.Simulation.Domain
                             CardStableId = source.Preview.SelectedTarotCard.CardStableId,
                             OrientationCode = source.Preview.SelectedTarotCard.OrientationCode,
                         },
+                    DeactivateActiveMajorArcana =
+                        source.Preview.DeactivateActiveMajorArcana,
                 },
             };
 

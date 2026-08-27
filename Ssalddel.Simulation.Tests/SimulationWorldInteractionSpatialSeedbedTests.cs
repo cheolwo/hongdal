@@ -10,18 +10,18 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationWorldInteractionSpatialSeedbedTests
 {
     [Fact]
-    public void 일곱_공간모판은_21개_E3_WI와_경관구성후보를_결정적으로검증한다()
+    public void 여덟_공간모판은_32개_E3_WI와_경관구성후보를_결정적으로검증한다()
     {
         var first = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
         var second = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
 
-        Assert.Equal("simulation-world-interaction-spatial-seedbeds.r1", first.Revision);
-        Assert.Equal("simulation-world-interactions.r8",
+        Assert.Equal("simulation-world-interaction-spatial-seedbeds.r7", first.Revision);
+        Assert.Equal("simulation-world-interactions.r27",
             first.WorldInteractionCatalogRevision);
         Assert.Equal("pyeongchang-landscape-grammar.v1",
             first.LandscapeGrammarRevision);
-        Assert.Equal(7, first.Definitions.Length);
-        Assert.Equal(21, first.Definitions.SelectMany(value => value.IncludedWiIds)
+        Assert.Equal(8, first.Definitions.Length);
+        Assert.Equal(32, first.Definitions.SelectMany(value => value.IncludedWiIds)
             .Distinct(StringComparer.Ordinal).Count());
         Assert.Equal(first.CatalogHashSha256, second.CatalogHashSha256);
         Assert.All(first.Definitions, definition =>
@@ -45,6 +45,20 @@ public sealed class SimulationWorldInteractionSpatialSeedbedTests
             value.FlowDirectionCode == SimulationWorld상호작용공간모판Codes.Input);
         Assert.Contains(workYard.ExternalConnectorStubs, value =>
             value.FlowDirectionCode == SimulationWorld상호작용공간모판Codes.Output);
+
+        var encounter = first.Definitions.Single(value =>
+            value.StableId == "wi-spatial-seedbed:nature-survival-encounter.v1");
+        var threatWatch = encounter.InternalSpaces.Single(value =>
+            value.SpaceCode == "threat-watch");
+        Assert.Contains(Simulation공간능력Codes.ObservationArea,
+            threatWatch.CapabilityCodes);
+        Assert.Contains(Simulation공간능력Codes.ThreatMonitoringArea,
+            threatWatch.CapabilityCodes);
+        Assert.Equal(1m, threatWatch.BaseCapacities.Single(value =>
+            value.CapacityCode == Simulation공간용량Codes.WorkArea).Quantity);
+        Assert.Contains(encounter.WiBindings, value =>
+            value.WorldInteractionId == "WI-NATURE-01"
+            && value.InternalSpaceCode == "threat-watch");
     }
 
     [Fact]
@@ -52,7 +66,7 @@ public sealed class SimulationWorldInteractionSpatialSeedbedTests
     {
         var world = SimulationWorldInteractionSpatialSeedbedTestFixture.CreateSpatialWorld();
 
-        Assert.Equal(14, world.Definitions.Length);
+        Assert.Equal(17, world.Definitions.Length);
         Assert.Equal(world.Definitions.Length, world.Definitions
             .Select(value => value.SpatialStableId).Distinct(StringComparer.Ordinal).Count());
         Assert.All(world.Definitions, definition =>
@@ -166,6 +180,11 @@ internal static class SimulationWorldInteractionSpatialSeedbedTestFixture
     internal const string HubUnloading = "spatial:seedbed:hub-receiving:unloading";
     internal const string HubInspection = "spatial:seedbed:hub-receiving:inspection";
     internal const string HubStorage = "spatial:seedbed:hub-receiving:storage";
+    internal const string HubPicking = "spatial:seedbed:hub-outbound:picking";
+    internal const string HubOutboundStaging =
+        "spatial:seedbed:hub-outbound:staging";
+    internal const string NatureThreatWatch =
+        "spatial:seedbed:nature-survival-encounter:threat-watch";
 
     internal static readonly string SeedbedRoot = Resolve(
         "eng/world-seedbeds/wi-spatial-seedbeds");
@@ -211,6 +230,11 @@ internal static class SimulationWorldInteractionSpatialSeedbedTestFixture
                     HubInspection, hubFacility, "area:sim:pyeongchang:jinbu-hub"),
                 Binding("wi-spatial-seedbed:hub-receiving-storage.v1", "storage-area",
                     HubStorage, hubFacility, "area:sim:pyeongchang:jinbu-hub"),
+                Binding("wi-spatial-seedbed:hub-outbound-staging.v1", "picking-area",
+                    HubPicking, hubFacility, "area:sim:pyeongchang:jinbu-hub"),
+                Binding("wi-spatial-seedbed:hub-outbound-staging.v1",
+                    "outbound-staging-area", HubOutboundStaging, hubFacility,
+                    "area:sim:pyeongchang:jinbu-hub"),
                 Binding("wi-spatial-seedbed:nature-survival-home.v1", "safe-clearing",
                     "spatial:seedbed:nature-survival-home:safe-clearing",
                     "facility:scenario:pyeongchang:nature-home",
@@ -225,6 +249,10 @@ internal static class SimulationWorldInteractionSpatialSeedbedTestFixture
                     "area:pyeongchang:nature-home"),
                 Binding("wi-spatial-seedbed:nature-survival-encounter.v1", "harvest-grove",
                     "spatial:seedbed:nature-survival-encounter:harvest-grove",
+                    "facility:scenario:pyeongchang:nature-encounter",
+                    "area:pyeongchang:nature-home"),
+                Binding("wi-spatial-seedbed:nature-survival-encounter.v1", "threat-watch",
+                    NatureThreatWatch,
                     "facility:scenario:pyeongchang:nature-encounter",
                     "area:pyeongchang:nature-home"),
                 Binding("wi-spatial-seedbed:nature-survival-encounter.v1", "encounter-edge",

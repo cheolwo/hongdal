@@ -62,6 +62,40 @@ public sealed class SimulationLhWorldTests
     }
 
     [Fact]
+    public void 스트리밍범위계산기는_고정3_5_9가아닌_프로필반경을사용한다()
+    {
+        var profile = AdaptiveWindowProfile(0, 1, 2);
+
+        var plan = new SimulationLhWindowPlanner().Plan(
+            AdaptiveWindowRequest("epoch:window:adaptive", "E"), profile);
+
+        Assert.Equal(25, plan.Cells.Length);
+        Assert.Single(plan.Cells, value =>
+            value.WindowRoleCode == SimulationLhWorldCodes.Detail);
+        Assert.Equal(8, plan.Cells.Count(value =>
+            value.WindowRoleCode == SimulationLhWorldCodes.Active));
+        Assert.Equal(16, plan.Cells.Count(value =>
+            value.WindowRoleCode == SimulationLhWorldCodes.Prefetch));
+        var east = plan.Cells.Single(value => value.CellX == 2803
+            && value.CellY == 4581);
+        var west = plan.Cells.Single(value => value.CellX == 2799
+            && value.CellY == 4581);
+        Assert.True(east.Priority < west.Priority);
+    }
+
+    [Fact]
+    public void 스트리밍범위계산기는_역전된동적Map반경을거부한다()
+    {
+        var profile = AdaptiveWindowProfile(2, 1, 4);
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            new SimulationLhWindowPlanner().Plan(
+                AdaptiveWindowRequest("epoch:window:invalid", "None"), profile));
+
+        Assert.Contains("SimulationDynamicMapWindowPolicyInvalid", exception.Message);
+    }
+
+    [Fact]
     public void 셀내용공급자는_L3범위계산과분리해_교체할수있다()
     {
         var source = new RecordingCellContentSource();
@@ -234,6 +268,21 @@ public sealed class SimulationLhWorldTests
         Assert.Equal(81, preview.Cells.Length);
         Assert.True(preview.IsCandidateOnly);
         Assert.True(preview.DoesNotApplyResourceLedgers);
+        Assert.All(preview.Cells, cell =>
+            Assert.True(cell.WorldAssetAssembly?.IsAvailable));
+        var natureOwner = Assert.Single(preview.Cells, cell =>
+            cell.CellX == SimulationNatureWorldCellAssemblyEngine
+                .DefaultNatureOwnerL3X
+            && cell.CellY == SimulationNatureWorldCellAssemblyEngine
+                .DefaultNatureOwnerL3Y);
+        Assert.NotNull(natureOwner.WorldAssetAssembly);
+        Assert.Equal(64, natureOwner.WorldAssetAssembly!
+            .AssemblyHashSha256.Length);
+        Assert.Equal(natureOwner.CellKey, natureOwner.WorldAssetAssembly
+            .ExteriorPlacement.CellStableId);
+        Assert.Equal(natureOwner.BasePlanHashSha256,
+            natureOwner.WorldAssetAssembly.ExteriorPlacement
+                .SourceLhBasePlanHashSha256);
 
         request.RequestEpoch = "epoch:http:stale";
         request.ExpectedWorldRevision++;
@@ -254,6 +303,26 @@ public sealed class SimulationLhWorldTests
                 SimulationLhWorldService.CenterL3Y),
             MovementDirectionCode = direction,
             ExpectedWorldRevision = 7,
+        };
+
+    private static SimulationLhWorldProfileResponse AdaptiveWindowProfile(
+        int detailRadius, int activeRadius, int prefetchRadius)
+        => new()
+        {
+            DetailRadius = detailRadius,
+            ActiveRadius = activeRadius,
+            PrefetchRadius = prefetchRadius,
+            MaxConcurrentPreparations = 4,
+            BoundaryPrefetchFraction = .25d,
+        };
+
+    private static SimulationLhCellPreviewRequest AdaptiveWindowRequest(
+        string epoch, string direction)
+        => new()
+        {
+            RequestEpoch = epoch,
+            FocusL3CellKey = "kr5186:l3:2801:4581",
+            MovementDirectionCode = direction,
         };
 
     private static void AssertLevel(

@@ -27,6 +27,11 @@ namespace Ssalddel.Simulation.Domain
 
         private void ApplyTarotContext(SimulationTurnClosingSnapshot closing)
         {
+            if (UsesContextualArcana)
+            {
+                ApplyContextualTarotContext(closing);
+                return;
+            }
             var selected = closing.SelectedCards.SingleOrDefault(value =>
                 value.CardKindCode == SimulationTurnCardKindCodes.Tarot);
             var nextFrameSetRevision = tarotContextState.FrameSet.Revision + 1;
@@ -237,6 +242,7 @@ namespace Ssalddel.Simulation.Domain
 
         private void ExpireTarotContext()
         {
+            if (UsesContextualArcana) return;
             if (tarotContextState.FrameSet.ActiveFrames.Any(value =>
                     value.EndsAtTurnNumber < CurrentTick + 1))
                 tarotContextState = EmptyTarotContext(
@@ -322,6 +328,10 @@ namespace Ssalddel.Simulation.Domain
                     EvaluatedTurnNumber = value.EvaluatedTurnNumber,
                     RuleRevision = value.RuleRevision,
                 }).ToArray(),
+                MajorArcanaActivations = source.MajorArcanaActivations
+                    .Select(CloneMajorArcanaActivation).ToArray(),
+                OrientationInheritances = source.OrientationInheritances
+                    .Select(CloneOrientationInheritance).ToArray(),
                 ContextStateHashSha256 = source.ContextStateHashSha256,
             };
 

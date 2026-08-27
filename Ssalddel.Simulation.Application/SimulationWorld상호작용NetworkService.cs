@@ -10,8 +10,8 @@ using Ssalddel.Simulation.Contracts;
 namespace Ssalddel.Simulation.Application
 {
     /// <summary>
-    /// 4개 실제 E5 AreaSet과 AreaSet Network 위에서 49개 WI의 공간 참여 방식을
-    /// 직접 37, 문맥 6, 비공간 6으로 분리해 검증한다.
+    /// 4개 실제 E5 AreaSet과 AreaSet Network 위에서 64개 WI의 공간 참여 방식을
+    /// 직접 42, 문맥 6, 비공간 9, E5 대기 7로 분리해 검증한다.
     /// </summary>
     [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
         Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E4,
@@ -47,6 +47,7 @@ namespace Ssalddel.Simulation.Application
             var contextByWi = catalog.ContextualBindings.ToDictionary(
                 item => item.WorldInteractionId, StringComparer.Ordinal);
             var nonSpatial = catalog.NonSpatialWiIds.ToHashSet(StringComparer.Ordinal);
+            var pendingE5 = catalog.PendingE5WiIds.ToHashSet(StringComparer.Ordinal);
             var transitions = catalog.Transitions
                 .OrderBy(item => item.TransitionStableId, StringComparer.Ordinal)
                 .Select(item => EvaluateTransition(
@@ -58,10 +59,16 @@ namespace Ssalddel.Simulation.Application
                 var related = transitions.Where(item =>
                     item.FromWorldInteractionId == binding.WorldInteractionId
                     || item.ToWorldInteractionId == binding.WorldInteractionId).ToArray();
+                // 미래 E5 대기 WI와의 인계는 Network 전체 준비도에는 남기되,
+                // 이미 승인된 직접 WI의 현재 공간 폐루프를 소급해 무효화하지 않는다.
+                var blockingRelated = related.Where(item =>
+                    !pendingE5.Contains(item.FromWorldInteractionId)
+                    && !pendingE5.Contains(item.ToWorldInteractionId)).ToArray();
                 binding.SpatialClosedLoop = binding.StatusCode ==
                     SimulationWorld상호작용Graph상태Codes.Ready
-                    && related.All(IsReadyTransition);
-                if (!binding.SpatialClosedLoop && related.Any(item => !IsReadyTransition(item)))
+                    && blockingRelated.All(IsReadyTransition);
+                if (!binding.SpatialClosedLoop
+                    && blockingRelated.Any(item => !IsReadyTransition(item)))
                     binding.Limitations = binding.Limitations
                         .Concat(new[] { "선행 또는 후속 WI와의 공간 인계가 닫히지 않았습니다." })
                         .Distinct(StringComparer.Ordinal).ToArray();
@@ -173,16 +180,16 @@ namespace Ssalddel.Simulation.Application
                 "SimulationWorldInteractionNetworkCatalogMismatch");
             Require(catalog.CatalogHashSha256.Length == 64,
                 "SimulationWorldInteractionNetworkCatalogHashInvalid");
-            Require(catalog.Bindings.Length == 37
+            Require(catalog.Bindings.Length == 42
                     && catalog.ContextualBindings.Length == 6
-                    && catalog.NonSpatialWiIds.Length == 6
-                    && catalog.PendingE5WiIds.Length == 0,
+                    && catalog.NonSpatialWiIds.Length == 9
+                    && catalog.PendingE5WiIds.Length == 7,
                 "SimulationWorldInteractionNetworkPartitionInvalid");
             var ids = catalog.Bindings.Select(item => item.WorldInteractionId)
                 .Concat(catalog.ContextualBindings.Select(item => item.WorldInteractionId))
                 .Concat(catalog.NonSpatialWiIds)
                 .Concat(catalog.PendingE5WiIds).ToArray();
-            Require(ids.Length == 49 && ids.Distinct(StringComparer.Ordinal).Count() == 49,
+            Require(ids.Length == 64 && ids.Distinct(StringComparer.Ordinal).Count() == 64,
                 "SimulationWorldInteractionNetworkCoverageInvalid");
             Require(catalog.Bindings.All(item =>
                     item.ParticipationCode == SimulationWorld상호작용공간참여Codes.Required

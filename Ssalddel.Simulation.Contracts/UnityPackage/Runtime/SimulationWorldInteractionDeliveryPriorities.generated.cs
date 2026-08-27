@@ -34,30 +34,34 @@ namespace Ssalddel.Simulation.Contracts
 
     public static class SimulationWI실행우선순위Catalog
     {
-        public const string Revision = "world-interaction-delivery-priorities.r4";
-        public const string ActiveWorldInteractionId = "WI-NATURE-05";
-        public const string ActiveEvidenceStage = "E6";
+        public const string Revision = "world-interaction-delivery-priorities.r21";
+        public const string ActiveWorldInteractionId = "WI-ACTOR-02";
+        public const string ActiveEvidenceStage = "E5";
         public const int WorkInProgressLimit = 1;
         private static readonly SimulationWI실행우선순위Definition[] 항목들 =
         {
-            new SimulationWI실행우선순위Definition("WI-NATURE-05", "D1", 1, "Core", "Active", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-06", "D1", 2, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-07", "D1", 3, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-08", "D1", 4, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-12", "D1", 5, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-09", "D1", 6, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-10", "D1", 7, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-01", "D1", 8, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-twilight-return.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-11", "D1", 9, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-twilight-return.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-02", "D1", 10, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-twilight-return.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-03", "D1", 11, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-twilight-return.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-04", "D1", 12, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-twilight-return.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-13", "D1", 13, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-14", "D1", 14, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-15", "D1", 15, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
-            new SimulationWI실행우선순위Definition("WI-CON-01", "D1", 16, "Shared", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-workbench-foundation.v1", "playable-loop:nature-building-learning.v1", "playable-loop:farm-player-placement.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-16", "D1", 17, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-field-supply-return.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-17", "D1", 18, "Core", "Queued", "Required", "Nature", new[] { "playable-loop:nature-field-supply-return.v1" }),
+            new SimulationWI실행우선순위Definition("WI-ACTOR-01", "D1", 1, "Core", "Queued", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-ACTOR-02", "D1", 2, "Core", "Active", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-05", "D1", 3, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-06", "D1", 4, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-07", "D1", 5, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-08", "D1", 6, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-12", "D1", 7, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-09", "D1", 8, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-10", "D1", 9, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-01", "D1", 10, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-twilight-return.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-11", "D1", 11, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-twilight-return.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-02", "D1", 12, "Extension", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-regional-threat-recovery.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-03", "D1", 13, "Extension", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-regional-threat-recovery.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-04", "D1", 14, "Extension", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-regional-threat-recovery.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-13", "D1", 15, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-14", "D1", 16, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-15", "D1", 17, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
+            new SimulationWI실행우선순위Definition("WI-CON-01", "D1", 18, "Shared", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-workbench-foundation.v1", "playable-loop:nature-building-learning.v1", "playable-loop:farm-player-placement.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-16", "D1", 19, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-field-supply-return.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-17", "D1", 20, "Core", "Queued", "Required", "Nature", new[] { "playable-loop:nature-field-supply-return.v1" }),
+            new SimulationWI실행우선순위Definition("WI-REFLECT-01", "D1", 21, "Extension", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-base-reflection.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-18", "D1", 22, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-01", "D2", 1, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-02", "D2", 2, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-03", "D2", 3, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),

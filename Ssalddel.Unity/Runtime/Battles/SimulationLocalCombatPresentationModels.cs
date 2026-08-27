@@ -19,6 +19,11 @@ namespace Ssalddel.Unity.Battles
         public const string Retreat = "Retreat";
         public const string DirectAction = "DirectAction";
         public const string TacticalCommand = "TacticalCommand";
+        public const string ObserverOperation = "ObserverOperation";
+        public const string ObserverPaused = "ObserverPaused";
+        public const string PauseObserverIntervention = "PauseObserverIntervention";
+        public const string ActivateObserverCard = "ActivateObserverCard";
+        public const string SkipObserverIntervention = "SkipObserverIntervention";
         public const string Active = "Active";
     }
 
@@ -50,6 +55,7 @@ namespace Ssalddel.Unity.Battles
 
     public sealed class LocalCombatStateApiModel
     {
+        public string RuleRevision { get; set; } = string.Empty;
         public int FrozenWorldTick { get; set; }
         public long FrozenWorldRevision { get; set; }
         public string StateCode { get; set; } = string.Empty;
@@ -64,6 +70,39 @@ namespace Ssalddel.Unity.Battles
         public string[] EscalationReasonCodes { get; set; } = Array.Empty<string>();
         public bool HostileTelegraphActive { get; set; }
         public int HostileTelegraphOpenedCombatTick { get; set; }
+        public bool ParticipationModeLocked { get; set; }
+        public string FrozenCardLoadoutHashSha256 { get; set; } = string.Empty;
+        public LocalCombatObserverOperationApiModel ObserverOperation { get; set; }
+            = new();
+        public LocalCombatPerformanceApiModel Performance { get; set; } = new();
+    }
+
+    public sealed class LocalCombatObserverOperationApiModel
+    {
+        public string PolicyRevision { get; set; } = string.Empty;
+        public bool TacticalPauseActive { get; set; }
+        public bool InterventionOpportunityConsumed { get; set; }
+        public string ActivatedCardCopyStableId { get; set; } = string.Empty;
+        public string ActivatedModifierCode { get; set; } = string.Empty;
+        public int AutomaticActionCount { get; set; }
+        public string[] AvailableEmergencyCardCopyStableIds { get; set; }
+            = Array.Empty<string>();
+    }
+
+    public sealed class LocalCombatPerformanceApiModel
+    {
+        public string RuleRevision { get; set; } = string.Empty;
+        public bool IsFinal { get; set; }
+        public int FinalHealthPermille { get; set; }
+        public int SuccessfulDefenseCount { get; set; }
+        public int ElapsedCombatTicks { get; set; }
+        public int HostileCount { get; set; }
+        public int HealthScore { get; set; }
+        public int DefenseScore { get; set; }
+        public int SpeedScore { get; set; }
+        public int TotalScore { get; set; }
+        public string GradeCode { get; set; } = string.Empty;
+        public int RewardBonusQuantity { get; set; }
     }
 
     public sealed class LocalCombatActionCommandDraft
@@ -82,6 +121,16 @@ namespace Ssalddel.Unity.Battles
         public long ExpectedBattleRevision { get; set; }
         public string RequestingActorStableId { get; set; } = string.Empty;
         public string ControlModeCode { get; set; } = string.Empty;
+        public string ExpectedCardLoadoutHashSha256 { get; set; } = string.Empty;
+    }
+
+    public sealed class LocalCombatObserverInterventionCommandDraft
+    {
+        public string CommandId { get; set; } = string.Empty;
+        public long ExpectedBattleRevision { get; set; }
+        public string RequestingActorStableId { get; set; } = string.Empty;
+        public string ActionCode { get; set; } = string.Empty;
+        public string CardCopyStableId { get; set; } = string.Empty;
     }
 
     public sealed class CombatScaleDecisionApiModel

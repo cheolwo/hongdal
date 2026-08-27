@@ -13,6 +13,10 @@ namespace Ssalddel.Simulation.Domain
         private readonly Dictionary<string, SimulationNatureResourceNodeSnapshot>
             natureResourceNodes = new Dictionary<string, SimulationNatureResourceNodeSnapshot>(
                 StringComparer.Ordinal);
+        private readonly Dictionary<string, SimulationNatureDroppedTimberSnapshot>
+            natureDroppedTimber =
+                new Dictionary<string, SimulationNatureDroppedTimberSnapshot>(
+                    StringComparer.Ordinal);
         private readonly Dictionary<string, AppliedNatureSurvivalCommand>
             appliedNatureSurvivalCommands =
                 new Dictionary<string, AppliedNatureSurvivalCommand>(StringComparer.Ordinal);
@@ -27,6 +31,13 @@ namespace Ssalddel.Simulation.Domain
         private string natureCurrentH1StableId = string.Empty;
         private int natureNoiseEventCount;
         private bool naturePlayerInsideCabin;
+        private bool natureSleeping;
+        private string natureSelectedExpansionPlanCode = string.Empty;
+        private bool natureDay2Ready;
+        private string natureLinkedCombatStableId = string.Empty;
+        private string natureLastCombatResultCode = string.Empty;
+        private bool natureExpeditionPrepared;
+        private string natureLastProtectedMaterialItemCode = string.Empty;
         private SimulationNatureActiveWorkSnapshot? natureActiveWork;
         private SimulationNatureCabinSnapshot natureCabin = new SimulationNatureCabinSnapshot();
         private SimulationNatureEncounterSnapshot? natureEncounter;
@@ -38,6 +49,117 @@ namespace Ssalddel.Simulation.Domain
                 return CreateNatureSurvivalStateSnapshot();
             }
         }
+
+        public Simulation플레이어기회Snapshot[] GetNaturePlayerOpportunities()
+        {
+            lock (gate)
+            {
+                EnsureNatureSurvivalEnabled();
+                var requests = natureResourceNodes.Values
+                    .Where(value => value.StateCode ==
+                        SimulationNatureSurvivalCodes.Standing)
+                    .OrderBy(value => value.ResourceNodeStableId,
+                        StringComparer.Ordinal)
+                    .Take(1)
+                    .Select(value => new SimulationNatureSurvivalActionPreviewRequest
+                    {
+                        ObservedWorldRevision = Revision,
+                        PlayerStableId = natureSurvivalCreationState!.PlayerStableId,
+                        ActionCode = SimulationNatureSurvivalCodes.BeginHarvest,
+                        TargetStableId = value.ResourceNodeStableId,
+                    })
+                    .Concat(natureDroppedTimber.Values
+                        .Where(value => value.StateCode ==
+                            SimulationNatureSurvivalCodes.DroppedTimberAvailable)
+                        .OrderBy(value => value.DroppedTimberStableId,
+                            StringComparer.Ordinal)
+                        .Take(1)
+                        .Select(value => OpportunityRequest(
+                            SimulationNatureSurvivalCodes.CollectDroppedTimber,
+                            value.DroppedTimberStableId)))
+                    .Concat(new[]
+                    {
+                        OpportunityRequest(SimulationNatureSurvivalCodes.StoreAtCabin,
+                            natureCabin.CabinStableId),
+                        OpportunityRequest(
+                            SimulationNatureSurvivalCodes.PrepareFieldSupply,
+                            Simulation영역건물발전Codes.NatureWorkbenchBlueprint),
+                    });
+
+                var opportunities = requests.Select(request =>
+                {
+                    var preview = CreateNatureSurvivalActionPreview(request);
+                    return new Simulation플레이어기회Snapshot
+                    {
+                        OpportunityStableId = "opportunity:nature:"
+                            + preview.WorldInteractionId.ToLowerInvariant()
+                            + ":" + preview.TargetStableId.ToLowerInvariant(),
+                        PlayerActivityTrackCode = preview.PlayerActivityTrackCode,
+                        PlayerFlowCode = preview.PlayerFlowCode,
+                        NextPlayerFlowCode = preview.NextPlayerFlowCode,
+                        CycleHandoffCode = preview.CycleHandoffCode,
+                        WorldInteractionId = preview.WorldInteractionId,
+                        WorldInteractionName = preview.WorldInteractionName,
+                        WorldInteractionDisplayName =
+                            preview.WorldInteractionDisplayName,
+                        ResponsibilityKindCode = preview.ResponsibilityKindCode,
+                        PrimaryOutcomeCode = preview.PrimaryOutcomeCode,
+                        SingleResponsibilityAssessmentCode =
+                            preview.SingleResponsibilityAssessmentCode,
+                        ActionCode = preview.ActionCode,
+                        TargetStableId = preview.TargetStableId,
+                        Available = preview.CanConfirm,
+                        BlockReasonCodes = preview.BlockReasonCodes.ToArray(),
+                    };
+                }).ToList();
+                if (IsNatureR4)
+                    opportunities.Add(
+                        CreateNatureFieldSupplyDelegatedOpportunity());
+                return opportunities.ToArray();
+            }
+        }
+
+        public Simulation영역수요Snapshot[] GetNatureAreaNeeds()
+        {
+            lock (gate)
+            {
+                EnsureNatureSurvivalEnabled();
+                return new[]
+                {
+                    AreaNeed("need:nature:field-supply:timber",
+                        SimulationNatureSurvivalCodes.TimberItemCode,
+                        SimulationNatureSurvivalCodes.FieldSupplyTimberCost,
+                        NatureAvailableTimberQuantity()),
+                    AreaNeed("need:nature:field-supply:rebuild-part",
+                        SimulationNatureSurvivalCodes.RebuildPartItemCode,
+                        SimulationNatureSurvivalCodes.FieldSupplyRebuildPartCost,
+                        NaturePlayerItemQuantity(
+                            SimulationNatureSurvivalCodes.RebuildPartItemCode)),
+                };
+            }
+        }
+
+        private SimulationNatureSurvivalActionPreviewRequest OpportunityRequest(
+            string actionCode, string targetStableId)
+            => new SimulationNatureSurvivalActionPreviewRequest
+            {
+                ObservedWorldRevision = Revision,
+                PlayerStableId = natureSurvivalCreationState!.PlayerStableId,
+                ActionCode = actionCode,
+                TargetStableId = targetStableId,
+            };
+
+        private Simulation영역수요Snapshot AreaNeed(string needCode,
+            string itemCode, int requiredQuantity, int availableQuantity)
+            => new Simulation영역수요Snapshot
+            {
+                AreaSetStableId = natureSurvivalCreationState!.AreaSetStableId,
+                NeedCode = needCode,
+                RequiredItemCode = itemCode,
+                RequiredQuantity = requiredQuantity,
+                AvailableQuantity = availableQuantity,
+                Satisfied = availableQuantity >= requiredQuantity,
+            };
 
         public SimulationNatureSurvivalActionPreviewSnapshot PreviewNatureSurvivalAction(
             SimulationNatureSurvivalActionPreviewRequest request)
@@ -120,31 +242,42 @@ namespace Ssalddel.Simulation.Domain
                     throw new SimulationConflictException(
                         SimulationNatureSurvivalCodes.ExpectedRevisionMismatch);
 
+                var combatPaused = IsNatureR2
+                    && natureEncounter?.StateCode ==
+                        SimulationNatureSurvivalCodes.CombatActive;
                 var soloPaused = string.Equals(hostedSessionModeCode,
                         SimulationHostedWorldCodes.Solo, StringComparison.Ordinal)
                     && IsNaturePauseReason(request.PauseReasonCode);
-                natureClockPaused = soloPaused;
-                naturePauseReasonCode = soloPaused
-                    ? NormalizeOptional(request.PauseReasonCode) : string.Empty;
-                if (!soloPaused && request.ElapsedRealtimeSeconds > 0)
+                natureClockPaused = soloPaused || combatPaused;
+                naturePauseReasonCode = combatPaused
+                    ? SimulationNatureSurvivalCodes.CombatActiveClockFrozen
+                    : soloPaused ? NormalizeOptional(request.PauseReasonCode)
+                    : string.Empty;
+                if (!natureClockPaused && request.ElapsedRealtimeSeconds > 0)
                 {
                     var previousSecond = natureElapsedSecondsInCycle;
                     var previousCycleIndex = natureCycleIndex;
+                    var elapsedSeconds = NatureClockElapsedSeconds(request);
                     var projection = NatureSurvivalRules.AdvanceClock(
                         natureCycleIndex,
                         natureElapsedSecondsInCycle,
-                        request.ElapsedRealtimeSeconds);
+                        elapsedSeconds);
                     if (CurrentTick + projection.CompletedCycleCount > DurationTicks)
                         throw new SimulationConflictException(
                             SimulationNatureSurvivalCodes.DurationExceeded);
 
-                    if (request.WorkInputHeld)
-                        AdvanceNatureActiveWork(request.ElapsedRealtimeSeconds);
+                    TryBeginNatureNpcFieldSupplyWork();
+                    if (request.WorkInputHeld || IsNatureNpcFieldSupplyWork)
+                        AdvanceNatureActiveWork(elapsedSeconds);
                     natureCycleIndex = projection.CycleIndex;
                     natureElapsedSecondsInCycle = projection.ElapsedSecondsInCycle;
+                    AdvanceNatureLearningVisit();
                     RegrowNatureResources();
                     TryTriggerFirstDuskEncounter(previousCycleIndex, previousSecond,
-                        request.ElapsedRealtimeSeconds);
+                        elapsedSeconds);
+                    if (natureSleeping && natureElapsedSecondsInCycle >=
+                        NatureSurvivalRules.NightEndsAtSecond)
+                        natureSleeping = false;
                     if (projection.CompletedCycleCount > 0)
                         AdvanceWorldState(projection.CompletedCycleCount);
                 }
@@ -176,6 +309,7 @@ namespace Ssalddel.Simulation.Domain
                 RequiredWorkSeconds = NatureSurvivalRules.CabinWorkSeconds,
                 StorageCapacity = NatureSurvivalRules.CabinStorageCapacity,
             };
+            InitializeAreaBuildingProgression(request);
             foreach (var node in request.ResourceNodes)
             {
                 natureResourceNodes.Add(node.ResourceNodeStableId.Trim(),
@@ -226,6 +360,8 @@ namespace Ssalddel.Simulation.Domain
 
             var action = request.ActionCode.Trim();
             var timber = NaturePlayerItemQuantity(SimulationNatureSurvivalCodes.TimberItemCode);
+            SimulationNatureDroppedTimberSnapshot? targetDroppedTimber = null;
+            var remainingInventoryCapacity = NatureRemainingInventoryCapacityUnits();
             var workSeconds = 0;
             if (action == SimulationNatureSurvivalCodes.AcquireAxe)
             {
@@ -241,11 +377,41 @@ namespace Ssalddel.Simulation.Domain
                     reasons.Add(SimulationNatureSurvivalCodes.ResourceNodeNotFound);
                 else if (node.StateCode != SimulationNatureSurvivalCodes.Standing)
                     reasons.Add(SimulationNatureSurvivalCodes.ResourceNodeUnavailable);
-                if (!NaturePlayerHasItem(SimulationNatureSurvivalCodes.AxeItemCode))
+                if (!ActorHasEquippedCapability(
+                        natureSurvivalCreationState!.PlayerStableId,
+                        SimulationActorEquipmentCodes.Woodcutting))
                     reasons.Add(SimulationNatureSurvivalCodes.AxeRequired);
                 if (natureActiveWork != null)
                     reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+                var choice = NormalizeOptional(request.ChoiceCode);
+                if (!string.IsNullOrEmpty(choice)
+                    && choice != SimulationNatureSurvivalCodes.UseFieldSupplyPack)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+                if (choice == SimulationNatureSurvivalCodes.UseFieldSupplyPack)
+                {
+                    if (!IsNatureR4 || NaturePlayerItemQuantity(
+                            SimulationNatureSurvivalCodes.NatureFieldSupplyPackItemCode) < 1)
+                        reasons.Add(SimulationNatureSurvivalCodes.FieldSupplyPackRequired);
+                    if (natureExpeditionPrepared)
+                        reasons.Add(SimulationNatureSurvivalCodes.ExpeditionAlreadyPrepared);
+                }
                 workSeconds = NatureSurvivalRules.HarvestWorkSeconds;
+            }
+            else if (action == SimulationNatureSurvivalCodes.CollectDroppedTimber)
+            {
+                if (!IsNatureR5)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+                if (!natureDroppedTimber.TryGetValue(
+                        NormalizeOptional(request.TargetStableId),
+                        out targetDroppedTimber))
+                    reasons.Add(SimulationNatureSurvivalCodes.DroppedTimberNotFound);
+                else if (targetDroppedTimber.StateCode !=
+                    SimulationNatureSurvivalCodes.DroppedTimberAvailable)
+                    reasons.Add(SimulationNatureSurvivalCodes.DroppedTimberUnavailable);
+                if (targetDroppedTimber != null
+                    && remainingInventoryCapacity < targetDroppedTimber.Quantity)
+                    reasons.Add(SimulationWorldSurvivalInventoryCodes
+                        .PlayerCapacityExceeded);
             }
             else if (action == SimulationNatureSurvivalCodes.PlaceCabinBlueprint)
             {
@@ -267,12 +433,21 @@ namespace Ssalddel.Simulation.Domain
             else if (action == SimulationNatureSurvivalCodes.ResolveEncounter)
             {
                 if (natureEncounter == null
-                    || natureEncounter.StateCode != SimulationNatureSurvivalCodes.Pending)
+                    || (natureEncounter.StateCode != SimulationNatureSurvivalCodes.Pending
+                        && natureEncounter.StateCode !=
+                            SimulationNatureSurvivalCodes.CombatActive))
                     reasons.Add(SimulationNatureSurvivalCodes.EncounterNotPending);
-                if (NormalizeOptional(request.ChoiceCode)
-                        != SimulationNatureSurvivalCodes.Fight
-                    && NormalizeOptional(request.ChoiceCode)
-                        != SimulationNatureSurvivalCodes.Retreat)
+                var choice = NormalizeOptional(request.ChoiceCode);
+                var pendingChoice = choice == SimulationNatureSurvivalCodes.Fight
+                    || choice == SimulationNatureSurvivalCodes.Retreat;
+                var combatResult = choice == SimulationNatureSurvivalCodes.Victory
+                    || choice == SimulationNatureSurvivalCodes.Defeat
+                    || choice == SimulationNatureSurvivalCodes.Retreat;
+                if (natureEncounter?.StateCode == SimulationNatureSurvivalCodes.Pending
+                    && !pendingChoice)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+                if (natureEncounter?.StateCode == SimulationNatureSurvivalCodes.CombatActive
+                    && (!IsNatureR2 || !combatResult))
                     reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
             }
             else if (action == SimulationNatureSurvivalCodes.EnterCabin)
@@ -295,6 +470,73 @@ namespace Ssalddel.Simulation.Domain
                         natureActiveWork.TargetStableId, StringComparison.Ordinal))
                     reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
             }
+            else if (action == SimulationNatureSurvivalCodes.StoreAtCabin)
+            {
+                if (!IsNatureR2)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+                if (natureCabin.StateCode != SimulationNatureSurvivalCodes.Completed)
+                    reasons.Add(SimulationNatureSurvivalCodes.CabinRequired);
+                if (!naturePlayerInsideCabin)
+                    reasons.Add(SimulationNatureSurvivalCodes.CabinAccessRequired);
+                if (timber <= 0)
+                    reasons.Add(SimulationNatureSurvivalCodes.TimberNotCarried);
+                if (NatureCabinStoredTimberQuantity() >= natureCabin.StorageCapacity)
+                    reasons.Add(SimulationNatureSurvivalCodes.CabinStorageFull);
+            }
+            else if (action == SimulationNatureSurvivalCodes.SleepInCabin)
+            {
+                if (!IsNatureR2 || natureCabin.StateCode !=
+                    SimulationNatureSurvivalCodes.Completed)
+                    reasons.Add(SimulationNatureSurvivalCodes.CabinRequired);
+                if (!naturePlayerInsideCabin)
+                    reasons.Add(SimulationNatureSurvivalCodes.CabinAccessRequired);
+                if (NatureSurvivalRules.PhaseAt(natureElapsedSecondsInCycle)
+                    != NatureSurvivalClockPhaseCodes.Night)
+                    reasons.Add(SimulationNatureSurvivalCodes.NightRequired);
+                if (natureSleeping || natureEncounter?.StateCode ==
+                    SimulationNatureSurvivalCodes.CombatActive)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+            }
+            else if (action == SimulationNatureSurvivalCodes.SelectExpansionPlan)
+            {
+                if (!IsNatureR2 || !KnownExpansionPlan(request.ChoiceCode))
+                    reasons.Add(SimulationNatureSurvivalCodes.ExpansionPlanInvalid);
+                if (!string.IsNullOrWhiteSpace(natureSelectedExpansionPlanCode))
+                    reasons.Add(SimulationNatureSurvivalCodes.ExpansionPlanAlreadySelected);
+                if (NatureSurvivalRules.PhaseAt(natureElapsedSecondsInCycle)
+                    != NatureSurvivalClockPhaseCodes.Dawn)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+            }
+            else if (action == SimulationNatureSurvivalCodes.BeginBuildingConstruction)
+            {
+                AppendNatureBuildingPreview(request, reasons, out var buildingBlueprint);
+                if (buildingBlueprint != null)
+                    workSeconds = buildingBlueprint.ConstructionSeconds;
+            }
+            else if (action == SimulationNatureSurvivalCodes.PrepareFieldSupply)
+            {
+                if (!IsNatureR4)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+                if (!string.Equals(NormalizeOptional(request.TargetStableId),
+                        Simulation영역건물발전Codes.NatureWorkbenchBlueprint,
+                        StringComparison.Ordinal)
+                    || !NatureWorkbenchOperational())
+                    reasons.Add(SimulationNatureSurvivalCodes.WorkbenchRequired);
+                if (!naturePlayerInsideCabin)
+                    reasons.Add(SimulationNatureSurvivalCodes.CabinAccessRequired);
+                if (natureActiveWork != null)
+                    reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
+                if (NatureAvailableTimberQuantity() <
+                    SimulationNatureSurvivalCodes.FieldSupplyTimberCost)
+                    reasons.Add(SimulationNatureSurvivalCodes
+                        .FieldSupplyTimberInsufficient);
+                if (NaturePlayerItemQuantity(
+                        SimulationNatureSurvivalCodes.RebuildPartItemCode) <
+                    SimulationNatureSurvivalCodes.FieldSupplyRebuildPartCost)
+                    reasons.Add(SimulationNatureSurvivalCodes
+                        .FieldSupplyRebuildPartInsufficient);
+                workSeconds = SimulationNatureSurvivalCodes.FieldSupplyCraftSeconds;
+            }
             else
             {
                 reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
@@ -306,21 +548,73 @@ namespace Ssalddel.Simulation.Domain
                     && natureActiveWork != null
                 ? natureActiveWork.TargetStableId
                 : NormalizeOptional(request.TargetStableId);
+            var 세계상호작용Id =
+                SimulationNatureSurvivalCodes.WorldInteractionIdForAction(action);
 
             return new SimulationNatureSurvivalActionPreviewSnapshot
             {
                 SessionStableId = SessionStableId,
                 WorldRevision = Revision,
-                WorldInteractionId =
-                    SimulationNatureSurvivalCodes.WorldInteractionIdForAction(action),
+                WorldInteractionId = 세계상호작용Id,
+                WorldInteractionName = Simulation세계상호작용이름Catalog
+                    .한국어기능명(세계상호작용Id),
+                WorldInteractionDisplayName = Simulation세계상호작용이름Catalog
+                    .한국어표시명(세계상호작용Id),
+                ResponsibilityKindCode = Simulation세계상호작용이름Catalog
+                    .책임종류코드(세계상호작용Id),
+                PrimaryOutcomeCode = Simulation세계상호작용이름Catalog
+                    .주요결과코드(세계상호작용Id),
+                SingleResponsibilityAssessmentCode =
+                    Simulation세계상호작용이름Catalog
+                        .단일책임판정코드(세계상호작용Id),
                 ActionCode = action,
                 TargetStableId = targetStableId,
+                PlayerActivityTrackCode =
+                    SimulationNatureSurvivalCodes.PlayerActivityTrackCodeForAction(action),
+                PlayerFlowCode =
+                    SimulationNatureSurvivalCodes.PlayerFlowCodeForAction(action),
+                NextPlayerFlowCode =
+                    SimulationNatureSurvivalCodes.NextPlayerFlowCodeForAction(action),
+                CycleHandoffCode =
+                    SimulationNatureSurvivalCodes.CycleHandoffCodeForAction(action),
                 CanConfirm = reasons.Count == 0,
                 BlockReasonCodes = reasons.Distinct().ToArray(),
-                RequiredTimberQuantity = action == SimulationNatureSurvivalCodes.BeginCabinBuild
-                    ? NatureSurvivalRules.CabinTimberCost : 0,
-                AvailableTimberQuantity = timber,
+                RequiredTimberQuantity = action ==
+                    SimulationNatureSurvivalCodes.BeginCabinBuild
+                    ? NatureSurvivalRules.CabinTimberCost
+                    : action == SimulationNatureSurvivalCodes.BeginBuildingConstruction
+                        ? areaBuildingCatalog?.Blueprints.SingleOrDefault(value =>
+                            value.BlueprintStableId == targetStableId)
+                            ?.RequiredTimberQuantity ?? 0
+                        : action == SimulationNatureSurvivalCodes.PrepareFieldSupply
+                            ? SimulationNatureSurvivalCodes.FieldSupplyTimberCost
+                            : 0,
+                AvailableTimberQuantity = action ==
+                    SimulationNatureSurvivalCodes.BeginBuildingConstruction
+                    || action == SimulationNatureSurvivalCodes.PrepareFieldSupply
+                    ? NatureAvailableTimberQuantity() : timber,
                 RequiredWorkSeconds = workSeconds,
+                TransferableTimberQuantity = action ==
+                    SimulationNatureSurvivalCodes.StoreAtCabin
+                    ? Math.Max(0, Math.Min(timber, natureCabin.StorageCapacity
+                        - NatureCabinStoredTimberQuantity())) : 0,
+                CabinStoredTimberQuantity = NatureCabinStoredTimberQuantity(),
+                CabinStorageCapacity = natureCabin.StorageCapacity,
+                RequiredRebuildPartQuantity = action ==
+                    SimulationNatureSurvivalCodes.BeginBuildingConstruction
+                    ? areaBuildingCatalog?.Blueprints.SingleOrDefault(value =>
+                        value.BlueprintStableId == targetStableId)
+                        ?.RequiredRebuildPartQuantity ?? 0
+                    : action == SimulationNatureSurvivalCodes.PrepareFieldSupply
+                        ? SimulationNatureSurvivalCodes.FieldSupplyRebuildPartCost
+                        : 0,
+                AvailableRebuildPartQuantity = NaturePlayerItemQuantity(
+                    SimulationNatureSurvivalCodes.RebuildPartItemCode),
+                TargetDroppedTimberQuantity = targetDroppedTimber?.Quantity ?? 0,
+                RemainingInventoryCapacityUnits = remainingInventoryCapacity,
+                BuildingBlueprintStableId = action ==
+                    SimulationNatureSurvivalCodes.BeginBuildingConstruction
+                    ? targetStableId : string.Empty,
                 SimulationOnly = true,
                 IsOperationalState = false,
                 SpatialEvidenceStateCode = spatial.StateCode,
@@ -333,17 +627,41 @@ namespace Ssalddel.Simulation.Domain
             var action = request.ActionCode.Trim();
             if (action == SimulationNatureSurvivalCodes.AcquireAxe)
             {
-                AddNaturePlayerItem(natureSurvivalCreationState!.PlayerStableId,
-                    SimulationNatureSurvivalCodes.AxeItemCode, "기본 도끼", 1);
+                ApplyNatureAxeAcquisitionToActorEquipment();
             }
             else if (action == SimulationNatureSurvivalCodes.BeginHarvest)
             {
+                if (NormalizeOptional(request.ChoiceCode) ==
+                    SimulationNatureSurvivalCodes.UseFieldSupplyPack)
+                {
+                    ConsumeNaturePlayerItem(
+                        SimulationNatureSurvivalCodes.NatureFieldSupplyPackItemCode, 1);
+                    natureExpeditionPrepared = true;
+                    natureLastProtectedMaterialItemCode = string.Empty;
+                }
                 natureActiveWork = new SimulationNatureActiveWorkSnapshot
                 {
                     WorkKindCode = SimulationNatureSurvivalCodes.Harvest,
                     TargetStableId = NormalizeOptional(request.TargetStableId),
                     RequiredWorkSeconds = NatureSurvivalRules.HarvestWorkSeconds,
                 };
+            }
+            else if (action == SimulationNatureSurvivalCodes.CollectDroppedTimber)
+            {
+                var droppedTimber = natureDroppedTimber[
+                    NormalizeOptional(request.TargetStableId)];
+                AddNaturePlayerItem(natureSurvivalCreationState!.PlayerStableId,
+                    SimulationNatureSurvivalCodes.TimberItemCode, "통나무",
+                    droppedTimber.Quantity);
+                droppedTimber.StateCode =
+                    SimulationNatureSurvivalCodes.DroppedTimberCollected;
+                droppedTimber.CollectedWorldRevision = Revision + 1L;
+                CompleteLatestWorldInteractionManifestation(
+                    SimulationNatureSurvivalCodes
+                        .CollectDroppedTimberWorldInteractionId,
+                    new[] { "effect:nature:dropped-timber-collected" },
+                    new[] { "TimberCollected", "DroppedTimberRemoved" },
+                    Revision + 1L);
             }
             else if (action == SimulationNatureSurvivalCodes.PlaceCabinBlueprint)
             {
@@ -367,15 +685,33 @@ namespace Ssalddel.Simulation.Domain
             }
             else if (action == SimulationNatureSurvivalCodes.ResolveEncounter)
             {
-                natureEncounter!.StateCode = SimulationNatureSurvivalCodes.Resolved;
-                natureEncounter.ResolutionCode = NormalizeOptional(request.ChoiceCode);
-                if (NormalizeOptional(request.ChoiceCode)
-                    == SimulationNatureSurvivalCodes.Retreat)
+                var choice = NormalizeOptional(request.ChoiceCode);
+                if (IsNatureR2 && natureEncounter!.StateCode ==
+                    SimulationNatureSurvivalCodes.Pending
+                    && choice == SimulationNatureSurvivalCodes.Fight)
                 {
-                    natureCurrentH2StableId = SimulationNatureSurvivalCodes.HomeH2StableId;
-                    natureCurrentH1StableId = SimulationNatureSurvivalCodes.SafeClearingH1StableId;
-                    naturePlayerInsideCabin = natureCabin.StateCode
-                        == SimulationNatureSurvivalCodes.Completed;
+                    natureLinkedCombatStableId = "battle:nature:"
+                        + natureEncounter.EncounterStableId;
+                    natureEncounter.StateCode =
+                        SimulationNatureSurvivalCodes.CombatActive;
+                    natureEncounter.LinkedCombatStableId = natureLinkedCombatStableId;
+                }
+                else if (IsNatureR2 && natureEncounter!.StateCode ==
+                    SimulationNatureSurvivalCodes.CombatActive)
+                {
+                    ApplyNatureCombatResult(choice,
+                        request.AuthoritativeRewardBonusQuantity);
+                }
+                else
+                {
+                    natureEncounter!.StateCode = SimulationNatureSurvivalCodes.Resolved;
+                    natureEncounter.ResolutionCode = choice;
+                    if (choice == SimulationNatureSurvivalCodes.Retreat)
+                    {
+                        natureLastCombatResultCode = choice;
+                        EndNatureExpedition();
+                        ReturnNaturePlayerToHome();
+                    }
                 }
             }
             else if (action == SimulationNatureSurvivalCodes.EnterCabin)
@@ -394,7 +730,18 @@ namespace Ssalddel.Simulation.Domain
                 var cancelledWorldInteractionId = cancelled.WorkKindCode ==
                     SimulationNatureSurvivalCodes.CabinBuild
                     ? SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId
-                    : SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId;
+                    : cancelled.WorkKindCode ==
+                        Simulation영역건물발전Codes.ExpansionBuildWorkKind
+                        ? Simulation영역건물발전Codes.ConstructionWorldInteractionId
+                        : cancelled.WorkKindCode ==
+                            SimulationNatureSurvivalCodes.FieldSupplyCraft
+                            ? SimulationNatureSurvivalCodes
+                                .PrepareFieldSupplyWorldInteractionId
+                            : cancelled.WorkKindCode ==
+                                SimulationNatureSurvivalCodes.FieldSupplyNpcCraft
+                                ? SimulationNatureSurvivalCodes
+                                    .PrepareFieldSupplyDelegatedWorldInteractionId
+                            : SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId;
                 if (cancelled.WorkKindCode == SimulationNatureSurvivalCodes.CabinBuild)
                 {
                     if (natureCabin.ReservedTimberQuantity > 0)
@@ -406,11 +753,67 @@ namespace Ssalddel.Simulation.Domain
                     natureCabin.ReservedTimberQuantity = 0;
                     natureCabin.CompletedWorkSeconds = 0;
                 }
+                else if (cancelled.WorkKindCode ==
+                    Simulation영역건물발전Codes.ExpansionBuildWorkKind)
+                {
+                    CancelNatureBuildingConstruction(cancelled);
+                }
+                else if (cancelled.WorkKindCode ==
+                    SimulationNatureSurvivalCodes.FieldSupplyCraft
+                    || cancelled.WorkKindCode ==
+                    SimulationNatureSurvivalCodes.FieldSupplyNpcCraft)
+                {
+                    AddNaturePlayerItem(natureSurvivalCreationState!.PlayerStableId,
+                        SimulationNatureSurvivalCodes.TimberItemCode, "통나무",
+                        cancelled.ReservedTimberQuantity);
+                    AddNaturePlayerItem(natureSurvivalCreationState.PlayerStableId,
+                        SimulationNatureSurvivalCodes.RebuildPartItemCode, "재건 부품",
+                        cancelled.ReservedRebuildPartQuantity);
+                    if (cancelled.WorkKindCode ==
+                        SimulationNatureSurvivalCodes.FieldSupplyNpcCraft)
+                        CancelNatureNpcFieldSupplyWork();
+                }
                 CompleteLatestWorldInteractionManifestation(
                     cancelledWorldInteractionId,
                     new[] { "effect:nature:work-cancelled" },
                     new[] { "WorkCancelled" }, Revision + 1L);
                 natureActiveWork = null;
+            }
+            else if (action == SimulationNatureSurvivalCodes.StoreAtCabin)
+            {
+                StoreNatureTimberAtCabin(request.CommandId.Trim());
+            }
+            else if (action == SimulationNatureSurvivalCodes.SleepInCabin)
+            {
+                natureSleeping = true;
+            }
+            else if (action == SimulationNatureSurvivalCodes.SelectExpansionPlan)
+            {
+                natureSelectedExpansionPlanCode = NormalizeOptional(request.ChoiceCode);
+                natureDay2Ready = true;
+            }
+            else if (action == SimulationNatureSurvivalCodes.BeginBuildingConstruction)
+            {
+                BeginNatureBuildingConstruction(request);
+            }
+            else if (action == SimulationNatureSurvivalCodes.PrepareFieldSupply)
+            {
+                ConsumeNatureBuildingTimber(
+                    SimulationNatureSurvivalCodes.FieldSupplyTimberCost);
+                ConsumeNaturePlayerItem(
+                    SimulationNatureSurvivalCodes.RebuildPartItemCode,
+                    SimulationNatureSurvivalCodes.FieldSupplyRebuildPartCost);
+                natureActiveWork = new SimulationNatureActiveWorkSnapshot
+                {
+                    WorkKindCode = SimulationNatureSurvivalCodes.FieldSupplyCraft,
+                    TargetStableId = Simulation영역건물발전Codes.NatureWorkbenchBlueprint,
+                    RequiredWorkSeconds =
+                        SimulationNatureSurvivalCodes.FieldSupplyCraftSeconds,
+                    ReservedTimberQuantity =
+                        SimulationNatureSurvivalCodes.FieldSupplyTimberCost,
+                    ReservedRebuildPartQuantity =
+                        SimulationNatureSurvivalCodes.FieldSupplyRebuildPartCost,
+                };
             }
         }
 
@@ -429,14 +832,22 @@ namespace Ssalddel.Simulation.Domain
                 node.StateCode = SimulationNatureSurvivalCodes.Stump;
                 node.RegrowsAtCycleIndex = natureCycleIndex
                     + NatureSurvivalRules.TreeRegrowthCycleCount;
-                AddNaturePlayerItem(natureSurvivalCreationState!.PlayerStableId,
-                    SimulationNatureSurvivalCodes.TimberItemCode, "통나무",
-                    NatureSurvivalRules.HarvestTimberQuantity);
+                if (IsNatureR5)
+                    CreateNatureDroppedTimber(node,
+                        NatureSurvivalRules.HarvestTimberQuantity,
+                        Revision + 1L);
+                else
+                    AddNaturePlayerItem(natureSurvivalCreationState!.PlayerStableId,
+                        SimulationNatureSurvivalCodes.TimberItemCode, "통나무",
+                        NatureSurvivalRules.HarvestTimberQuantity);
                 natureNoiseEventCount++;
                 CompleteLatestWorldInteractionManifestation(
                     SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId,
                     new[] { "effect:nature:harvest-completed" },
-                    new[] { "TimberAdded", "ResourceNodeDepleted" }, Revision + 1L);
+                    IsNatureR5
+                        ? new[] { "DroppedTimberCreated", "ResourceNodeDepleted" }
+                        : new[] { "TimberAdded", "ResourceNodeDepleted" },
+                    Revision + 1L);
             }
             else if (natureActiveWork.WorkKindCode == SimulationNatureSurvivalCodes.CabinBuild)
             {
@@ -445,11 +856,37 @@ namespace Ssalddel.Simulation.Domain
                 natureCabin.ReservedTimberQuantity = 0;
                 natureCabin.RecoveryAvailable = true;
                 natureCabin.DefenseAvailable = true;
+                if (IsNatureR2) EnsureNatureCabinStorage();
                 natureNoiseEventCount++;
                 CompleteLatestWorldInteractionManifestation(
                     SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId,
                     new[] { "effect:nature:cabin-completed" },
                     new[] { "CabinOperational" }, Revision + 1L);
+            }
+            else if (natureActiveWork.WorkKindCode ==
+                Simulation영역건물발전Codes.ExpansionBuildWorkKind)
+            {
+                CompleteNatureBuildingConstruction();
+            }
+            else if (natureActiveWork.WorkKindCode ==
+                SimulationNatureSurvivalCodes.FieldSupplyCraft
+                || natureActiveWork.WorkKindCode ==
+                SimulationNatureSurvivalCodes.FieldSupplyNpcCraft)
+            {
+                var delegated = natureActiveWork.WorkKindCode ==
+                    SimulationNatureSurvivalCodes.FieldSupplyNpcCraft;
+                AddNaturePlayerItem(natureSurvivalCreationState!.PlayerStableId,
+                    SimulationNatureSurvivalCodes.NatureFieldSupplyPackItemCode,
+                    "Nature 현장 보급 꾸러미", 1);
+                CompleteLatestWorldInteractionManifestation(
+                    delegated
+                        ? SimulationNatureSurvivalCodes
+                            .PrepareFieldSupplyDelegatedWorldInteractionId
+                        : SimulationNatureSurvivalCodes
+                            .PrepareFieldSupplyWorldInteractionId,
+                    new[] { "effect:nature:field-supply-crafted" },
+                    new[] { "NatureFieldSupplyPackAdded" }, Revision + 1L);
+                if (delegated) CompleteNatureNpcFieldSupplyWork();
             }
             natureActiveWork = null;
         }
@@ -465,7 +902,18 @@ namespace Ssalddel.Simulation.Domain
                 evidenceWorldInteractionId = natureActiveWork.WorkKindCode ==
                     SimulationNatureSurvivalCodes.CabinBuild
                     ? SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId
-                    : SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId;
+                    : natureActiveWork.WorkKindCode ==
+                        Simulation영역건물발전Codes.ExpansionBuildWorkKind
+                        ? Simulation영역건물발전Codes.ConstructionWorldInteractionId
+                        : natureActiveWork.WorkKindCode ==
+                            SimulationNatureSurvivalCodes.FieldSupplyCraft
+                            ? SimulationNatureSurvivalCodes
+                                .PrepareFieldSupplyWorldInteractionId
+                            : natureActiveWork.WorkKindCode ==
+                                SimulationNatureSurvivalCodes.FieldSupplyNpcCraft
+                                ? SimulationNatureSurvivalCodes
+                                    .PrepareFieldSupplyDelegatedWorldInteractionId
+                            : SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId;
             }
 
             var spatialStableId =
@@ -517,14 +965,26 @@ namespace Ssalddel.Simulation.Domain
             int previousSecond,
             int elapsedSeconds)
         {
-            if (natureEncounter != null || natureNoiseEventCount <= 0
+            if ((natureEncounter != null && natureEncounter.StateCode !=
+                    SimulationNatureSurvivalCodes.Resolved)
+                || natureNoiseEventCount <= 0
                 || !NatureSurvivalRules.CrossedIntoDusk(previousSecond, elapsedSeconds))
                 return;
             var evaluatedCycle = previousSecond < NatureSurvivalRules.DaylightEndsAtSecond
                 ? previousCycleIndex : previousCycleIndex + 1;
             if (!natureEncounterEvaluatedCycleIndices.Add(evaluatedCycle)) return;
-            if (!NatureSurvivalRules.RollFirstDuskEncounter(
-                ScenarioSeed, SessionStableId, evaluatedCycle, natureNoiseEventCount)) return;
+            var triggers = IsNatureR2
+                ? NatureSurvivalRules.ShouldTriggerDuskEncounter(
+                    ScenarioSeed, SessionStableId, evaluatedCycle, natureNoiseEventCount)
+                : NatureSurvivalRules.RollFirstDuskEncounter(
+                    ScenarioSeed, SessionStableId, evaluatedCycle, natureNoiseEventCount);
+            if (!triggers) return;
+
+            var rawThreat = NatureSurvivalRules.NoiseThreatTier(natureNoiseEventCount);
+            var cabinDefense = natureCabin.StateCode ==
+                SimulationNatureSurvivalCodes.Completed;
+            var effectiveThreat = NatureSurvivalRules.EffectiveThreatTier(
+                natureNoiseEventCount, cabinDefense);
 
             natureEncounter = new SimulationNatureEncounterSnapshot
             {
@@ -533,8 +993,11 @@ namespace Ssalddel.Simulation.Domain
                 StateCode = SimulationNatureSurvivalCodes.Pending,
                 ThreatPresentationCode = SimulationNatureSurvivalCodes.SkeletonPlaceholderCode,
                 TriggeredCycleIndex = evaluatedCycle,
-                CabinDefenseApplied = natureCabin.StateCode
-                    == SimulationNatureSurvivalCodes.Completed,
+                CabinDefenseApplied = cabinDefense,
+                RawThreatTier = rawThreat,
+                EffectiveThreatTier = effectiveThreat,
+                HostileCount = NatureSurvivalRules.EncounterHostileCount(
+                    natureNoiseEventCount, cabinDefense),
             };
         }
 
@@ -559,11 +1022,34 @@ namespace Ssalddel.Simulation.Domain
                 HasAxe = NaturePlayerHasItem(SimulationNatureSurvivalCodes.AxeItemCode),
                 TimberQuantity = NaturePlayerItemQuantity(
                     SimulationNatureSurvivalCodes.TimberItemCode),
+                StoredTimberQuantity = NatureCabinStoredTimberQuantity(),
                 NoiseEventCount = natureNoiseEventCount,
+                RawThreatTier = NatureSurvivalRules.NoiseThreatTier(
+                    natureNoiseEventCount),
+                EffectiveThreatTier = NatureSurvivalRules.EffectiveThreatTier(
+                    natureNoiseEventCount, natureCabin.DefenseAvailable),
+                RebuildPartQuantity = NaturePlayerItemQuantity(
+                    SimulationNatureSurvivalCodes.RebuildPartItemCode),
+                FieldSupplyPackQuantity = NaturePlayerItemQuantity(
+                    SimulationNatureSurvivalCodes.NatureFieldSupplyPackItemCode),
+                ExpeditionPrepared = natureExpeditionPrepared,
+                LastProtectedMaterialItemCode =
+                    natureLastProtectedMaterialItemCode,
+                LinkedCombatStableId = natureLinkedCombatStableId,
+                LastCombatResultCode = natureLastCombatResultCode,
+                Sleeping = natureSleeping,
+                SelectedExpansionPlanCode = natureSelectedExpansionPlanCode,
+                Day2Ready = natureDay2Ready,
+                BuildingProgression = CreateNatureBuildingProgressionSnapshot(),
+                LearningVisit = CloneLearningVisit(natureLearningVisit),
                 PlayerInsideCabin = naturePlayerInsideCabin,
                 ResourceNodes = natureResourceNodes.Values
                     .OrderBy(value => value.ResourceNodeStableId, StringComparer.Ordinal)
                     .Select(CloneNatureResourceNode).ToArray(),
+                DroppedTimber = natureDroppedTimber.Values
+                    .OrderBy(value => value.DroppedTimberStableId,
+                        StringComparer.Ordinal)
+                    .Select(CloneNatureDroppedTimber).ToArray(),
                 ActiveWork = CloneNatureActiveWork(natureActiveWork),
                 Cabin = CloneNatureCabin(natureCabin),
                 Encounter = CloneNatureEncounter(natureEncounter),
@@ -612,6 +1098,270 @@ namespace Ssalddel.Simulation.Domain
             item.Quantity -= quantity;
         }
 
+        private bool IsNatureR2 => natureSurvivalCreationState != null
+            && SimulationNatureSurvivalCodes.IsR2(
+                natureSurvivalCreationState.ProfileRevision);
+
+        private bool IsNatureR4 => natureSurvivalCreationState != null
+            && SimulationNatureSurvivalCodes.IsR4(
+                natureSurvivalCreationState.ProfileRevision);
+
+        private bool IsNatureR5 => natureSurvivalCreationState != null
+            && SimulationNatureSurvivalCodes.IsR5(
+                natureSurvivalCreationState.ProfileRevision);
+
+        private decimal NatureRemainingInventoryCapacityUnits()
+        {
+            if (natureSurvivalCreationState == null
+                || !worldInventoryPlayers.TryGetValue(
+                    natureSurvivalCreationState.PlayerStableId, out var player))
+                return 0m;
+            return Math.Max(0m, player.InventoryCapacityUnits
+                - PlayerTotalQuantity(player.PlayerStableId));
+        }
+
+        private void CreateNatureDroppedTimber(
+            SimulationNatureResourceNodeSnapshot node, int quantity,
+            long createdWorldRevision)
+        {
+            var stableId = "drop:nature:timber:"
+                + node.ResourceNodeStableId + ":cycle:" + natureCycleIndex
+                    .ToString(CultureInfo.InvariantCulture);
+            if (natureDroppedTimber.ContainsKey(stableId))
+                throw new SimulationConflictException(
+                    "SimulationNatureDroppedTimberDuplicate");
+            natureDroppedTimber.Add(stableId,
+                new SimulationNatureDroppedTimberSnapshot
+                {
+                    DroppedTimberStableId = stableId,
+                    SourceResourceNodeStableId = node.ResourceNodeStableId,
+                    H2StableId = node.H2StableId,
+                    H1StableId = node.H1StableId,
+                    LocalX = node.LocalX,
+                    LocalZ = node.LocalZ,
+                    Quantity = quantity,
+                    UnitCode = SimulationNatureSurvivalCodes.UnitEach,
+                    StateCode = SimulationNatureSurvivalCodes
+                        .DroppedTimberAvailable,
+                    CreatedWorldRevision = createdWorldRevision,
+                });
+        }
+
+        private int NatureClockElapsedSeconds(
+            SimulationNatureSurvivalClockAdvanceRequest request)
+        {
+            if (!natureSleeping) return request.ElapsedRealtimeSeconds;
+            var remainingNight = Math.Max(0,
+                NatureSurvivalRules.NightEndsAtSecond - natureElapsedSecondsInCycle);
+            return Math.Min(remainingNight, checked(request.ElapsedRealtimeSeconds
+                * NatureSurvivalRules.SleepNightTimeMultiplier));
+        }
+
+        private static bool KnownExpansionPlan(string choiceCode)
+        {
+            var choice = NormalizeOptional(choiceCode);
+            return choice == SimulationNatureSurvivalCodes.Workbench
+                || choice == SimulationNatureSurvivalCodes.StorageRack
+                || choice == SimulationNatureSurvivalCodes.Palisade;
+        }
+
+        private void ApplyNatureCombatResult(string resultCode,
+            int authoritativeRewardBonusQuantity)
+        {
+            if (natureEncounter == null || natureEncounter.StateCode !=
+                SimulationNatureSurvivalCodes.CombatActive)
+                throw new SimulationConflictException(
+                    SimulationNatureSurvivalCodes.EncounterNotPending);
+
+            if (authoritativeRewardBonusQuantity < 0
+                || authoritativeRewardBonusQuantity > 2
+                || resultCode != SimulationNatureSurvivalCodes.Victory
+                   && authoritativeRewardBonusQuantity != 0)
+                throw new SimulationContractException(
+                    "SimulationNatureCombatRewardBonusInvalid");
+
+            if (resultCode == SimulationNatureSurvivalCodes.Victory)
+            {
+                AddNaturePlayerItem(natureSurvivalCreationState!.PlayerStableId,
+                    SimulationNatureSurvivalCodes.RebuildPartItemCode,
+                    "재건 부품", Math.Max(1, natureEncounter.HostileCount)
+                        + authoritativeRewardBonusQuantity);
+            }
+            else if (resultCode == SimulationNatureSurvivalCodes.Defeat)
+            {
+                natureLastProtectedMaterialItemCode =
+                    LoseHalfOfCarriedNatureMaterials(natureExpeditionPrepared);
+            }
+            natureEncounter.StateCode = SimulationNatureSurvivalCodes.Resolved;
+            natureEncounter.ResolutionCode = resultCode;
+            natureLastCombatResultCode = resultCode;
+            natureClockPaused = false;
+            naturePauseReasonCode = string.Empty;
+            EndNatureExpedition(clearLastProtectedMaterial: resultCode !=
+                SimulationNatureSurvivalCodes.Defeat);
+            ReturnNaturePlayerToHome();
+        }
+
+        private string LoseHalfOfCarriedNatureMaterials(bool protectOneStack)
+        {
+            var prefix = natureSurvivalCreationState!.PlayerStableId + "|";
+            var carriedMaterials = worldInventoryPlayerItems.Where(value =>
+                    value.Key.StartsWith(prefix, StringComparison.Ordinal)
+                    && value.Value.ItemCode.StartsWith("material:",
+                        StringComparison.Ordinal)
+                    && decimal.Floor(value.Value.Quantity * .5m) > 0)
+                .OrderBy(value => value.Value.ItemCode, StringComparer.Ordinal)
+                .ToArray();
+            var protectedItemCode = protectOneStack && carriedMaterials.Length > 0
+                ? carriedMaterials[0].Value.ItemCode : string.Empty;
+            foreach (var entry in carriedMaterials)
+            {
+                if (string.Equals(entry.Value.ItemCode, protectedItemCode,
+                        StringComparison.Ordinal))
+                    continue;
+                entry.Value.Quantity -= decimal.Floor(entry.Value.Quantity * .5m);
+            }
+            return protectedItemCode;
+        }
+
+        private void EndNatureExpedition(bool clearLastProtectedMaterial = true)
+        {
+            natureExpeditionPrepared = false;
+            if (clearLastProtectedMaterial)
+                natureLastProtectedMaterialItemCode = string.Empty;
+        }
+
+        private bool NatureWorkbenchOperational()
+            => natureBuildingNodes.TryGetValue(
+                    Simulation영역건물발전Codes.NatureWorkbenchBlueprint,
+                    out var workbench)
+                && workbench.StateCode == Simulation영역건물발전Codes.Operational;
+
+        private void ReturnNaturePlayerToHome()
+        {
+            natureCurrentH2StableId = SimulationNatureSurvivalCodes.HomeH2StableId;
+            naturePlayerInsideCabin = natureCabin.StateCode ==
+                SimulationNatureSurvivalCodes.Completed;
+            natureCurrentH1StableId = naturePlayerInsideCabin
+                ? natureCabin.H1StableId
+                : SimulationNatureSurvivalCodes.SafeClearingH1StableId;
+        }
+
+        private void EnsureNatureCabinStorage()
+        {
+            var playerId = natureSurvivalCreationState!.PlayerStableId;
+            if (string.IsNullOrWhiteSpace(worldInventoryRuleRevision))
+                worldInventoryRuleRevision =
+                    SimulationWorldSurvivalInventoryCodes.RuleRevision;
+            if (!worldInventoryBuildings.ContainsKey(natureCabin.CabinStableId))
+            {
+                worldInventoryBuildings.Add(natureCabin.CabinStableId,
+                    new SimulationWorldBuildingInteriorSnapshot
+                    {
+                        BuildingStableId = natureCabin.CabinStableId,
+                        TileKey = natureCabin.H1StableId,
+                        RegionStableId = SimulationNatureSurvivalCodes.AreaSetStableId,
+                        BuildingEvidenceKindCode =
+                            SimulationWorldSurvivalInventoryCodes.SimulationScenario,
+                        SourceRecordStableId = natureCabin.CabinStableId,
+                        InteriorSpaceStableId = natureCabin.H1StableId + ":interior",
+                        InteriorEvidenceKindCode =
+                            SimulationWorldSurvivalInventoryCodes.SimulationScenario,
+                    });
+            }
+            if (!worldInventoryContainers.ContainsKey(
+                SimulationNatureSurvivalCodes.CabinStorageContainerStableId))
+            {
+                worldInventoryContainers.Add(
+                    SimulationNatureSurvivalCodes.CabinStorageContainerStableId,
+                    new SimulationWorldContainerSnapshot
+                    {
+                        ContainerStableId = SimulationNatureSurvivalCodes
+                            .CabinStorageContainerStableId,
+                        BuildingStableId = natureCabin.CabinStableId,
+                        InteriorSpaceStableId = natureCabin.H1StableId + ":interior",
+                        AccessPolicyCode =
+                            SimulationWorldSurvivalInventoryCodes.ManagerOnly,
+                        CapacityUnits = natureCabin.StorageCapacity,
+                        ManagerPlayerStableIds = new[] { playerId },
+                        EvidenceKindCode =
+                            SimulationWorldSurvivalInventoryCodes.SimulationScenario,
+                    });
+            }
+            if (!worldInventoryItemStacks.ContainsKey(
+                SimulationNatureSurvivalCodes.CabinStorageTimberStackStableId))
+            {
+                worldInventoryItemStacks.Add(
+                    SimulationNatureSurvivalCodes.CabinStorageTimberStackStableId,
+                    new SimulationWorldItemStackSnapshot
+                    {
+                        ItemStackStableId = SimulationNatureSurvivalCodes
+                            .CabinStorageTimberStackStableId,
+                        ContainerStableId = SimulationNatureSurvivalCodes
+                            .CabinStorageContainerStableId,
+                        ItemCode = SimulationNatureSurvivalCodes.TimberItemCode,
+                        KoreanName = "통나무",
+                        UnitCode = SimulationNatureSurvivalCodes.UnitEach,
+                        BuildingItemRelationStableId = natureCabin.CabinStableId,
+                        EvidenceKindCode =
+                            SimulationWorldSurvivalInventoryCodes.SimulationScenario,
+                    });
+            }
+            if (worldInventoryPlayers.TryGetValue(playerId, out var player)
+                && !player.ManagedContainerStableIds.Contains(
+                    SimulationNatureSurvivalCodes.CabinStorageContainerStableId,
+                    StringComparer.Ordinal))
+            {
+                player.ManagedContainerStableIds = player.ManagedContainerStableIds
+                    .Concat(new[]
+                    {
+                        SimulationNatureSurvivalCodes.CabinStorageContainerStableId,
+                    }).OrderBy(value => value, StringComparer.Ordinal).ToArray();
+            }
+        }
+
+        private int NatureCabinStoredTimberQuantity()
+            => worldInventoryItemStacks.TryGetValue(
+                SimulationNatureSurvivalCodes.CabinStorageTimberStackStableId,
+                out var stack) ? decimal.ToInt32(stack.Quantity) : 0;
+
+        private void StoreNatureTimberAtCabin(string commandId)
+        {
+            EnsureNatureCabinStorage();
+            var carried = NaturePlayerItemQuantity(
+                SimulationNatureSurvivalCodes.TimberItemCode);
+            var quantity = Math.Max(0, Math.Min(carried,
+                natureCabin.StorageCapacity - NatureCabinStoredTimberQuantity()));
+            if (quantity <= 0)
+                throw new SimulationConflictException(
+                    SimulationNatureSurvivalCodes.CabinStorageFull);
+
+            ConsumeNaturePlayerItem(SimulationNatureSurvivalCodes.TimberItemCode,
+                quantity);
+            var stack = worldInventoryItemStacks[
+                SimulationNatureSurvivalCodes.CabinStorageTimberStackStableId];
+            stack.Quantity += quantity;
+            worldInventoryTransfers.Add(new SimulationWorldItemTransferSnapshot
+            {
+                TransferStableId = "world-item-transfer:" + commandId,
+                CommandId = commandId,
+                PlayerStableId = natureSurvivalCreationState!.PlayerStableId,
+                BuildingStableId = natureCabin.CabinStableId,
+                SourceContainerStableId = "player-inventory:"
+                    + natureSurvivalCreationState.PlayerStableId,
+                SourceItemStackStableId = "player-item:"
+                    + SimulationNatureSurvivalCodes.TimberItemCode,
+                ItemCode = SimulationNatureSurvivalCodes.TimberItemCode,
+                Quantity = quantity,
+                UnitCode = SimulationNatureSurvivalCodes.UnitEach,
+                AppliedWorldTick = CurrentTick,
+                AppliedWorldRevision = Revision + 1L,
+                EvidenceKindCode =
+                    SimulationWorldSurvivalInventoryCodes.SimulationScenario,
+                SimulationOnly = true,
+            });
+        }
+
         private void EnsureNatureSurvivalEnabled()
         {
             if (natureSurvivalCreationState == null)
@@ -639,7 +1389,20 @@ namespace Ssalddel.Simulation.Domain
         {
             if (request == null) return;
             if (!string.Equals(request.ProfileRevision,
-                SimulationNatureSurvivalCodes.ProfileRevision, StringComparison.Ordinal))
+                    SimulationNatureSurvivalCodes.ProfileRevisionR1,
+                    StringComparison.Ordinal)
+                && !string.Equals(request.ProfileRevision,
+                    SimulationNatureSurvivalCodes.ProfileRevisionR2,
+                    StringComparison.Ordinal)
+                && !string.Equals(request.ProfileRevision,
+                    SimulationNatureSurvivalCodes.ProfileRevisionR3,
+                    StringComparison.Ordinal)
+                && !string.Equals(request.ProfileRevision,
+                    SimulationNatureSurvivalCodes.ProfileRevisionR4,
+                    StringComparison.Ordinal)
+                && !string.Equals(request.ProfileRevision,
+                    SimulationNatureSurvivalCodes.ProfileRevisionR5,
+                    StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationNatureSurvivalProfileUnsupported");
             RequireStableId(request.PlayerStableId, "SimulationNaturePlayerStableIdInvalid");
             RequireStableId(request.AreaSetStableId, "SimulationNatureAreaSetStableIdInvalid");
@@ -705,6 +1468,8 @@ namespace Ssalddel.Simulation.Domain
                 request.SpawnH2StableId.Trim(), request.SpawnH1StableId.Trim(),
                 request.InventoryCapacityUnits.ToString(CultureInfo.InvariantCulture),
                 request.StartsWithAxe.ToString(),
+                request.BuildingProgressionCatalog?.Revision ?? string.Empty,
+                request.BuildingProgressionCatalog?.HashSha256 ?? string.Empty,
                 string.Join(";", request.ResourceNodes
                     .OrderBy(value => value.ResourceNodeStableId, StringComparer.Ordinal)
                     .Select(value => string.Join(",", new[]
@@ -754,6 +1519,9 @@ namespace Ssalddel.Simulation.Domain
                 SpawnH1StableId = source.SpawnH1StableId,
                 InventoryCapacityUnits = source.InventoryCapacityUnits,
                 StartsWithAxe = source.StartsWithAxe,
+                BuildingProgressionCatalog = source.BuildingProgressionCatalog == null
+                    ? null : Simulation영역건물발전Catalog.Clone(
+                        source.BuildingProgressionCatalog),
                 ResourceNodes = source.ResourceNodes.Select(value =>
                     new SimulationNatureResourceNodeInitialStateRequest
                     {
@@ -783,14 +1551,49 @@ namespace Ssalddel.Simulation.Domain
                 PauseReasonCode = source.PauseReasonCode,
                 HasAxe = source.HasAxe,
                 TimberQuantity = source.TimberQuantity,
+                StoredTimberQuantity = source.StoredTimberQuantity,
                 NoiseEventCount = source.NoiseEventCount,
+                RawThreatTier = source.RawThreatTier,
+                EffectiveThreatTier = source.EffectiveThreatTier,
+                RebuildPartQuantity = source.RebuildPartQuantity,
+                FieldSupplyPackQuantity = source.FieldSupplyPackQuantity,
+                ExpeditionPrepared = source.ExpeditionPrepared,
+                LastProtectedMaterialItemCode =
+                    source.LastProtectedMaterialItemCode,
+                LinkedCombatStableId = source.LinkedCombatStableId,
+                LastCombatResultCode = source.LastCombatResultCode,
+                Sleeping = source.Sleeping,
+                SelectedExpansionPlanCode = source.SelectedExpansionPlanCode,
+                Day2Ready = source.Day2Ready,
+                BuildingProgression = source.BuildingProgression == null ? null
+                    : CloneAreaBuildingProgression(source.BuildingProgression),
+                LearningVisit = CloneLearningVisit(source.LearningVisit),
                 PlayerInsideCabin = source.PlayerInsideCabin,
                 ResourceNodes = source.ResourceNodes.Select(CloneNatureResourceNode).ToArray(),
+                DroppedTimber = source.DroppedTimber
+                    .Select(CloneNatureDroppedTimber).ToArray(),
                 ActiveWork = CloneNatureActiveWork(source.ActiveWork),
                 Cabin = CloneNatureCabin(source.Cabin),
                 Encounter = CloneNatureEncounter(source.Encounter),
                 SimulationOnly = source.SimulationOnly,
                 IsOperationalState = source.IsOperationalState,
+            };
+
+        private static SimulationNatureDroppedTimberSnapshot
+            CloneNatureDroppedTimber(SimulationNatureDroppedTimberSnapshot source)
+            => new SimulationNatureDroppedTimberSnapshot
+            {
+                DroppedTimberStableId = source.DroppedTimberStableId,
+                SourceResourceNodeStableId = source.SourceResourceNodeStableId,
+                H2StableId = source.H2StableId,
+                H1StableId = source.H1StableId,
+                LocalX = source.LocalX,
+                LocalZ = source.LocalZ,
+                Quantity = source.Quantity,
+                UnitCode = source.UnitCode,
+                StateCode = source.StateCode,
+                CreatedWorldRevision = source.CreatedWorldRevision,
+                CollectedWorldRevision = source.CollectedWorldRevision,
             };
 
         private static SimulationNatureResourceNodeSnapshot CloneNatureResourceNode(
@@ -814,6 +1617,8 @@ namespace Ssalddel.Simulation.Domain
                 TargetStableId = source.TargetStableId,
                 RequiredWorkSeconds = source.RequiredWorkSeconds,
                 CompletedWorkSeconds = source.CompletedWorkSeconds,
+                ReservedTimberQuantity = source.ReservedTimberQuantity,
+                ReservedRebuildPartQuantity = source.ReservedRebuildPartQuantity,
             };
 
         private static SimulationNatureCabinSnapshot CloneNatureCabin(
@@ -845,6 +1650,10 @@ namespace Ssalddel.Simulation.Domain
                 TriggeredCycleIndex = source.TriggeredCycleIndex,
                 ResolutionCode = source.ResolutionCode,
                 CabinDefenseApplied = source.CabinDefenseApplied,
+                RawThreatTier = source.RawThreatTier,
+                EffectiveThreatTier = source.EffectiveThreatTier,
+                HostileCount = source.HostileCount,
+                LinkedCombatStableId = source.LinkedCombatStableId,
             };
 
         private sealed class AppliedNatureSurvivalCommand

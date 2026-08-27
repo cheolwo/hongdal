@@ -3,6 +3,7 @@ namespace Ssalddel.WorkflowRules.Contracts
     public static class NatureSurvivalProfileCodes
     {
         public const string RealtimeR1 = "nature-survival.realtime.r1";
+        public const string RealtimeR2 = "nature-survival.realtime.r2";
     }
 
     public static class NatureSurvivalClockPhaseCodes

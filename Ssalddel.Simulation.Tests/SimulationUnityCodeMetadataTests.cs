@@ -1,4 +1,6 @@
 using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Interior.Contracts;
+using Ssalddel.Interior.Domain;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
@@ -78,6 +80,8 @@ public sealed class SimulationUnityCodeMetadataTests
 
     private static IReadOnlyList<SsalddelCodeMetadataDescriptor> ReadSimulationMetadata()
         => SsalddelCodeMetadataReader.Read(
+                typeof(I실내공간조립Engine).Assembly,
+                typeof(DeterministicInteriorLayoutEngine).Assembly,
                 typeof(경영SimulationSession생성Request).Assembly,
                 typeof(경영SimulationSessionAggregate).Assembly,
                 typeof(경영SimulationSession생명주기Service).Assembly,

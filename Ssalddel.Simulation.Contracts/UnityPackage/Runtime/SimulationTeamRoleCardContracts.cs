@@ -14,6 +14,10 @@ namespace Ssalddel.Simulation.Contracts
         public const string Active = "Active";
         public const string DirectAction = "DirectAction";
         public const string TacticalCommand = "TacticalCommand";
+        public const string ObserverOperation = "ObserverOperation";
+        public const string ObserverTactic = "ObserverTactic";
+        public const string ObserverSupport = "ObserverSupport";
+        public const string ObserverEmergency = "ObserverEmergency";
     }
 
     public sealed class SimulationTeamRoleCardInitialState

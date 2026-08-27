@@ -9,7 +9,9 @@ namespace Ssalddel.Simulation.Contracts
     /// </summary>
     public static class SimulationLocalCombatCodes
     {
-        public const string RuleRevision = "combat-encounter.world-local.r2";
+        public const string RuleRevisionR2 = "combat-encounter.world-local.r2";
+        public const string RuleRevisionR3 = "combat-encounter.world-local.r3";
+        public const string RuleRevision = RuleRevisionR3;
         public const string ScalePolicyRevision = "combat-scale.nature-farm.r1";
         public const string WorldLocal = "WorldLocal";
         public const string DerivedBattlefield = "DerivedBattlefield";
@@ -30,6 +32,35 @@ namespace Ssalddel.Simulation.Contracts
         public const string HoldPosition = "HoldPosition";
         public const string DirectAction = "DirectAction";
         public const string TacticalCommand = "TacticalCommand";
+        public const string ObserverOperation = "ObserverOperation";
+        public const string ObserverTacticSlot = "ObserverTactic";
+        public const string ObserverSupportSlot = "ObserverSupport";
+        public const string ObserverEmergencySlot = "ObserverEmergency";
+        public const string FocusedAssaultCardDefinition =
+            "combat-card:nature:focused-assault";
+        public const string CautiousDefenseCardDefinition =
+            "combat-card:nature:cautious-defense";
+        public const string WeaknessObservationCardDefinition =
+            "combat-card:nature:weakness-observation";
+        public const string CabinCoverCardDefinition =
+            "combat-card:nature:cabin-cover";
+        public const string FieldRecoveryCardDefinition =
+            "combat-card:nature:field-recovery";
+        public const string SafeRetreatCardDefinition =
+            "combat-card:nature:safe-retreat";
+        public const string ObserverFocusedAssault = "ObserverFocusedAssault";
+        public const string ObserverCautiousDefense = "ObserverCautiousDefense";
+        public const string ObserverWeaknessObservation = "ObserverWeaknessObservation";
+        public const string ObserverCabinCover = "ObserverCabinCover";
+        public const string ObserverFieldRecovery = "ObserverFieldRecovery";
+        public const string ObserverSafeRetreat = "ObserverSafeRetreat";
+        public const string PauseObserverIntervention = "PauseObserverIntervention";
+        public const string ActivateObserverCard = "ActivateObserverCard";
+        public const string SkipObserverIntervention = "SkipObserverIntervention";
+        public const string ObserverPaused = "ObserverPaused";
+        public const string GradeS = "S";
+        public const string GradeA = "A";
+        public const string GradeB = "B";
         public const string Player = "Player";
         public const string Companion = "Companion";
         public const string Hostile = "Hostile";
@@ -46,8 +77,11 @@ namespace Ssalddel.Simulation.Contracts
         public const int LocalMaximumThreatUnits = 5;
         public const int LocalMaximumCompanionUnits = 3;
         public const int DefaultActionCooldownTicks = 5;
-        public const int GuardWindowTicks = 4;
+        public const int GuardWindowTicks = DefaultActionCooldownTicks;
         public const int CounterWindowTicks = 2;
+        public const int ObserverRecoveryPermille = 150;
+        public const int PerformanceGradeSThreshold = 850;
+        public const int PerformanceGradeAThreshold = 650;
     }
 
     public sealed class SimulationCombatScaleDecisionSnapshot
@@ -123,6 +157,40 @@ namespace Ssalddel.Simulation.Contracts
         public string[] EscalationReasonCodes { get; set; } = Array.Empty<string>();
         public bool HostileTelegraphActive { get; set; }
         public int HostileTelegraphOpenedCombatTick { get; set; }
+        public bool ParticipationModeLocked { get; set; }
+        public string FrozenCardLoadoutHashSha256 { get; set; } = string.Empty;
+        public SimulationLocalCombatObserverOperationSnapshot ObserverOperation { get; set; }
+            = new();
+        public SimulationLocalCombatPerformanceSnapshot Performance { get; set; }
+            = new();
+    }
+
+    public sealed class SimulationLocalCombatObserverOperationSnapshot
+    {
+        public string PolicyRevision { get; set; } = "observer-combat-policy.r1";
+        public bool TacticalPauseActive { get; set; }
+        public bool InterventionOpportunityConsumed { get; set; }
+        public string ActivatedCardCopyStableId { get; set; } = string.Empty;
+        public string ActivatedModifierCode { get; set; } = string.Empty;
+        public int AutomaticActionCount { get; set; }
+        public string[] AvailableEmergencyCardCopyStableIds { get; set; }
+            = Array.Empty<string>();
+    }
+
+    public sealed class SimulationLocalCombatPerformanceSnapshot
+    {
+        public string RuleRevision { get; set; } = "direct-combat-performance.r1";
+        public bool IsFinal { get; set; }
+        public int FinalHealthPermille { get; set; }
+        public int SuccessfulDefenseCount { get; set; }
+        public int ElapsedCombatTicks { get; set; }
+        public int HostileCount { get; set; }
+        public int HealthScore { get; set; }
+        public int DefenseScore { get; set; }
+        public int SpeedScore { get; set; }
+        public int TotalScore { get; set; }
+        public string GradeCode { get; set; } = string.Empty;
+        public int RewardBonusQuantity { get; set; }
     }
 
     [SsalddelCodeMetadata(
@@ -173,6 +241,28 @@ namespace Ssalddel.Simulation.Contracts
         public long ExpectedBattleRevision { get; set; }
         public string RequestingActorStableId { get; set; } = string.Empty;
         public string ControlModeCode { get; set; } = string.Empty;
+        public string ExpectedCardLoadoutHashSha256 { get; set; } = string.Empty;
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationParallelBattle,
+        SsalddelCodeLayer.Contract,
+        "관찰 운영 전투의 단일 전술 일시정지와 비상 카드 발동을 확정한다.",
+        StepKey = "contract.local-combat-observer-intervention",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        FlowOrder = 12,
+        Boundary = "클라이언트는 CardCopyStableId와 예상 전투 개정만 보내며 회복·피해·후퇴 결과를 계산하지 않는다.")]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E1,
+        "구성 요소의 핵심 계약과 불변 경계를 정의한다.",
+        Boundary = "계약 정의는 실행 효과나 E 단계 달성 증거를 소유하지 않는다.")]
+    public sealed class SimulationLocalCombatObserverInterventionConfirmRequest
+    {
+        public string CommandId { get; set; } = string.Empty;
+        public long ExpectedBattleRevision { get; set; }
+        public string RequestingActorStableId { get; set; } = string.Empty;
+        public string ActionCode { get; set; } = string.Empty;
+        public string CardCopyStableId { get; set; } = string.Empty;
     }
 
     public sealed class SimulationBattleEscalationConfirmRequest

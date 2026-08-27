@@ -12,10 +12,90 @@ namespace Ssalddel.Simulation.Domain
     {
         public static string Calculate(SimulationSessionSavePackage package)
         {
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V27,
+                    StringComparison.Ordinal))
+            {
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(
+                    package);
+                basePackage.SchemaVersion =
+                    package.ActorEquipmentBaseSchemaVersion;
+                basePackage.ActorEquipmentBaseSchemaVersion = string.Empty;
+                basePackage.ActorEquipment = null;
+                basePackage.ReplayHash = string.Empty;
+                var baseReplayHash = Calculate(basePackage);
+                var v27Canonical = string.Join("|", new[]
+                {
+                    SimulationSaveSchemaVersions.V27,
+                    package.ActorEquipmentBaseSchemaVersion,
+                    baseReplayHash,
+                    package.ActorEquipment?.StateHashSha256 ?? string.Empty,
+                });
+                using var v27Sha = SHA256.Create();
+                return BitConverter.ToString(v27Sha.ComputeHash(
+                        Encoding.UTF8.GetBytes(v27Canonical)))
+                    .Replace("-", string.Empty).ToLowerInvariant();
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V26,
+                    StringComparison.Ordinal))
+            {
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(
+                    package);
+                basePackage.SchemaVersion =
+                    package.WorldAssetPlacementBaseSchemaVersion;
+                basePackage.WorldAssetPlacementBaseSchemaVersion =
+                    string.Empty;
+                basePackage.WorldAssetPlacement = null;
+                basePackage.ReplayHash = string.Empty;
+                var baseReplayHash = Calculate(basePackage);
+                var v26Canonical = string.Join("|", new[]
+                {
+                    SimulationSaveSchemaVersions.V26,
+                    package.WorldAssetPlacementBaseSchemaVersion,
+                    baseReplayHash,
+                    package.WorldAssetPlacement?.StateHashSha256
+                        ?? string.Empty,
+                });
+                using var v26Sha = SHA256.Create();
+                return BitConverter.ToString(v26Sha.ComputeHash(
+                        Encoding.UTF8.GetBytes(v26Canonical)))
+                    .Replace("-", string.Empty).ToLowerInvariant();
+            }
             var canonical = new StringBuilder();
             Add(canonical, package.SchemaVersion);
-            var isV15 = string.Equals(package.SchemaVersion,
-                SimulationSaveSchemaVersions.V15, StringComparison.Ordinal);
+            var isV25 = string.Equals(package.SchemaVersion,
+                SimulationSaveSchemaVersions.V25, StringComparison.Ordinal);
+            var isV24 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                || isV25;
+            var isV23 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                || isV24;
+            var isV22 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V22, StringComparison.Ordinal)
+                || isV23;
+            var isV21 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V21, StringComparison.Ordinal)
+                || isV22;
+            var isV20 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V20, StringComparison.Ordinal)
+                || isV21;
+            var isV19 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V19, StringComparison.Ordinal)
+                || isV20;
+            var isV18 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V18, StringComparison.Ordinal)
+                || isV19;
+            var isV17 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V17, StringComparison.Ordinal)
+                || isV18;
+            var isV16 = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V16, StringComparison.Ordinal)
+                || isV17;
+            var isV15OrLater = string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V15, StringComparison.Ordinal)
+                || isV16;
             var includesRealityContext = string.Equals(package.SchemaVersion,
                 SimulationSaveSchemaVersions.V8, StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion,
@@ -30,9 +110,9 @@ namespace Ssalddel.Simulation.Domain
                     SimulationSaveSchemaVersions.V13, StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V14, StringComparison.Ordinal)
-                || isV15;
+                || isV15OrLater;
             AddCreateRequest(canonical, package.SessionCreateRequest,
-                includesRealityContext);
+                includesRealityContext, isV16, isV21, isV22);
             var includesTarotJourneyRoot = string.Equals(package.SchemaVersion,
                 SimulationSaveSchemaVersions.V7, StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion,
@@ -49,8 +129,15 @@ namespace Ssalddel.Simulation.Domain
                     SimulationSaveSchemaVersions.V13, StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V14, StringComparison.Ordinal)
-                || isV15;
-            AddSnapshot(canonical, package.Snapshot, includesTarotJourneyRoot);
+                || isV15OrLater;
+            AddSnapshot(canonical, package.Snapshot, includesTarotJourneyRoot,
+                isV16, isV21, isV22);
+            if (isV25)
+            {
+                AddWorldAtmosphereInitialState(canonical,
+                    package.SessionCreateRequest.Atmosphere!);
+                AddWorldAtmosphereState(canonical, package.Snapshot.Atmosphere);
+            }
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V5,
                     StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
@@ -71,7 +158,7 @@ namespace Ssalddel.Simulation.Domain
                     StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
-                || isV15)
+                || isV15OrLater)
                 AddRegionalCausality(canonical, package.Snapshot.RegionalCausality);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V6,
                     StringComparison.Ordinal)
@@ -99,7 +186,7 @@ namespace Ssalddel.Simulation.Domain
                 || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                         StringComparison.Ordinal)
                     && package.SessionCreateRequest.IntegratedWorld != null)
-                || (isV15 && package.SessionCreateRequest.IntegratedWorld != null))
+                || (isV15OrLater && package.SessionCreateRequest.IntegratedWorld != null))
             {
                 AddIntegratedWorldInitialState(canonical,
                     package.SessionCreateRequest.IntegratedWorld!);
@@ -119,7 +206,7 @@ namespace Ssalddel.Simulation.Domain
                      StringComparison.Ordinal)
                  || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                      StringComparison.Ordinal)
-                 || isV15) && package.RealityContext != null)
+                 || isV15OrLater) && package.RealityContext != null)
                 AddRealityContext(canonical, package.RealityContext);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V9,
                     StringComparison.Ordinal)
@@ -133,7 +220,7 @@ namespace Ssalddel.Simulation.Domain
                     StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
-                || isV15)
+                || isV15OrLater)
                 AddNatureMind(canonical, package.Snapshot.NatureMind);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V10,
                     StringComparison.Ordinal)
@@ -145,7 +232,7 @@ namespace Ssalddel.Simulation.Domain
                     StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
-                || isV15)
+                || isV15OrLater)
                 AddAreaAccess(canonical, package.Snapshot.AreaAccess);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V11,
                     StringComparison.Ordinal)
@@ -155,7 +242,7 @@ namespace Ssalddel.Simulation.Domain
                     StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
-                || isV15)
+                || isV15OrLater)
                 AddHostedWorld(canonical, package.Snapshot.HostedWorld);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V12,
                     StringComparison.Ordinal)
@@ -163,21 +250,22 @@ namespace Ssalddel.Simulation.Domain
                     StringComparison.Ordinal)
                 || string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
-                || isV15)
+                || isV15OrLater)
                 AddCoopConstruction(canonical, package.Snapshot.CoopConstruction);
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V13,
                     StringComparison.Ordinal)
                 || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                         StringComparison.Ordinal)
                     && package.SessionCreateRequest.NatureSurvival != null)
-                || (isV15 && package.SessionCreateRequest.NatureSurvival != null))
+                || (isV15OrLater && package.SessionCreateRequest.NatureSurvival != null))
             {
                 AddNatureSurvivalInitialState(canonical,
-                    package.SessionCreateRequest.NatureSurvival!);
-                AddNatureSurvivalState(canonical, package.Snapshot.NatureSurvival);
+                    package.SessionCreateRequest.NatureSurvival!, isV19);
+                AddNatureSurvivalState(canonical, package.Snapshot.NatureSurvival,
+                    isV17, isV19, isV20, isV24);
             }
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
-                    StringComparison.Ordinal) || isV15)
+                    StringComparison.Ordinal) || isV15OrLater)
                 AddRegionalDevelopment(canonical, package.Snapshot.RegionalDevelopment);
             if (package.SessionCreateRequest.WorldInventory != null)
                 AddWorldInventory(canonical, package.WorldInventory);
@@ -228,7 +316,7 @@ namespace Ssalddel.Simulation.Domain
                 Add(canonical, entry.CommandTypeCode);
                 Add(canonical, entry.AppliedWorldTick);
                 Add(canonical, entry.ResultingWorldRevision);
-                if (isV15)
+                if (isV15OrLater)
                     AddWorldInteractionInvocation(canonical,
                         entry.WorldInteractionInvocation);
                 if (entry.TickRequest != null)
@@ -258,6 +346,9 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, request.LocalX);
                     Add(canonical, request.LocalZ);
                     Add(canonical, request.YawDegrees);
+                    if (isV18)
+                        Add(canonical,
+                            request.AuthoritativeRewardBonusQuantity);
                 }
                 if (entry.NatureSurvivalClockAdvanceRequest != null)
                 {
@@ -267,6 +358,27 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, request.ElapsedRealtimeSeconds);
                     Add(canonical, request.WorkInputHeld);
                     Add(canonical, request.PauseReasonCode);
+                }
+                if (entry.ActorItemAcquireConfirmRequest != null)
+                {
+                    var request = entry.ActorItemAcquireConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedEquipmentRevision);
+                    Add(canonical, request.ActorStableId);
+                    Add(canonical, request.ItemInstanceStableId);
+                    Add(canonical, request.SpecializationWorldInteractionId);
+                }
+                if (entry.ActorEquipmentChangeConfirmRequest != null)
+                {
+                    var request = entry.ActorEquipmentChangeConfirmRequest;
+                    Add(canonical, request.CommandId);
+                    Add(canonical, request.ExpectedEquipmentRevision);
+                    Add(canonical, request.ActorStableId);
+                    Add(canonical, request.OperationCode);
+                    Add(canonical, request.ItemInstanceStableId);
+                    Add(canonical, request.SlotCode);
+                    Add(canonical, request.SwapItemInstanceStableId);
+                    Add(canonical, request.SpecializationWorldInteractionId);
                 }
                 if (entry.DecisionConfirmRequest != null)
                 {
@@ -307,8 +419,11 @@ namespace Ssalddel.Simulation.Domain
                 {
                     Add(canonical, entry.TurnClosingConfirmRequest.CommandId);
                     Add(canonical, entry.TurnClosingConfirmRequest.ExpectedRevision);
-                    Add(canonical, 경영SimulationSessionAggregate.BuildTurnClosingPayloadKey(
-                        entry.TurnClosingConfirmRequest.Preview));
+                    Add(canonical, isV16
+                        ? 경영SimulationSessionAggregate.BuildTurnClosingPayloadKey(
+                            entry.TurnClosingConfirmRequest.Preview)
+                        : 경영SimulationSessionAggregate.BuildLegacyTurnClosingPayloadKey(
+                            entry.TurnClosingConfirmRequest.Preview));
                 }
                 if (entry.NpcPolicyChangeRequest != null)
                 {
@@ -476,7 +591,7 @@ namespace Ssalddel.Simulation.Domain
                         entry.TaskCancelRequest));
                 }
             }
-            if (isV15)
+            if (isV15OrLater)
             {
                 Add(canonical, package.WorldInteractionManifestations.Length);
                 foreach (var manifestation in package.WorldInteractionManifestations
@@ -484,7 +599,40 @@ namespace Ssalddel.Simulation.Domain
                                  StringComparer.Ordinal))
                     AddWorldInteractionManifestation(canonical, manifestation);
             }
-
+            if (isV23)
+                AddWI음양주체분류(canonical, package);
+            if (isV22)
+            {
+                var hasComposition = package.SpatialComposition != null
+                    && package.SpatialCompositionHandle != null;
+                if (hasComposition)
+                {
+                    var composition = package.SpatialComposition!;
+                    var handle = package.SpatialCompositionHandle!;
+                    Add(canonical,
+                        package.SessionCreateRequest.SpatialCompositionRuleRevision);
+                    Add(canonical, composition.SchemaVersion);
+                    Add(canonical, composition.AreaCode);
+                    Add(canonical, composition.AreaSetStableId);
+                    Add(canonical, composition.PlacementControlRevision);
+                    Add(canonical, composition.RuleCatalogRevision);
+                    Add(canonical, composition.RuleCatalogHashSha256);
+                    Add(canonical, composition.WorldTick);
+                    Add(canonical, composition.WorldRevision);
+                    Add(canonical, composition.GraphHashSha256);
+                    Add(canonical, handle.SchemaVersion);
+                    Add(canonical, handle.AreaCode);
+                    Add(canonical, handle.AreaSetStableId);
+                    Add(canonical, handle.RuleCatalogRevision);
+                    Add(canonical, handle.RuleCatalogHashSha256);
+                    Add(canonical, handle.SourceWorldRevision);
+                    Add(canonical, handle.GraphHashSha256);
+                }
+                else
+                {
+                    Add(canonical, "InteriorPlanHandlesOnlyV1");
+                }
+            }
             using (var sha = SHA256.Create())
             {
                 var bytes = Encoding.UTF8.GetBytes(canonical.ToString());
@@ -497,15 +645,27 @@ namespace Ssalddel.Simulation.Domain
         private static void AddCreateRequest(
             StringBuilder target,
             경영SimulationSession생성Request request,
-            bool includesRealityContext)
+            bool includesRealityContext,
+            bool includesV16,
+            bool includesV21,
+            bool includesV22)
         {
             Add(target, request.ClientRequestId.ToString("N"));
             Add(target, request.ScenarioStableId);
             Add(target, request.ScenarioDataRevision);
             Add(target, request.ScenarioSeed);
             Add(target, request.RuleRevision);
+            if (includesV21)
+                Add(target, request.NpcRoutineControlRevision);
+            if (includesV22 && (request.InteriorPlanHandles?.Length ?? 0) > 0)
+                AddInteriorPlanHandles(target, request.InteriorPlanHandles);
             if (includesRealityContext)
                 Add(target, request.RealityContextProfileStableId);
+            if (includesV16)
+            {
+                Add(target, request.TarotOrientationPolicyCode);
+                Add(target, request.TownNpcLifeProfileStableId);
+            }
             Add(target, request.DurationTicks);
             Add(target, request.WorldContext.FactionStableId);
             Add(target, request.WorldContext.TerritoryStableId);
@@ -513,7 +673,8 @@ namespace Ssalddel.Simulation.Domain
             Add(target, request.WorldContext.GameDateStartsOn.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture));
             Add(target, 경영SimulationSessionAggregate.BuildSettlementPayloadKey(request.Settlement));
             if (request.NpcWorkforce != null)
-                Add(target, 경영SimulationSessionAggregate.BuildNpcWorkforcePayloadKey(request.NpcWorkforce));
+                Add(target, 경영SimulationSessionAggregate.BuildNpcWorkforcePayloadKey(
+                    request.NpcWorkforce, includesV21));
             if (request.SpatialWorld != null)
                 Add(target, 경영SimulationSessionAggregate.BuildSimulationSpatialPayloadKey(
                     request.SpatialWorld));
@@ -534,6 +695,32 @@ namespace Ssalddel.Simulation.Domain
                     request.NatureMind));
         }
 
+        private static void AddInteriorPlanHandles(
+            StringBuilder target,
+            SimulationInteriorPlanHandleSnapshot[]? handles)
+        {
+            var ordered = (handles
+                    ?? Array.Empty<SimulationInteriorPlanHandleSnapshot>())
+                .OrderBy(value => value.BuildingPlacementStableId,
+                    StringComparer.Ordinal)
+                .ToArray();
+            Add(target, ordered.Length);
+            foreach (var handle in ordered)
+            {
+                Add(target, handle.SchemaVersion);
+                Add(target, handle.BuildingPlacementStableId);
+                Add(target, handle.H1StableId);
+                Add(target, handle.InteriorDefinitionRevision);
+                Add(target, handle.ReferenceCatalogRevision);
+                Add(target, handle.ReferenceCatalogHashSha256);
+                Add(target, handle.PlacementControlRuleRevision);
+                Add(target, handle.VisualMetricCatalogRevision);
+                Add(target, handle.VisualMetricCatalogHashSha256);
+                Add(target, handle.AdjustmentRevision);
+                Add(target, handle.InteriorPlacementPlanHashSha256);
+            }
+        }
+
         private static void AddWorldInteractionInvocation(StringBuilder target,
             SimulationWorldInteractionInvocationRecord? value)
         {
@@ -550,6 +737,49 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.TimeReferenceId);
             Add(target, value.SpatialEvidenceStateCode);
             AddStrings(target, value.SpatialEvidenceReferenceIds);
+        }
+
+        private static void AddWI음양주체분류(StringBuilder target,
+            SimulationSessionSavePackage package)
+        {
+            Add(target, "WorldInteractionPolarityQuadrantsV1");
+            var invocations = package.CommandLog
+                .Where(value => value.WorldInteractionInvocation != null)
+                .OrderBy(value => value.Sequence).ToArray();
+            Add(target, invocations.Length);
+            foreach (var entry in invocations)
+            {
+                Add(target, entry.Sequence);
+                Add(target, entry.WorldInteractionInvocation!.WorldInteractionId);
+                AddWI음양주체분류(target,
+                    entry.WorldInteractionInvocation.음양주체분류);
+            }
+
+            var executions = (package.Snapshot.NpcRoutineExecutions
+                    ?? Array.Empty<SimulationNpcRoutineExecutionSnapshot>())
+                .OrderBy(value => value.ExecutionStableId,
+                    StringComparer.Ordinal).ToArray();
+            Add(target, executions.Length);
+            foreach (var execution in executions)
+            {
+                Add(target, execution.ExecutionStableId);
+                Add(target, execution.ActorStableId);
+                AddWI음양주체분류(target, execution.음양주체분류);
+            }
+        }
+
+        private static void AddWI음양주체분류(StringBuilder target,
+            SimulationWI음양주체분류Snapshot? value)
+        {
+            value ??= new SimulationWI음양주체분류Snapshot();
+            Add(target, value.PayloadCode);
+            Add(target, value.음양Code);
+            Add(target, value.수행주체Code);
+            Add(target, value.사분면Code);
+            Add(target, value.사분면기호);
+            Add(target, value.판정방식Code);
+            Add(target, value.판정RuleRevision);
+            Add(target, value.판정근거StableId);
         }
 
         private static void AddWorldInteractionManifestation(StringBuilder target,
@@ -1058,7 +1288,8 @@ namespace Ssalddel.Simulation.Domain
         }
 
         private static void AddSnapshot(StringBuilder target,
-            경영SimulationSessionSnapshot value, bool includesTarotJourneyRoot)
+            경영SimulationSessionSnapshot value, bool includesTarotJourneyRoot,
+            bool includesV16, bool includesV21, bool includesV22)
         {
             Add(target, value.SessionStableId);
             Add(target, value.ClientRequestId.ToString("N"));
@@ -1066,6 +1297,10 @@ namespace Ssalddel.Simulation.Domain
             Add(target, value.ScenarioDataRevision);
             Add(target, value.ScenarioSeed);
             Add(target, value.RuleRevision);
+            if (includesV21)
+                Add(target, value.NpcRoutineControlRevision);
+            if (includesV22 && (value.InteriorPlanHandles?.Length ?? 0) > 0)
+                AddInteriorPlanHandles(target, value.InteriorPlanHandles);
             Add(target, value.CurrentTick);
             Add(target, value.DurationTicks);
             Add(target, value.Revision);
@@ -1145,6 +1380,25 @@ namespace Ssalddel.Simulation.Domain
                     Add(target, closing.SelectedCards.Length);
                     foreach (var card in closing.SelectedCards)
                         AddTurnCard(target, card);
+                    if (includesV16)
+                    {
+                        Add(target, closing.DeactivatedActiveMajorArcana);
+                        var direction = closing.MajorArcanaDirectionDecision;
+                        Add(target, direction != null);
+                        if (direction != null)
+                        {
+                            Add(target, direction.DirectionCode);
+                            Add(target, direction.RecoveryShareMicro);
+                            Add(target, direction.RecoveryOutput);
+                            Add(target, direction.ThreatOutput);
+                            Add(target, direction.ContextPlayerStableId);
+                            Add(target, direction.EvidenceRevision);
+                            Add(target, direction.EvidenceHashSha256);
+                            Add(target, direction.RuleRevision);
+                            Add(target, direction.DecidedAtWorldRevision);
+                            Add(target, direction.DecidedAtWorldTick);
+                        }
+                    }
                 }
                 Add(target, value.ActiveTurnCardEffects.Length);
                 foreach (var effect in value.ActiveTurnCardEffects)
@@ -1174,21 +1428,37 @@ namespace Ssalddel.Simulation.Domain
                             value.TarotContext.FrameSet.JourneyRoot.CardStableId))
                     || value.TarotContext.FrameSet.ActiveFrames.Length > 0
                     || value.TarotContext.Proposals.Length > 0
-                    || value.TarotContext.IncidentEvaluations.Length > 0))
+                    || value.TarotContext.IncidentEvaluations.Length > 0
+                    || (includesV16
+                        && value.TarotContext.MajorArcanaActivations.Length > 0)))
             {
-                Add(target, includesTarotJourneyRoot
-                    ? "TarotContextExtensionV2" : "TarotContextExtensionV1");
-                Add(target, includesTarotJourneyRoot
+                Add(target, includesV16 ? "TarotContextExtensionV3"
+                    : includesTarotJourneyRoot
+                        ? "TarotContextExtensionV2" : "TarotContextExtensionV1");
+                Add(target, includesV16
+                    ? 경영SimulationSessionAggregate
+                        .BuildTarotContextStateV3PayloadKey(value.TarotContext)
+                    : includesTarotJourneyRoot
                     ? 경영SimulationSessionAggregate
                         .BuildTarotContextStatePayloadKey(value.TarotContext)
                     : 경영SimulationSessionAggregate
                         .BuildLegacyTarotContextStatePayloadKey(value.TarotContext));
-                Add(target, includesTarotJourneyRoot
+                Add(target, includesV16
+                    ? 경영SimulationSessionAggregate
+                        .BuildTarotContextStateV3Hash(value.TarotContext)
+                    : includesTarotJourneyRoot
                     ? value.TarotContext.ContextStateHashSha256
                     : 경영SimulationSessionAggregate
                         .BuildLegacyTarotContextStateHash(value.TarotContext));
             }
-            AddNpcWorkforceSnapshot(target, value);
+            if (includesV16)
+            {
+                Add(target, "TownNpcLifeExtensionV1");
+                Add(target, 경영SimulationSessionAggregate
+                    .BuildTownNpcLifePayloadKey(value.TownNpcLife));
+                Add(target, value.TownNpcLife.StateHashSha256);
+            }
+            AddNpcWorkforceSnapshot(target, value, includesV21);
             AddSimulationSpatialSnapshot(target, value);
             AddSettlement(target, value.Settlement);
             if (value.FarmSurvival != null)
@@ -1263,7 +1533,8 @@ namespace Ssalddel.Simulation.Domain
 
         private static void AddNpcWorkforceSnapshot(
             StringBuilder target,
-            경영SimulationSessionSnapshot value)
+            경영SimulationSessionSnapshot value,
+            bool includesV21)
         {
             if (value.NpcOrganizations.Length == 0
                 && value.NpcActors.Length == 0
@@ -1403,6 +1674,26 @@ namespace Ssalddel.Simulation.Domain
                 Add(target, inventory.UpdatedTick);
                 Add(target, inventory.Revision);
                 AddStrings(target, inventory.SourceStableIds);
+            }
+            if (includesV21)
+            {
+                Add(target, value.NpcRoutineExecutions.Length);
+                foreach (var execution in value.NpcRoutineExecutions.OrderBy(
+                             item => item.ExecutionStableId, StringComparer.Ordinal))
+                {
+                    Add(target, execution.ExecutionStableId);
+                    Add(target, execution.AreaCode);
+                    Add(target, execution.WorldInteractionId);
+                    Add(target, execution.ParentExecutionStableId);
+                    Add(target, execution.PolicyStableId);
+                    Add(target, execution.TaskStableId);
+                    Add(target, execution.InventoryStableId);
+                    Add(target, execution.OriginCode);
+                    Add(target, execution.ControlPolicyCode);
+                    Add(target, execution.TriggerSourceCode);
+                    Add(target, execution.RecordedWorldTick);
+                    Add(target, execution.Revision);
+                }
             }
         }
 

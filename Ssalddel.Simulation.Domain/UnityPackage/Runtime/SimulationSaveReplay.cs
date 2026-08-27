@@ -33,9 +33,38 @@ namespace Ssalddel.Simulation.Domain
                     throw new SimulationConflictException("SimulationExpectedRevisionMismatch");
 
                 var lhWorld = request.LhWorldState ?? lhWorldState;
+                var worldAssetPlacement = request.WorldAssetPlacementState
+                    ?? worldAssetPlacementState;
+                var hasWI음양주체분류 = commandLog.Any(value =>
+                        string.Equals(value.WorldInteractionInvocation?.PayloadCode,
+                            "WorldInteractionInvocation.v2",
+                            StringComparison.Ordinal))
+                    || npcRoutineExecutions.Values.Any(value =>
+                        string.Equals(value.음양주체분류?.판정RuleRevision,
+                            SimulationWI음양주체사분면Rules.RuleRevision,
+                            StringComparison.Ordinal));
                 var package = new SimulationSessionSavePackage
                 {
-                    SchemaVersion = worldInteractionManifestations.Count > 0
+                    SchemaVersion = HasWorldAtmosphere
+                        ? SimulationSaveSchemaVersions.V25
+                        : IsNatureR5
+                        ? SimulationSaveSchemaVersions.V24
+                        : hasWI음양주체분류
+                        ? SimulationSaveSchemaVersions.V23
+                        : HasSpatialCompositionState
+                        || HasInteriorPlanHandles
+                        ? SimulationSaveSchemaVersions.V22
+                        : IsNpcRoutineControlEnabled
+                        ? SimulationSaveSchemaVersions.V21
+                        : IsNatureR4
+                        ? SimulationSaveSchemaVersions.V20
+                        : IsNatureR3
+                        ? SimulationSaveSchemaVersions.V19
+                        : IsNatureR2
+                        ? SimulationSaveSchemaVersions.V18
+                        : UsesContextualArcana || HasTownNpcLife
+                        ? SimulationSaveSchemaVersions.V16
+                        : worldInteractionManifestations.Count > 0
                         ? SimulationSaveSchemaVersions.V15
                         : regionalDevelopmentSchemaEnabled
                         && HasRegionalDevelopmentState()
@@ -83,7 +112,28 @@ namespace Ssalddel.Simulation.Domain
                         : CloneRealityContext(realityContext),
                     WorldInteractionManifestations = worldInteractionManifestations
                         .Select(CloneWorldInteractionManifestation).ToArray(),
+                    SpatialComposition = spatialCompositionState == null
+                        ? null : SimulationSpatialCompositionSnapshots.Clone(
+                            spatialCompositionState),
+                    SpatialCompositionHandle = spatialCompositionState == null
+                        ? null : SimulationSpatialCompositionSnapshots
+                            .CreateHandle(spatialCompositionState),
+                    WorldAssetPlacement = SimulationSaveReplayCloner
+                        .CloneWorldAssetPlacementState(worldAssetPlacement),
+                    ActorEquipment = actorEquipmentLegacyBridge ? null
+                        : CreateActorEquipmentStateSnapshot(),
                 };
+                if (worldAssetPlacement != null)
+                {
+                    package.WorldAssetPlacementBaseSchemaVersion =
+                        package.SchemaVersion;
+                    package.SchemaVersion = SimulationSaveSchemaVersions.V26;
+                }
+                if (package.ActorEquipment?.IsEnabled == true)
+                {
+                    package.ActorEquipmentBaseSchemaVersion = package.SchemaVersion;
+                    package.SchemaVersion = SimulationSaveSchemaVersions.V27;
+                }
                 package.ReplayHash = SimulationReplayHasher.Calculate(package);
                 return SimulationSaveReplayCloner.ClonePackage(package);
             }
@@ -121,6 +171,33 @@ namespace Ssalddel.Simulation.Domain
                 ResultingWorldRevision = Revision,
                 NatureSurvivalClockAdvanceRequest =
                     SimulationSaveReplayCloner.CloneNatureSurvivalClockRequest(request),
+            });
+
+        private void AppendActorItemAcquireCommand(
+            SimulationActorItemAcquireConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode = SimulationCommandTypeCodes.ActorItemAcquireConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                ActorItemAcquireConfirmRequest =
+                    SimulationSaveReplayCloner.CloneActorItemAcquireConfirmRequest(
+                        request),
+            });
+
+        private void AppendActorEquipmentChangeCommand(
+            SimulationActorEquipmentChangeConfirmRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode =
+                    SimulationCommandTypeCodes.ActorEquipmentChangeConfirm,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                ActorEquipmentChangeConfirmRequest =
+                    SimulationSaveReplayCloner
+                        .CloneActorEquipmentChangeConfirmRequest(request),
             });
 
         private void AppendIntegratedWorldCommand(SimulationIntegratedWorldCommandRequest request)
@@ -375,6 +452,11 @@ namespace Ssalddel.Simulation.Domain
                 ScenarioSeed = ScenarioSeed,
                 RuleRevision = RuleRevision,
                 RealityContextProfileStableId = RealityContextProfileStableId,
+                NpcRoutineControlRevision = NpcRoutineControlRevision,
+                SpatialCompositionRuleRevision =
+                    SpatialCompositionRuleRevision,
+                TarotOrientationPolicyCode = tarotOrientationPolicyCode,
+                TownNpcLifeProfileStableId = townNpcLifeProfileStableId,
                 DurationTicks = DurationTicks,
                 WorldContext = new SimulationWorldContext생성Request
                 {
@@ -387,6 +469,8 @@ namespace Ssalddel.Simulation.Domain
                 NpcWorkforce = CloneNpcWorkforceInitialState(npcWorkforceCreationState),
                 SpatialWorld = CloneSimulationSpatialInitialState(spatialWorldCreationState),
                 WorldInventory = CloneWorldInventoryInitialState(worldInventoryCreationState),
+                ActorEquipment = actorEquipmentLegacyBridge ? null
+                    : CloneActorEquipmentInitialState(actorEquipmentCreationState),
                 SurvivalTarot = CloneSurvivalTarotInitialState(survivalTarotCreationState),
                 FarmSurvival = CloneFarmSurvivalInitialState(farmSurvivalCreationState),
                 TeamRoleCards = CloneTeamRoleCardInitialStateOrNull(
@@ -396,6 +480,9 @@ namespace Ssalddel.Simulation.Domain
                 NatureMind = CloneNatureMindInitialState(natureMindCreationState),
                 NatureSurvival = CloneNatureSurvivalInitialState(
                     natureSurvivalCreationState),
+                Atmosphere = CloneWorldAtmosphereInitialState(
+                    atmosphereCreationState),
+                InteriorPlanHandles = CreateInteriorPlanHandleSnapshots(),
             };
 
         private static void ValidateSaveRequest(SimulationSessionSaveRequest request)

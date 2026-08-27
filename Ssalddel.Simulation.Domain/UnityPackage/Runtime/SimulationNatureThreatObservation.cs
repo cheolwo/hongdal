@@ -16,17 +16,18 @@ namespace Ssalddel.Simulation.Domain
                 var decisionRequest = BuildNatureThreatObservationDecision(
                     request, includeExpectedRevisionBlock: true);
                 var preview = CreateDecisionPreview(decisionRequest);
-                var route = CreateNatureThreatStateSnapshot().Routes.FirstOrDefault(value =>
-                    value.NatureRouteCode == request.NatureRouteCode.Trim());
+                var source = ResolveNatureThreatObservationSource(
+                    request.NatureRouteCode.Trim());
                 return new SimulationNatureThreatObservationPreviewSnapshot
                 {
                     SessionStableId = SessionStableId,
                     NatureRouteCode = request.NatureRouteCode.Trim(),
-                    EffectivePressure = route?.EffectivePressure ?? 0,
-                    PressureLevelCode = route?.PressureLevelCode ?? string.Empty,
-                    SourceIncidentStableIds = route?.SourceIncidentStableIds.ToArray()
-                        ?? Array.Empty<string>(),
-                    NextWorldInteractionIds = new[] { "WI-NATURE-02", "WI-NATURE-03" },
+                    EffectivePressure = source.EffectivePressure,
+                    PressureLevelCode = source.PressureLevelCode,
+                    SourceIncidentStableIds = source.SourceStableIds,
+                    NextWorldInteractionIds = source.IsTwilightEncounter
+                        ? new[] { "WI-NATURE-11", "WI-NATURE-02" }
+                        : new[] { "WI-NATURE-02", "WI-NATURE-03" },
                     DecisionPreview = preview,
                     CanConfirm = preview.Decision.BlockReasonCodes.Length == 0,
                     BlockingReasonCodes = preview.Decision.BlockReasonCodes.ToArray(),
@@ -61,13 +62,16 @@ namespace Ssalddel.Simulation.Domain
             bool includeExpectedRevisionBlock)
         {
             var routeCode = request.NatureRouteCode.Trim();
-            var route = CreateNatureThreatStateSnapshot().Routes.FirstOrDefault(value =>
-                value.NatureRouteCode == routeCode);
+            var source = ResolveNatureThreatObservationSource(routeCode);
+            var preferredSpatialStableId = request.PreferredSpatialStableId.Trim();
+            var facilityStableId = spatialDefinitions.TryGetValue(
+                preferredSpatialStableId, out var preferredSpatial)
+                ? preferredSpatial.FacilityStableId
+                : SimulationNatureInteractionCodes.NatureHomeFacility;
             var routeStableId = "nature-route:" + routeCode;
-            var sourceIds = route?.SourceIncidentStableIds.Length > 0
-                ? route.SourceIncidentStableIds.ToArray()
-                : new[] { routeStableId };
-            var blockReasonCodes = route == null
+            var sourceIds = source.SourceStableIds.Length > 0
+                ? source.SourceStableIds : new[] { routeStableId };
+            var blockReasonCodes = !source.IsAvailable
                 ? new[] { "NatureThreatRouteUnavailable" }
                 : Array.Empty<string>();
             if (includeExpectedRevisionBlock && request.ExpectedRevision != Revision)
@@ -87,9 +91,9 @@ namespace Ssalddel.Simulation.Domain
                     {
                         ValueTypeCode = SimulationNatureInteractionCodes.NatureThreatObserved,
                         TargetLedgerStableId = routeStableId,
-                        BeforeValue = route?.EffectivePressure ?? 0,
+                        BeforeValue = source.EffectivePressure,
                         Delta = 0,
-                        AfterValue = route?.EffectivePressure ?? 0,
+                        AfterValue = source.EffectivePressure,
                         UnitCode = SimulationNatureInteractionCodes.PressurePointUnit,
                         SourceStableIds = sourceIds,
                     },
@@ -101,10 +105,10 @@ namespace Ssalddel.Simulation.Domain
                 {
                     TaskStableId = request.TaskStableId.Trim(),
                     TaskTypeCode = SimulationNatureInteractionCodes.ThreatObservationTask,
-                    FacilityStableId = SimulationNatureInteractionCodes.NatureHomeFacility,
+                    FacilityStableId = facilityStableId,
                     ActionCode = SimulationNatureInteractionCodes.RegionalThreatObservation,
                     AssignedActorStableId = request.ActorStableId.Trim(),
-                    PreferredSpatialStableId = request.PreferredSpatialStableId.Trim(),
+                    PreferredSpatialStableId = preferredSpatialStableId,
                     AssignedCapacity = 1m,
                     AssignedCapacityUnitCode = "slot",
                     DurationTicks = 1,
@@ -116,6 +120,57 @@ namespace Ssalddel.Simulation.Domain
                     SourceStableIds = sourceIds,
                 },
             };
+        }
+
+        private NatureThreatObservationSource ResolveNatureThreatObservationSource(
+            string routeCode)
+        {
+            var route = CreateNatureThreatStateSnapshot().Routes.FirstOrDefault(value =>
+                value.NatureRouteCode == routeCode);
+            if (route != null)
+                return new NatureThreatObservationSource(true, false,
+                    route.EffectivePressure, route.PressureLevelCode,
+                    route.SourceIncidentStableIds.ToArray());
+            var twilight = routeCode ==
+                SimulationNatureInteractionCodes.NatureHomeTwilightRoute
+                && natureSurvivalCreationState != null
+                && natureEncounter != null
+                && (natureEncounter.StateCode == SimulationNatureSurvivalCodes.Pending
+                    || natureEncounter.StateCode ==
+                    SimulationNatureSurvivalCodes.CombatActive);
+            if (!twilight)
+                return new NatureThreatObservationSource(false, false, 0,
+                    string.Empty, Array.Empty<string>());
+            var pressure = Math.Max(0, natureEncounter!.EffectiveThreatTier);
+            var level = pressure switch
+            {
+                0 => SimulationNatureThreatCodes.Stable,
+                1 => SimulationNatureThreatCodes.Warning,
+                2 => SimulationNatureThreatCodes.Threatened,
+                _ => SimulationNatureThreatCodes.Infested,
+            };
+            return new NatureThreatObservationSource(true, true, pressure, level,
+                new[] { natureEncounter.EncounterStableId });
+        }
+
+        private sealed class NatureThreatObservationSource
+        {
+            public NatureThreatObservationSource(bool isAvailable,
+                bool isTwilightEncounter, int effectivePressure,
+                string pressureLevelCode, string[] sourceStableIds)
+            {
+                IsAvailable = isAvailable;
+                IsTwilightEncounter = isTwilightEncounter;
+                EffectivePressure = effectivePressure;
+                PressureLevelCode = pressureLevelCode;
+                SourceStableIds = sourceStableIds;
+            }
+
+            public bool IsAvailable { get; }
+            public bool IsTwilightEncounter { get; }
+            public int EffectivePressure { get; }
+            public string PressureLevelCode { get; }
+            public string[] SourceStableIds { get; }
         }
 
         private static void ValidateNatureThreatObservationPreview(

@@ -62,6 +62,41 @@ namespace Ssalddel.Simulation.Application
         ISimulationNatureSurvivalRuntime Nature { get; }
         ISimulationSessionGameplayRuntime Gameplay { get; }
         ISimulationWorldInteractionRuntime WorldInteractions { get; }
+        ISimulationActorEquipmentRuntime ActorEquipment { get; }
+    }
+
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E2,
+        "보편 물품 획득과 장착 상태 변경 WI 실행 경계를 제공한다.",
+        Boundary = "표현 객체가 아니라 공통 Simulation Core가 물품과 슬롯 상태를 확정한다.",
+        WorldInteractionIds = new[] {
+            SimulationActorEquipmentCodes.AcquireWorldInteractionId,
+            SimulationActorEquipmentCodes.ChangeEquipmentWorldInteractionId })]
+    public interface ISimulationActorEquipmentRuntime
+    {
+        ValueTask<SimulationActorEquipmentStateSnapshot> GetActorEquipmentAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationActorItemAcquirePreviewSnapshot>
+            PreviewActorItemAcquireAsync(
+                string sessionStableId,
+                SimulationActorItemAcquirePreviewRequest request,
+                CancellationToken cancellationToken = default);
+        ValueTask<SimulationActorEquipmentStateSnapshot>
+            ConfirmActorItemAcquireAsync(
+                string sessionStableId,
+                SimulationActorItemAcquireConfirmRequest request,
+                CancellationToken cancellationToken = default);
+        ValueTask<SimulationActorEquipmentChangePreviewSnapshot>
+            PreviewActorEquipmentChangeAsync(
+                string sessionStableId,
+                SimulationActorEquipmentChangePreviewRequest request,
+                CancellationToken cancellationToken = default);
+        ValueTask<SimulationActorEquipmentStateSnapshot>
+            ConfirmActorEquipmentChangeAsync(
+                string sessionStableId,
+                SimulationActorEquipmentChangeConfirmRequest request,
+                CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -80,6 +115,37 @@ namespace Ssalddel.Simulation.Application
         ISimulationLogisticsRuntime Logistics { get; }
         ISimulationFarmWorldInteractionRuntime FarmWorldInteractions { get; }
         ISimulationNatureWorldInteractionRuntime NatureWorldInteractions { get; }
+        ISimulationBattleRuntime Battles { get; }
+    }
+
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E2,
+        "현장 전투의 생성·참여 방식·행동·관찰 개입·전투 Tick 공통 실행 경계를 제공한다.",
+        Boundary = "LocalProcess와 RemoteHost는 같은 계약을 사용하고 Unity는 피해나 성과를 계산하지 않는다.")]
+    public interface ISimulationBattleRuntime
+    {
+        ValueTask<SimulationBattleCreatePreviewSnapshot> PreviewBattleAsync(
+            string sessionStableId, SimulationBattleCreatePreviewRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationBattleInstanceSnapshot> ConfirmBattleAsync(
+            string sessionStableId, SimulationBattleCreateConfirmRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationBattleInstanceSnapshot> ConfirmBattleControlModeAsync(
+            string sessionStableId, string battleStableId,
+            SimulationLocalCombatControlModeConfirmRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationBattleInstanceSnapshot> ConfirmBattleActionAsync(
+            string sessionStableId, string battleStableId,
+            SimulationLocalCombatActionConfirmRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationBattleInstanceSnapshot> ConfirmObserverInterventionAsync(
+            string sessionStableId, string battleStableId,
+            SimulationLocalCombatObserverInterventionConfirmRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationBattleInstanceSnapshot> AdvanceBattleAsync(
+            string sessionStableId, string battleStableId,
+            SimulationBattleAdvanceRequest request,
+            CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -238,6 +304,9 @@ namespace Ssalddel.Simulation.Application
         ValueTask<SimulationTurnClosingContextSnapshot> GetTurnClosingContextAsync(
             string sessionStableId,
             CancellationToken cancellationToken = default);
+        ValueTask<SimulationTownNpcLifeStateSnapshot> GetTownNpcLifeStateAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken = default);
         ValueTask<SimulationTurnClosingPreviewSnapshot> PreviewTurnClosingAsync(
             string sessionStableId,
             SimulationTurnClosingPreviewRequest request,
@@ -337,8 +406,14 @@ namespace Ssalddel.Simulation.Application
             경영SimulationTick진행Request request,
             CancellationToken cancellationToken = default);
 
+        ValueTask<SimulationNpcRoutineWorkProjection[]> GetNpcRoutineWorkAsync(
+            string sessionStableId,
+            string areaCode,
+            CancellationToken cancellationToken = default);
+
         ValueTask<SimulationSpatialCompositionStateSnapshot>
-            GetSpatialCompositionAsync(string sessionStableId,
+            GetSpatialCompositionAsync(
+                string sessionStableId,
                 string areaCode,
                 CancellationToken cancellationToken = default);
 
@@ -368,10 +443,29 @@ namespace Ssalddel.Simulation.Application
             SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId,
             SimulationNatureSurvivalCodes.EnterCabinWorldInteractionId,
             SimulationNatureSurvivalCodes.LeaveCabinWorldInteractionId,
-            SimulationNatureSurvivalCodes.ResolveEncounterWorldInteractionId })]
+            SimulationNatureSurvivalCodes.ResolveEncounterWorldInteractionId,
+            SimulationNatureSurvivalCodes.StoreAtCabinWorldInteractionId,
+            SimulationNatureSurvivalCodes.SleepInCabinWorldInteractionId,
+            SimulationNatureSurvivalCodes.SelectExpansionPlanWorldInteractionId,
+            SimulationNatureSurvivalCodes.PrepareFieldSupplyWorldInteractionId,
+            SimulationNatureSurvivalCodes.PrepareFieldSupplyDelegatedWorldInteractionId,
+            Simulation영역건물발전Codes.ConstructionWorldInteractionId })]
     public interface ISimulationNatureSurvivalRuntime
     {
         ValueTask<SimulationNatureSurvivalStateSnapshot> GetAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<Simulation영역건물발전Snapshot> GetBuildingProgressionAsync(
+            string sessionStableId,
+            string areaCode,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<Simulation플레이어기회Snapshot[]> GetPlayerOpportunitiesAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<Simulation영역수요Snapshot[]> GetAreaNeedsAsync(
             string sessionStableId,
             CancellationToken cancellationToken = default);
 
@@ -386,7 +480,12 @@ namespace Ssalddel.Simulation.Application
                 SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId,
                 SimulationNatureSurvivalCodes.EnterCabinWorldInteractionId,
                 SimulationNatureSurvivalCodes.LeaveCabinWorldInteractionId,
-                SimulationNatureSurvivalCodes.ResolveEncounterWorldInteractionId })]
+                SimulationNatureSurvivalCodes.ResolveEncounterWorldInteractionId,
+                SimulationNatureSurvivalCodes.StoreAtCabinWorldInteractionId,
+                SimulationNatureSurvivalCodes.SleepInCabinWorldInteractionId,
+                SimulationNatureSurvivalCodes.SelectExpansionPlanWorldInteractionId,
+                SimulationNatureSurvivalCodes.PrepareFieldSupplyWorldInteractionId,
+                Simulation영역건물발전Codes.ConstructionWorldInteractionId })]
         ValueTask<SimulationNatureSurvivalActionPreviewSnapshot> PreviewAsync(
             string sessionStableId,
             SimulationNatureSurvivalActionPreviewRequest request,
@@ -403,12 +502,24 @@ namespace Ssalddel.Simulation.Application
                 SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId,
                 SimulationNatureSurvivalCodes.EnterCabinWorldInteractionId,
                 SimulationNatureSurvivalCodes.LeaveCabinWorldInteractionId,
-                SimulationNatureSurvivalCodes.ResolveEncounterWorldInteractionId })]
+                SimulationNatureSurvivalCodes.ResolveEncounterWorldInteractionId,
+                SimulationNatureSurvivalCodes.StoreAtCabinWorldInteractionId,
+                SimulationNatureSurvivalCodes.SleepInCabinWorldInteractionId,
+                SimulationNatureSurvivalCodes.SelectExpansionPlanWorldInteractionId,
+                SimulationNatureSurvivalCodes.PrepareFieldSupplyWorldInteractionId,
+                Simulation영역건물발전Codes.ConstructionWorldInteractionId })]
         ValueTask<경영SimulationSessionSnapshot> ConfirmAsync(
             string sessionStableId,
             SimulationNatureSurvivalCommandRequest request,
             CancellationToken cancellationToken = default);
 
+        [SsalddelEvidenceResponsibility(
+            SsalddelEvidenceStage.E2,
+            "Nature 권위 시계가 정책으로 승인된 NPC 현장 보급 작업을 진행한다.",
+            Boundary = "플레이어 입력 유지나 Unity 표현이 NPC 위임 작업 완료를 확정하지 않는다.",
+            WorldInteractionIds = new[] {
+                SimulationNatureSurvivalCodes
+                    .PrepareFieldSupplyDelegatedWorldInteractionId })]
         ValueTask<경영SimulationSessionSnapshot> AdvanceRealtimeAsync(
             string sessionStableId,
             SimulationNatureSurvivalClockAdvanceRequest request,
@@ -420,6 +531,8 @@ namespace Ssalddel.Simulation.Application
         public string SlotStableId { get; set; } = string.Empty;
         public long ExpectedRevision { get; set; }
         public SimulationLhWorldStateSnapshot? LhWorldState { get; set; }
+        public SimulationWorldAssetPlacementStateSnapshot?
+            WorldAssetPlacementState { get; set; }
     }
 
     public sealed class SimulationLocalSaveSlotResult

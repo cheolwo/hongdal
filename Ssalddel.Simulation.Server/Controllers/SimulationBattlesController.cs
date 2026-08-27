@@ -112,6 +112,13 @@ public sealed class SimulationBattlesController(SimulationBattleInstanceService 
         => Execute(() => service.ConfirmLocalControlMode(sessionStableId,
             battleStableId, request));
 
+    [HttpPost("{battleStableId}/observer-interventions/confirm")]
+    public ActionResult<SimulationBattleInstanceSnapshot> ConfirmObserverIntervention(
+        string sessionStableId, string battleStableId,
+        [FromBody] SimulationLocalCombatObserverInterventionConfirmRequest request)
+        => Execute(() => service.ConfirmObserverIntervention(sessionStableId,
+            battleStableId, request));
+
     [HttpPost("{battleStableId}/escalations/preview")]
     public ActionResult<SimulationBattleEscalationPreviewSnapshot> PreviewEscalation(
         string sessionStableId, string battleStableId,

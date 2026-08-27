@@ -75,7 +75,25 @@ namespace Ssalddel.Simulation.Domain
             SimulationSessionSavePackage package)
         {
             if (!string.Equals(package.SchemaVersion,
-                    SimulationSaveSchemaVersions.V15, StringComparison.Ordinal))
+                    SimulationSaveSchemaVersions.V15, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V16, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V17, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V18, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V19, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V20, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V21, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V22, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V24, StringComparison.Ordinal))
                 return;
             if (package.WorldInteractionManifestations == null)
                 throw new SimulationConflictException(
@@ -194,7 +212,24 @@ namespace Ssalddel.Simulation.Domain
                 SpatialEvidenceStateCode = source.SpatialEvidenceStateCode,
                 SpatialEvidenceReferenceIds =
                     source.SpatialEvidenceReferenceIds.ToArray(),
+                음양주체분류 = CloneWI음양주체분류(source.음양주체분류),
             };
+
+        internal static SimulationWI음양주체분류Snapshot
+            CloneWI음양주체분류(SimulationWI음양주체분류Snapshot source)
+            => source == null
+                ? new SimulationWI음양주체분류Snapshot()
+                : new SimulationWI음양주체분류Snapshot
+                {
+                    PayloadCode = source.PayloadCode,
+                    음양Code = source.음양Code,
+                    수행주체Code = source.수행주체Code,
+                    사분면Code = source.사분면Code,
+                    사분면기호 = source.사분면기호,
+                    판정방식Code = source.판정방식Code,
+                    판정RuleRevision = source.판정RuleRevision,
+                    판정근거StableId = source.판정근거StableId,
+                };
 
         internal static SimulationWorldInteractionManifestationRecord
             CloneWorldInteractionManifestation(

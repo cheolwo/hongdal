@@ -76,19 +76,25 @@ namespace Ssalddel.Simulation.Application
             var farm = world.FarmSurvival;
             var natureEncounter = world.NatureThreat.Encounters.FirstOrDefault(value =>
                 value.EncounterStableId == request.EncounterStableId.Trim());
+            var natureSurvivalEncounter = world.NatureSurvival?.Encounter;
+            if (natureSurvivalEncounter?.EncounterStableId !=
+                request.EncounterStableId.Trim()) natureSurvivalEncounter = null;
             var blocks = new List<string>();
             if (battlefieldDerivationService == null
                 && request.ExpectedWorldRevision != world.Revision)
                 blocks.Add("WorldRevisionConflict");
             if ((farm == null || farm.IsOperationalState || !farm.SimulationOnly)
-                && natureEncounter == null)
+                && natureEncounter == null && natureSurvivalEncounter == null)
                 blocks.Add("SimulationBattleFarmStateUnavailable");
             var encounter = farm?.Encounters.FirstOrDefault(value =>
                 value.EncounterStableId == request.EncounterStableId.Trim());
-            if (encounter == null && natureEncounter == null)
+            if (encounter == null && natureEncounter == null
+                && natureSurvivalEncounter == null)
                 blocks.Add("SimulationBattleEncounterNotFound");
             else if (encounter?.StateCode == SimulationFarmSurvivalCodes.Resolved
-                || natureEncounter?.StateCode == SimulationRegionalIncidentCodes.Resolved)
+                || natureEncounter?.StateCode == SimulationRegionalIncidentCodes.Resolved
+                || natureSurvivalEncounter?.StateCode ==
+                    SimulationNatureSurvivalCodes.Resolved)
                 blocks.Add("SimulationBattleEncounterAlreadyResolved");
 
             var actorIds = farm?.Actors.Where(value =>
@@ -106,18 +112,25 @@ namespace Ssalddel.Simulation.Application
                     "battle-squad:initial:" + request.EncounterStableId.Trim(),
                 }).Where(value => !string.IsNullOrWhiteSpace(value)).ToArray();
             var hostileStrength = encounter?.ThreatUnitCount
-                ?? natureEncounter?.ThreatUnitCount ?? 0;
+                ?? natureEncounter?.ThreatUnitCount
+                ?? natureSurvivalEncounter?.HostileCount ?? 0;
             if (hostileStrength <= 0)
                 blocks.Add("SimulationBattleHostileForceUnavailable");
             var areaStableId = encounter != null ? farm?.AreaStableId ?? string.Empty
-                : natureEncounter == null ? string.Empty
-                    : "nature-route:" + natureEncounter.NatureRouteCode;
-            var threatTypeCode = encounter?.ThreatTypeCode ?? "NatureThreat";
+                : natureEncounter != null
+                    ? "nature-route:" + natureEncounter.NatureRouteCode
+                    : natureSurvivalEncounter != null
+                        ? world.NatureSurvival?.AreaSetStableId ?? string.Empty
+                        : string.Empty;
+            var threatTypeCode = encounter?.ThreatTypeCode
+                ?? (natureSurvivalEncounter == null
+                    ? "NatureThreat" : "NatureFirstDayThreat");
             var scale = SimulationCombatScalePolicy.Evaluate(hostileStrength,
                 initialActors.Length, threatTypeCode, threatTypeCode);
             // 공간 파생 공급자가 없는 기존 생성 경로는 과거와 동일하게 독립 전장을
             // 사용한다. H5/LH 현장 전투는 지역 문맥을 공급할 수 있는 서버에서만 연다.
-            if (battlefieldDerivationService == null)
+            if (battlefieldDerivationService == null
+                && natureSurvivalEncounter == null)
                 scale = new SimulationCombatScaleDecisionSnapshot
                 {
                     EncounterScaleCode = SimulationLocalCombatCodes.Battlefield,
@@ -133,17 +146,24 @@ namespace Ssalddel.Simulation.Application
             var derivation = new SimulationBattlefieldDerivationSnapshot();
             var roster = new SimulationBattleUnitRosterSnapshot();
             var localWorldContext = BuildLocalWorldContext(world, areaStableId, derivation);
-            if (battlefieldDerivationService != null && hostileStrength > 0)
+            if (hostileStrength > 0)
                 roster = SimulationBattleUnitRosterBuilder.Build(
                     request.EncounterStableId.Trim(), farm?.Actors
+                        .Where(value => initialActors.Contains(
+                            value.ActorStableId, StringComparer.Ordinal))
+                        .ToArray()
                         ?? Array.Empty<SimulationFarmActorSnapshot>(), hostileStrength,
                     threatTypeCode, world.TeamRoleCards);
-            if (battlefieldDerivationService != null && hostileStrength > 0
+            if (battlefieldDerivationService != null
+                && (scale.CombatSpaceCode ==
+                    SimulationLocalCombatCodes.DerivedBattlefield
+                    || natureSurvivalEncounter == null)
+                && hostileStrength > 0
                 && !string.IsNullOrWhiteSpace(areaStableId))
             {
                 derivation = battlefieldDerivationService.Derive(sessionStableId.Trim(),
                     request.EncounterStableId.Trim(), areaStableId, world.Revision,
-                    natureEncounter != null);
+                    natureEncounter != null || natureSurvivalEncounter != null);
                 localWorldContext = BuildLocalWorldContext(world, areaStableId, derivation);
                 if (scale.CombatSpaceCode == SimulationLocalCombatCodes.DerivedBattlefield
                     && !derivation.CanConfirm)
@@ -352,8 +372,10 @@ namespace Ssalddel.Simulation.Application
             var combatWorldTick = battleSnapshot.CombatSpaceCode ==
                 SimulationLocalCombatCodes.WorldLocal
                 ? battleSnapshot.StartedWorldTick : session.CurrentTick;
-            return battle.Advance(request, combatWorldTick,
+            var result = battle.Advance(request, combatWorldTick,
                 HeroContribution(session, battle.EncounterStableId));
+            ApplyNatureSurvivalCombatOutcomeIfCompleted(sessionStableId, result);
+            return result;
         }
 
         public SimulationBattleInstanceSnapshot ConfirmLocalFocus(string sessionStableId,
@@ -372,11 +394,57 @@ namespace Ssalddel.Simulation.Application
                 .ConfirmLocalControlMode(request);
         }
 
+        public SimulationBattleInstanceSnapshot ConfirmObserverIntervention(
+            string sessionStableId, string battleStableId,
+            SimulationLocalCombatObserverInterventionConfirmRequest request)
+        {
+            FindPolicy(sessionStableId, request.RequestingActorStableId);
+            var result = FindBattle(sessionStableId, battleStableId)
+                .ConfirmObserverIntervention(request);
+            ApplyNatureSurvivalCombatOutcomeIfCompleted(sessionStableId, result);
+            return result;
+        }
+
         public SimulationBattleInstanceSnapshot ConfirmLocalAction(string sessionStableId,
             string battleStableId, SimulationLocalCombatActionConfirmRequest request)
         {
             FindPolicy(sessionStableId, request.RequestingActorStableId);
-            return FindBattle(sessionStableId, battleStableId).ConfirmLocalAction(request);
+            var result = FindBattle(sessionStableId, battleStableId)
+                .ConfirmLocalAction(request);
+            ApplyNatureSurvivalCombatOutcomeIfCompleted(sessionStableId, result);
+            return result;
+        }
+
+        private void ApplyNatureSurvivalCombatOutcomeIfCompleted(
+            string sessionStableId, SimulationBattleInstanceSnapshot battle)
+        {
+            if (battle.PhaseCode != SimulationBattleInstanceCodes.Completed
+                || battle.Outcome == null) return;
+            var session = FindSession(sessionStableId);
+            var nature = session.GetNatureSurvivalState();
+            if (!SimulationNatureSurvivalCodes.IsR2(nature.ProfileRevision)
+                || nature.Encounter?.EncounterStableId != battle.EncounterStableId
+                || nature.Encounter.StateCode !=
+                    SimulationNatureSurvivalCodes.CombatActive)
+                return;
+            var resultCode = battle.LocalCombat.StateCode ==
+                    SimulationLocalCombatCodes.Retreated
+                ? SimulationNatureSurvivalCodes.Retreat
+                : battle.Outcome.ResultCode == SimulationBattleInstanceCodes.Victory
+                    ? SimulationNatureSurvivalCodes.Victory
+                    : SimulationNatureSurvivalCodes.Defeat;
+            session.ConfirmNatureSurvivalAction(new SimulationNatureSurvivalCommandRequest
+            {
+                CommandId = "command:nature-combat-result:" + battle.BattleStableId,
+                ExpectedRevision = session.Revision,
+                PlayerStableId = nature.PlayerStableId,
+                ActionCode = SimulationNatureSurvivalCodes.ResolveEncounter,
+                TargetStableId = battle.EncounterStableId,
+                ChoiceCode = resultCode,
+                AuthoritativeRewardBonusQuantity = resultCode ==
+                        SimulationNatureSurvivalCodes.Victory
+                    ? battle.LocalCombat.Performance.RewardBonusQuantity : 0,
+            });
         }
 
         public SimulationBattleEscalationPreviewSnapshot PreviewEscalation(

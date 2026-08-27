@@ -8,10 +8,43 @@ using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Simulation.Domain
 {
-    public static class SimulationSessionReplay
+    public static partial class SimulationSessionReplay
     {
         public static 경영SimulationSessionAggregate Restore(SimulationSessionSavePackage package)
         {
+            if (package == null) throw new ArgumentNullException(nameof(package));
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V27,
+                    StringComparison.Ordinal))
+            {
+                ValidatePackage(package);
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.ActorEquipmentBaseSchemaVersion;
+                basePackage.ActorEquipmentBaseSchemaVersion = string.Empty;
+                basePackage.ActorEquipment = null;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                var restoredAggregate = Restore(basePackage);
+                restoredAggregate.RestoreActorEquipmentState(
+                    package.ActorEquipment);
+                return restoredAggregate;
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V26,
+                    StringComparison.Ordinal))
+            {
+                ValidatePackage(package);
+                var legacy = SimulationSaveReplayCloner.ClonePackage(package);
+                legacy.SchemaVersion =
+                    package.WorldAssetPlacementBaseSchemaVersion;
+                legacy.WorldAssetPlacementBaseSchemaVersion = string.Empty;
+                legacy.WorldAssetPlacement = null;
+                legacy.ReplayHash = SimulationReplayHasher.Calculate(legacy);
+                var restoredAggregate = Restore(legacy);
+                restoredAggregate.RestoreWorldAssetPlacementState(
+                    package.WorldAssetPlacement);
+                return restoredAggregate;
+            }
             ValidatePackage(package);
             var aggregate = new 경영SimulationSessionAggregate(
                 SimulationSaveReplayCloner.CloneCreateRequest(package.SessionCreateRequest),
@@ -39,11 +72,51 @@ namespace Ssalddel.Simulation.Domain
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V15,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V16,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V17,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V18,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V19,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V20,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V21,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V22,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V23,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V24,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V25,
                     StringComparison.Ordinal))
                 aggregate.UseLegacyRegionalCausalityRules();
             if (!string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V15,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V16,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V17,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V18,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V19,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V20,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V21,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V22,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V23,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V24,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V25,
                     StringComparison.Ordinal))
                 aggregate.UseLegacyRegionalDevelopmentRules();
             if (!string.Equals(aggregate.SessionStableId, package.SessionStableId, StringComparison.Ordinal))
@@ -64,7 +137,7 @@ namespace Ssalddel.Simulation.Domain
                         || entry.TurnClosingConfirmRequest != null
                         || entry.NpcPolicyChangeRequest != null)
                         throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
-                    aggregate.ConfirmDecision(
+                    aggregate.ReplayDecision(
                         SimulationSaveReplayCloner.CloneConfirmRequest(entry.DecisionConfirmRequest));
                 }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.HarvestDispositionImpactConfirm)
@@ -285,6 +358,22 @@ namespace Ssalddel.Simulation.Domain
                         SimulationSaveReplayCloner.CloneNatureSurvivalClockRequest(
                             entry.NatureSurvivalClockAdvanceRequest!));
                 }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.ActorItemAcquireConfirm)
+                {
+                    aggregate.ConfirmActorItemAcquire(
+                        SimulationSaveReplayCloner
+                            .CloneActorItemAcquireConfirmRequest(
+                                entry.ActorItemAcquireConfirmRequest!));
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.ActorEquipmentChangeConfirm)
+                {
+                    aggregate.ConfirmActorEquipmentChange(
+                        SimulationSaveReplayCloner
+                            .CloneActorEquipmentChangeConfirmRequest(
+                                entry.ActorEquipmentChangeConfirmRequest!));
+                }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
@@ -311,11 +400,70 @@ namespace Ssalddel.Simulation.Domain
 
             aggregate.RestoreLhWorldState(package.LhWorld);
             aggregate.RestoreWorldInteractionEvidence(package);
+            if ((string.Equals(package.SchemaVersion,
+                     SimulationSaveSchemaVersions.V22, StringComparison.Ordinal)
+                 || string.Equals(package.SchemaVersion,
+                     SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                 || string.Equals(package.SchemaVersion,
+                     SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                 || string.Equals(package.SchemaVersion,
+                     SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                && package.SpatialComposition != null)
+                aggregate.RestoreSpatialCompositionState(
+                    package.SpatialComposition);
             var replayed = aggregate.CreateSavePackage(new SimulationSessionSaveRequest
             {
                 SaveStableId = package.SaveStableId,
                 ExpectedRevision = aggregate.Revision,
             });
+            if (!string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V27,
+                    StringComparison.Ordinal)
+                && string.Equals(replayed.SchemaVersion,
+                    SimulationSaveSchemaVersions.V27,
+                    StringComparison.Ordinal))
+            {
+                replayed.SchemaVersion = replayed.ActorEquipmentBaseSchemaVersion;
+                replayed.ActorEquipmentBaseSchemaVersion = string.Empty;
+                replayed.ActorEquipment = null;
+                replayed.ReplayHash = SimulationReplayHasher.Calculate(replayed);
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V17, StringComparison.Ordinal)
+                && !string.Equals(replayed.SchemaVersion,
+                    SimulationSaveSchemaVersions.V17, StringComparison.Ordinal))
+            {
+                replayed.SchemaVersion = SimulationSaveSchemaVersions.V17;
+                replayed.ReplayHash = SimulationReplayHasher.Calculate(replayed);
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V21, StringComparison.Ordinal)
+                && (string.Equals(replayed.SchemaVersion,
+                        SimulationSaveSchemaVersions.V22, StringComparison.Ordinal)
+                    || string.Equals(replayed.SchemaVersion,
+                        SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                    || string.Equals(replayed.SchemaVersion,
+                        SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                    || string.Equals(replayed.SchemaVersion,
+                        SimulationSaveSchemaVersions.V25, StringComparison.Ordinal)))
+            {
+                replayed.SchemaVersion = SimulationSaveSchemaVersions.V21;
+                replayed.SpatialComposition = null;
+                replayed.SpatialCompositionHandle = null;
+                replayed.ReplayHash = SimulationReplayHasher.Calculate(replayed);
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V22, StringComparison.Ordinal)
+                && (string.Equals(replayed.SchemaVersion,
+                        SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                    || string.Equals(replayed.SchemaVersion,
+                        SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                    || string.Equals(replayed.SchemaVersion,
+                        SimulationSaveSchemaVersions.V25, StringComparison.Ordinal)))
+            {
+                replayed.SchemaVersion = SimulationSaveSchemaVersions.V22;
+                replayed.ReplayHash = SimulationReplayHasher.Calculate(replayed);
+            }
             replayed = SimulationBattleSaveReplay.AttachToPackage(
                 replayed,
                 package.Battles);
@@ -333,6 +481,67 @@ namespace Ssalddel.Simulation.Domain
         private static void ValidatePackage(SimulationSessionSavePackage package)
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V27,
+                    StringComparison.Ordinal))
+            {
+                if (string.IsNullOrWhiteSpace(
+                        package.ActorEquipmentBaseSchemaVersion)
+                    || string.Equals(package.ActorEquipmentBaseSchemaVersion,
+                        SimulationSaveSchemaVersions.V27,
+                        StringComparison.Ordinal)
+                    || package.ActorEquipment == null
+                    || !package.ActorEquipment.IsEnabled
+                    || !string.Equals(package.ActorEquipment.StateHashSha256,
+                        경영SimulationSessionAggregate
+                            .CalculateActorEquipmentStateHash(
+                                package.ActorEquipment),
+                        StringComparison.Ordinal))
+                    throw new SimulationContractException(
+                        "SimulationActorEquipmentStateInvalid");
+                if (!string.Equals(package.ReplayHash,
+                        SimulationReplayHasher.Calculate(package),
+                        StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationReplayHashMismatch");
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.ActorEquipmentBaseSchemaVersion;
+                basePackage.ActorEquipmentBaseSchemaVersion = string.Empty;
+                basePackage.ActorEquipment = null;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                ValidatePackage(basePackage);
+                return;
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V26,
+                    StringComparison.Ordinal))
+            {
+                if (string.IsNullOrWhiteSpace(
+                        package.WorldAssetPlacementBaseSchemaVersion)
+                    || string.Equals(
+                        package.WorldAssetPlacementBaseSchemaVersion,
+                        SimulationSaveSchemaVersions.V26,
+                        StringComparison.Ordinal))
+                    throw new SimulationContractException(
+                        "SimulationWorldAssetPlacementBaseSchemaInvalid");
+                SimulationWorldAssetPlacementSaveReplay.Validate(
+                    package.WorldAssetPlacement,
+                    package.SavedWorldRevision);
+                if (!string.Equals(package.ReplayHash,
+                        SimulationReplayHasher.Calculate(package),
+                        StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationReplayHashMismatch");
+                var legacy = SimulationSaveReplayCloner.ClonePackage(package);
+                legacy.SchemaVersion =
+                    package.WorldAssetPlacementBaseSchemaVersion;
+                legacy.WorldAssetPlacementBaseSchemaVersion = string.Empty;
+                legacy.WorldAssetPlacement = null;
+                legacy.ReplayHash = SimulationReplayHasher.Calculate(legacy);
+                ValidatePackage(legacy);
+                return;
+            }
             if (!string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V1, StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V2,
                     StringComparison.Ordinal)
@@ -361,6 +570,26 @@ namespace Ssalddel.Simulation.Domain
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V15,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V16,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V17,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V18,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V19,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V20,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V21,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V22,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V23,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V24,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V25,
                     StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationSaveSchemaUnsupported");
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
@@ -495,11 +724,193 @@ namespace Ssalddel.Simulation.Domain
                         || package.Snapshot.RegionalDevelopment.Areas == null
                         || package.Snapshot.RegionalDevelopment.Connectors == null
                         || package.WorldInteractionManifestations == null))
+                || (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V16,
+                        StringComparison.Ordinal)
+                    && (package.Snapshot.RegionalDevelopment == null
+                        || package.Snapshot.RegionalDevelopment.Opportunities == null
+                        || package.Snapshot.RegionalDevelopment.RouteSafeties == null
+                        || package.Snapshot.RegionalDevelopment.Areas == null
+                        || package.Snapshot.RegionalDevelopment.Connectors == null
+                        || package.WorldInteractionManifestations == null
+                        || package.Snapshot.TarotContext == null
+                        || package.Snapshot.TarotContext.MajorArcanaActivations == null
+                        || package.Snapshot.TarotContext.OrientationInheritances == null
+                        || package.Snapshot.TownNpcLife == null
+                        || package.Snapshot.TownNpcLife.Items == null
+                        || package.Snapshot.TownNpcLife.Npcs == null
+                        || package.Snapshot.TownNpcLife.Goals == null
+                        || package.Snapshot.TownNpcLife.Orders == null))
+                || ((string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V17,
+                        StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion,
+                        SimulationSaveSchemaVersions.V18, StringComparison.Ordinal)
+                    || string.Equals(package.SchemaVersion,
+                        SimulationSaveSchemaVersions.V19, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                        SimulationSaveSchemaVersions.V20, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                        SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                        SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                    && (package.SessionCreateRequest.NatureSurvival == null
+                        || !SimulationNatureSurvivalCodes.IsR2(package.SessionCreateRequest
+                            .NatureSurvival.ProfileRevision)
+                        || package.Snapshot.NatureSurvival == null
+                        || !package.Snapshot.NatureSurvival.IsEnabled))
+                || ((string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V19, StringComparison.Ordinal)
+                      || string.Equals(package.SchemaVersion,
+                          SimulationSaveSchemaVersions.V20, StringComparison.Ordinal)
+                      || string.Equals(package.SchemaVersion,
+                          SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                      || string.Equals(package.SchemaVersion,
+                          SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                    && (package.SessionCreateRequest.NatureSurvival == null
+                        || !SimulationNatureSurvivalCodes.IsR3(
+                            package.SessionCreateRequest.NatureSurvival.ProfileRevision)
+                        || package.SessionCreateRequest.NatureSurvival
+                            .BuildingProgressionCatalog == null
+                        || package.Snapshot.NatureSurvival.BuildingProgression == null))
+                || ((string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V20, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                    && (package.SessionCreateRequest.NatureSurvival == null
+                        || !SimulationNatureSurvivalCodes.IsR4(
+                            package.SessionCreateRequest.NatureSurvival.ProfileRevision)))
+                || ((string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                    && (package.SessionCreateRequest.NatureSurvival == null
+                        || !SimulationNatureSurvivalCodes.IsR5(
+                            package.SessionCreateRequest.NatureSurvival.ProfileRevision)
+                        || package.Snapshot.NatureSurvival == null
+                        || package.Snapshot.NatureSurvival.DroppedTimber == null))
+                || ((string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V21, StringComparison.Ordinal)
+                     || ((string.Equals(package.SchemaVersion,
+                              SimulationSaveSchemaVersions.V22,
+                              StringComparison.Ordinal)
+                          || string.Equals(package.SchemaVersion,
+                              SimulationSaveSchemaVersions.V23,
+                              StringComparison.Ordinal)
+                          || string.Equals(package.SchemaVersion,
+                              SimulationSaveSchemaVersions.V24,
+                              StringComparison.Ordinal)
+                          || string.Equals(package.SchemaVersion,
+                              SimulationSaveSchemaVersions.V25,
+                              StringComparison.Ordinal))
+                        && (!string.IsNullOrWhiteSpace(package.SessionCreateRequest
+                                .NpcRoutineControlRevision)
+                            || (package.Snapshot.NpcRoutineExecutions?.Length
+                                ?? 0) > 0)))
+                    && (string.IsNullOrWhiteSpace(package.SessionCreateRequest
+                            .NpcRoutineControlRevision)
+                        || !SimulationNpcRoutineControlRevisionCodes.IsKnown(
+                            package.SessionCreateRequest
+                                .NpcRoutineControlRevision)
+                        || !string.Equals(package.Snapshot.NpcRoutineControlRevision,
+                            package.SessionCreateRequest.NpcRoutineControlRevision,
+                            StringComparison.Ordinal)
+                        || package.Snapshot.NpcRoutineExecutions == null
+                        || package.SessionCreateRequest.NatureSurvival != null
+                        && !SimulationNatureSurvivalCodes.IsR2(
+                            package.SessionCreateRequest.NatureSurvival.ProfileRevision)))
+                || (string.Equals(package.SchemaVersion,
+                        SimulationSaveSchemaVersions.V22, StringComparison.Ordinal)
+                    && ((package.SpatialComposition == null)
+                            != (package.SpatialCompositionHandle == null)
+                        || package.SpatialComposition == null
+                            && (package.SessionCreateRequest.InteriorPlanHandles
+                                ?.Length ?? 0) == 0
+                        || package.SpatialComposition != null
+                            && (!string.Equals(package.SessionCreateRequest
+                                    .SpatialCompositionRuleRevision,
+                                    SimulationSpatialCompositionCodes.RuleRevision,
+                                    StringComparison.Ordinal)
+                                || !string.Equals(package.SpatialComposition
+                                        .GraphHashSha256,
+                                    package.SpatialCompositionHandle!
+                                        .GraphHashSha256,
+                                    StringComparison.Ordinal)
+                                || !string.Equals(package.SpatialComposition
+                                        .GraphHashSha256,
+                                    SimulationSpatialCompositionEngine
+                                        .ComputeGraphHash(
+                                            package.SpatialComposition),
+                                    StringComparison.Ordinal))
+                        || !경영SimulationSessionAggregate
+                            .InteriorPlanHandlesEqual(
+                                package.SessionCreateRequest.InteriorPlanHandles,
+                                package.Snapshot.InteriorPlanHandles)))
+                || ((string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                     || string.Equals(package.SchemaVersion,
+                         SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                    && ((package.SpatialComposition == null)
+                            != (package.SpatialCompositionHandle == null)
+                        || package.SpatialComposition != null
+                            && (!string.Equals(package.SessionCreateRequest
+                                    .SpatialCompositionRuleRevision,
+                                    SimulationSpatialCompositionCodes.RuleRevision,
+                                    StringComparison.Ordinal)
+                                || !string.Equals(package.SpatialComposition
+                                        .GraphHashSha256,
+                                    package.SpatialCompositionHandle!
+                                        .GraphHashSha256,
+                                    StringComparison.Ordinal)
+                                || !string.Equals(package.SpatialComposition
+                                        .GraphHashSha256,
+                                    SimulationSpatialCompositionEngine
+                                        .ComputeGraphHash(
+                                            package.SpatialComposition),
+                                    StringComparison.Ordinal))
+                        || !경영SimulationSessionAggregate
+                            .InteriorPlanHandlesEqual(
+                                package.SessionCreateRequest.InteriorPlanHandles,
+                                package.Snapshot.InteriorPlanHandles)))
                 || package.CommandLog == null
                 || package.Battles == null)
             {
                 throw new SimulationContractException("SimulationSavePackageInvalid");
             }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V22, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+            {
+                경영SimulationSessionAggregate.ValidateInteriorPlanHandles(
+                    package.SessionCreateRequest.InteriorPlanHandles
+                    ?? Array.Empty<SimulationInteriorPlanHandleSnapshot>());
+                경영SimulationSessionAggregate.ValidateInteriorPlanHandles(
+                    package.Snapshot.InteriorPlanHandles
+                    ?? Array.Empty<SimulationInteriorPlanHandleSnapshot>());
+            }
+            else if ((package.SessionCreateRequest.InteriorPlanHandles?.Length ?? 0) > 0
+                || (package.Snapshot.InteriorPlanHandles?.Length ?? 0) > 0)
+            {
+                throw new SimulationContractException(
+                    "SimulationInteriorPlanHandlesRequireV22");
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V23, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V24, StringComparison.Ordinal)
+                || string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                ValidateWI음양주체분류(package);
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V25, StringComparison.Ordinal))
+                ValidateWorldAtmosphere(package);
             if (package.Snapshot.Settlement != null
                 && (package.Snapshot.Settlement.Districts == null
                     || package.Snapshot.Settlement.Facilities == null
@@ -771,6 +1182,20 @@ namespace Ssalddel.Simulation.Domain
                     경영SimulationSessionAggregate.ValidateNatureSurvivalClockRequest(
                         entry.NatureSurvivalClockAdvanceRequest!);
                 }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.ActorItemAcquireConfirm)
+                {
+                    경영SimulationSessionAggregate
+                        .ValidateActorItemAcquireConfirmRequest(
+                            entry.ActorItemAcquireConfirmRequest!);
+                }
+                else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.ActorEquipmentChangeConfirm)
+                {
+                    경영SimulationSessionAggregate
+                        .ValidateActorEquipmentChangeConfirmRequest(
+                            entry.ActorEquipmentChangeConfirmRequest!);
+                }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
@@ -806,6 +1231,58 @@ namespace Ssalddel.Simulation.Domain
                 throw new SimulationConflictException("SimulationReplayHashMismatch");
         }
 
+        private static void ValidateWI음양주체분류(
+            SimulationSessionSavePackage package)
+        {
+            if (package.WorldInteractionManifestations == null)
+                throw new SimulationContractException(
+                    "SimulationSavePackageInvalid");
+
+            foreach (var entry in package.CommandLog.Where(value =>
+                         value.WorldInteractionInvocation != null))
+            {
+                var invocation = entry.WorldInteractionInvocation!;
+                var classification = invocation.음양주체분류;
+                if (!string.Equals(invocation.PayloadCode,
+                        "WorldInteractionInvocation.v2",
+                        StringComparison.Ordinal))
+                {
+                    if (!string.IsNullOrWhiteSpace(
+                            classification?.판정RuleRevision))
+                        throw new SimulationContractException(
+                            "SimulationSavePackageInvalid");
+                    continue;
+                }
+
+                if (!SimulationWI음양주체사분면Rules.Matches(
+                        invocation.WorldInteractionId,
+                        invocation.TriggerSourceCode,
+                        classification)
+                    || SimulationWI수행주체Codes.IsActor(
+                            classification.수행주체Code)
+                        && string.IsNullOrWhiteSpace(invocation.ActorStableId))
+                    throw new SimulationContractException(
+                        "SimulationSavePackageInvalid");
+            }
+
+            foreach (var execution in package.Snapshot.NpcRoutineExecutions
+                         ?? Array.Empty<SimulationNpcRoutineExecutionSnapshot>())
+            {
+                var classification = execution.음양주체분류;
+                if (string.IsNullOrWhiteSpace(classification?.판정RuleRevision))
+                    continue;
+                if (!SimulationWI음양주체사분면Rules.Matches(
+                        execution.WorldInteractionId,
+                        execution.TriggerSourceCode,
+                        classification)
+                    || SimulationWI수행주체Codes.IsActor(
+                            classification.수행주체Code)
+                        && string.IsNullOrWhiteSpace(execution.ActorStableId))
+                    throw new SimulationContractException(
+                        "SimulationSavePackageInvalid");
+            }
+        }
+
         private static void EnsureSingleCommandPayload(SimulationCommandLogEntrySnapshot entry)
         {
             var payloadCount = 0;
@@ -839,6 +1316,8 @@ namespace Ssalddel.Simulation.Domain
             if (entry.FacilityDamageQueueRequest != null) payloadCount++;
             if (entry.NatureSurvivalActionRequest != null) payloadCount++;
             if (entry.NatureSurvivalClockAdvanceRequest != null) payloadCount++;
+            if (entry.ActorItemAcquireConfirmRequest != null) payloadCount++;
+            if (entry.ActorEquipmentChangeConfirmRequest != null) payloadCount++;
             if (payloadCount != 1)
                 throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
         }
