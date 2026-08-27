@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-seedbed-catalog.v1",
   "revision": "simulation-world-interaction-spatial-seedbeds.r7",
-  "worldInteractionCatalogRevision": "simulation-world-interactions.r27",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r28",
   "landscapeGrammarRevision": "pyeongchang-landscape-grammar.v1",
   "definitionRefs": [
     "definitions/farm-production.v1.json",

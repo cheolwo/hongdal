@@ -29,7 +29,7 @@ $catalog = Get-Content -LiteralPath (Join-Path $repositoryRoot $InputPath) `
 $loops = Get-Content -LiteralPath (Join-Path $repositoryRoot `
     ([string] $catalog.playableLoopCatalogPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 
-Require ([string] $catalog.schemaVersion -eq "post-e7-evidence-campaigns.v3") "SchemaInvalid"
+Require ([string] $catalog.schemaVersion -eq "post-e7-evidence-campaigns.v4") "SchemaInvalid"
 Require ([string] $catalog.evidenceModelRevision -eq
     "horizontal-dual-cycle-evidence.r3") "EvidenceModelInvalid"
 foreach ($principle in @(
@@ -45,7 +45,9 @@ foreach ($principle in @(
     "automaticValidationCannotApproveE9OrE10",
     "findingReopensE9OrEarliestAffectedE1ToE8",
     "revisionChangeInvalidatesActiveObservationWindow",
-    "operationalEffectsRequireSeparateAuthority")) {
+    "operationalEffectsRequireSeparateAuthority",
+    "pipelineProfileBundleIsFrozenEvidence",
+    "pipelineFailureReopensEarliestResponsibleStage")) {
     $property = $catalog.principles.PSObject.Properties[$principle]
     Require ($null -ne $property -and [bool] $property.Value) "PrincipleMissing:$principle"
 }
@@ -57,6 +59,18 @@ Require ([bool] $policy.requiresLocalRemoteParity) "LocalRemoteParityMustBeRequi
 Require ([int] $policy.requiredPresentationActualInputRunCount -eq 2) "PresentationRunThresholdInvalid"
 Require ([bool] $policy.requiresSaveReentry) "SaveReentryMustBeRequired"
 Require ([int] $policy.requiredBlockingConsoleErrorCount -eq 0) "ConsoleErrorThresholdInvalid"
+Require ([bool] $policy.requiresActionJournalHashParity) `
+    "ActionJournalHashParityMustBeRequired"
+Require ([bool] $policy.requiresConditionalProgressionHashParity) `
+    "ProgressionHashParityMustBeRequired"
+Require ([bool] $policy.requiresPipelineTraceDigestParity) `
+    "PipelineTraceDigestParityMustBeRequired"
+Require ([bool] $catalog.pipelineHarmonyPolicy.requiresActionRecordLineage) `
+    "HarmonyActionRecordLineageMustBeRequired"
+Require ([bool] $catalog.pipelineHarmonyPolicy.requiresEngineCursorContinuity) `
+    "HarmonyEngineCursorContinuityMustBeRequired"
+Require ([bool] $catalog.pipelineHarmonyPolicy.requiresSharedProfileBundleHash) `
+    "HarmonyProfileBundleHashMustBeRequired"
 
 $loopById = @{}
 foreach ($loop in @($loops.items)) { $loopById[[string] $loop.loopStableId] = $loop }
@@ -112,6 +126,14 @@ foreach ($campaign in @($catalog.playableUnitStabilityCampaigns)) {
         Require ([int] $campaign.results.blockingConsoleErrorCount -eq
             [int] $policy.requiredBlockingConsoleErrorCount) "StabilityConsoleErrorsRemain:$id"
         Require (@($campaign.results.evidenceRefs).Count -gt 0) "StabilityEvidenceMissing:$id"
+        Require-Text $campaign.pipelineProfileBundleHash `
+            "StabilityPipelineProfileBundleHashMissing:$id"
+        Require ([bool] $campaign.results.actionJournalHashParityPassed) `
+            "StabilityActionJournalHashParityMissing:$id"
+        Require ([bool] $campaign.results.conditionalProgressionHashParityPassed) `
+            "StabilityProgressionHashParityMissing:$id"
+        Require ([bool] $campaign.results.pipelineTraceDigestParityPassed) `
+            "StabilityPipelineTraceDigestParityMissing:$id"
         Require (@($campaign.blockers).Count -eq 0) "StabilityBlockersRemain:$id"
     }
     $stabilityById[$id] = $campaign
@@ -240,6 +262,12 @@ foreach ($campaign in @($catalog.areaHarmonyCampaigns)) {
         Require ([string] $human.approvedCandidateBuildHash -eq [string] $campaign.candidateBuildHash) `
             "HumanCandidateBuildDiffersFromHarmony:$id"
         Require (@($campaign.blockers).Count -eq 0) "HarmonyBlockersRemain:$id"
+        Require-Text $campaign.pipelineValidation.profileBundleHash `
+            "HarmonyPipelineProfileBundleHashMissing:$id"
+        Require ([bool] $campaign.pipelineValidation.actionRecordLineagePassed) `
+            "HarmonyActionRecordLineageMissing:$id"
+        Require ([bool] $campaign.pipelineValidation.engineCursorContinuityPassed) `
+            "HarmonyEngineCursorContinuityMissing:$id"
     }
     $harmonyById[$id] = $campaign
 }
@@ -300,7 +328,7 @@ foreach ($window in @($catalog.limitedOperationWindows)) {
             "OperationTestersBelowGate:$id"
         Require ([int] $window.freshTargetPlayerCount -ge [int] $profile.minimumFreshTargetPlayerCount) `
             "OperationFreshPlayersBelowGate:$id"
-        foreach ($metric in @("crashCount", "unhandledExceptionCount", "saveCorruptionCount", "replayHashMismatchCount")) {
+        foreach ($metric in @("crashCount", "unhandledExceptionCount", "saveCorruptionCount", "replayHashMismatchCount", "duplicateActionRecordCount", "actionJournalHashMismatchCount", "progressionHashMismatchCount", "engineCursorRebuildFailureCount")) {
             Require ([int] $window.$metric -eq 0) "OperationFailureMetric:${id}:$metric"
         }
         Require ([bool] $window.rollbackExercisePassed) "OperationRollbackMissing:$id"
@@ -319,6 +347,7 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("- E9 영역 조화·사람 승인 후보: ``$(@($catalog.areaHarmonyCampaigns).Count)``")
 [void] $builder.AppendLine("- E9 보류 영역: ``$(@($catalog.deferredAreaHarmonySubjects).Count)``")
 [void] $builder.AppendLine("- E10 제한 운영 창: ``$(@($catalog.limitedOperationWindows).Count)``")
+[void] $builder.AppendLine("- 파이프라인 안정성: 행위 원장·조건부 성장·trace digest 동등성 필수")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("## E8 PlayableUnit 안정성")
 [void] $builder.AppendLine()

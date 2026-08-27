@@ -21,11 +21,11 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
 
         Assert.True(result.Passed);
         Assert.Empty(result.FailureCodes);
-        Assert.Equal(9, result.TraceEntries.Length);
+        Assert.Equal(16, result.TraceEntries.Length);
     }
 
     [Fact]
-    public void 필수Sky단계누락은_가장이른E3재검토로차단한다()
+    public void 필수Sky단계누락은_표현E5재검토로차단한다()
     {
         var profile = SimulationNatureFirstDayEngineValidationProfiles.Get(
             "WI-NATURE-14");
@@ -38,7 +38,7 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
             .Validate(profile, trace, "command:sleep");
 
         Assert.False(result.Passed);
-        Assert.Equal("E3", result.EarliestReopenEvidenceStageCode);
+        Assert.Equal("E5", result.EarliestReopenEvidenceStageCode);
         Assert.Contains(result.FailureCodes, value => value.StartsWith(
             "EngineInteractionRequiredStepMissing:Sky.Presentation",
             StringComparison.Ordinal));
@@ -51,7 +51,10 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
             "WI-NATURE-13");
         var trace = CompleteTrace("WI-NATURE-13", "command:store");
         trace.Single(value => value.ComponentCode ==
-            SimulationEngineInteractionComponentCodes.InteriorPlacement)
+            SimulationEngineInteractionComponentCodes.InteriorPlacement
+                              && value.PhaseCode ==
+                              SimulationEngineInteractionPhaseCodes
+                                  .InteriorPlacement)
             .AfterAuthorityRevision++;
 
         var result = new SimulationPlayableLoopEngineInteractionValidator()
@@ -87,6 +90,51 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
                 (value.ComponentCode, value.PhaseCode)),
             remoteResult.TraceEntries.Select(value =>
                 (value.ComponentCode, value.PhaseCode)));
+    }
+
+    [Fact]
+    public void 행위원장누락은_논리E5를다시연다()
+    {
+        var profile = SimulationNatureFirstDayEngineValidationProfiles.Get(
+            "WI-NATURE-15");
+        var trace = CompleteTrace("WI-NATURE-15", "command:missing-journal")
+            .Where(value => value.ComponentCode !=
+                            SimulationEngineInteractionComponentCodes
+                                .ActionJournal).ToArray();
+
+        var result = new SimulationPlayableLoopEngineInteractionValidator()
+            .Validate(profile, trace, "command:missing-journal");
+
+        Assert.False(result.Passed);
+        Assert.Equal("E5", result.EarliestReopenEvidenceStageCode);
+        Assert.Contains(result.FailureCodes, value => value.StartsWith(
+            "EngineInteractionRequiredStepMissing:Simulation.ActionJournal",
+            StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void 분야성장NotApplicable은_사유가있어야통과한다()
+    {
+        var profile = SimulationNatureFirstDayEngineValidationProfiles.Get(
+            "WI-NATURE-15");
+        var trace = CompleteTrace("WI-NATURE-15", "command:no-progress");
+        var progression = trace.Single(value => value.ComponentCode ==
+            SimulationEngineInteractionComponentCodes.PlayerDomainProgression);
+        progression.StatusCode =
+            SimulationEngineInteractionStatusCodes.NotApplicable;
+
+        var validator = new SimulationPlayableLoopEngineInteractionValidator();
+        var missingReason = validator.Validate(profile, trace,
+            "command:no-progress");
+        progression.ReasonCode = "WorldInteractionHasNoPlayerProgressBinding";
+        var explained = validator.Validate(profile, trace,
+            "command:no-progress");
+
+        Assert.False(missingReason.Passed);
+        Assert.Contains(
+            "EngineInteractionNotApplicableReasonMissing:Simulation.PlayerDomainProgression",
+            missingReason.FailureCodes);
+        Assert.True(explained.Passed);
     }
 
     [Fact]
@@ -132,6 +180,12 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
             (SimulationEngineInteractionComponentCodes.AuthorityCore,
                 SimulationEngineInteractionPhaseCodes.AuthorityCommit,
                 SimulationEngineInteractionComponentKinds.Authority),
+            (SimulationEngineInteractionComponentCodes.ActionJournal,
+                SimulationEngineInteractionPhaseCodes.ActionRecordAppend,
+                SimulationEngineInteractionComponentKinds.Authority),
+            (SimulationEngineInteractionComponentCodes.PlayerDomainProgression,
+                SimulationEngineInteractionPhaseCodes.PlayerProgressionApply,
+                SimulationEngineInteractionComponentKinds.Authority),
             (SimulationEngineInteractionComponentCodes.WorldInteractionPipeline,
                 SimulationEngineInteractionPhaseCodes.ReturnProjection,
                 SimulationEngineInteractionComponentKinds.Orchestration),
@@ -139,11 +193,22 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
         if (worldInteractionId == "WI-NATURE-14")
         {
             phases.Add((SimulationEngineInteractionComponentCodes.LhSurface,
+                SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+                SimulationEngineInteractionComponentKinds.Presentation));
+            phases.Add((SimulationEngineInteractionComponentCodes.LhSurface,
                 SimulationEngineInteractionPhaseCodes.SurfacePreparation,
                 SimulationEngineInteractionComponentKinds.Presentation));
             phases.Add((
                 SimulationEngineInteractionComponentCodes.SkyPresentation,
+                SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+                SimulationEngineInteractionComponentKinds.Presentation));
+            phases.Add((
+                SimulationEngineInteractionComponentCodes.SkyPresentation,
                 SimulationEngineInteractionPhaseCodes.AtmosphereProjection,
+                SimulationEngineInteractionComponentKinds.Presentation));
+            phases.Add((
+                SimulationEngineInteractionComponentCodes.ExteriorPlacement,
+                SimulationEngineInteractionPhaseCodes.ActionRecordRead,
                 SimulationEngineInteractionComponentKinds.Presentation));
             phases.Add((
                 SimulationEngineInteractionComponentCodes.ExteriorPlacement,
@@ -152,7 +217,15 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
         }
         phases.Add((
             SimulationEngineInteractionComponentCodes.InteriorPlacement,
+            SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+            SimulationEngineInteractionComponentKinds.Presentation));
+        phases.Add((
+            SimulationEngineInteractionComponentCodes.InteriorPlacement,
             SimulationEngineInteractionPhaseCodes.InteriorPlacement,
+            SimulationEngineInteractionComponentKinds.Presentation));
+        phases.Add((
+            SimulationEngineInteractionComponentCodes.WorldPresentation,
+            SimulationEngineInteractionPhaseCodes.ActionRecordRead,
             SimulationEngineInteractionComponentKinds.Presentation));
         phases.Add((
             SimulationEngineInteractionComponentCodes.WorldPresentation,

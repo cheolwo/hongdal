@@ -1,6 +1,6 @@
 {
   "schemaVersion": "world-interaction-delivery-priorities.v1",
-  "revision": "world-interaction-delivery-priorities.r21",
+  "revision": "world-interaction-delivery-priorities.r22",
   "lastVerifiedDate": "2026-08-27",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
@@ -10,45 +10,45 @@
   "workInProgressLimit": 1,
   "defaultIndividualTargetEvidenceStage": "E7",
   "activeWork": {
-    "worldInteractionId": "WI-ACTOR-02",
-    "workStateCode": "E7Closed",
-    "currentEvidenceStage": "E7",
+    "worldInteractionId": "WI-NATURE-15",
+    "workStateCode": "Active",
+    "currentEvidenceStage": "E6",
     "targetEvidenceStage": "E7",
-    "startedReason": "도구별 WI를 늘리기 전에 보편 장착 계약을 닫고 Nature 도끼의 획득→장착→벌목 입력 흐름을 현재 revision에서 재검증한다.",
+    "startedReason": "밤→Day2 Core의 논리 E7과 실제 입력 기계 폐루프를 보존하면서 Day2 계획 선택의 Game View 판독·미감·사람 수용을 정제한다.",
     "stageReviews": [
       {
         "stageCode": "E4",
         "resultCode": "Passed",
-        "summary": "PlayerDriven Actor·고유 ItemInstance·8개 Slot·EquipmentRevision을 결속하고 보편 WI의 공간은 NotApplicable로 판정했다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json", "docs/Architecture/플레이어중심게임개발업무구조.md"]
+        "summary": "오두막·새벽 계획 기준점과 WI-NATURE-14·15의 권위·표현 문맥을 결속했다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json"]
       },
       {
         "stageCode": "E5",
         "resultCode": "Passed",
-        "summary": "Equip·Unequip·Swap, 장착 Capability, 벌목 허용·차단, v27 저장·Replay와 LocalProcess·RemoteHost 동등성을 확인했다.",
-        "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs", "eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"]
+        "summary": "수면·새벽 자동 해제·계획 선택·Day2Ready와 대기 상태를 canonical Scene에 발현했다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json", "evidence:nature-night-day2-wi15-playmode-20260826"]
       },
       {
         "stageCode": "E6",
         "resultCode": "Partial",
-        "summary": "I 장착 상태창·8개 슬롯·권위 Confirm·손 도끼 표현 코드와 Unity 소비 어셈블리 빌드는 통과했지만 실제 Test Runner와 화면은 차단됐다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json", "docs/Architecture/플레이어중심게임개발업무구조.md"],
+        "summary": "비 크기와 LH 진단 경계는 정리했지만 Day2 계획판의 선택·비용·다음 행동 판독과 주변 구도 정제가 남았다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json"],
         "refinement": {
-          "playerQuestion": "획득한 도끼가 아직 장착되지 않았고 장착 뒤에만 벌목할 수 있음을 상태창과 세계 표현에서 이해할 수 있는가?",
-          "answer": "I 상태창에서 Inventory와 8개 슬롯을 나누고 MainHand Confirm 뒤 손 도끼와 벌목 능력을 함께 갱신한다.",
-          "costAndRisk": "Unity는 장착 결과나 능력을 계산하지 않고 Simulation 상태 사본을 표시한다.",
-          "feedback": "장착 전 벌목 차단 이유, 장착 슬롯, 손 도구와 해제 뒤 능력 상실을 구분한다.",
-          "returnOrNextChoice": "도끼를 장착해 벌목으로 진행하거나 해제·교체해 다른 도구 선택으로 돌아간다.",
+          "playerQuestion": "새벽에 세 확장안의 차이와 다음 행동을 한눈에 이해할 수 있는가?",
+          "answer": "작업대·보관대·방책의 비용과 효과, 현재 선택과 다음 건설 행동을 계획판에 함께 표시한다.",
+          "costAndRisk": "Unity 표현은 계획 선택이나 Day2Ready를 직접 변경하지 않고 권위 상태 사본만 표시한다.",
+          "feedback": "선택 전 세 후보와 선택 후 확정 상태·부족 재료·다음 행동을 구분한다.",
+          "returnOrNextChoice": "계획을 고른 뒤 저장하거나 작업대 건설 위치 선택으로 돌아간다.",
           "realityGroundingCode": "NotApplied",
           "authorityCode": "SimulationCore",
-          "presentationBoundary": "상태창·손 도구 GameObject는 EquipmentRevision과 Capability를 변경하지 않는다."
+          "presentationBoundary": "계획판·하늘·강수·LH 경계 표현은 WorldRevision을 변경하지 않는다."
         }
       },
       {
         "stageCode": "E7",
         "resultCode": "Pending",
-        "summary": "실행 중 Unity Editor 때문에 획득→장착→벌목→해제 차단→저장 재진입의 실제 Test Runner·Play Mode·Game View·Console을 아직 검증하지 못했다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"]
+        "summary": "자동 실제 입력 폐루프는 통과했지만 사람 직접 입력·Game View 판독·비와 천둥 청음 수용이 남았다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json"]
       }
     ]
   },
@@ -165,7 +165,7 @@
       "order": 6,
       "title": "후속 세계·운송 통합",
       "areaCode": "Integration",
-      "expectedWorldInteractionCount": 19,
+      "expectedWorldInteractionCount": 20,
       "entryRule": "관련 독립 영역이 모두 E7 PlayClosed일 때만 통합 경로를 연다.",
       "exitRule": "영역 간 운송·마트·공통 세계 운영을 별도 통합 PlayableLoop로 검증한다."
     }
@@ -239,6 +239,7 @@
     { "worldInteractionId": "WI-WORLD-05", "deliveryWaveCode": "D6", "orderInWave": 16, "completionRoleCode": "DeferredIntegration", "playableLoopRefs": [], "syntyTrackCode": "Integration" },
     { "worldInteractionId": "WI-WORLD-06", "deliveryWaveCode": "D6", "orderInWave": 17, "completionRoleCode": "DeferredIntegration", "playableLoopRefs": [], "syntyTrackCode": "None" },
     { "worldInteractionId": "WI-WORLD-07", "deliveryWaveCode": "D6", "orderInWave": 18, "completionRoleCode": "DeferredIntegration", "playableLoopRefs": [], "syntyTrackCode": "None" },
-    { "worldInteractionId": "WI-WORLD-08", "deliveryWaveCode": "D6", "orderInWave": 19, "completionRoleCode": "DeferredIntegration", "playableLoopRefs": ["playable-loop:solo-world-day.v1"], "syntyTrackCode": "None" }
+    { "worldInteractionId": "WI-WORLD-08", "deliveryWaveCode": "D6", "orderInWave": 19, "completionRoleCode": "DeferredIntegration", "playableLoopRefs": ["playable-loop:solo-world-day.v1"], "syntyTrackCode": "None" },
+    { "worldInteractionId": "WI-REVIEW-01", "deliveryWaveCode": "D6", "orderInWave": 20, "completionRoleCode": "DeferredIntegration", "playableLoopRefs": [], "syntyTrackCode": "None" }
   ]
 }

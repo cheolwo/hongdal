@@ -183,6 +183,8 @@ Nature의 1차 플레이는 생존·채집·건설·방어이고 심리 회복�
 | WI-WORLD-07 | 활동 시작·완료 |
 | WI-WORLD-08 | 턴 종료 |
 
+`WI-REVIEW-01`은 플레이어가 자신이 위임한 NPC 업무 완료 계보를 검토해 운영 숙련 근거를 확정하는 별도 업무 검토 WI다. NPC 완료 자체와 검토를 합치지 않는다.
+
 이 WI들은 현재 E3 구현·E1 공간 통합이다. NPC 관련 계약이 있다는 사실만으로 NPC PlayableUnit E7, 그 단위의 E8 반복 안정성, 여러 Core의 E9 생활 조화를 주장하지 않는다.
 
 ## Preview→Confirm 공통 계약
@@ -211,7 +213,7 @@ Nature의 1차 플레이는 생존·채집·건설·방어이고 심리 회복�
 4. 저장 `SimulationWorldShell`에서 실제 서버 Preview·Confirm·Tick·재조회로 E7을 증명한다.
 5. Hub·Town은 각각 독립 내부 폐루프를 닫은 후에만 영역 간 사슬을 통합 증거로 승격한다.
 
-## 64개 WI 식별자 재고
+## 65개 WI 식별자 재고
 
 | 그룹 | 안정 식별자 |
 | --- | --- |
@@ -227,3 +229,4 @@ Nature의 1차 플레이는 생존·채집·건설·방어이고 심리 회복�
 | CON | WI-CON-01 |
 | CITY | WI-CITY-01, WI-CITY-02, WI-CITY-03, WI-CITY-04 |
 | WORLD | WI-WORLD-01, WI-WORLD-02, WI-WORLD-03, WI-WORLD-04, WI-WORLD-05, WI-WORLD-06, WI-WORLD-07, WI-WORLD-08 |
+| REVIEW | WI-REVIEW-01 |

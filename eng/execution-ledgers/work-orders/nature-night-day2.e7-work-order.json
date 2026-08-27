@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-NIGHT-DAY2",
+  "title": "Nature 오두막 수면과 Day2 확장 계획 반환",
+  "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+  "activeWorldInteractionId": "WI-NATURE-15",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "iterationState": {
+    "currentPass": "ImpactReassessment",
+    "nextReopenCondition": "행위 원장 기록·표현 엔진 cursor 소비·Game View 증거 중 하나라도 빠지면 같은 Goal의 가장 이른 Logic 또는 Presentation E를 다시 연다."
+  },
+  "changeImpactReviewRef": "eng/execution-ledgers/work-orders/nature-sky-engine.e9-work-order.json",
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E5",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Affected", "summary": "기존 실제 입력 증거에 v28 행위 원장·파이프라인 trace가 없으므로 다시 검증한다." },
+        { "code": "E6", "disposition": "Affected", "summary": "행위 결과·성장 적용 여부와 실패 회복 설명을 새 원장 계보로 다시 확인한다." },
+        { "code": "E5", "disposition": "ReusedWithVerification", "summary": "수면과 계획 Confirm이 권위 상태·Day2Ready를 변경하며 새 행위 원장 결속을 검증한다." },
+        { "code": "E4", "disposition": "ReusedWithVerification", "summary": "오두막·새벽 계획 기준점과 WI-NATURE-14·15를 결속한다." },
+        { "code": "E3", "disposition": "ReusedWithVerification", "summary": "결정성·Save/Replay·Local/Remote 동등성을 회귀한다." },
+        { "code": "E2", "disposition": "ReusedWithVerification", "summary": "공통 Simulation Core와 LocalProcess·RemoteHost Adapter를 사용한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어는 밤을 넘기고 다음 확장 방향을 선택해 Day2로 반환한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["WI-NATURE-14", "WI-NATURE-15"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["nature-survival.realtime.r5"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["evidence:nature-night-day2-wi15-hosted-parity-20260826"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["WI-NATURE-14", "WI-NATURE-15"] },
+        { "code": "E5", "status": "Passed", "evidenceRefs": ["evidence:nature-r2-core-20260825"] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-wi15-hosted-parity-20260826"] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-wi15-playmode-20260826"] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Gap", "summary": "사람 입력과 청음으로 수면→새벽→계획 선택→저장 재진입을 수용 확인해야 한다." },
+        { "code": "E6", "disposition": "Affected", "summary": "Day2 계획 세 선택·비용·다음 행동과 오두막 주변 구도를 한눈에 읽히게 한다." },
+        { "code": "E5", "disposition": "Gap", "summary": "표현 엔진이 같은 Revision의 행위 원장을 cursor로 읽었다는 증거가 없다." },
+        { "code": "E4", "disposition": "ReusedWithVerification", "summary": "오두막 내부 차폐와 새벽 계획 표현 기준점을 사용한다." },
+        { "code": "E3", "disposition": "ReusedWithVerification", "summary": "Synty 하늘·비·침상·계획판 후보를 준비한다." },
+        { "code": "E2", "disposition": "ReusedWithVerification", "summary": "밤·수면·새벽·계획 선택의 표현 언어를 구분한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어는 현재 시간대와 다음 확장 선택을 화면에서 이해할 수 있어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["WI-NATURE-15"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["world-atmosphere.r1"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["world-atmosphere.r1"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["evidence:nature-night-day2-wi14-playmode-20260826"] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": ["evidence:nature-dual-loop-game-view-20260826"] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-presentation-e7-20260826"] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-wi15-playmode-20260826"] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E4",
+    "status": "Blocked",
+    "candidateRevision": "nature-night-day2.r1/world-atmosphere.r1/simulation-save.v28",
+    "evidenceRefs": ["evidence:nature-night-day2-wi15-hosted-parity-20260826", "evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-night-day2-presentation-e7-20260826"],
+    "openFeedbackRefs": ["feedback:nature-night-day2:sky-engine-runtime.r1", "feedback:nature-night-day2:pipeline-presentation-cursor.r1"]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-night-day2.v1|WI-NATURE-15",
+    "profileRevision": "nature-night-day2.engine-interaction.r2",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Blocked",
+    "integratedStatusCode": "Blocked",
+    "earliestReopenEvidenceStageCode": "E5",
+    "evidenceRefs": ["test:SimulationNatureSurvivalTests", "test:SimulationPlayableLoopEngineInteractionTests"],
+    "blockerCodes": ["PresentationActionRecordCursorEvidenceMissing", "CurrentGameViewPipelineEvidenceMissing"]
+  }
+}

@@ -1,7 +1,7 @@
 {
   "catalogKey": "simulation-world-interactions",
   "schemaVersion": "5",
-  "revision": "simulation-world-interactions.r27",
+  "revision": "simulation-world-interactions.r28",
   "lastVerifiedDate": "2026-08-27",
   "defaultImplementationTargetStage": "E3",
   "defaultIntegrationTargetStage": "E7",
@@ -26,7 +26,8 @@
     "CARD": "메이저 아르카나",
     "CON": "영역 건설",
     "CITY": "도심 운영",
-    "WORLD": "공통 세계 운영"
+    "WORLD": "공통 세계 운영",
+    "REVIEW": "업무 검토"
   },
   "items": [
     {
@@ -503,7 +504,7 @@
       "actorRequirements": ["첫날을 마친 Nature 생존 플레이어"], "spatialRequirements": ["ShelterInterior"], "resourceRequirements": ["계획 비용 표시용 소지·보관 자원"], "reservationKinds": [],
       "previewRule": "새벽·미선택 상태·안정 계획 코드를 검사하고 부족 재료는 차단 대신 목표로 표시한다.", "confirmRule": "계획 코드와 Day2Ready만 고정하며 비용이나 향후 효과를 즉시 적용하지 않는다.", "taskRule": "다음 날 구현에서 계획 비용과 효과를 별도 WI로 실행한다.", "effectCodes": ["ExpansionPlanSelected", "Day2Ready"], "cancellationPolicy": "첫날 저장 기준선에서는 선택을 고정하며 변경은 다음 날 별도 규칙으로 다룬다.", "blockReasonCodes": ["SimulationNatureExpansionPlanInvalid", "SimulationNatureExpansionPlanAlreadySelected", "SimulationNatureSurvivalActionBlocked"],
       "predecessorWiIds": ["WI-NATURE-14"], "successorWiIds": ["WI-CON-01"], "returnContractCodes": ["Day2Ready"], "actionCode": "SelectExpansionPlan", "ruleRevision": "nature-survival.realtime.r2", "saveReplayPayloadCodes": ["NatureSurvivalCommand", "ExpansionPlan", "Day2Ready", "WorldRevision"], "httpContracts": ["POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/previews", "POST /api/simulation/v1/sessions/{sessionStableId}/nature-survival/commands"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"],
-      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["계획 고정, Day2Ready와 simulation-save.v17 canonical hash 재생을 집중 시험한다."] }, "integration": { "status": "Done", "currentStage": "E7", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-15"], "e6RefinementRefs": ["world-interaction-delivery-priorities.r12:wi-nature-15:e6"], "e7EvidenceRefs": ["evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-night-day2-wi15-hosted-parity-20260826"], "evidence": ["오두막 H1에 DawnPlanChoice·DawnPlanChoiceAnchor를 추가하고 실제 nature-home-encounter-defense Graph의 nature-shelter Node에 결정적 Actual E5 결속을 생성했다.", "canonical SimulationWorldShell에서 실제 숫자 1 입력으로 Workbench 계획을 고정하고 Day2Ready Game View·Console 0 오류를 확인했다.", "LocalProcess와 RemoteHost가 계획 선택, 최종 revision, simulation-save.v23 Replay hash와 복원 상태를 동일하게 만들었고 생활 거점 동등성 회귀 4/4가 통과했다."] }, "sourceReferences": ["docs/Architecture/Nature생존생활거점세로조각.md"], "notes": ["재료가 부족해도 계획 선택은 허용하며 부족량은 다음 날 목표다."]
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["계획 고정, Day2Ready와 simulation-save.v17 canonical hash 재생을 집중 시험한다."] }, "integration": { "status": "InProgress", "currentStage": "E6", "targetStage": "E7", "e4SeedbedRefs": ["wi-spatial-seedbed:nature-survival-home.v1"], "e5PlacementRefs": ["binding:actual-e5:wi-nature-15"], "e6RefinementRefs": ["world-interaction-delivery-priorities.r12:wi-nature-15:e6"], "e7EvidenceRefs": ["evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-night-day2-wi15-hosted-parity-20260826"], "evidence": ["오두막 H1에 DawnPlanChoice·DawnPlanChoiceAnchor를 추가하고 실제 nature-home-encounter-defense Graph의 nature-shelter Node에 결정적 Actual E5 결속을 생성했다.", "canonical SimulationWorldShell에서 실제 숫자 1 입력으로 Workbench 계획을 고정하고 Day2Ready Game View·Console 0 오류를 확인했다.", "LocalProcess와 RemoteHost가 계획 선택, 최종 revision, simulation-save.v23 Replay hash와 복원 상태를 동일하게 만들었고 생활 거점 동등성 회귀 4/4가 통과했다."] }, "sourceReferences": ["docs/Architecture/Nature생존생활거점세로조각.md"], "notes": ["재료가 부족해도 계획 선택은 허용하며 부족량은 다음 날 목표다."]
     },
     {
       "id": "WI-NATURE-16", "groupCode": "NATURE", "sequence": 16, "title": "현장 보급 꾸러미 제작", "kind": "Command",
@@ -687,6 +688,15 @@
       "previewRule": "미해결 필수 작업과 마감 조건을 검사한다.", "confirmRule": "ExpectedRevision으로 턴 마감을 확정한다.", "taskRule": "턴 효과와 후속 상태를 결정적으로 계산한다.", "effectCodes": ["TurnClosed"], "cancellationPolicy": "확정된 턴 마감은 취소하지 않고 후속 보정 명령을 사용한다.", "blockReasonCodes": ["TurnClosingBlocked"],
       "predecessorWiIds": [], "successorWiIds": [], "actionCode": "TurnClosing", "ruleRevision": "world-interaction.shared-policy.r1", "saveReplayPayloadCodes": ["TurnClosingConfirm"], "httpContracts": ["기존 turn-closing Preview/Confirm 경로 재사용"], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/SimulationTurnClosing.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["Ssalddel.Simulation.Tests/SimulationTurnClosingTests.cs의 Preview·Confirm·개정·저장재생·Controller 시험 통과."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["Ssalddel.Simulation.Tests/SimulationTurnClosingTests.cs의 Preview·Confirm·개정·저장재생·Controller 시험 통과."] }, "sourceReferences": ["docs/Architecture/세계상호작용단위중심공간Simulation통합.md"], "notes": []
+    },
+    {
+      "id": "WI-REVIEW-01", "groupCode": "REVIEW", "sequence": 1, "title": "NPC 업무 결과 검토 확정", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 자신이 위임한 NPC 업무의 완료 결과와 계보를 검토해 운영 학습 근거를 확정한다.", "startStateCodes": ["NpcWorkCompleted", "ReviewPending"], "completionStateCodes": ["NpcWorkReviewConfirmed"],
+      "actorRequirements": ["위임을 발의한 플레이어"], "spatialRequirements": [], "resourceRequirements": ["위임 행위 기록", "NPC 완료 행위 기록"], "reservationKinds": [],
+      "previewRule": "플레이어·위임·NPC 완료 기록의 연결과 중복 검토 여부를 읽기 전용으로 검사한다.", "confirmRule": "ExpectedRevision과 CommandId로 검토 결과와 운영 숙련 효과를 한 번만 확정한다.", "taskRule": "검토는 즉시 완료하며 NPC의 실제 작업 결과를 다시 실행하지 않는다.", "effectCodes": ["NpcWorkReviewConfirmed", "PlayerOperationalProficiencyChanged"], "cancellationPolicy": "Confirm 전에는 상태를 바꾸지 않으며 완료된 검토는 같은 CommandId로 멱등 조회한다.", "blockReasonCodes": ["NpcWorkReviewLineageInvalid", "NpcWorkReviewUnauthorized", "NpcWorkReviewAlreadyConfirmed"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "NpcWorkReviewConfirm", "ruleRevision": "player-domain-progress.r1", "saveReplayPayloadCodes": ["ActionManifestationLedger", "PlayerDomainProfile", "simulation-save.v28"], "httpContracts": ["첫 E1~E3 판본은 Simulation Core 계약만 제공하고 HTTP 노출은 후속 E4 결속에서 결정한다."], "existingImplementationReferences": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerDomainProficiency.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationActionManifestationLedger.cs"],
+      "implementation": { "status": "InProgress", "currentStage": "E2", "targetStage": "E3", "evidence": ["행위 발현 기록 계보와 위임·NPC 완료·플레이어 검토 3중 결속 규칙 및 집중 단위시험을 추가했다."] }, "integration": { "status": "NotSelected", "currentStage": "E1", "targetStage": "E7", "evidence": ["실제 NPC 작업 완료 Adapter, 주 세션 저장과 Unity 검토 입력은 후속이다."] }, "sourceReferences": ["docs/Architecture/WI단일책임원칙.md", "docs/Architecture/플레이어중심게임개발업무구조.md"], "notes": ["WI-WORLD-09는 별도 작업에서 지형 평탄화 후보로 예약되어 있어 REVIEW 작업군을 신설했다.", "NPC 작업 완료만으로 플레이어 숙련을 지급하지 않는다."]
     }
   ]
 }

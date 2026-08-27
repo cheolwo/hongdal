@@ -114,7 +114,7 @@ if ($activeWorkState -eq "Active") {
     else {
         @($stageReviews | Where-Object {
                 [Array]::IndexOf(@("E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"),
-                    [string] $_.stageCode) -le $currentStageIndex
+                    [string] $_.stageCode) -lt $currentStageIndex
             } | ForEach-Object stageCode)
     }
     Require (($passedStageCodes -join ",") -eq ($expectedPassedStageCodes -join ",")) `

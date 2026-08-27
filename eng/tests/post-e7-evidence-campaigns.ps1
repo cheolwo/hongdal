@@ -6,7 +6,7 @@ $manager = Join-Path $repositoryRoot `
     "eng/execution-ledgers/manage-post-e7-evidence-campaigns.ps1"
 $result = & $manager -Mode Write
 if ([string] $result -ne
-    "PostE7EvidenceCampaignsValid:E8=16;E9=4;Deferred=2;E10=1;Revision=post-e7-evidence-campaigns.r6") {
+    "PostE7EvidenceCampaignsValid:E8=16;E9=4;Deferred=2;E10=1;Revision=post-e7-evidence-campaigns.r7") {
     throw "PostE7EvidenceCampaignValidationFailed:$result"
 }
 $check = & $manager -Mode Check

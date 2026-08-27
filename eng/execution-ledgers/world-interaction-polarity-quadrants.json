@@ -1,6 +1,6 @@
 {
   "schemaVersion": "world-interaction-polarity-quadrants.v1",
-  "revision": "world-interaction-polarity-quadrants.r4",
+  "revision": "world-interaction-polarity-quadrants.r5",
   "lastVerifiedDate": "2026-08-27",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
@@ -39,7 +39,7 @@
     "WI-001", "WI-HUB-03", "WI-MARKET-02", "WI-MARKET-03",
     "WI-NATURE-04", "WI-NATURE-12", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-NATURE-17",
     "WI-ORDER-01", "WI-ORDER-07", "WI-REFLECT-01",
-    "WI-WORLD-02", "WI-WORLD-03", "WI-WORLD-06", "WI-WORLD-07", "WI-WORLD-08"
+    "WI-WORLD-02", "WI-WORLD-03", "WI-WORLD-06", "WI-WORLD-07", "WI-WORLD-08", "WI-REVIEW-01"
   ],
   "contextualWorldInteractionIds": [
     "WI-CON-01", "WI-NATURE-03", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-16", "WI-WORLD-04"

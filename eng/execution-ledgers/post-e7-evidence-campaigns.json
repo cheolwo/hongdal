@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "post-e7-evidence-campaigns.v3",
-  "revision": "post-e7-evidence-campaigns.r6",
+  "schemaVersion": "post-e7-evidence-campaigns.v4",
+  "revision": "post-e7-evidence-campaigns.r7",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "principles": {
@@ -16,7 +16,9 @@
     "automaticValidationCannotApproveE9OrE10": true,
     "findingReopensE9OrEarliestAffectedE1ToE8": true,
     "revisionChangeInvalidatesActiveObservationWindow": true,
-    "operationalEffectsRequireSeparateAuthority": true
+    "operationalEffectsRequireSeparateAuthority": true,
+    "pipelineProfileBundleIsFrozenEvidence": true,
+    "pipelineFailureReopensEarliestResponsibleStage": true
   },
   "allowedCampaignStatusCodes": ["WaitingForE7", "Ready", "WaitingForStableMembers", "InProgress", "Blocked", "Passed"],
   "allowedModuleStatusCodes": ["Pending", "Passed", "Blocked", "NotApplicable"],
@@ -29,20 +31,28 @@
     "requiresLocalRemoteParity": true,
     "requiredPresentationActualInputRunCount": 2,
     "requiresSaveReentry": true,
-    "requiredBlockingConsoleErrorCount": 0
+    "requiredBlockingConsoleErrorCount": 0,
+    "requiresActionJournalHashParity": true,
+    "requiresConditionalProgressionHashParity": true,
+    "requiresPipelineTraceDigestParity": true
   },
   "requiredHarmonyModuleCodesByTrack": {
     "Logic": ["authority-revision-interleave", "resource-time-result-handoff", "failure-recovery-return", "npc-life-continuity"],
     "Presentation": ["space-traversal-presentation", "camera-input-continuity", "state-result-feedback", "npc-behavior-observability"]
+  },
+  "pipelineHarmonyPolicy": {
+    "requiresActionRecordLineage": true,
+    "requiresEngineCursorContinuity": true,
+    "requiresSharedProfileBundleHash": true
   },
   "requiredHumanMetricCodesByTrack": {
     "Logic": ["CausalCoherence", "ChoiceConsequence", "ProgressionContinuity"],
     "Presentation": ["Readability", "FeedbackClarity", "TransitionNaturalness"]
   },
   "playableUnitStabilityCampaigns": [
-    { "stabilityCampaignStableId": "stability:nature-shelter-foundation.v1", "loopStableId": "playable-loop:nature-shelter-foundation.v1", "evidenceStageCode": "E8", "statusCode": "Passed", "promotionEligible": true, "currentEvidenceStage": "E7", "observedClosureStateCode": "PlayClosed", "observedLoopStatusCode": "Validated", "candidateRevision": "actor-equipment.r1/simulation-save.v27", "candidateBuildHash": "unity:6e0f022;hongdal:75742dc7", "results": { "logicDeterministicRunCount": 3, "saveRestoreReplayPassed": true, "localRemoteParityPassed": true, "presentationActualInputRunCount": 3, "saveReentryPassed": true, "blockingConsoleErrorCount": 0, "evidenceRefs": ["evidence:nature-shelter-e8-logic-20260827", "evidence:nature-shelter-e8-presentation-20260827"] }, "blockers": [] },
-    { "stabilityCampaignStableId": "stability:nature-twilight-return.v1", "loopStableId": "playable-loop:nature-twilight-return.v1", "evidenceStageCode": "E8", "statusCode": "Passed", "promotionEligible": true, "currentEvidenceStage": "E7", "observedClosureStateCode": "PlayClosed", "observedLoopStatusCode": "Validated", "candidateRevision": "nature-survival.realtime.r2/simulation-save.v27", "candidateBuildHash": "unity:2bde342;hongdal:f2e3d0a2", "results": { "logicDeterministicRunCount": 3, "saveRestoreReplayPassed": true, "localRemoteParityPassed": true, "presentationActualInputRunCount": 4, "saveReentryPassed": true, "blockingConsoleErrorCount": 0, "evidenceRefs": ["evidence:nature-twilight-e8-logic-20260827", "evidence:nature-twilight-e8-presentation-20260827"] }, "blockers": [] },
-    { "stabilityCampaignStableId": "stability:nature-night-day2.v1", "loopStableId": "playable-loop:nature-night-day2.v1", "evidenceStageCode": "E8", "statusCode": "WaitingForE7", "promotionEligible": false, "currentEvidenceStage": "E6", "observedClosureStateCode": "Open", "observedLoopStatusCode": "InProgress", "candidateRevision": "", "candidateBuildHash": "", "results": { "logicDeterministicRunCount": 0, "saveRestoreReplayPassed": false, "localRemoteParityPassed": false, "presentationActualInputRunCount": 0, "saveReentryPassed": false, "blockingConsoleErrorCount": -1, "evidenceRefs": [] }, "blockers": ["PlayableUnit E7이 아직 닫히지 않았다."] },
+    { "stabilityCampaignStableId": "stability:nature-shelter-foundation.v1", "loopStableId": "playable-loop:nature-shelter-foundation.v1", "evidenceStageCode": "E8", "statusCode": "Blocked", "promotionEligible": false, "currentEvidenceStage": "E7", "observedClosureStateCode": "PlayClosed", "observedLoopStatusCode": "Validated", "candidateRevision": "actor-equipment.r1/simulation-save.v27", "candidateBuildHash": "unity:6e0f022;hongdal:75742dc7", "pipelineProfileBundleHash": "", "results": { "logicDeterministicRunCount": 3, "saveRestoreReplayPassed": true, "localRemoteParityPassed": true, "presentationActualInputRunCount": 3, "saveReentryPassed": true, "blockingConsoleErrorCount": 0, "actionJournalHashParityPassed": false, "conditionalProgressionHashParityPassed": false, "pipelineTraceDigestParityPassed": false, "evidenceRefs": ["evidence:nature-shelter-e8-logic-20260827", "evidence:nature-shelter-e8-presentation-20260827"] }, "blockers": ["기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다."] },
+    { "stabilityCampaignStableId": "stability:nature-twilight-return.v1", "loopStableId": "playable-loop:nature-twilight-return.v1", "evidenceStageCode": "E8", "statusCode": "Blocked", "promotionEligible": false, "currentEvidenceStage": "E7", "observedClosureStateCode": "PlayClosed", "observedLoopStatusCode": "Validated", "candidateRevision": "nature-survival.realtime.r2/simulation-save.v27", "candidateBuildHash": "unity:2bde342;hongdal:f2e3d0a2", "pipelineProfileBundleHash": "", "results": { "logicDeterministicRunCount": 3, "saveRestoreReplayPassed": true, "localRemoteParityPassed": true, "presentationActualInputRunCount": 4, "saveReentryPassed": true, "blockingConsoleErrorCount": 0, "actionJournalHashParityPassed": false, "conditionalProgressionHashParityPassed": false, "pipelineTraceDigestParityPassed": false, "evidenceRefs": ["evidence:nature-twilight-e8-logic-20260827", "evidence:nature-twilight-e8-presentation-20260827"] }, "blockers": ["기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다."] },
+    { "stabilityCampaignStableId": "stability:nature-night-day2.v1", "loopStableId": "playable-loop:nature-night-day2.v1", "evidenceStageCode": "E8", "statusCode": "WaitingForE7", "promotionEligible": false, "currentEvidenceStage": "E4", "observedClosureStateCode": "Open", "observedLoopStatusCode": "InProgress", "candidateRevision": "", "candidateBuildHash": "", "results": { "logicDeterministicRunCount": 0, "saveRestoreReplayPassed": false, "localRemoteParityPassed": false, "presentationActualInputRunCount": 0, "saveReentryPassed": false, "blockingConsoleErrorCount": -1, "evidenceRefs": [] }, "blockers": ["행위 원장·표현 cursor 통합 관문을 E5부터 다시 닫아야 한다."] },
     { "stabilityCampaignStableId": "stability:nature-workbench-foundation.v1", "loopStableId": "playable-loop:nature-workbench-foundation.v1", "evidenceStageCode": "E8", "statusCode": "WaitingForE7", "promotionEligible": false, "currentEvidenceStage": "E6", "observedClosureStateCode": "Open", "observedLoopStatusCode": "InProgress", "candidateRevision": "", "candidateBuildHash": "", "results": { "logicDeterministicRunCount": 0, "saveRestoreReplayPassed": false, "localRemoteParityPassed": false, "presentationActualInputRunCount": 0, "saveReentryPassed": false, "blockingConsoleErrorCount": -1, "evidenceRefs": [] }, "blockers": ["PlayableUnit E7이 아직 닫히지 않았다."] },
     { "stabilityCampaignStableId": "stability:nature-field-supply-return.v1", "loopStableId": "playable-loop:nature-field-supply-return.v1", "evidenceStageCode": "E8", "statusCode": "WaitingForE7", "promotionEligible": false, "currentEvidenceStage": "E1", "observedClosureStateCode": "Open", "observedLoopStatusCode": "InProgress", "candidateRevision": "", "candidateBuildHash": "", "results": { "logicDeterministicRunCount": 0, "saveRestoreReplayPassed": false, "localRemoteParityPassed": false, "presentationActualInputRunCount": 0, "saveReentryPassed": false, "blockingConsoleErrorCount": -1, "evidenceRefs": [] }, "blockers": ["PlayableUnit E7이 아직 닫히지 않았다."] },
     { "stabilityCampaignStableId": "stability:farm-crop-cycle.v1", "loopStableId": "playable-loop:farm-crop-cycle.v1", "evidenceStageCode": "E8", "statusCode": "WaitingForE7", "promotionEligible": false, "currentEvidenceStage": "E1", "observedClosureStateCode": "Open", "observedLoopStatusCode": "InProgress", "candidateRevision": "", "candidateBuildHash": "", "results": { "logicDeterministicRunCount": 0, "saveRestoreReplayPassed": false, "localRemoteParityPassed": false, "presentationActualInputRunCount": 0, "saveReentryPassed": false, "blockingConsoleErrorCount": -1, "evidenceRefs": [] }, "blockers": ["PlayableUnit E7이 아직 닫히지 않았다."] },
@@ -71,16 +81,16 @@
       "blockers": ["다섯 Core PlayableUnit의 E8 안정성 증거가 아직 없다."], "nextAction": "현재 Goal을 E7까지 닫은 뒤 PlayableUnit별 E8 안정성을 순서대로 검증한다."
     },
     {
-      "harmonySetStableId": "area-harmony:nature-first-evening.v1", "evidenceStageCode": "E9", "areaCode": "Nature", "aggregateLoopStableId": "playable-loop:nature-survival-homestead.v1", "statusCode": "Ready", "promotionEligible": false, "frozenWorldRevision": "", "candidateBuildHash": "",
+      "harmonySetStableId": "area-harmony:nature-first-evening.v1", "evidenceStageCode": "E9", "areaCode": "Nature", "aggregateLoopStableId": "playable-loop:nature-survival-homestead.v1", "statusCode": "WaitingForStableMembers", "promotionEligible": false, "frozenWorldRevision": "", "candidateBuildHash": "",
       "requiredMemberStabilityCampaignStableIds": ["stability:nature-shelter-foundation.v1", "stability:nature-twilight-return.v1"],
       "executionOrderProfiles": ["Shelter-Twilight-ObserverVictory-SafeReturn", "Shelter-Twilight-Retreat-SafeReturn"],
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentEvidenceStage": "E8", "targetEvidenceStage": "E9", "statusCode": "Ready", "moduleReviews": [{"moduleCode":"authority-revision-interleave","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"resource-time-result-handoff","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"failure-recovery-return","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"npc-life-continuity","statusCode":"NotApplicable","applicabilityCode":"NotApplicable","evidenceRefs":["reason:no-npc-actor-in-first-evening-scope"]}] },
-        "presentation": { "trackCode": "Presentation", "currentEvidenceStage": "E8", "targetEvidenceStage": "E9", "statusCode": "Ready", "moduleReviews": [{"moduleCode":"space-traversal-presentation","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"camera-input-continuity","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"state-result-feedback","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"npc-behavior-observability","statusCode":"NotApplicable","applicabilityCode":"NotApplicable","evidenceRefs":["reason:no-npc-actor-in-first-evening-scope"]}] }
+        "logic": { "trackCode": "Logic", "currentEvidenceStage": "E8", "targetEvidenceStage": "E9", "statusCode": "WaitingForStableMembers", "moduleReviews": [{"moduleCode":"authority-revision-interleave","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"resource-time-result-handoff","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"failure-recovery-return","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"npc-life-continuity","statusCode":"NotApplicable","applicabilityCode":"NotApplicable","evidenceRefs":["reason:no-npc-actor-in-first-evening-scope"]}] },
+        "presentation": { "trackCode": "Presentation", "currentEvidenceStage": "E8", "targetEvidenceStage": "E9", "statusCode": "WaitingForStableMembers", "moduleReviews": [{"moduleCode":"space-traversal-presentation","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"camera-input-continuity","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"state-result-feedback","statusCode":"Pending","applicabilityCode":"Required","evidenceRefs":[]},{"moduleCode":"npc-behavior-observability","statusCode":"NotApplicable","applicabilityCode":"NotApplicable","evidenceRefs":["reason:no-npc-actor-in-first-evening-scope"]}] }
       },
       "humanAcceptance": { "requiredRatingCodes": ["Fun","Immersion","Completeness"], "minimumRating": 4, "requiredMetricCodesByTrack": {"Logic":["CausalCoherence","ChoiceConsequence","ProgressionContinuity"],"Presentation":["Readability","FeedbackClarity","TransitionNaturalness"]}, "sessions": [], "findings": [], "humanCandidateApproval": false, "approvedCandidateRevision": "", "approvedCandidateBuildHash": "" },
-      "integratedGate": { "currentEvidenceStage": "E8", "targetEvidenceStage": "E9", "statusCode": "Ready", "evidenceRefs": ["evidence:nature-shelter-e8-logic-20260827", "evidence:nature-shelter-e8-presentation-20260827", "evidence:nature-twilight-e8-logic-20260827", "evidence:nature-twilight-e8-presentation-20260827"], "openFeedbackRefs": [] },
-      "blockers": ["같은 후보 build의 승리·후퇴 순서에 대한 사람 논리·표현 평가와 재미·몰입·완성도 승인을 아직 실행하지 않았다."], "nextAction": "생활거점→황혼 직접 개입→거점 귀환과 생활거점→황혼 후퇴→거점 귀환을 같은 후보 build에서 사람이 평가한다."
+      "integratedGate": { "currentEvidenceStage": "E8", "targetEvidenceStage": "E9", "statusCode": "WaitingForStableMembers", "evidenceRefs": ["evidence:nature-shelter-e8-logic-20260827", "evidence:nature-shelter-e8-presentation-20260827", "evidence:nature-twilight-e8-logic-20260827", "evidence:nature-twilight-e8-presentation-20260827"], "openFeedbackRefs": ["feedback:pipeline-gate-retroactive-r1"] },
+      "blockers": ["두 구성원의 기존 v27 E8 증거가 행위 원장·조건부 성장·파이프라인 trace 소급 관문으로 무효화됐다."], "nextAction": "두 PlayableUnit을 v28 후보로 다시 안정화한 뒤 같은 profile bundle hash에서 사람 평가를 재개한다."
     },
     {
       "harmonySetStableId": "area-harmony:farm-core.v1", "evidenceStageCode": "E9", "areaCode": "Farm", "aggregateLoopStableId": "playable-loop:farm-internal-production.v1", "statusCode": "WaitingForStableMembers", "promotionEligible": false, "frozenWorldRevision": "", "candidateBuildHash": "",
@@ -116,6 +126,6 @@
     { "profileCode": "ReleasePilot", "platformCode": "WindowsX64", "authorityLocationCode": "LocalProcess", "minimumDistinctDays": 7, "minimumCompletedSessions": 20, "minimumTesterCount": 3, "minimumFreshTargetPlayerCount": 1, "requiresRollbackExercise": true }
   ],
   "limitedOperationWindows": [
-    { "windowStableId": "limited-operation:nature-core-internal.v1", "evidenceStageCode": "E10", "areaHarmonySetStableId": "area-harmony:nature-core.v1", "profileCode": "InternalPilot", "statusCode": "WaitingForStableMembers", "promotionEligible": false, "candidateRevision": "", "candidateBuildHash": "", "startedAt": "", "endedAt": "", "observedDistinctDays": 0, "completedSessionCount": 0, "testerCount": 0, "freshTargetPlayerCount": 0, "crashCount": 0, "unhandledExceptionCount": 0, "saveCorruptionCount": 0, "replayHashMismatchCount": 0, "rollbackExercisePassed": false, "humanContinueOperationApproval": false, "externalOperationalEffectsAuthorized": false, "blockers": ["area-harmony:nature-core.v1의 E9 사람 승인이 아직 없다."] }
+    { "windowStableId": "limited-operation:nature-core-internal.v1", "evidenceStageCode": "E10", "areaHarmonySetStableId": "area-harmony:nature-core.v1", "profileCode": "InternalPilot", "statusCode": "WaitingForStableMembers", "promotionEligible": false, "candidateRevision": "", "candidateBuildHash": "", "startedAt": "", "endedAt": "", "observedDistinctDays": 0, "completedSessionCount": 0, "testerCount": 0, "freshTargetPlayerCount": 0, "crashCount": 0, "unhandledExceptionCount": 0, "saveCorruptionCount": 0, "replayHashMismatchCount": 0, "duplicateActionRecordCount": 0, "actionJournalHashMismatchCount": 0, "progressionHashMismatchCount": 0, "engineCursorRebuildFailureCount": 0, "rollbackExercisePassed": false, "humanContinueOperationApproval": false, "externalOperationalEffectsAuthorized": false, "blockers": ["area-harmony:nature-core.v1의 E9 사람 승인이 아직 없다."] }
   ]
 }

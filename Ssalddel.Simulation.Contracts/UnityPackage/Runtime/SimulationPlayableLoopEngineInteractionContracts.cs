@@ -6,6 +6,9 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string WorldInteractionPipeline = "WI.ExecutionPipeline";
         public const string AuthorityCore = "Simulation.AuthorityCore";
+        public const string ActionJournal = "Simulation.ActionJournal";
+        public const string PlayerDomainProgression =
+            "Simulation.PlayerDomainProgression";
         public const string LhSurface = "LH.Surface";
         public const string SkyPresentation = "Sky.Presentation";
         public const string ExteriorPlacement = "Placement.Exterior";
@@ -25,6 +28,9 @@ namespace Ssalddel.Simulation.Contracts
         public const string Preview = "Preview";
         public const string Confirm = "Confirm";
         public const string AuthorityCommit = "AuthorityCommit";
+        public const string ActionRecordAppend = "ActionRecordAppend";
+        public const string PlayerProgressionApply = "PlayerProgressionApply";
+        public const string ActionRecordRead = "ActionRecordRead";
         public const string SurfacePreparation = "SurfacePreparation";
         public const string AtmosphereProjection = "AtmosphereProjection";
         public const string ExteriorPlacement = "ExteriorPlacement";
@@ -76,6 +82,8 @@ namespace Ssalddel.Simulation.Contracts
     {
         public string ComponentCode { get; set; } = string.Empty;
         public string PhaseCode { get; set; } = string.Empty;
+        public string MaturityTrackCode { get; set; } = "Logic";
+        public string EarliestReopenEvidenceStageCode { get; set; } = "E3";
         public bool AllowsReused { get; set; } = true;
         public bool AllowsNotApplicable { get; set; }
     }
@@ -85,6 +93,10 @@ namespace Ssalddel.Simulation.Contracts
         public string ProfileRevision { get; set; } = string.Empty;
         public string PlayableLoopStableId { get; set; } = string.Empty;
         public string WorldInteractionId { get; set; } = string.Empty;
+        public string[] ExpectedChangeSemanticCodes { get; set; }
+            = Array.Empty<string>();
+        public string[] RequiredPresentationConsumerCodes { get; set; }
+            = Array.Empty<string>();
         public SimulationPlayableLoopEngineRequirement[] Requirements { get; set; }
             = Array.Empty<SimulationPlayableLoopEngineRequirement>();
     }

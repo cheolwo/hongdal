@@ -28,13 +28,13 @@ if ($catalog -notmatch "public string 실행파동Code" -or
     $catalog -notmatch "public string 목표EvidenceStage" -or
     $catalog -notmatch "public string 개발작업상태Code" -or
     $catalog -notmatch "public string NpcE8정책Code" -or
-    $catalog -notmatch 'ActiveWorldInteractionId = "WI-ACTOR-02"' -or
-    $catalog -notmatch 'ActiveEvidenceStage = "E5"' -or
+    $catalog -notmatch 'ActiveWorldInteractionId = "WI-NATURE-15"' -or
+    $catalog -notmatch 'ActiveEvidenceStage = "E6"' -or
     $catalog -notmatch "WorkInProgressLimit = 1" -or
     $catalog -notmatch "SimulationWI실행우선순위Catalog") {
     throw "WorldInteractionDeliveryPriorityContractShapeInvalid"
 }
-if ($check -notmatch "WorldInteractionDeliveryPrioritiesValid:64") {
+if ($check -notmatch "WorldInteractionDeliveryPrioritiesValid:65") {
     throw "WorldInteractionDeliveryPriorityValidationDidNotComplete"
 }
 

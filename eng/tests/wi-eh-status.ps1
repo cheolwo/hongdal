@@ -27,13 +27,13 @@ $status = Get-Content -LiteralPath $jsonPath -Raw -Encoding UTF8 | ConvertFrom-J
 if ([string] $status.schemaVersion -ne "simulation-world-interaction-eh-status.v1") {
     throw "WorldInteractionEhStatusSchemaInvalid"
 }
-$summaryInvalid = $status.summary.totalWorldInteractions -ne 64 -or
+$summaryInvalid = $status.summary.totalWorldInteractions -ne 65 -or
     $status.summary.implementationE3Count -ne 60 -or
     $status.summary.establishedH1Count -ne 14 -or
     $status.summary.establishedH3Count -ne 15 -or
     $status.summary.candidateLineageCount -ne 21 -or
     $status.summary.missingRequiredCount -ne 5 -or
-    $status.summary.notApplicableCount -ne 9
+    $status.summary.notApplicableCount -ne 10
 if ($summaryInvalid) {
     throw "WorldInteractionEhStatusSummaryInvalid"
 }
@@ -126,7 +126,7 @@ $cityMissing = @($status.items | Where-Object {
 if ($cityMissing.Count -ne 4) {
     throw "WorldInteractionCityPlannedSpatialGapInvalid"
 }
-if ($check -notmatch "WorldInteractionEhStatusValid:Items=64") {
+if ($check -notmatch "WorldInteractionEhStatusValid:Items=65") {
     throw "WorldInteractionEhStatusCheckDidNotComplete"
 }
 

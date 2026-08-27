@@ -267,7 +267,7 @@ foreach ($item in @($catalog.items)) {
     $itemsById[$id] = $item
 }
 
-Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 52) "CommandCountMustBe52"
+Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 53) "CommandCountMustBe53"
 Require (@($catalog.items | Where-Object kind -eq "AutomaticTransition").Count -eq 11) "AutomaticTransitionCountMustBe11"
 Require (@($catalog.items | Where-Object kind -eq "SharedPolicy").Count -eq 1) "SharedPolicyCountMustBe1"
 
@@ -431,8 +431,8 @@ Add-PolarityAssignments @($polarityCatalog.notApplicableWorldInteractionIds) `
 Require ($polarityByWi.Count -eq $itemsById.Count) "PolarityCoverageMismatch"
 Require (@($polarityCatalog.fixedYangWorldInteractionIds).Count -eq 27) `
     "FixedYangCountMustBe27"
-Require (@($polarityCatalog.fixedYinWorldInteractionIds).Count -eq 23) `
-    "FixedYinCountMustBe23"
+Require (@($polarityCatalog.fixedYinWorldInteractionIds).Count -eq 24) `
+    "FixedYinCountMustBe24"
 Require (@($polarityCatalog.contextualWorldInteractionIds).Count -eq 6) `
     "ContextualPolarityCountMustBe6"
 Require (@($polarityCatalog.notApplicableWorldInteractionIds).Count -eq 8) `

@@ -2,12 +2,12 @@
 
 > 이 문서는 E/H 원장·공간 재고·공식 H 정의를 대조해 자동 생성한다. 직접 수정하지 않는다.
 
-- WI: `64개` · E3: `60개`
+- WI: `65개` · E3: `60개`
 - E4/H1 실행 성립: `14개`
 - E5/H3 실제 공간 결속: `15개`
 - H1~H4 설계 후보 계보만 존재: `21개`
 - 필수 공간 설계 누락: `5개`
-- 공간 비적용: `9개`
+- 공간 비적용: `10개`
 - 공식 H 정의: `H1 8 / H2 0 / H3 5 / H4 1`
 
 후보 H2·H3·H4 계보와 Graph binding은 설계 입력이며 E 단계나 실제 배치를 자동 승격하지 않는다.
@@ -100,7 +100,7 @@
 | 진행 중 작업 취소 · `WI-NATURE-12` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 획득 자원 거점 보관 · `WI-NATURE-13` | `E3/E7` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
 | 오두막에서 수면·새벽 맞기 · `WI-NATURE-14` | `E3/E5` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
-| 다음 날 거점 확장 계획 선택 · `WI-NATURE-15` | `E3/E7` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
+| 다음 날 거점 확장 계획 선택 · `WI-NATURE-15` | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
 | 현장 보급 꾸러미 제작 · `WI-NATURE-16` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 현장 보급 제작 업무 위임 · `WI-NATURE-17` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 벌목 통나무 줍기 · `WI-NATURE-18` | `E3/E7` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
@@ -122,6 +122,12 @@
 | WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 승인 자료로 거점 성찰 확정 · `WI-REFLECT-01` | `E3/E3` | `Required` | `-` | `MissingRequired` | `P1` | `BlockedMissingDesign` | RequiredSpatialDesignMissing |
+
+## 업무 검토 (`REVIEW`)
+
+| WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| NPC 업무 결과 검토 확정 · `WI-REVIEW-01` | `E2/E1` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 
 ## 공통 세계 운영 (`WORLD`)
 

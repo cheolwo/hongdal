@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-interaction-responsibilities.v1",
-  "revision": "simulation-world-interaction-responsibilities.r4",
+  "revision": "simulation-world-interaction-responsibilities.r5",
   "lastVerifiedDate": "2026-08-27",
   "principles": {
     "oneIntentPerWorldInteraction": true,
@@ -91,9 +91,14 @@
     "WI-WORLD-05": "RegionDiscovered",
     "WI-WORLD-06": "TeamRoleCardEquipped",
     "WI-WORLD-07": "TeamActivityStarted",
-    "WI-WORLD-08": "TurnClosed"
+    "WI-WORLD-08": "TurnClosed",
+    "WI-REVIEW-01": "NpcWorkReviewConfirmed"
   },
   "atomicBundles": [
+    {
+      "worldInteractionId": "WI-REVIEW-01",
+      "reason": "업무 검토 완료와 운영 숙련 근거 확정은 같은 검토 결과에서 함께 성립해야 한다."
+    },
     {
       "worldInteractionId": "WI-FARM-04",
       "reason": "수확 Lot 생성과 재배 단위 수확 완료는 하나의 수확 원자성 안에서 함께 성립해야 한다."

@@ -24,7 +24,7 @@
       "managementSystem": "G1",
       "koreanName": "\uD68C\uADC0 \uC99D\uAC70",
       "technicalName": "E3\uD68C\uADC0\uC99D\uAC70Module",
-      "primaryCount": 186,
+      "primaryCount": 187,
       "secondaryCount": 1
     },
     {
@@ -3835,7 +3835,7 @@
       ]
     },
     {
-      "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate::ExecuteWorldInteraction(Ssalddel.Simulation.Contracts.SimulationWorldInteractionInvocationRecord,Func\u00601,System.Func\u00603[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[Ssalddel.Simulation.Contracts.SimulationWorldInteractionManifestationRecord, Ssalddel.Simulation.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]])",
+      "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate::ExecuteWorldInteraction(Ssalddel.Simulation.Contracts.SimulationWorldInteractionInvocationRecord,Func\u00601,System.Func\u00603[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[Ssalddel.Simulation.Contracts.Simulation\uC138\uACC4\uC0C1\uD638\uC791\uC6A9\uAD8C\uC704\uC99D\uAC70Bundle, Ssalddel.Simulation.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]])",
       "isCoverageCandidate": false,
       "assemblyName": "Ssalddel.Simulation.Domain",
       "componentName": "Ssalddel.Simulation.Domain.\uACBD\uC601SimulationSessionAggregate.ExecuteWorldInteraction",
@@ -5010,6 +5010,25 @@
       "primaryEvidenceStage": "E3",
       "responsibility": "Simulation\u00B7Unity \uACC4\uC57D\uACFC \uACB0\uC815\uC131 \uBC0F \uD68C\uADC0 \uC99D\uAC70\uB97C \uAC80\uC99D\uD55C\uB2E4.",
       "boundary": "\uC790\uB3D9 \uC2DC\uD5D8 \uD1B5\uACFC\uC640 \uC2E4\uC81C Play Mode\u00B7Game View\u00B7E \uC2B9\uACA9 \uC99D\uAC70\uB97C \uAD6C\uBD84\uD55C\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationActionManifestationAndPlayerDomainTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationActionManifestationAndPlayerDomainTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationActionManifestationAndPlayerDomainTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uAD8C\uC704 \uD589\uC704 \uC6D0\uC7A5\uACFC \uD50C\uB808\uC774\uC5B4 \uBD84\uC57C \uC131\uC7A5\uC758 \uACB0\uC815\uC131\u00B7\uC800\uC7A5\u00B7\uACC4\uBCF4 \uD68C\uADC0\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 Unity \uC5D4\uC9C4 cursor \uC18C\uBE44\uB098 Play Mode\u00B7Game View \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -12300,8 +12319,8 @@
     }
   ],
   "coverage": {
-    "candidateTypeCount": 589,
-    "annotatedTypeCount": 586,
+    "candidateTypeCount": 590,
+    "annotatedTypeCount": 587,
     "excludedTypeCount": 3,
     "uncoveredTypeCount": 0,
     "annotatedMethodCount": 17

@@ -2,16 +2,16 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interactions.json`와 참조된 단일 책임·조립 흐름·음양 사분면 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 대장 개정: `simulation-world-interactions.r27`
+- 대장 개정: `simulation-world-interactions.r28`
 - 증거 단계 개정: `simulation-evidence-stages.r13`
-- WI 발생원 개정: `world-interaction-trigger-sources.r6`
-- WI 단일 책임 개정: `simulation-world-interaction-responsibilities.r4`
+- WI 발생원 개정: `world-interaction-trigger-sources.r7`
+- WI 단일 책임 개정: `simulation-world-interaction-responsibilities.r5`
 - WI 조립 흐름 개정: `simulation-world-interaction-flows.r3`
-- WI 음양·수행주체 사분면 개정: `world-interaction-polarity-quadrants.r4`
+- WI 음양·수행주체 사분면 개정: `world-interaction-polarity-quadrants.r5`
 - 마지막 확인일: `2026-08-27`
 - 기본 구현 완료선: `E3 자동 시험 통과`
 - 실제 공간·공공데이터·Unity 통합 목표선: `E7 실제 플레이 폐루프`
-- 전체 항목: `64`
+- 전체 항목: `65`
 
 ## 읽는 법
 
@@ -25,7 +25,7 @@ WI는 한 행위자의 한 의도와 하나의 주요 권위 결과를 관통하
 
 | 분류 | 수 |
 | --- | ---: |
-| 명시적 명령 | 52 |
+| 명시적 명령 | 53 |
 | 자동 상태 전이 | 11 |
 | 공유 정책 | 1 |
 
@@ -117,7 +117,7 @@ WI는 한 행위자의 한 의도와 하나의 주요 권위 결과를 관통하
 | 진행 중 작업 취소 · `WI-NATURE-12` | 12 | 행위자 의도 | 원자적 부수 효과 | 음(陰) | `WorkCancelled` | PlayerDirect | PlayerDriven, NpcDriven | WorkActive → WorkCancelled, SafeChoiceAvailable | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | 획득 자원 거점 보관 · `WI-NATURE-13` | 13 | 행위자 의도 | 원자적 부수 효과 | 음(陰) | `TimberStored` | PlayerDirect | PlayerDriven, NpcDriven | CabinOperational, PlayerInsideCabin, TimberCarried → TimberStored | 완료 · `E3→E3` | 완료 · `E7→E7` |
 | 오두막에서 수면·새벽 맞기 · `WI-NATURE-14` | 14 | 행위자 의도 | 복합 책임·분리 필요 | 음(陰) | `DawnReached` | PlayerDirect | PlayerDriven, NpcDriven | Night, PlayerInsideCabin, EncounterResolved → Sleeping, DawnReached | 완료 · `E3→E3` | 진행 중 · `E5→E7` |
-| 다음 날 거점 확장 계획 선택 · `WI-NATURE-15` | 15 | 행위자 의도 | 원자적 부수 효과 | 음(陰) | `ExpansionPlanSelected` | PlayerDirect | PlayerDriven, NpcDriven | Dawn, PlanUnselected → Day2Ready, ExpansionPlanSelected | 완료 · `E3→E3` | 완료 · `E7→E7` |
+| 다음 날 거점 확장 계획 선택 · `WI-NATURE-15` | 15 | 행위자 의도 | 원자적 부수 효과 | 음(陰) | `ExpansionPlanSelected` | PlayerDirect | PlayerDriven, NpcDriven | Dawn, PlanUnselected → Day2Ready, ExpansionPlanSelected | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
 | 현장 보급 꾸러미 제작 · `WI-NATURE-16` | 16 | 행위자 의도 | 복합 책임·분리 필요 | 실행 문맥 판정 | `NatureFieldSupplyPackAdded` | PlayerDirect | PlayerDriven, NpcDriven | Day2Ready, NatureWorkbenchOperational, PlayerInsideCabin → NatureFieldSupplyPackAdded, FieldExpeditionChoiceAvailable | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | 현장 보급 제작 업무 위임 · `WI-NATURE-17` | 17 | 행위자 의도 | 복합 책임·분리 필요 | 음(陰) | `NpcFieldSupplyPolicySelected` | NpcRoutine | PlayerDriven, NpcDriven | Day2Ready, NatureWorkbenchOperational, NpcFieldSupplyPolicyEnabled → NatureFieldSupplyPackAdded, FieldExpeditionChoiceAvailable | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | 벌목 통나무 줍기 · `WI-NATURE-18` | 18 | 행위자 의도 | 원자적 부수 효과 | 양(陽) | `TimberCollected` | PlayerDirect | PlayerDriven, NpcDriven | DroppedTimberAvailable, InventoryCapacityAvailable → DroppedTimberCollected, TimberCarried | 완료 · `E3→E3` | 완료 · `E7→E7` |
@@ -139,6 +139,12 @@ WI는 한 행위자의 한 의도와 하나의 주요 권위 결과를 관통하
 | 한국어 기능명 · 고유 식별자 | 대장 순번 | 책임 종류 | 단일 책임 판정 | 음양 정의 | 주요 결과 | 조작 정책 | 허용 발생원 | 시작 → 완료 | 구현 | 통합 |
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 승인 자료로 거점 성찰 확정 · `WI-REFLECT-01` | 1 | 행위자 의도 | 단일 책임 | 음(陰) | `InnerLearningPending` | PlayerDirect | PlayerDriven | ReturnedToBase, NatureSafeChoiceAvailable, ReflectionChoiceAvailable → InnerLearningPending | 완료 · `E3→E3` | 미선정 · `E3→E7` |
+
+## 업무 검토 작업군 (`REVIEW`)
+
+| 한국어 기능명 · 고유 식별자 | 대장 순번 | 책임 종류 | 단일 책임 판정 | 음양 정의 | 주요 결과 | 조작 정책 | 허용 발생원 | 시작 → 완료 | 구현 | 통합 |
+| --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| NPC 업무 결과 검토 확정 · `WI-REVIEW-01` | 1 | 행위자 의도 | 원자적 부수 효과 | 음(陰) | `NpcWorkReviewConfirmed` | PlayerDirect | PlayerDriven | NpcWorkCompleted, ReviewPending → NpcWorkReviewConfirmed | 진행 중 · `E2→E3` | 미선정 · `E1→E7` |
 
 ## 공통 세계 운영 작업군 (`WORLD`)
 

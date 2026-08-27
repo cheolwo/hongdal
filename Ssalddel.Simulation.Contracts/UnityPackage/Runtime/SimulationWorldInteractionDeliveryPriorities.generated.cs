@@ -34,14 +34,14 @@ namespace Ssalddel.Simulation.Contracts
 
     public static class SimulationWI실행우선순위Catalog
     {
-        public const string Revision = "world-interaction-delivery-priorities.r21";
-        public const string ActiveWorldInteractionId = "WI-ACTOR-02";
-        public const string ActiveEvidenceStage = "E5";
+        public const string Revision = "world-interaction-delivery-priorities.r22";
+        public const string ActiveWorldInteractionId = "WI-NATURE-15";
+        public const string ActiveEvidenceStage = "E6";
         public const int WorkInProgressLimit = 1;
         private static readonly SimulationWI실행우선순위Definition[] 항목들 =
         {
             new SimulationWI실행우선순위Definition("WI-ACTOR-01", "D1", 1, "Core", "Queued", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-ACTOR-02", "D1", 2, "Core", "Active", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-ACTOR-02", "D1", 2, "Core", "Queued", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-05", "D1", 3, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-06", "D1", 4, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-07", "D1", 5, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
@@ -56,7 +56,7 @@ namespace Ssalddel.Simulation.Contracts
             new SimulationWI실행우선순위Definition("WI-NATURE-04", "D1", 14, "Extension", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-regional-threat-recovery.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-13", "D1", 15, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-14", "D1", 16, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-15", "D1", 17, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-15", "D1", 17, "Core", "Active", "NotApplicable", "Nature", new[] { "playable-loop:nature-night-day2.v1" }),
             new SimulationWI실행우선순위Definition("WI-CON-01", "D1", 18, "Shared", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-workbench-foundation.v1", "playable-loop:nature-building-learning.v1", "playable-loop:farm-player-placement.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-16", "D1", 19, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-field-supply-return.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-17", "D1", 20, "Core", "Queued", "Required", "Nature", new[] { "playable-loop:nature-field-supply-return.v1" }),
@@ -104,6 +104,7 @@ namespace Ssalddel.Simulation.Contracts
             new SimulationWI실행우선순위Definition("WI-WORLD-06", "D6", 17, "DeferredIntegration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
             new SimulationWI실행우선순위Definition("WI-WORLD-07", "D6", 18, "DeferredIntegration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
             new SimulationWI실행우선순위Definition("WI-WORLD-08", "D6", 19, "DeferredIntegration", "Deferred", "NotApplicable", "None", new[] { "playable-loop:solo-world-day.v1" }),
+            new SimulationWI실행우선순위Definition("WI-REVIEW-01", "D6", 20, "DeferredIntegration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
         };
         public static IReadOnlyList<SimulationWI실행우선순위Definition> All => 항목들;
         public static SimulationWI실행우선순위Definition? Find(string worldInteractionId)

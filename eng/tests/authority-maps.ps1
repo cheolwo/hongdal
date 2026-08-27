@@ -60,8 +60,8 @@ $wiLedgerPath = Join-Path $repoRoot 'eng/execution-ledgers/world-interactions.js
 $wiLedger = Get-Content -LiteralPath $wiLedgerPath -Raw -Encoding utf8 | ConvertFrom-Json
 $wiMap = Get-Content -LiteralPath (Join-Path $mapRoot '04_WI_GAMEPLAY_GRAPH.md') -Raw -Encoding utf8
 $wiIds = @($wiLedger.items | ForEach-Object { $_.id })
-if ($wiIds.Count -ne 64) {
-    throw "Expected 64 WI ledger entries, found $($wiIds.Count). Update the authority map and this gate together."
+if ($wiIds.Count -ne 65) {
+    throw "Expected 65 WI ledger entries, found $($wiIds.Count). Update the authority map and this gate together."
 }
 foreach ($wiId in $wiIds) {
     if (-not $wiMap.Contains($wiId)) {

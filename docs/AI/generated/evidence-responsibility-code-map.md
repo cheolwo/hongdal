@@ -2,8 +2,8 @@
 
 > 이 문서는 C# E 책임 Attribute와 현재 E 책임 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 후보 타입: `589`
-- 책임 지정: `586`
+- 후보 타입: `590`
+- 책임 지정: `587`
 - 사유 있는 제외: `3`
 - 미분류: `0`
 - 메서드 책임: `17`
@@ -14,7 +14,7 @@
 | --- | --- | --- | ---: | ---: |
 | `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 37 | 0 |
 | `E2` | `G1` | `E2실행경계Module` 실행 경계 | 158 | 0 |
-| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 186 | 1 |
+| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 187 | 1 |
 | `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 38 | 0 |
 | `E5` | `G1` | `E5세계발현Module` 세계 발현 | 7 | 0 |
 | `E6` | `G1` | `E6세계정제Module` 세계 정제 | 21 | 0 |
@@ -49,7 +49,7 @@
 
 - `E1`: `28`개
 - `E2`: `139`개
-- `E3`: `165`개
+- `E3`: `166`개
 
 ## 미분류 후보
 
@@ -294,6 +294,7 @@
 | `Ssalddel.Simulation.Tests.InteriorLayoutEngineTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.LocalSimulationRuntimeTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.PyeongchangRepresentativeSelectionTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationActionManifestationAndPlayerDomainTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationActorEquipmentTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationArcanaTownNpcLifeTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationAreaBuildingProgressionTests` | `E3` | `E3.SaveReplayRegression` | `` | `` | `Annotated` |

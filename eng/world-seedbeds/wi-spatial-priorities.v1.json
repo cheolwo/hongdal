@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-spatial-priorities.v1",
   "revision": "simulation-world-interaction-spatial-priorities.r10",
-  "worldInteractionCatalogRevision": "simulation-world-interactions.r27",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r28",
   "spatialParticipationCodes": [
     "Required",
     "Contextual",
@@ -13,6 +13,7 @@
     "WI-CARD-01",
     "WI-ORDER-01",
     "WI-ORDER-02",
+    "WI-REVIEW-01",
     "WI-WORLD-02",
     "WI-WORLD-03",
     "WI-WORLD-06",

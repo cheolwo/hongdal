@@ -15,7 +15,7 @@ namespace Ssalddel.Simulation.Application
     public static class SimulationNatureFirstDayEngineValidationProfiles
     {
         public const string ProfileRevision =
-            "nature-night-day2.engine-interaction.r1";
+            "nature-night-day2.engine-interaction.r2";
         public const string PlayableLoopStableId =
             "playable-loop:nature-night-day2.v1";
 
@@ -34,31 +34,66 @@ namespace Ssalddel.Simulation.Application
                         .WorldInteractionPipeline,
                     SimulationEngineInteractionPhaseCodes.Confirm),
                 Required(SimulationEngineInteractionComponentCodes.AuthorityCore,
-                    SimulationEngineInteractionPhaseCodes.AuthorityCommit),
+                    SimulationEngineInteractionPhaseCodes.AuthorityCommit,
+                    "Logic", "E5"),
+                Required(SimulationEngineInteractionComponentCodes.ActionJournal,
+                    SimulationEngineInteractionPhaseCodes.ActionRecordAppend,
+                    "Logic", "E5"),
+                Required(
+                    SimulationEngineInteractionComponentCodes
+                        .PlayerDomainProgression,
+                    SimulationEngineInteractionPhaseCodes.PlayerProgressionApply,
+                    "Logic", "E5", allowsNotApplicable: true),
                 Required(
                     SimulationEngineInteractionComponentCodes
                         .WorldInteractionPipeline,
-                    SimulationEngineInteractionPhaseCodes.ReturnProjection),
+                    SimulationEngineInteractionPhaseCodes.ReturnProjection,
+                    "Logic", "E5"),
             };
             if (string.Equals(worldInteractionId, "WI-NATURE-14",
                     StringComparison.Ordinal))
             {
                 requirements.Add(Required(
                     SimulationEngineInteractionComponentCodes.LhSurface,
-                    SimulationEngineInteractionPhaseCodes.SurfacePreparation));
+                    SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+                    "Presentation", "E5"));
+                requirements.Add(Required(
+                    SimulationEngineInteractionComponentCodes.LhSurface,
+                    SimulationEngineInteractionPhaseCodes.SurfacePreparation,
+                    "Presentation", "E5"));
                 requirements.Add(Required(
                     SimulationEngineInteractionComponentCodes.SkyPresentation,
-                    SimulationEngineInteractionPhaseCodes.AtmosphereProjection));
+                    SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+                    "Presentation", "E5"));
+                requirements.Add(Required(
+                    SimulationEngineInteractionComponentCodes.SkyPresentation,
+                    SimulationEngineInteractionPhaseCodes.AtmosphereProjection,
+                    "Presentation", "E5"));
                 requirements.Add(Required(
                     SimulationEngineInteractionComponentCodes.ExteriorPlacement,
-                    SimulationEngineInteractionPhaseCodes.ExteriorPlacement));
+                    SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+                    "Presentation", "E5"));
+                requirements.Add(Required(
+                    SimulationEngineInteractionComponentCodes.ExteriorPlacement,
+                    SimulationEngineInteractionPhaseCodes.ExteriorPlacement,
+                    "Presentation", "E5"));
             }
             requirements.Add(Required(
                 SimulationEngineInteractionComponentCodes.InteriorPlacement,
-                SimulationEngineInteractionPhaseCodes.InteriorPlacement));
+                SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+                "Presentation", "E5"));
+            requirements.Add(Required(
+                SimulationEngineInteractionComponentCodes.InteriorPlacement,
+                SimulationEngineInteractionPhaseCodes.InteriorPlacement,
+                "Presentation", "E5"));
             requirements.Add(Required(
                 SimulationEngineInteractionComponentCodes.WorldPresentation,
-                SimulationEngineInteractionPhaseCodes.ReturnProjection));
+                SimulationEngineInteractionPhaseCodes.ActionRecordRead,
+                "Presentation", "E5"));
+            requirements.Add(Required(
+                SimulationEngineInteractionComponentCodes.WorldPresentation,
+                SimulationEngineInteractionPhaseCodes.ReturnProjection,
+                "Presentation", "E5"));
 
             if (worldInteractionId != "WI-NATURE-13"
                 && worldInteractionId != "WI-NATURE-14"
@@ -70,16 +105,38 @@ namespace Ssalddel.Simulation.Application
                 ProfileRevision = ProfileRevision,
                 PlayableLoopStableId = PlayableLoopStableId,
                 WorldInteractionId = worldInteractionId,
+                ExpectedChangeSemanticCodes = worldInteractionId ==
+                                              "WI-NATURE-14"
+                    ? new[]
+                    {
+                        Simulation행위변화의미Codes.Actor상태변경,
+                        Simulation행위변화의미Codes.시간상태변경,
+                        Simulation행위변화의미Codes.대기변경,
+                        Simulation행위변화의미Codes.실내설비변경,
+                    }
+                    : new[]
+                    {
+                        Simulation행위변화의미Codes.Actor상태변경,
+                    },
+                RequiredPresentationConsumerCodes = requirements
+                    .Where(value => value.MaturityTrackCode == "Presentation")
+                    .Select(value => value.ComponentCode)
+                    .Distinct(StringComparer.Ordinal).ToArray(),
                 Requirements = requirements.ToArray(),
             };
         }
 
         private static SimulationPlayableLoopEngineRequirement Required(
-            string componentCode, string phaseCode) => new()
+            string componentCode, string phaseCode,
+            string trackCode = "Logic", string reopenStage = "E4",
+            bool allowsNotApplicable = false) => new()
         {
             ComponentCode = componentCode,
             PhaseCode = phaseCode,
+            MaturityTrackCode = trackCode,
+            EarliestReopenEvidenceStageCode = reopenStage,
             AllowsReused = true,
+            AllowsNotApplicable = allowsNotApplicable,
         };
     }
 
@@ -207,10 +264,12 @@ namespace Ssalddel.Simulation.Application
                                     StringComparison.Ordinal))
                 .OrderBy(value => value.Sequence).ToArray();
             var failures = new List<string>();
+            var reopenStages = new List<string>();
             var lastSequence = 0;
 
             foreach (var requirement in profile.Requirements)
             {
+                var failureCountBefore = failures.Count;
                 var match = trace.FirstOrDefault(value =>
                     value.Sequence > lastSequence
                     && string.Equals(value.ComponentCode,
@@ -222,6 +281,8 @@ namespace Ssalddel.Simulation.Application
                     failures.Add("EngineInteractionRequiredStepMissing:"
                                  + requirement.ComponentCode + ":"
                                  + requirement.PhaseCode);
+                    reopenStages.Add(
+                        requirement.EarliestReopenEvidenceStageCode);
                     continue;
                 }
                 if (string.Equals(match.StatusCode,
@@ -241,6 +302,15 @@ namespace Ssalddel.Simulation.Application
                          && !requirement.AllowsNotApplicable)
                     failures.Add("EngineInteractionNotApplicable:"
                                  + requirement.ComponentCode);
+                else if (string.Equals(match.StatusCode,
+                             SimulationEngineInteractionStatusCodes.NotApplicable,
+                             StringComparison.Ordinal)
+                         && string.IsNullOrWhiteSpace(match.ReasonCode))
+                    failures.Add("EngineInteractionNotApplicableReasonMissing:"
+                                 + requirement.ComponentCode);
+                if (failures.Count > failureCountBefore)
+                    reopenStages.Add(
+                        requirement.EarliestReopenEvidenceStageCode);
                 lastSequence = match.Sequence;
             }
 
@@ -249,8 +319,11 @@ namespace Ssalddel.Simulation.Application
                          SimulationEngineInteractionComponentKinds.Presentation,
                          StringComparison.Ordinal)))
                 if (entry.BeforeAuthorityRevision != entry.AfterAuthorityRevision)
+                {
                     failures.Add("PresentationMutatedAuthorityRevision:"
                                  + entry.ComponentCode);
+                    reopenStages.Add("E5");
+                }
 
             return new SimulationPlayableLoopEngineValidationSnapshot
             {
@@ -260,11 +333,17 @@ namespace Ssalddel.Simulation.Application
                 CommandId = commandId ?? string.Empty,
                 Passed = failures.Count == 0,
                 EarliestReopenEvidenceStageCode = failures.Count == 0
-                    ? string.Empty : "E3",
+                    ? string.Empty : EarliestStage(reopenStages),
                 FailureCodes = failures.Distinct(StringComparer.Ordinal).ToArray(),
                 TraceEntries = trace,
             };
         }
+
+        private static string EarliestStage(IEnumerable<string> values)
+            => values.Where(value => !string.IsNullOrWhiteSpace(value))
+                .OrderBy(value => int.TryParse(value.TrimStart('E'), out var rank)
+                    ? rank : int.MaxValue)
+                .FirstOrDefault() ?? "E3";
     }
 
     internal static class SimulationPlayableLoopEngineTraceHash

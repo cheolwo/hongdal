@@ -105,6 +105,7 @@ namespace Ssalddel.Simulation.Contracts
             new Simulation세계상호작용이름Definition("WI-ORDER-06", "ORDER", "주민 주문·소비", 6, "주민 주문 상품 수령", "ActorIntent", "OrderFulfilled", "Atomic", "Yang", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-ORDER-07", "ORDER", "주민 주문·소비", 7, "주민 상품 소비", "ActorIntent", "ResidentConsumed", "Atomic", "Yin", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-REFLECT-01", "REFLECT", "거점 성찰", 1, "승인 자료로 거점 성찰 확정", "ActorIntent", "InnerLearningPending", "Atomic", "Yin", "Fixed", false),
+            new Simulation세계상호작용이름Definition("WI-REVIEW-01", "REVIEW", "업무 검토", 1, "NPC 업무 결과 검토 확정", "ActorIntent", "NpcWorkReviewConfirmed", "AtomicBundle", "Yin", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-WORLD-01", "WORLD", "공통 세계 운영", 1, "NPC에게 반복 업무 배정", "SharedDecisionRule", "NpcAssigned", "Atomic", "NotApplicable", "NotApplicable", false),
             new Simulation세계상호작용이름Definition("WI-WORLD-02", "WORLD", "공통 세계 운영", 2, "NPC에게 업무 역량 위임", "ActorIntent", "NpcCapabilityGranted", "Atomic", "Yin", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-WORLD-03", "WORLD", "공통 세계 운영", 3, "진행 중 세계 업무 취소", "ActorIntent", "TaskCancelled", "AtomicBundle", "Yin", "Fixed", false),

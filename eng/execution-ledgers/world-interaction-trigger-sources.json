@@ -1,6 +1,6 @@
 {
   "schemaVersion": "world-interaction-trigger-sources.v1",
-  "revision": "world-interaction-trigger-sources.r6",
+  "revision": "world-interaction-trigger-sources.r7",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "principles": {
     "observationCollectionIsNotWorldInteraction": true,
@@ -31,10 +31,11 @@
     "WI-REFLECT-01": ["PlayerDriven"],
     "WI-NATURE-01": ["PlayerDriven", "NpcDriven", "WorldDerived"],
     "WI-WORLD-05": ["PlayerDriven", "NpcDriven", "WorldDerived"],
-    "WI-WORLD-08": ["PlayerDriven", "NpcDriven", "WorldDerived"]
+    "WI-WORLD-08": ["PlayerDriven", "NpcDriven", "WorldDerived"],
+    "WI-REVIEW-01": ["PlayerDriven"]
   },
   "notes": [
-    "현재 64개 WI에는 DataDriven 전용 정의가 없다. 향후 기상·가격 관측이 임계값을 넘어 권위 상태를 바꾸는 WI를 추가할 때 명시적으로 허용한다.",
+    "현재 65개 WI에는 DataDriven 전용 정의가 없다. 향후 기상·가격 관측이 임계값을 넘어 권위 상태를 바꾸는 WI를 추가할 때 명시적으로 허용한다.",
     "Command의 허용 발생원과 실제 조작 권한은 다르다. NpcRoutine은 NpcDriven으로 실행하며 플레이어는 정책·예외 개입만 사용한다."
   ]
 }

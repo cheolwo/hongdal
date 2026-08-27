@@ -2,10 +2,10 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interaction-delivery-priorities.json`와 WI·폐루프·H 상태 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 실행 우선순위 개정: `world-interaction-delivery-priorities.r21`
-- 전체 WI: `64`
+- 실행 우선순위 개정: `world-interaction-delivery-priorities.r22`
+- 전체 WI: `65`
 - 진행 방식: `SingleWorldInteractionVertical` / 작업 중 한도 `1`
-- 현재 활성 WI: `WI-ACTOR-02` / `E5` → `E7`
+- 현재 활성 WI: `WI-NATURE-15` / `E6` → `E7`
 - Synty H1 설계 재고: `84`
 - E7은 최신 PlayMode·Game View·Hosted 동등성 증거가 있을 때만 승격한다.
 
@@ -13,10 +13,10 @@
 
 | E 단계 | 판정 | 정제·검증 요약 |
 | --- | --- | --- |
-| E4 | Passed | PlayerDriven Actor·고유 ItemInstance·8개 Slot·EquipmentRevision을 결속하고 보편 WI의 공간은 NotApplicable로 판정했다. |
-| E5 | Passed | Equip·Unequip·Swap, 장착 Capability, 벌목 허용·차단, v27 저장·Replay와 LocalProcess·RemoteHost 동등성을 확인했다. |
-| E6 | Partial | I 장착 상태창·8개 슬롯·권위 Confirm·손 도끼 표현 코드와 Unity 소비 어셈블리 빌드는 통과했지만 실제 Test Runner와 화면은 차단됐다. |
-| E7 | Pending | 실행 중 Unity Editor 때문에 획득→장착→벌목→해제 차단→저장 재진입의 실제 Test Runner·Play Mode·Game View·Console을 아직 검증하지 못했다. |
+| E4 | Passed | 오두막·새벽 계획 기준점과 WI-NATURE-14·15의 권위·표현 문맥을 결속했다. |
+| E5 | Passed | 수면·새벽 자동 해제·계획 선택·Day2Ready와 대기 상태를 canonical Scene에 발현했다. |
+| E6 | Partial | 비 크기와 LH 진단 경계는 정리했지만 Day2 계획판의 선택·비용·다음 행동 판독과 주변 구도 정제가 남았다. |
+| E7 | Pending | 자동 실제 입력 폐루프는 통과했지만 사람 직접 입력·Game View 판독·비와 천둥 청음 수용이 남았다. |
 
 ## D1 Nature 행동 폐루프
 
@@ -26,7 +26,7 @@
 | 순서 | 한국어 행동명 · 고유 식별자 | 작업 | 역할 | 현재 구현 | 현재 통합 | 다음 관문 | NPC E8 | H 상태 | Synty | 폐루프 |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 물품 획득<br>`WI-ACTOR-01` | Queued | Core | E3 | E5 | E6 | Conditional | NotApplicable | Shared | playable-loop:nature-shelter-foundation.v1 |
-| 2 | 장착 상태 변경<br>`WI-ACTOR-02` | Active | Core | E3 | E5 | E6 | Conditional | NotApplicable | Shared | playable-loop:nature-shelter-foundation.v1 |
+| 2 | 장착 상태 변경<br>`WI-ACTOR-02` | Queued | Core | E3 | E5 | E6 | Conditional | NotApplicable | Shared | playable-loop:nature-shelter-foundation.v1 |
 | 3 | 벌목 도끼 획득<br>`WI-NATURE-05` | Queued | Core | E3 | E6 | E7 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
 | 4 | 나무 벌목 작업 시작<br>`WI-NATURE-06` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
 | 5 | 오두막을 지을 터 선정<br>`WI-NATURE-07` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
@@ -41,7 +41,7 @@
 | 14 | 탐사대 안전 회복<br>`WI-NATURE-04` | Queued | Extension | E3 | E1 | E2 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-regional-threat-recovery.v1 |
 | 15 | 획득 자원 거점 보관<br>`WI-NATURE-13` | Queued | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-night-day2.v1 |
 | 16 | 오두막에서 수면·새벽 맞기<br>`WI-NATURE-14` | Queued | Core | E3 | E5 | E6 | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-night-day2.v1 |
-| 17 | 다음 날 거점 확장 계획 선택<br>`WI-NATURE-15` | Queued | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-night-day2.v1 |
+| 17 | 다음 날 거점 확장 계획 선택<br>`WI-NATURE-15` | Active | Core | E3 | E6 | E7 | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-night-day2.v1 |
 | 18 | 영역 건물 건설 확정<br>`WI-CON-01` | Queued | Shared | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Construction | playable-loop:nature-workbench-foundation.v1<br>playable-loop:nature-building-learning.v1<br>playable-loop:farm-player-placement.v1 |
 | 19 | 현장 보급 꾸러미 제작<br>`WI-NATURE-16` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-field-supply-return.v1 |
 | 20 | 현장 보급 제작 업무 위임<br>`WI-NATURE-17` | Queued | Core | E3 | E4 | E5 | Required | EstablishedH1 | Nature | playable-loop:nature-field-supply-return.v1 |
@@ -129,3 +129,4 @@
 | 17 | 일행 역할 카드 장착<br>`WI-WORLD-06` | Deferred | DeferredIntegration | E3 | E1 | E2 | NotApplicable | NotApplicable | None | 후속 정의 |
 | 18 | 세계 활동 상태 변경<br>`WI-WORLD-07` | Deferred | DeferredIntegration | E3 | E1 | E2 | NotApplicable | CandidateLineage | None | 후속 정의 |
 | 19 | 하루 운영 턴 마감<br>`WI-WORLD-08` | Deferred | DeferredIntegration | E3 | E1 | E2 | NotApplicable | NotApplicable | None | playable-loop:solo-world-day.v1 |
+| 20 | NPC 업무 결과 검토 확정<br>`WI-REVIEW-01` | Deferred | DeferredIntegration | E2 | E1 | E2 | NotApplicable | NotApplicable | None | 후속 정의 |

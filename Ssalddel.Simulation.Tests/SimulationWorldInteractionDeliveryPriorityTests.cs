@@ -13,26 +13,26 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationWorldInteractionDeliveryPriorityTests
 {
     [Fact]
-    public void WI_64개는_한번씩배정되고_장착상태변경하나만E5활성이다()
+    public void WI_65개는_한번씩배정되고_다음확장계획하나만E6활성이다()
     {
         var all = SimulationWI실행우선순위Catalog.All;
 
-        Assert.Equal(64, all.Count);
-        Assert.Equal(64, all.Select(item => item.WorldInteractionId)
+        Assert.Equal(65, all.Count);
+        Assert.Equal(65, all.Select(item => item.WorldInteractionId)
             .Distinct(StringComparer.Ordinal).Count());
         Assert.Equal(1, SimulationWI실행우선순위Catalog.WorkInProgressLimit);
-        Assert.Equal("WI-ACTOR-02",
+        Assert.Equal("WI-NATURE-15",
             SimulationWI실행우선순위Catalog.ActiveWorldInteractionId);
-        Assert.Equal("E5",
+        Assert.Equal("E6",
             SimulationWI실행우선순위Catalog.ActiveEvidenceStage);
 
         var active = Assert.Single(all, item =>
             item.개발작업상태Code == "Active");
-        Assert.Equal("WI-ACTOR-02", active.WorldInteractionId);
+        Assert.Equal("WI-NATURE-15", active.WorldInteractionId);
         Assert.Equal("D1", active.실행파동Code);
-        Assert.Equal(2, active.파동내순서);
+        Assert.Equal(17, active.파동내순서);
         Assert.Equal("E7", active.목표EvidenceStage);
-        Assert.Equal("Conditional", active.NpcE8정책Code);
+        Assert.Equal("NotApplicable", active.NpcE8정책Code);
     }
 
     [Fact]

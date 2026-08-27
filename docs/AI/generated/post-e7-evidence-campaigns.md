@@ -7,14 +7,15 @@
 - E9 영역 조화·사람 승인 후보: `4`
 - E9 보류 영역: `2`
 - E10 제한 운영 창: `1`
+- 파이프라인 안정성: 행위 원장·조건부 성장·trace digest 동등성 필수
 
 ## E8 PlayableUnit 안정성
 
 | PlayableUnit | 현재 E | 상태 | 승격 가능 | 차단 |
 | --- | --- | --- | --- | --- |
-| `playable-loop:nature-shelter-foundation.v1` | E7 | Passed | True |  |
-| `playable-loop:nature-twilight-return.v1` | E7 | Passed | True |  |
-| `playable-loop:nature-night-day2.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
+| `playable-loop:nature-shelter-foundation.v1` | E7 | Blocked | False | 기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다. |
+| `playable-loop:nature-twilight-return.v1` | E7 | Blocked | False | 기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다. |
+| `playable-loop:nature-night-day2.v1` | E4 | WaitingForE7 | False | 행위 원장·표현 cursor 통합 관문을 E5부터 다시 닫아야 한다. |
 | `playable-loop:nature-workbench-foundation.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:nature-field-supply-return.v1` | E1 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:farm-crop-cycle.v1` | E1 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
@@ -34,7 +35,7 @@
 | 영역 | 후보 | 구성원 | 논리 | 표현 | 통합 | 사람 승인 |
 | --- | --- | ---: | --- | --- | --- | --- |
 | Nature | `area-harmony:nature-core.v1` | 5 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
-| Nature | `area-harmony:nature-first-evening.v1` | 2 | Ready | Ready | Ready | False |
+| Nature | `area-harmony:nature-first-evening.v1` | 2 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
 | Farm | `area-harmony:farm-core.v1` | 2 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
 | Hub | `area-harmony:hub-core.v1` | 2 | WaitingForStableMembers | WaitingForStableMembers | WaitingForStableMembers | False |
 

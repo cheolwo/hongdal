@@ -35,8 +35,8 @@ if ((@($stages.stages.code) -join ",") -ne
 if (@($catalog.items | Where-Object { $_.integration.targetStage -ne "E7" }).Count -ne 0) {
     throw "WorldInteractionIntegrationTargetMustBeE7"
 }
-if ([string] $catalog.schemaVersion -ne "5" -or [string] $catalog.revision -ne "simulation-world-interactions.r27") {
-    throw "WorldInteractionCatalogRevisionMustBeR27"
+if ([string] $catalog.schemaVersion -ne "5" -or [string] $catalog.revision -ne "simulation-world-interactions.r28") {
+    throw "WorldInteractionCatalogRevisionMustBeR28"
 }
 $responsibilities = Get-Content -LiteralPath (
     Join-Path $repositoryRoot ([string] $catalog.responsibilityPolicyPath)) -Raw -Encoding UTF8 |
@@ -47,7 +47,7 @@ $flows = Get-Content -LiteralPath (
 $polarities = Get-Content -LiteralPath (
     Join-Path $repositoryRoot ([string] $catalog.polarityQuadrantCatalogPath)) -Raw -Encoding UTF8 |
     ConvertFrom-Json
-if (@($responsibilities.primaryOutcomeCodes.PSObject.Properties).Count -ne 64) {
+if (@($responsibilities.primaryOutcomeCodes.PSObject.Properties).Count -ne 65) {
     throw "WorldInteractionPrimaryOutcomeCountInvalid"
 }
 if (@($responsibilities.legacyCompositeMigrations).Count -ne 6) {
@@ -78,7 +78,7 @@ if (@($flows.flows.edges).Count -ne 60) {
     throw "WorldInteractionFlowEdgeCountInvalid"
 }
 if (@($polarities.fixedYangWorldInteractionIds).Count -ne 27 -or
-    @($polarities.fixedYinWorldInteractionIds).Count -ne 23 -or
+    @($polarities.fixedYinWorldInteractionIds).Count -ne 24 -or
     @($polarities.contextualWorldInteractionIds).Count -ne 6 -or
     @($polarities.notApplicableWorldInteractionIds).Count -ne 8) {
     throw "WorldInteractionPolarityCoverageInvalid"
@@ -156,20 +156,25 @@ if ((@($e5Items.id | Sort-Object) -join ",") -ne
     "WI-ACTOR-01,WI-ACTOR-02,WI-NATURE-14") {
     throw "WorldInteractionE5ItemsInvalid"
 }
-if ($e6Items.Count -ne 9) { throw "WorldInteractionE6ItemCountMustBe9" }
-if ($e7Items.Count -ne 6) { throw "WorldInteractionE7ItemCountMustBe6" }
+if ($e6Items.Count -ne 10) { throw "WorldInteractionE6ItemCountMustBe10" }
+if ($e7Items.Count -ne 5) { throw "WorldInteractionE7ItemCountMustBe5" }
 if (@($e4SpatialItems | Where-Object { @($_.integration.e4SeedbedRefs).Count -eq 0 }).Count -ne 0) {
     throw "WorldInteractionE4SeedbedRefMissing"
 }
 if (@(($e4SpatialItems + $e6Items + $e7Items).integration.e4SeedbedRefs | Select-Object -Unique).Count -ne 7) {
     throw "WorldInteractionE4SeedbedCountMustBe7"
 }
-if (@($e6Items | Where-Object id -ne "WI-NATURE-05" | Where-Object {
+if (@($e6Items | Where-Object id -notin @("WI-NATURE-05", "WI-NATURE-15") | Where-Object {
         @($_.integration.e5PlacementRefs).Count -ne 1 -or
         $_.integration.e5PlacementRefs[0] -notlike "binding:actual-e5:*" -or
         @($_.integration.e6EvidenceRefs).Count -eq 0
     }).Count -ne 0) {
     throw "WorldInteractionFarmE5BindingInvalid"
+}
+$natureDay2Plan = @($e6Items | Where-Object id -eq "WI-NATURE-15")
+if ($natureDay2Plan.Count -ne 1 -or
+    @($natureDay2Plan[0].integration.e6RefinementRefs).Count -ne 1) {
+    throw "WorldInteractionNature15E6RefinementMissing"
 }
 $natureThreatObservation = @($e7Items | Where-Object id -eq "WI-NATURE-01")
 if ($natureThreatObservation.Count -ne 1 -or
@@ -190,7 +195,7 @@ if ($natureAxe.Count -ne 1 -or
     @($natureAxe[0].integration.e7EvidenceRefs).Count -lt 3) {
     throw "WorldInteractionNatureAxeEvidenceInvalid"
 }
-if ($check -notmatch "WorldInteractionCatalogValid:64") {
+if ($check -notmatch "WorldInteractionCatalogValid:65") {
     throw "WorldInteractionCatalogValidationDidNotComplete"
 }
 
