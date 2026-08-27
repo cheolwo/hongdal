@@ -28,6 +28,8 @@ namespace Ssalddel.Simulation.Domain
                     source.ActorEquipmentBaseSchemaVersion,
                 ActionManifestationBaseSchemaVersion =
                     source.ActionManifestationBaseSchemaVersion,
+                FocusMeditationBaseSchemaVersion =
+                    source.FocusMeditationBaseSchemaVersion,
                 SessionCreateRequest = CloneCreateRequest(source.SessionCreateRequest),
                 Snapshot = 경영SimulationSessionAggregate.Clone(source.Snapshot),
                 WorldInventory = 경영SimulationSessionAggregate.CloneWorldInventory(
@@ -303,6 +305,10 @@ namespace Ssalddel.Simulation.Domain
                     source.NatureSurvivalClockAdvanceRequest == null ? null
                         : CloneNatureSurvivalClockRequest(
                             source.NatureSurvivalClockAdvanceRequest),
+                NatureFocusTimingAttemptRequest =
+                    source.NatureFocusTimingAttemptRequest == null ? null
+                        : CloneFocusTimingAttemptRequest(
+                            source.NatureFocusTimingAttemptRequest),
                 ActorItemAcquireConfirmRequest =
                     source.ActorItemAcquireConfirmRequest == null ? null
                         : CloneActorItemAcquireConfirmRequest(
@@ -344,6 +350,18 @@ namespace Ssalddel.Simulation.Domain
                 ElapsedRealtimeSeconds = source.ElapsedRealtimeSeconds,
                 WorkInputHeld = source.WorkInputHeld,
                 PauseReasonCode = source.PauseReasonCode,
+            };
+
+        public static Simulation집중판정AttemptRequest
+            CloneFocusTimingAttemptRequest(
+                Simulation집중판정AttemptRequest source)
+            => new Simulation집중판정AttemptRequest
+            {
+                CommandId = source.CommandId,
+                ChallengeStableId = source.ChallengeStableId,
+                ExpectedWorldRevision = source.ExpectedWorldRevision,
+                ExpectedChallengeRevision = source.ExpectedChallengeRevision,
+                InputOffsetMillis = source.InputOffsetMillis,
             };
 
         public static SimulationActorItemAcquireConfirmRequest

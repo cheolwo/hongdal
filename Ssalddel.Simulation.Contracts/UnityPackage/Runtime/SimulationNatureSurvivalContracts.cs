@@ -264,6 +264,8 @@ namespace Ssalddel.Simulation.Contracts
         public string SpawnH1StableId { get; set; } = SimulationNatureSurvivalCodes.SafeClearingH1StableId;
         public decimal InventoryCapacityUnits { get; set; } = 24m;
         public bool StartsWithAxe { get; set; } = true;
+        public string FocusAccessibilityModeCode { get; set; }
+            = Simulation집중판정Codes.Standard;
         public SimulationNatureResourceNodeInitialStateRequest[] ResourceNodes { get; set; }
             = Array.Empty<SimulationNatureResourceNodeInitialStateRequest>();
         public Simulation영역건물발전CatalogSnapshot? BuildingProgressionCatalog
@@ -396,6 +398,8 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationNatureDroppedTimberSnapshot[] DroppedTimber { get; set; }
             = Array.Empty<SimulationNatureDroppedTimberSnapshot>();
         public SimulationNatureActiveWorkSnapshot? ActiveWork { get; set; }
+        public Simulation집중판정ChallengeSnapshot? ActiveFocusChallenge { get; set; }
+        public Simulation집중판정ResultSnapshot? LastFocusResult { get; set; }
         public SimulationNatureCabinSnapshot Cabin { get; set; }
             = new SimulationNatureCabinSnapshot();
         public SimulationNatureEncounterSnapshot? Encounter { get; set; }
@@ -436,6 +440,7 @@ namespace Ssalddel.Simulation.Contracts
 
     public sealed class SimulationNatureActiveWorkSnapshot
     {
+        public string OriginCommandId { get; set; } = string.Empty;
         public string WorkKindCode { get; set; } = string.Empty;
         public string TargetStableId { get; set; } = string.Empty;
         public int RequiredWorkSeconds { get; set; }

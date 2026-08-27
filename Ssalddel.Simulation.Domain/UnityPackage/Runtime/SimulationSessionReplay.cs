@@ -14,6 +14,19 @@ namespace Ssalddel.Simulation.Domain
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
             if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V29,
+                    StringComparison.Ordinal))
+            {
+                ValidatePackage(package);
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion = package.FocusMeditationBaseSchemaVersion;
+                basePackage.FocusMeditationBaseSchemaVersion = string.Empty;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                var restored = Restore(basePackage);
+                restored.RestoreNatureFocusState(package.Snapshot.NatureSurvival);
+                return restored;
+            }
+            if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V28,
                     StringComparison.Ordinal))
             {
@@ -377,6 +390,13 @@ namespace Ssalddel.Simulation.Domain
                             entry.NatureSurvivalClockAdvanceRequest!));
                 }
                 else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.NatureFocusTimingAttempt)
+                {
+                    aggregate.SubmitNatureFocusTiming(
+                        SimulationSaveReplayCloner.CloneFocusTimingAttemptRequest(
+                            entry.NatureFocusTimingAttemptRequest!));
+                }
+                else if (entry.CommandTypeCode ==
                     SimulationCommandTypeCodes.ActorItemAcquireConfirm)
                 {
                     aggregate.ConfirmActorItemAcquire(
@@ -499,6 +519,33 @@ namespace Ssalddel.Simulation.Domain
         private static void ValidatePackage(SimulationSessionSavePackage package)
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V29,
+                    StringComparison.Ordinal))
+            {
+                if (!string.Equals(package.FocusMeditationBaseSchemaVersion,
+                        SimulationSaveSchemaVersions.V28,
+                        StringComparison.Ordinal)
+                    || package.PlayerDomainProfile == null
+                    || !string.Equals(package.PlayerDomainProfile.SchemaCode,
+                        Simulation플레이어분야SchemaCodes.분야Profile,
+                        StringComparison.Ordinal))
+                    throw new SimulationContractException(
+                        "SimulationFocusMeditationSaveStateInvalid");
+                Simulation플레이어분야Engine.Restore(
+                    package.PlayerDomainProfile);
+                if (!string.Equals(package.ReplayHash,
+                        SimulationReplayHasher.Calculate(package),
+                        StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationReplayHashMismatch");
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion = package.FocusMeditationBaseSchemaVersion;
+                basePackage.FocusMeditationBaseSchemaVersion = string.Empty;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                ValidatePackage(basePackage);
+                return;
+            }
             if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V28,
                     StringComparison.Ordinal))
@@ -1233,6 +1280,19 @@ namespace Ssalddel.Simulation.Domain
                         entry.NatureSurvivalClockAdvanceRequest!);
                 }
                 else if (entry.CommandTypeCode ==
+                    SimulationCommandTypeCodes.NatureFocusTimingAttempt)
+                {
+                    var request = entry.NatureFocusTimingAttemptRequest;
+                    if (request == null
+                        || string.IsNullOrWhiteSpace(request.CommandId)
+                        || string.IsNullOrWhiteSpace(request.ChallengeStableId)
+                        || request.ExpectedWorldRevision < 0
+                        || request.ExpectedChallengeRevision < 0
+                        || request.InputOffsetMillis < 0)
+                        throw new SimulationConflictException(
+                            "SimulationCommandLogPayloadInvalid");
+                }
+                else if (entry.CommandTypeCode ==
                     SimulationCommandTypeCodes.ActorItemAcquireConfirm)
                 {
                     경영SimulationSessionAggregate
@@ -1366,6 +1426,7 @@ namespace Ssalddel.Simulation.Domain
             if (entry.FacilityDamageQueueRequest != null) payloadCount++;
             if (entry.NatureSurvivalActionRequest != null) payloadCount++;
             if (entry.NatureSurvivalClockAdvanceRequest != null) payloadCount++;
+            if (entry.NatureFocusTimingAttemptRequest != null) payloadCount++;
             if (entry.ActorItemAcquireConfirmRequest != null) payloadCount++;
             if (entry.ActorEquipmentChangeConfirmRequest != null) payloadCount++;
             if (payloadCount != 1)

@@ -15,7 +15,7 @@ namespace Ssalddel.Simulation.Application
     public static class SimulationNatureFirstDayEngineValidationProfiles
     {
         public const string ProfileRevision =
-            "nature-night-day2.engine-interaction.r2";
+            "nature-night-day2.engine-interaction.r3";
         public const string PlayableLoopStableId =
             "playable-loop:nature-night-day2.v1";
 
@@ -33,6 +33,11 @@ namespace Ssalddel.Simulation.Application
                     SimulationEngineInteractionComponentCodes
                         .WorldInteractionPipeline,
                     SimulationEngineInteractionPhaseCodes.Confirm),
+                Required(
+                    SimulationEngineInteractionComponentCodes
+                        .WorldInteractionPipeline,
+                    SimulationEngineInteractionPhaseCodes.FocusEvidenceCollect,
+                    "Logic", "E4", allowsNotApplicable: true),
                 Required(SimulationEngineInteractionComponentCodes.AuthorityCore,
                     SimulationEngineInteractionPhaseCodes.AuthorityCommit,
                     "Logic", "E5"),
@@ -43,6 +48,12 @@ namespace Ssalddel.Simulation.Application
                     SimulationEngineInteractionComponentCodes
                         .PlayerDomainProgression,
                     SimulationEngineInteractionPhaseCodes.PlayerProgressionApply,
+                    "Logic", "E5", allowsNotApplicable: true),
+                Required(
+                    SimulationEngineInteractionComponentCodes
+                        .PlayerMeditationProgression,
+                    SimulationEngineInteractionPhaseCodes
+                        .MeditationProgressionApply,
                     "Logic", "E5", allowsNotApplicable: true),
                 Required(
                     SimulationEngineInteractionComponentCodes

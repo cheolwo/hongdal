@@ -9,6 +9,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string ActionJournal = "Simulation.ActionJournal";
         public const string PlayerDomainProgression =
             "Simulation.PlayerDomainProgression";
+        public const string PlayerMeditationProgression =
+            "Simulation.PlayerMeditationProgression";
         public const string LhSurface = "LH.Surface";
         public const string SkyPresentation = "Sky.Presentation";
         public const string ExteriorPlacement = "Placement.Exterior";
@@ -27,9 +29,12 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string Preview = "Preview";
         public const string Confirm = "Confirm";
+        public const string FocusEvidenceCollect = "FocusEvidenceCollect";
         public const string AuthorityCommit = "AuthorityCommit";
         public const string ActionRecordAppend = "ActionRecordAppend";
         public const string PlayerProgressionApply = "PlayerProgressionApply";
+        public const string MeditationProgressionApply =
+            "MeditationProgressionApply";
         public const string ActionRecordRead = "ActionRecordRead";
         public const string SurfacePreparation = "SurfacePreparation";
         public const string AtmosphereProjection = "AtmosphereProjection";

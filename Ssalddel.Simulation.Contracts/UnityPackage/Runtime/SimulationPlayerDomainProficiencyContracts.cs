@@ -6,7 +6,8 @@ namespace Ssalddel.Simulation.Contracts
     public static class Simulation플레이어분야SchemaCodes
     {
         public const string 분야Catalog = "simulation-player-domain-catalog.v1";
-        public const string 분야Profile = "simulation-player-domain-profile.v1";
+        public const string 분야ProfileV1 = "simulation-player-domain-profile.v1";
+        public const string 분야Profile = "simulation-player-domain-profile.v2";
         public const string 분야학습효과선 = "simulation-domain-learning-effect-line.v1";
         public const string 분야진척기여 = "simulation-domain-progress-contribution.v1";
     }
@@ -210,6 +211,14 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<Simulation분야진척Snapshot>();
         public Simulation분야진척기여Snapshot[] 기여기록들 { get; set; }
             = Array.Empty<Simulation분야진척기여Snapshot>();
+        public long 명상경험Milli { get; set; }
+        public int 명상숙련도 { get; set; }
+        public string 명상숙련도단계Code { get; set; }
+            = Simulation분야단계Codes.미경험;
+        public Simulation명상분야기여요약Snapshot[] 명상분야기여요약들
+            { get; set; } = Array.Empty<Simulation명상분야기여요약Snapshot>();
+        public Simulation명상숙련기여Snapshot[] 명상기여기록들 { get; set; }
+            = Array.Empty<Simulation명상숙련기여Snapshot>();
         public string StateHashSha256 { get; set; } = string.Empty;
     }
 

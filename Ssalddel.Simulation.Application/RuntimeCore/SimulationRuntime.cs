@@ -524,6 +524,11 @@ namespace Ssalddel.Simulation.Application
             string sessionStableId,
             SimulationNatureSurvivalClockAdvanceRequest request,
             CancellationToken cancellationToken = default);
+
+        ValueTask<Simulation집중판정ChallengeSnapshot> SubmitFocusTimingAsync(
+            string sessionStableId,
+            Simulation집중판정AttemptRequest request,
+            CancellationToken cancellationToken = default);
     }
 
     public sealed class SimulationLocalSaveSlotRequest

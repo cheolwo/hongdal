@@ -13,6 +13,30 @@ namespace Ssalddel.Simulation.Domain
         public static string Calculate(SimulationSessionSavePackage package)
         {
             if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V29,
+                    StringComparison.Ordinal))
+            {
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion = package.FocusMeditationBaseSchemaVersion;
+                basePackage.FocusMeditationBaseSchemaVersion = string.Empty;
+                basePackage.ReplayHash = string.Empty;
+                var baseReplayHash = Calculate(basePackage);
+                var v29Canonical = string.Join("|", new[]
+                {
+                    SimulationSaveSchemaVersions.V29,
+                    package.FocusMeditationBaseSchemaVersion,
+                    baseReplayHash,
+                    package.PlayerDomainProfile?.StateHashSha256 ?? string.Empty,
+                    Simulation집중판정Codes.MeditationRuleRevision,
+                    경영SimulationSessionAggregate.CalculateNatureFocusStateHash(
+                        package.Snapshot.NatureSurvival),
+                });
+                using var sha = SHA256.Create();
+                return BitConverter.ToString(sha.ComputeHash(
+                        Encoding.UTF8.GetBytes(v29Canonical)))
+                    .Replace("-", string.Empty).ToLowerInvariant();
+            }
+            if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V28,
                     StringComparison.Ordinal))
             {

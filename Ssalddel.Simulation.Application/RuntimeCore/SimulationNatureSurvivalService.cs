@@ -200,6 +200,11 @@ namespace Ssalddel.Simulation.Application
             SimulationNatureSurvivalClockAdvanceRequest request)
             => Find(sessionStableId).AdvanceNatureSurvivalClock(request);
 
+        public Simulation집중판정ChallengeSnapshot SubmitFocusTiming(
+            string sessionStableId,
+            Simulation집중판정AttemptRequest request)
+            => Find(sessionStableId).SubmitNatureFocusTiming(request);
+
         private 경영SimulationSessionAggregate Find(string sessionStableId)
         {
             if (string.IsNullOrWhiteSpace(sessionStableId))

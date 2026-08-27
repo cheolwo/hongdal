@@ -10,9 +10,11 @@ namespace Ssalddel.Simulation.Domain
         private Simulation플레이어분야ProfileSnapshot? playerDomainProfileState;
 
         internal (Simulation행위발현Record 기록,
-            Simulation분야성장적용Snapshot 성장적용, bool 재사용)
+            Simulation분야성장적용Snapshot 성장적용,
+            Simulation명상성장적용Snapshot 명상성장적용, bool 재사용)
             AppendActionManifestationAndProgression(
-                Simulation행위발현Record draft)
+                Simulation행위발현Record draft,
+                Simulation집중판정ResultSnapshot? focusResult = null)
         {
             if (draft == null)
                 throw new SimulationContractException(
@@ -36,7 +38,14 @@ namespace Ssalddel.Simulation.Domain
                                     || binding.기여방식Code ==
                                     Simulation분야기여방식Codes.PlayerOrOperation)
                                 && draft.결과분류Code !=
-                                    Simulation행위결과분류Codes.취소;
+                                    Simulation행위결과분류Codes.취소
+                                && !(string.Equals(draft.WorldInteractionId,
+                                        SimulationNatureSurvivalCodes
+                                            .BeginHarvestWorldInteractionId,
+                                        StringComparison.Ordinal)
+                                    && draft.PrimaryOutcomeCode.EndsWith(
+                                        ":TaskStarted",
+                                        StringComparison.Ordinal));
             if (canApplyField)
                 draft.변화의미Codes = (draft.변화의미Codes
                         ?? Array.Empty<string>())
@@ -44,6 +53,41 @@ namespace Ssalddel.Simulation.Domain
                     {
                         Simulation행위변화의미Codes.플레이어진척변경,
                     }).Distinct(StringComparer.Ordinal).ToArray();
+
+            var canApplyMeditation = focusResult != null
+                && focusResult.명상경험증가Milli > 0
+                && string.Equals(draft.TriggerSourceCode,
+                    SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
+                    StringComparison.Ordinal)
+                && string.Equals(draft.ActorStableId, playerStableId,
+                    StringComparison.Ordinal)
+                && draft.결과분류Code != Simulation행위결과분류Codes.취소;
+            if (canApplyMeditation)
+            {
+                var actionRecordStableId = Simulation행위발현Ledger
+                    .CalculateRecordStableId(draft);
+                var contributionStableId =
+                    Simulation플레이어분야Engine
+                        .CalculateMeditationContributionStableId(
+                            focusResult!.ChallengeStableId,
+                            actionRecordStableId, focusResult.RuleRevision);
+                draft.변화의미Codes = (draft.변화의미Codes
+                        ?? Array.Empty<string>())
+                    .Concat(new[]
+                    {
+                        Simulation행위변화의미Codes.플레이어명상변경,
+                        Simulation행위변화의미Codes.플레이어회복변경,
+                    }).Distinct(StringComparer.Ordinal).ToArray();
+                draft.SourceReferenceIds = (draft.SourceReferenceIds
+                        ?? Array.Empty<string>())
+                    .Concat(new[]
+                    {
+                        focusResult.ChallengeStableId,
+                        focusResult.SourceStableId,
+                        contributionStableId,
+                    }).Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Distinct(StringComparer.Ordinal).ToArray();
+            }
 
             var ledger = actionManifestationLedgerState == null
                 ? new Simulation행위발현Ledger(draft.WorldStableId)
@@ -81,6 +125,66 @@ namespace Ssalddel.Simulation.Domain
                 reason = PlayerProgressNotApplicableReason(draft, binding);
             }
 
+            var meditationBeforeRevision = playerDomain.Snapshot().Revision;
+            var meditation = new Simulation명상성장적용Snapshot
+            {
+                PlayerStableId = playerStableId,
+                BeforeProfileRevision = meditationBeforeRevision,
+                AfterProfileRevision = meditationBeforeRevision,
+            };
+            if (reused)
+            {
+                meditation.상태Code = Simulation집중판정Codes.Reused;
+                meditation.사유Code = "IdempotentCommandReused";
+            }
+            else if (focusResult == null)
+            {
+                meditation.상태Code = Simulation집중판정Codes.NotApplicable;
+                meditation.사유Code = "FocusEvidenceNotProvided";
+            }
+            else if (focusResult.명상경험증가Milli <= 0)
+            {
+                meditation.상태Code = Simulation집중판정Codes.NotApplicable;
+                meditation.사유Code = "FocusResultHasNoReward";
+            }
+            else if (!canApplyMeditation)
+            {
+                meditation.상태Code = Simulation집중판정Codes.NotApplicable;
+                meditation.사유Code = "FocusActionNotPlayerDriven";
+            }
+            else
+            {
+                focusResult.SourceActionRecordStableId = record.행위기록StableId;
+                focusResult.AppliedWorldRevision = record.AfterWorldRevision;
+                playerDomain.ApplyMeditation(new Simulation명상숙련기여Request
+                {
+                    PlayerStableId = playerStableId,
+                    행위기록 = record,
+                    집중판정결과 = focusResult,
+                });
+                var contribution = playerDomain.Snapshot().명상기여기록들
+                    .Single(value => string.Equals(value.ChallengeStableId,
+                        focusResult.ChallengeStableId,
+                        StringComparison.Ordinal)
+                        && string.Equals(value.SourceActionRecordStableId,
+                            record.행위기록StableId,
+                            StringComparison.Ordinal));
+                meditation.상태Code = Simulation집중판정Codes.Applied;
+                meditation.ContributionStableId = contribution.ContributionStableId;
+                meditation.명상경험증가Milli = focusResult.명상경험증가Milli;
+                meditation.회복증가Milli = focusResult.회복증가Milli;
+                meditation.AfterProfileRevision = playerDomain.Snapshot().Revision;
+                ApplyNatureMindImpactForPlayer(playerStableId,
+                    "mind-impact:focus:" + focusResult.ChallengeStableId +
+                    ":recovery",
+                    SimulationNatureMindCodes.FocusTimingCompleted,
+                    focusResult.SourceStableId,
+                    SimulationNatureMindCodes.RecoveryAxis,
+                    focusResult.회복증가Milli /
+                    (decimal)Simulation집중판정Codes.MilliPerPoint,
+                    record.AppliedWorldTick);
+            }
+
             actionManifestationLedgerState = ledger.Snapshot();
             playerDomainProfileState = playerDomain.Snapshot();
             return (record, new Simulation분야성장적용Snapshot
@@ -90,11 +194,12 @@ namespace Ssalddel.Simulation.Domain
                 PlayerStableId = playerStableId,
                 BeforeProfileRevision = beforeProfileRevision,
                 AfterProfileRevision = playerDomainProfileState.Revision,
-            }, reused);
+            }, meditation, reused);
         }
 
         internal (Simulation행위발현Record? 기록,
-            Simulation분야성장적용Snapshot 성장적용)
+            Simulation분야성장적용Snapshot 성장적용,
+            Simulation명상성장적용Snapshot 명상성장적용)
             FindActionManifestation(string commandId)
         {
             var record = actionManifestationLedgerState?.TailRecords
@@ -105,6 +210,18 @@ namespace Ssalddel.Simulation.Domain
                 상태Code = record == null
                     ? Simulation분야성장적용상태Codes.NotApplicable
                     : Simulation분야성장적용상태Codes.Reused,
+                사유Code = record == null
+                    ? "LegacyCommandWithoutActionRecord"
+                    : "IdempotentCommandReused",
+                PlayerStableId = playerDomainProfileState?.PlayerStableId
+                    ?? string.Empty,
+                BeforeProfileRevision = playerDomainProfileState?.Revision ?? 0,
+                AfterProfileRevision = playerDomainProfileState?.Revision ?? 0,
+            }, new Simulation명상성장적용Snapshot
+            {
+                상태Code = record == null
+                    ? Simulation집중판정Codes.NotApplicable
+                    : Simulation집중판정Codes.Reused,
                 사유Code = record == null
                     ? "LegacyCommandWithoutActionRecord"
                     : "IdempotentCommandReused",

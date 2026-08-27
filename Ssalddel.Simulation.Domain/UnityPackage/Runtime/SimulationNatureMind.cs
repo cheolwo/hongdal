@@ -197,6 +197,34 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
+        private void ApplyNatureMindImpactForPlayer(
+            string playerStableId, string effectStableIdPrefix,
+            string sourceCode, string sourceStableId, string axisCode,
+            decimal magnitude, int appliedWorldTick)
+        {
+            if (natureMindCreationState == null || magnitude == 0m
+                || !natureMindPlayers.TryGetValue(playerStableId,
+                    out var player)) return;
+            var effectStableId = effectStableIdPrefix + ":" + playerStableId;
+            if (natureMindEffects.ContainsKey(effectStableId)) return;
+            natureMindEffects.Add(effectStableId,
+                new SimulationMindImpactEffectSnapshot
+                {
+                    EffectStableId = effectStableId,
+                    PlayerStableId = playerStableId,
+                    SourceCode = sourceCode,
+                    SourceStableId = sourceStableId,
+                    AxisCode = axisCode,
+                    Magnitude = magnitude,
+                    AppliedWorldTick = appliedWorldTick,
+                    RuleRevision = natureMindCreationState.RuleRevision,
+                });
+            player.Revision++;
+            player.InterpretationBandCode = ResolveInterpretationBand(
+                player, player.InterpretationBandCode);
+            RefreshNaturePeriodState(player, appliedWorldTick);
+        }
+
         private SimulationNatureMindStateSnapshot CreateNatureMindStateSnapshot()
             => new SimulationNatureMindStateSnapshot
             {

@@ -33,6 +33,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string V26 = "simulation-save.v26";
         public const string V27 = "simulation-save.v27";
         public const string V28 = "simulation-save.v28";
+        public const string V29 = "simulation-save.v29";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -72,6 +73,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string IntegratedWorldEffectEnqueued = "IntegratedWorldEffectEnqueued";
         public const string NatureSurvivalActionConfirm = "NatureSurvivalActionConfirm";
         public const string NatureSurvivalClockAdvance = "NatureSurvivalClockAdvance";
+        public const string NatureFocusTimingAttempt = "NatureFocusTimingAttempt";
         public const string ActorItemAcquireConfirm = "ActorItemAcquireConfirm";
         public const string ActorEquipmentChangeConfirm = "ActorEquipmentChangeConfirm";
     }
@@ -155,6 +157,8 @@ namespace Ssalddel.Simulation.Contracts
             { get; set; }
         public SimulationNatureSurvivalClockAdvanceRequest? NatureSurvivalClockAdvanceRequest
             { get; set; }
+        public Simulation집중판정AttemptRequest? NatureFocusTimingAttemptRequest
+            { get; set; }
         public SimulationActorItemAcquireConfirmRequest? ActorItemAcquireConfirmRequest
             { get; set; }
         public SimulationActorEquipmentChangeConfirmRequest?
@@ -185,6 +189,8 @@ namespace Ssalddel.Simulation.Contracts
         public string ActorEquipmentBaseSchemaVersion { get; set; }
             = string.Empty;
         public string ActionManifestationBaseSchemaVersion { get; set; }
+            = string.Empty;
+        public string FocusMeditationBaseSchemaVersion { get; set; }
             = string.Empty;
         public 경영SimulationSession생성Request SessionCreateRequest { get; set; }
             = new 경영SimulationSession생성Request();

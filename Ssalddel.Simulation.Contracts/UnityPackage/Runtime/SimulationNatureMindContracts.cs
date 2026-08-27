@@ -14,6 +14,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string FarmHarvestDispositionCompleted =
             "FarmHarvestDispositionCompleted";
         public const string FarmStorageFact = "fact:farm-storage-utilization";
+        public const string FocusTimingCompleted = "FocusTimingCompleted";
     }
 
     public static class SimulationNaturePeriodCodes

@@ -58,6 +58,7 @@ namespace Ssalddel.Simulation.Domain
                         행위발현기록 = previous.기록
                             ?? new Simulation행위발현Record(),
                         분야성장적용 = previous.성장적용,
+                        명상성장적용 = previous.명상성장적용,
                         Reused = true,
                     };
                 }
@@ -77,7 +78,7 @@ namespace Ssalddel.Simulation.Domain
                     throw new SimulationConflictException(
                         "WorldInteractionManifestationLinkInvalid");
                 var action = AppendActionManifestationAndProgression(
-                    evidence.행위발현기록);
+                    evidence.행위발현기록, evidence.집중판정결과);
                 worldInteractionManifestations.Add(
                     CloneWorldInteractionManifestation(manifestation));
                 return new Simulation세계상호작용실행Result<T>
@@ -85,6 +86,7 @@ namespace Ssalddel.Simulation.Domain
                     AuthorityResult = result,
                     행위발현기록 = action.기록,
                     분야성장적용 = action.성장적용,
+                    명상성장적용 = action.명상성장적용,
                     Reused = action.재사용,
                 };
             }

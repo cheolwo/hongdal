@@ -64,6 +64,14 @@ public sealed class SimulationNatureSurvivalController(
         [FromBody] SimulationNatureSurvivalClockAdvanceRequest request)
         => Execute(() => service.AdvanceClock(sessionStableId, request));
 
+    [HttpPost("focus-timing/attempts")]
+    [ProducesResponseType(typeof(Simulation집중판정ChallengeSnapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<Simulation집중판정ChallengeSnapshot> SubmitFocusTiming(
+        string sessionStableId,
+        [FromBody] Simulation집중판정AttemptRequest request)
+        => Execute(() => service.SubmitFocusTiming(sessionStableId, request));
+
     private ActionResult<T> Execute<T>(Func<T> action)
     {
         try

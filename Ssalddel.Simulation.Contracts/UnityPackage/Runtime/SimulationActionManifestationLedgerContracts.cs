@@ -30,6 +30,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string 대기변경 = "AtmosphereChanged";
         public const string 시간상태변경 = "TimeStateChanged";
         public const string 플레이어진척변경 = "PlayerProgressChanged";
+        public const string 플레이어명상변경 = "MeditationProgressChanged";
+        public const string 플레이어회복변경 = "PlayerRecoveryChanged";
     }
 
     public static class Simulation분야성장적용상태Codes
@@ -54,6 +56,7 @@ namespace Ssalddel.Simulation.Contracts
             { get; set; } = new SimulationWorldInteractionManifestationRecord();
         public Simulation행위발현Record 행위발현기록 { get; set; }
             = new Simulation행위발현Record();
+        public Simulation집중판정ResultSnapshot? 집중판정결과 { get; set; }
     }
 
     public sealed class Simulation세계상호작용실행Result<T>
@@ -63,6 +66,8 @@ namespace Ssalddel.Simulation.Contracts
             = new Simulation행위발현Record();
         public Simulation분야성장적용Snapshot 분야성장적용 { get; set; }
             = new Simulation분야성장적용Snapshot();
+        public Simulation명상성장적용Snapshot 명상성장적용 { get; set; }
+            = new Simulation명상성장적용Snapshot();
         public bool Reused { get; set; }
     }
 

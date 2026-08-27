@@ -603,13 +603,26 @@ public sealed class SimulationNatureSurvivalTests
         {
             SimulationEngineInteractionPhaseCodes.Preview,
             SimulationEngineInteractionPhaseCodes.Confirm,
+            SimulationEngineInteractionPhaseCodes.FocusEvidenceCollect,
             SimulationEngineInteractionPhaseCodes.AuthorityCommit,
             SimulationEngineInteractionPhaseCodes.ActionRecordAppend,
             SimulationEngineInteractionPhaseCodes.PlayerProgressionApply,
+            SimulationEngineInteractionPhaseCodes.MeditationProgressionApply,
             SimulationEngineInteractionPhaseCodes.ReturnProjection,
         }, trace.Select(value => value.PhaseCode));
         Assert.All(trace, value => Assert.Equal("LocalProcess",
             value.AuthorityLocationCode));
+        var focusEvidence = trace.Single(value => value.PhaseCode ==
+            SimulationEngineInteractionPhaseCodes.FocusEvidenceCollect);
+        Assert.Equal(SimulationEngineInteractionStatusCodes.NotApplicable,
+            focusEvidence.StatusCode);
+        Assert.Equal("FocusProfileNotConfigured", focusEvidence.ReasonCode);
+        var meditationProgress = trace.Single(value => value.PhaseCode ==
+            SimulationEngineInteractionPhaseCodes.MeditationProgressionApply);
+        Assert.Equal(SimulationEngineInteractionStatusCodes.NotApplicable,
+            meditationProgress.StatusCode);
+        Assert.Equal("FocusEvidenceNotProvided",
+            meditationProgress.ReasonCode);
         Assert.Equal(aggregate.Revision,
             trace.Last().AfterAuthorityRevision);
         var action = Assert.Single(aggregate.GetActionManifestationLedger()!
@@ -2010,6 +2023,148 @@ public sealed class SimulationNatureSurvivalTests
         Assert.True(state!.HasAxe);
         Assert.Equal(SimulationNatureSurvivalCodes.ProfileRevision,
             state.ProfileRevision);
+    }
+
+    [Fact]
+    public void 벌목집중은_완료때만_현장과명상을지급하고_v29재생을보존한다()
+    {
+        var request = CreateR5Request();
+        request.NatureMind = new SimulationNatureMindInitialStateRequest
+        {
+            Players = new[]
+            {
+                new SimulationNatureMindPlayerInitialStateRequest
+                {
+                    PlayerStableId = "player:solo",
+                },
+            },
+        };
+        var aggregate = new 경영SimulationSessionAggregate(request);
+        var sessions = new InMemory경영SimulationSessionStore();
+        sessions.Restore(aggregate);
+        var service = new SimulationNatureSurvivalService(sessions);
+        var started = service.Confirm(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:focus:harvest",
+            ExpectedRevision = aggregate.Revision,
+            PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.BeginHarvest,
+            TargetStableId = "resource:nature-tree:01",
+        });
+        var offered = service.Get(aggregate.SessionStableId)
+            .ActiveFocusChallenge!;
+
+        Assert.Equal(0, aggregate.GetPlayerDomainProfile()!
+            .분야진척들.Single(value => value.분야StableId ==
+                Simulation플레이어분야Codes.채집자원).현장숙련도);
+        service.SubmitFocusTiming(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:focus:attempt",
+            ChallengeStableId = offered.ChallengeStableId,
+            ExpectedWorldRevision = started.Revision,
+            ExpectedChallengeRevision = offered.ChallengeRevision,
+            InputOffsetMillis = 500,
+        });
+        service.AdvanceClock(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:focus:complete",
+            ExpectedRevision = aggregate.Revision,
+            ElapsedRealtimeSeconds = NatureSurvivalRules.HarvestWorkSeconds,
+            WorkInputHeld = true,
+        });
+
+        var state = service.Get(aggregate.SessionStableId);
+        var profile = aggregate.GetPlayerDomainProfile()!;
+        Assert.Null(state.ActiveFocusChallenge);
+        Assert.Equal(Simulation집중판정Codes.Perfect,
+            state.LastFocusResult!.ResultCode);
+        Assert.Equal(250, profile.명상경험Milli);
+        Assert.Equal(0, profile.명상숙련도);
+        Assert.Equal(2, profile.분야진척들.Single(value =>
+            value.분야StableId == Simulation플레이어분야Codes.채집자원)
+            .현장숙련도);
+        Assert.Equal(.25m, aggregate.GetNatureMindState().Balances
+            .Single().RecoveryOutput);
+        Assert.Contains(aggregate.GetNatureMindState().Effects, value =>
+            value.SourceCode == SimulationNatureMindCodes.FocusTimingCompleted
+            && value.Magnitude == .25m);
+        var completionRecord = aggregate.GetActionManifestationLedger()!
+            .TailRecords.Single(value => value.CommandId ==
+                "command:focus:harvest:completed");
+        Assert.Contains(Simulation행위변화의미Codes.플레이어명상변경,
+            completionRecord.변화의미Codes);
+        Assert.Contains(Simulation행위변화의미Codes.플레이어회복변경,
+            completionRecord.변화의미Codes);
+        Assert.Contains(state.LastFocusResult!.SourceStableId,
+            completionRecord.SourceReferenceIds);
+        Assert.Contains(profile.명상기여기록들.Single().ContributionStableId,
+            completionRecord.SourceReferenceIds);
+
+        var saved = aggregate.CreateSavePackage(new()
+        {
+            SaveStableId = "save:nature-focus:v29",
+            ExpectedRevision = aggregate.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(saved);
+        var savedAgain = restored.CreateSavePackage(new()
+        {
+            SaveStableId = saved.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(SimulationSaveSchemaVersions.V29, saved.SchemaVersion);
+        Assert.Equal(saved.ReplayHash, savedAgain.ReplayHash);
+        Assert.Equal(250,
+            restored.GetPlayerDomainProfile()!.명상경험Milli);
+    }
+
+    [Fact]
+    public void 벌목취소는_집중을무효화하고_숙련과심리효과를남기지않는다()
+    {
+        var request = CreateR5Request();
+        request.NatureMind = new SimulationNatureMindInitialStateRequest
+        {
+            Players = new[]
+            {
+                new SimulationNatureMindPlayerInitialStateRequest
+                    { PlayerStableId = "player:solo" },
+            },
+        };
+        var aggregate = new 경영SimulationSessionAggregate(request);
+        var sessions = new InMemory경영SimulationSessionStore();
+        sessions.Restore(aggregate);
+        var service = new SimulationNatureSurvivalService(sessions);
+        service.Confirm(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:focus:cancel-start",
+            ExpectedRevision = aggregate.Revision,
+            PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.BeginHarvest,
+            TargetStableId = "resource:nature-tree:01",
+        });
+        var challenge = service.Get(aggregate.SessionStableId)
+            .ActiveFocusChallenge!;
+        service.SubmitFocusTiming(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:focus:cancel-attempt",
+            ChallengeStableId = challenge.ChallengeStableId,
+            ExpectedWorldRevision = aggregate.Revision,
+            ExpectedChallengeRevision = challenge.ChallengeRevision,
+            InputOffsetMillis = 500,
+        });
+        service.Confirm(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:focus:cancel",
+            ExpectedRevision = aggregate.Revision,
+            PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.CancelActiveWork,
+            TargetStableId = "resource:nature-tree:01",
+        });
+
+        Assert.Equal(Simulation집중판정Codes.Voided,
+            service.Get(aggregate.SessionStableId).LastFocusResult!.StateCode);
+        Assert.Equal(0, aggregate.GetPlayerDomainProfile()!.명상숙련도);
+        Assert.Equal(0, aggregate.GetPlayerDomainProfile()!.명상경험Milli);
+        Assert.Empty(aggregate.GetNatureMindState().Effects);
     }
 
     private static 경영SimulationSessionSnapshot Confirm(

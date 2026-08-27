@@ -203,6 +203,13 @@ namespace Ssalddel.Simulation.Application
             => ExecuteAsync(() => nature.AdvanceClock(sessionStableId, request),
                 cancellationToken);
 
+        public ValueTask<Simulation집중판정ChallengeSnapshot>
+            SubmitFocusTimingAsync(string sessionStableId,
+                Simulation집중판정AttemptRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => nature.SubmitFocusTiming(
+                sessionStableId, request), cancellationToken);
+
         public ValueTask<SimulationTurnClosingContextSnapshot>
             GetTurnClosingContextAsync(string sessionStableId,
                 CancellationToken cancellationToken = default)

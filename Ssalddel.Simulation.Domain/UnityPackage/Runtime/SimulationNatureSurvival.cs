@@ -641,10 +641,12 @@ namespace Ssalddel.Simulation.Domain
                 }
                 natureActiveWork = new SimulationNatureActiveWorkSnapshot
                 {
+                    OriginCommandId = request.CommandId.Trim(),
                     WorkKindCode = SimulationNatureSurvivalCodes.Harvest,
                     TargetStableId = NormalizeOptional(request.TargetStableId),
                     RequiredWorkSeconds = NatureSurvivalRules.HarvestWorkSeconds,
                 };
+                BeginNatureHarvestFocus(request);
             }
             else if (action == SimulationNatureSurvivalCodes.CollectDroppedTimber)
             {
@@ -777,6 +779,9 @@ namespace Ssalddel.Simulation.Domain
                     cancelledWorldInteractionId,
                     new[] { "effect:nature:work-cancelled" },
                     new[] { "WorkCancelled" }, Revision + 1L);
+                if (cancelled.WorkKindCode ==
+                    SimulationNatureSurvivalCodes.Harvest)
+                    VoidNatureHarvestFocus(cancelled.OriginCommandId);
                 natureActiveWork = null;
             }
             else if (action == SimulationNatureSurvivalCodes.StoreAtCabin)
@@ -828,6 +833,7 @@ namespace Ssalddel.Simulation.Domain
 
             if (natureActiveWork.WorkKindCode == SimulationNatureSurvivalCodes.Harvest)
             {
+                var completedWork = CloneNatureActiveWork(natureActiveWork)!;
                 var node = natureResourceNodes[natureActiveWork.TargetStableId];
                 node.StateCode = SimulationNatureSurvivalCodes.Stump;
                 node.RegrowsAtCycleIndex = natureCycleIndex
@@ -847,6 +853,8 @@ namespace Ssalddel.Simulation.Domain
                     IsNatureR5
                         ? new[] { "DroppedTimberCreated", "ResourceNodeDepleted" }
                         : new[] { "TimberAdded", "ResourceNodeDepleted" },
+                    Revision + 1L);
+                CompleteNatureHarvestActionAndFocus(completedWork,
                     Revision + 1L);
             }
             else if (natureActiveWork.WorkKindCode == SimulationNatureSurvivalCodes.CabinBuild)
@@ -1051,6 +1059,9 @@ namespace Ssalddel.Simulation.Domain
                         StringComparer.Ordinal)
                     .Select(CloneNatureDroppedTimber).ToArray(),
                 ActiveWork = CloneNatureActiveWork(natureActiveWork),
+                ActiveFocusChallenge = CloneFocusChallenge(
+                    natureActiveFocusChallenge),
+                LastFocusResult = CloneFocusResult(natureLastFocusResult),
                 Cabin = CloneNatureCabin(natureCabin),
                 Encounter = CloneNatureEncounter(natureEncounter),
                 SimulationOnly = true,
@@ -1411,6 +1422,7 @@ namespace Ssalddel.Simulation.Domain
             RequireStableId(request.SpawnH1StableId, "SimulationNatureH1StableIdInvalid");
             if (request.InventoryCapacityUnits <= 0m)
                 throw new SimulationContractException("SimulationNatureInventoryCapacityInvalid");
+            Simulation집중판정Policy.Create(request.FocusAccessibilityModeCode);
             if (request.ResourceNodes == null || request.ResourceNodes.Length == 0)
                 throw new SimulationContractException("SimulationNatureResourceNodesMissing");
             var ids = new HashSet<string>(StringComparer.Ordinal);
@@ -1468,6 +1480,7 @@ namespace Ssalddel.Simulation.Domain
                 request.SpawnH2StableId.Trim(), request.SpawnH1StableId.Trim(),
                 request.InventoryCapacityUnits.ToString(CultureInfo.InvariantCulture),
                 request.StartsWithAxe.ToString(),
+                request.FocusAccessibilityModeCode,
                 request.BuildingProgressionCatalog?.Revision ?? string.Empty,
                 request.BuildingProgressionCatalog?.HashSha256 ?? string.Empty,
                 string.Join(";", request.ResourceNodes
@@ -1519,6 +1532,7 @@ namespace Ssalddel.Simulation.Domain
                 SpawnH1StableId = source.SpawnH1StableId,
                 InventoryCapacityUnits = source.InventoryCapacityUnits,
                 StartsWithAxe = source.StartsWithAxe,
+                FocusAccessibilityModeCode = source.FocusAccessibilityModeCode,
                 BuildingProgressionCatalog = source.BuildingProgressionCatalog == null
                     ? null : Simulation영역건물발전Catalog.Clone(
                         source.BuildingProgressionCatalog),
@@ -1573,6 +1587,9 @@ namespace Ssalddel.Simulation.Domain
                 DroppedTimber = source.DroppedTimber
                     .Select(CloneNatureDroppedTimber).ToArray(),
                 ActiveWork = CloneNatureActiveWork(source.ActiveWork),
+                ActiveFocusChallenge = CloneFocusChallenge(
+                    source.ActiveFocusChallenge),
+                LastFocusResult = CloneFocusResult(source.LastFocusResult),
                 Cabin = CloneNatureCabin(source.Cabin),
                 Encounter = CloneNatureEncounter(source.Encounter),
                 SimulationOnly = source.SimulationOnly,
@@ -1613,6 +1630,7 @@ namespace Ssalddel.Simulation.Domain
             SimulationNatureActiveWorkSnapshot? source)
             => source == null ? null : new SimulationNatureActiveWorkSnapshot
             {
+                OriginCommandId = source.OriginCommandId,
                 WorkKindCode = source.WorkKindCode,
                 TargetStableId = source.TargetStableId,
                 RequiredWorkSeconds = source.RequiredWorkSeconds,

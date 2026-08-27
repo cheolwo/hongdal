@@ -21,7 +21,7 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
 
         Assert.True(result.Passed);
         Assert.Empty(result.FailureCodes);
-        Assert.Equal(16, result.TraceEntries.Length);
+        Assert.Equal(18, result.TraceEntries.Length);
     }
 
     [Fact]
@@ -138,6 +138,32 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
     }
 
     [Fact]
+    public void 명상성장NotApplicable은_사유가있어야통과한다()
+    {
+        var profile = SimulationNatureFirstDayEngineValidationProfiles.Get(
+            "WI-NATURE-15");
+        var trace = CompleteTrace("WI-NATURE-15", "command:no-meditation");
+        var progression = trace.Single(value => value.ComponentCode ==
+            SimulationEngineInteractionComponentCodes
+                .PlayerMeditationProgression);
+        progression.StatusCode =
+            SimulationEngineInteractionStatusCodes.NotApplicable;
+
+        var validator = new SimulationPlayableLoopEngineInteractionValidator();
+        var missingReason = validator.Validate(profile, trace,
+            "command:no-meditation");
+        progression.ReasonCode = "MeditationContributionNotPresent";
+        var explained = validator.Validate(profile, trace,
+            "command:no-meditation");
+
+        Assert.False(missingReason.Passed);
+        Assert.Contains(
+            "EngineInteractionNotApplicableReasonMissing:Simulation.PlayerMeditationProgression",
+            missingReason.FailureCodes);
+        Assert.True(explained.Passed);
+    }
+
+    [Fact]
     public void 수집기는_명령별순서를부여하고_사본을반환한다()
     {
         var sink = new InMemorySimulationPlayableLoopEngineTraceSink();
@@ -177,6 +203,9 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
             (SimulationEngineInteractionComponentCodes.WorldInteractionPipeline,
                 SimulationEngineInteractionPhaseCodes.Confirm,
                 SimulationEngineInteractionComponentKinds.Orchestration),
+            (SimulationEngineInteractionComponentCodes.WorldInteractionPipeline,
+                SimulationEngineInteractionPhaseCodes.FocusEvidenceCollect,
+                SimulationEngineInteractionComponentKinds.Orchestration),
             (SimulationEngineInteractionComponentCodes.AuthorityCore,
                 SimulationEngineInteractionPhaseCodes.AuthorityCommit,
                 SimulationEngineInteractionComponentKinds.Authority),
@@ -185,6 +214,9 @@ public sealed class SimulationPlayableLoopEngineInteractionTests
                 SimulationEngineInteractionComponentKinds.Authority),
             (SimulationEngineInteractionComponentCodes.PlayerDomainProgression,
                 SimulationEngineInteractionPhaseCodes.PlayerProgressionApply,
+                SimulationEngineInteractionComponentKinds.Authority),
+            (SimulationEngineInteractionComponentCodes.PlayerMeditationProgression,
+                SimulationEngineInteractionPhaseCodes.MeditationProgressionApply,
                 SimulationEngineInteractionComponentKinds.Authority),
             (SimulationEngineInteractionComponentCodes.WorldInteractionPipeline,
                 SimulationEngineInteractionPhaseCodes.ReturnProjection,

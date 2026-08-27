@@ -158,6 +158,15 @@ namespace Ssalddel.Simulation.Domain
                         package.SchemaVersion;
                     package.SchemaVersion = SimulationSaveSchemaVersions.V28;
                 }
+                if (package.PlayerDomainProfile?.명상기여기록들?.Length > 0
+                    && string.Equals(package.PlayerDomainProfile.SchemaCode,
+                        Simulation플레이어분야SchemaCodes.분야Profile,
+                        StringComparison.Ordinal))
+                {
+                    package.FocusMeditationBaseSchemaVersion =
+                        package.SchemaVersion;
+                    package.SchemaVersion = SimulationSaveSchemaVersions.V29;
+                }
                 package.ReplayHash = SimulationReplayHasher.Calculate(package);
                 return SimulationSaveReplayCloner.ClonePackage(package);
             }
@@ -195,6 +204,19 @@ namespace Ssalddel.Simulation.Domain
                 ResultingWorldRevision = Revision,
                 NatureSurvivalClockAdvanceRequest =
                     SimulationSaveReplayCloner.CloneNatureSurvivalClockRequest(request),
+            });
+
+        private void AppendNatureFocusTimingCommand(
+            Simulation집중판정AttemptRequest request)
+            => commandLog.Add(new SimulationCommandLogEntrySnapshot
+            {
+                Sequence = commandLog.Count + 1L,
+                CommandTypeCode =
+                    SimulationCommandTypeCodes.NatureFocusTimingAttempt,
+                AppliedWorldTick = CurrentTick,
+                ResultingWorldRevision = Revision,
+                NatureFocusTimingAttemptRequest = SimulationSaveReplayCloner
+                    .CloneFocusTimingAttemptRequest(request),
             });
 
         private void AppendActorItemAcquireCommand(

@@ -36,11 +36,8 @@ namespace Ssalddel.Simulation.Domain
         {
             this.catalog = catalog;
             ValidateCatalog(catalog);
-            state = Clone(snapshot);
-            if (!string.Equals(state.SchemaCode,
-                    Simulation플레이어분야SchemaCodes.분야Profile,
-                    StringComparison.Ordinal)
-                || !string.Equals(state.CatalogRevision, catalog.CatalogRevision,
+            state = UpgradeLegacyProfile(Clone(snapshot));
+            if (!string.Equals(state.CatalogRevision, catalog.CatalogRevision,
                     StringComparison.Ordinal)
                 || !string.Equals(state.RuleRevision, catalog.RuleRevision,
                     StringComparison.Ordinal))
@@ -186,6 +183,63 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
+        public Simulation플레이어분야ProfileSnapshot ApplyMeditation(
+            Simulation명상숙련기여Request request)
+        {
+            if (request == null) throw new SimulationContractException(
+                "SimulationMeditationProgressRequestRequired");
+            lock (gate)
+            {
+                ValidatePlayer(request.PlayerStableId);
+                var record = ValidateRecord(request.행위기록);
+                var result = request.집중판정결과
+                    ?? throw new SimulationContractException(
+                        "SimulationMeditationFocusResultRequired");
+                if (result.명상경험증가Milli <= 0) return Snapshot();
+                ValidateDomainSkill(result.분야StableId,
+                    result.세부숙련StableId);
+                if (!string.Equals(result.SourceActionRecordStableId,
+                        record.행위기록StableId, StringComparison.Ordinal)
+                    || result.AppliedWorldRevision != record.AfterWorldRevision)
+                    throw new SimulationContractException(
+                        "SimulationMeditationActionLineageInvalid");
+                var id = CalculateMeditationContributionStableId(
+                    result.ChallengeStableId,
+                    record.행위기록StableId, result.RuleRevision);
+                var existing = state.명상기여기록들.SingleOrDefault(value =>
+                    value.ContributionStableId == id);
+                if (existing != null)
+                {
+                    if (existing.명상경험증가Milli != result.명상경험증가Milli
+                        || existing.ResultCode != result.ResultCode)
+                        throw new SimulationConflictException(
+                            "SimulationMeditationContributionPayloadConflict");
+                    return Snapshot();
+                }
+                state.명상기여기록들 = state.명상기여기록들.Concat(new[]
+                {
+                    new Simulation명상숙련기여Snapshot
+                    {
+                        ContributionStableId = id,
+                        PlayerStableId = state.PlayerStableId,
+                        ChallengeStableId = result.ChallengeStableId,
+                        SourceActionRecordStableId = record.행위기록StableId,
+                        WorldInteractionId = record.WorldInteractionId,
+                        분야StableId = result.분야StableId,
+                        세부숙련StableId = result.세부숙련StableId,
+                        ResultCode = result.ResultCode,
+                        명상경험증가Milli = result.명상경험증가Milli,
+                        AppliedWorldRevision = result.AppliedWorldRevision,
+                        RuleRevision = Simulation집중판정Codes.MeditationRuleRevision,
+                    },
+                }).OrderBy(value => value.ContributionStableId,
+                    StringComparer.Ordinal).ToArray();
+                RefreshMeditationSummary();
+                CompleteMutation();
+                return Snapshot();
+            }
+        }
+
         public Simulation플레이어분야PerspectiveWorldState CreatePerspective(
             string dataRevision, string interpretationRevision,
             string[] authorizedFactCodes)
@@ -253,10 +307,131 @@ namespace Ssalddel.Simulation.Domain
                 Add(canonical, contribution.현장숙련도증가량); Add(canonical, contribution.운영숙련도증가량);
                 Add(canonical, contribution.AppliedWorldRevision); Add(canonical, contribution.RuleRevision);
             }
+            Add(canonical, value.명상경험Milli);
+            Add(canonical, value.명상숙련도);
+            Add(canonical, value.명상숙련도단계Code);
+            foreach (var summary in value.명상분야기여요약들.OrderBy(item =>
+                         item.분야StableId, StringComparer.Ordinal).ThenBy(item =>
+                         item.세부숙련StableId, StringComparer.Ordinal))
+            {
+                Add(canonical, summary.분야StableId);
+                Add(canonical, summary.세부숙련StableId);
+                Add(canonical, summary.ContributionCount);
+                Add(canonical, summary.명상경험Milli);
+            }
+            foreach (var meditation in value.명상기여기록들.OrderBy(item =>
+                         item.ContributionStableId, StringComparer.Ordinal))
+            {
+                Add(canonical, meditation.ContributionStableId);
+                Add(canonical, meditation.PlayerStableId);
+                Add(canonical, meditation.ChallengeStableId);
+                Add(canonical, meditation.SourceActionRecordStableId);
+                Add(canonical, meditation.WorldInteractionId);
+                Add(canonical, meditation.분야StableId);
+                Add(canonical, meditation.세부숙련StableId);
+                Add(canonical, meditation.ResultCode);
+                Add(canonical, meditation.명상경험증가Milli);
+                Add(canonical, meditation.AppliedWorldRevision);
+                Add(canonical, meditation.RuleRevision);
+            }
             using var sha = SHA256.Create();
             return BitConverter.ToString(sha.ComputeHash(
                     Encoding.UTF8.GetBytes(canonical.ToString())))
                 .Replace("-", string.Empty).ToLowerInvariant();
+        }
+
+        private static Simulation플레이어분야ProfileSnapshot UpgradeLegacyProfile(
+            Simulation플레이어분야ProfileSnapshot profile)
+        {
+            if (!string.Equals(profile.SchemaCode,
+                    Simulation플레이어분야SchemaCodes.분야ProfileV1,
+                    StringComparison.Ordinal))
+            {
+                if (!string.Equals(profile.SchemaCode,
+                        Simulation플레이어분야SchemaCodes.분야Profile,
+                        StringComparison.Ordinal))
+                    throw new SimulationContractException(
+                        "SimulationPlayerDomainProfileRevisionInvalid");
+                return profile;
+            }
+
+            if (!string.Equals(profile.StateHashSha256,
+                    CalculateLegacyV1Hash(profile), StringComparison.Ordinal))
+                throw new SimulationContractException(
+                    "SimulationPlayerDomainProfileHashMismatch");
+            profile.SchemaCode = Simulation플레이어분야SchemaCodes.분야Profile;
+            profile.명상경험Milli = 0;
+            profile.명상숙련도 = 0;
+            profile.명상숙련도단계Code = Simulation분야단계Codes.미경험;
+            profile.명상분야기여요약들 =
+                Array.Empty<Simulation명상분야기여요약Snapshot>();
+            profile.명상기여기록들 =
+                Array.Empty<Simulation명상숙련기여Snapshot>();
+            profile.StateHashSha256 = CalculateHash(profile);
+            return profile;
+        }
+
+        internal static string CalculateLegacyV1Hash(
+            Simulation플레이어분야ProfileSnapshot value)
+        {
+            var upgradedSchema = value.SchemaCode;
+            var meditationMilli = value.명상경험Milli;
+            var meditation = value.명상숙련도;
+            var meditationStage = value.명상숙련도단계Code;
+            var summaries = value.명상분야기여요약들;
+            var contributions = value.명상기여기록들;
+            value.SchemaCode = Simulation플레이어분야SchemaCodes.분야ProfileV1;
+            value.명상경험Milli = 0;
+            value.명상숙련도 = 0;
+            value.명상숙련도단계Code = string.Empty;
+            value.명상분야기여요약들 = Array.Empty<Simulation명상분야기여요약Snapshot>();
+            value.명상기여기록들 = Array.Empty<Simulation명상숙련기여Snapshot>();
+            try
+            {
+                var canonical = new StringBuilder();
+                Add(canonical, value.SchemaCode); Add(canonical, value.PlayerStableId);
+                Add(canonical, value.Revision); Add(canonical, value.CatalogRevision);
+                Add(canonical, value.RuleRevision);
+                foreach (var progress in value.분야진척들.OrderBy(item =>
+                             item.분야StableId, StringComparer.Ordinal))
+                {
+                    Add(canonical, progress.분야StableId); Add(canonical, progress.이해도);
+                    Add(canonical, progress.현장숙련도); Add(canonical, progress.운영숙련도);
+                    Add(canonical, progress.이해도단계Code); Add(canonical, progress.현장숙련도단계Code);
+                    Add(canonical, progress.운영숙련도단계Code);
+                    foreach (var skill in progress.세부숙련진척들.OrderBy(item =>
+                                 item.세부숙련StableId, StringComparer.Ordinal))
+                    {
+                        Add(canonical, skill.세부숙련StableId); Add(canonical, skill.이해도);
+                        Add(canonical, skill.현장숙련도); Add(canonical, skill.운영숙련도);
+                    }
+                    AddStrings(canonical, progress.활성해금Codes);
+                }
+                foreach (var contribution in value.기여기록들.OrderBy(item =>
+                             item.ContributionStableId, StringComparer.Ordinal))
+                {
+                    Add(canonical, contribution.ContributionStableId);
+                    Add(canonical, contribution.PlayerStableId); Add(canonical, contribution.SourceCode);
+                    Add(canonical, contribution.분야StableId); Add(canonical, contribution.세부숙련StableId);
+                    Add(canonical, contribution.PublicationStableId); Add(canonical, contribution.PublicationRevision);
+                    Add(canonical, contribution.WorldInteractionId); Add(canonical, contribution.OriginCommandId);
+                    Add(canonical, contribution.SourceActionRecordStableId);
+                    Add(canonical, contribution.EffectBatchStableId); Add(canonical, contribution.EffectReceiptStableId);
+                    Add(canonical, contribution.결과Code); Add(canonical, contribution.이해도증가량);
+                    Add(canonical, contribution.현장숙련도증가량); Add(canonical, contribution.운영숙련도증가량);
+                    Add(canonical, contribution.AppliedWorldRevision); Add(canonical, contribution.RuleRevision);
+                }
+                return Hash(canonical.ToString());
+            }
+            finally
+            {
+                value.SchemaCode = upgradedSchema;
+                value.명상경험Milli = meditationMilli;
+                value.명상숙련도 = meditation;
+                value.명상숙련도단계Code = meditationStage;
+                value.명상분야기여요약들 = summaries;
+                value.명상기여기록들 = contributions;
+            }
         }
 
         private void ApplyBindings(SimulationWI분야결속Definition binding,
@@ -329,6 +504,39 @@ namespace Ssalddel.Simulation.Domain
         }
 
         private void RefreshHash() => state.StateHashSha256 = CalculateHash(state);
+
+        private void RefreshMeditationSummary()
+        {
+            state.명상경험Milli = state.명상기여기록들.Sum(value =>
+                value.명상경험증가Milli);
+            state.명상숙련도 = checked((int)(state.명상경험Milli /
+                Simulation집중판정Codes.MilliPerPoint));
+            state.명상숙련도단계Code = MeditationStage(
+                state.명상경험Milli, catalog.숙련도단계기준들);
+            state.명상분야기여요약들 = state.명상기여기록들
+                .GroupBy(value => new
+                {
+                    value.분야StableId,
+                    value.세부숙련StableId,
+                }).OrderBy(group => group.Key.분야StableId,
+                    StringComparer.Ordinal).ThenBy(group =>
+                    group.Key.세부숙련StableId, StringComparer.Ordinal)
+                .Select(group => new Simulation명상분야기여요약Snapshot
+                {
+                    분야StableId = group.Key.분야StableId,
+                    세부숙련StableId = group.Key.세부숙련StableId,
+                    ContributionCount = group.Count(),
+                    명상경험Milli = group.Sum(value =>
+                        value.명상경험증가Milli),
+                }).ToArray();
+        }
+
+        private static string MeditationStage(long value,
+            Simulation분야단계기준Definition[] thresholds)
+            => thresholds.Where(item =>
+                    (long)item.최소진척 *
+                    Simulation집중판정Codes.MilliPerPoint <= value)
+                .OrderByDescending(item => item.최소진척).First().단계Code;
 
         private Simulation행위발현Record ValidateRecord(Simulation행위발현Record record)
         {
@@ -425,6 +633,12 @@ namespace Ssalddel.Simulation.Domain
             => "domain-contribution:" + Hash(string.Join("|", sourceKey,
                 source, domain, skill)).Substring(0, 32);
 
+        internal static string CalculateMeditationContributionStableId(
+            string challenge,
+            string actionRecord, string revision)
+            => "meditation-contribution:" + Hash(string.Join("|",
+                challenge, actionRecord, revision)).Substring(0, 32);
+
         private static string EffectReceiptId(string contributionId)
             => "domain-progress-effect:" + Hash(contributionId).Substring(0, 32);
 
@@ -470,6 +684,34 @@ namespace Ssalddel.Simulation.Domain
                 RuleRevision = value.RuleRevision,
                 분야진척들 = value.분야진척들.Select(Clone).ToArray(),
                 기여기록들 = value.기여기록들.Select(Clone).ToArray(),
+                명상경험Milli = value.명상경험Milli,
+                명상숙련도 = value.명상숙련도,
+                명상숙련도단계Code = value.명상숙련도단계Code,
+                명상분야기여요약들 = (value.명상분야기여요약들
+                    ?? Array.Empty<Simulation명상분야기여요약Snapshot>())
+                    .Select(item => new Simulation명상분야기여요약Snapshot
+                    {
+                        분야StableId = item.분야StableId,
+                        세부숙련StableId = item.세부숙련StableId,
+                        ContributionCount = item.ContributionCount,
+                        명상경험Milli = item.명상경험Milli,
+                    }).ToArray(),
+                명상기여기록들 = (value.명상기여기록들
+                    ?? Array.Empty<Simulation명상숙련기여Snapshot>())
+                    .Select(item => new Simulation명상숙련기여Snapshot
+                    {
+                        ContributionStableId = item.ContributionStableId,
+                        PlayerStableId = item.PlayerStableId,
+                        ChallengeStableId = item.ChallengeStableId,
+                        SourceActionRecordStableId = item.SourceActionRecordStableId,
+                        WorldInteractionId = item.WorldInteractionId,
+                        분야StableId = item.분야StableId,
+                        세부숙련StableId = item.세부숙련StableId,
+                        ResultCode = item.ResultCode,
+                        명상경험증가Milli = item.명상경험증가Milli,
+                        AppliedWorldRevision = item.AppliedWorldRevision,
+                        RuleRevision = item.RuleRevision,
+                    }).ToArray(),
                 StateHashSha256 = value.StateHashSha256,
             };
 
