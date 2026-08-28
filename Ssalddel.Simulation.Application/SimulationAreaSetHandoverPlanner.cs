@@ -78,12 +78,20 @@ namespace Ssalddel.Simulation.Application
                 .ToDictionary(group => group.Key, group => group.First(),
                     StringComparer.Ordinal);
 
-            var candidates = definition.CorridorInstances
+            var physicalCandidates = definition.CorridorInstances
                 .Where(value => value.FromAreaSetInstanceStableId == current
                                 || value.ToAreaSetInstanceStableId == current)
                 .Select(corridor => CreateCandidate(
                     corridor, current, focusX, focusZ, direction,
-                    request.MovementDirectionCode, definition, accessByArea))
+                    request.MovementDirectionCode, definition, accessByArea));
+            var reservedCandidates = definition.ReservedConnections
+                .Where(value => value.FromAreaSetInstanceStableId == current
+                                || value.ToAreaSetInstanceStableId == current)
+                .Select(connection => CreateReservedCandidate(
+                    connection, current, focusX, focusZ, direction,
+                    request.MovementDirectionCode, definition, accessByArea));
+            var candidates = physicalCandidates
+                .Concat(reservedCandidates)
                 .OrderByDescending(value => value.HeadingAlignment01)
                 .ThenBy(value => value.DistanceToTransitionMeters)
                 .ThenBy(value => value.TargetAreaSetStableId, StringComparer.Ordinal)
@@ -119,6 +127,79 @@ namespace Ssalddel.Simulation.Application
                 response.WorldLayoutHashSha256,
                 response.AvailabilityCode,
                 string.Join(",", candidates.Select(value => value.CandidateHashSha256)),
+            }));
+            return response;
+        }
+
+        private static SimulationAreaSetHandoverCandidateResponse CreateReservedCandidate(
+            SimulationWorldReservedConnectionResponse connection,
+            string current,
+            double focusX,
+            double focusZ,
+            (double X, double Z) direction,
+            string directionCode,
+            SimulationWorldLayoutDefinitionResponse definition,
+            IReadOnlyDictionary<string, SimulationPlayerAreaAccessSnapshot> accessByArea)
+        {
+            var target = connection.FromAreaSetInstanceStableId == current
+                ? connection.ToAreaSetInstanceStableId
+                : connection.FromAreaSetInstanceStableId;
+            var anchor = definition.AreaAnchors.Single(value =>
+                value.AreaSetStableId == target);
+            if (anchor.PlacementStateCode != SimulationWorldLayoutCodes.Reserved
+                || anchor.CanTraverse || anchor.CanActivate)
+                throw new InvalidOperationException("AreaSetHandoverReservedAnchorInvalid");
+
+            var deltaX = anchor.FixedPlacementTransform.LocalXMeters - focusX;
+            var deltaZ = anchor.FixedPlacementTransform.LocalZMeters - focusZ;
+            var distance = Math.Sqrt(deltaX * deltaX + deltaZ * deltaZ);
+            var alignment = directionCode == SimulationLhWorldCodes.None || distance < .000001d
+                ? .5d
+                : Math.Clamp((deltaX / distance * direction.X
+                              + deltaZ / distance * direction.Z + 1d) / 2d, 0d, 1d);
+            var access = accessByArea.TryGetValue(target, out var accessEntry)
+                ? accessEntry.AccessStateCode
+                : SimulationAreaSetHandoverCodes.AccessUnknown;
+            var blockers = new[]
+            {
+                SimulationAreaSetHandoverCodes.AreaSetCorridorReserved,
+                SimulationAreaSetHandoverCodes.AreaSetPlacementReserved,
+                "AreaSetActualE5PackageMissing",
+            };
+            var response = new SimulationAreaSetHandoverCandidateResponse
+            {
+                TargetAreaSetStableId = target,
+                RelationStableId = connection.RelationStableId,
+                CorridorInstanceStableId = string.Empty,
+                CorridorLandscapeGraphStableId = string.Empty,
+                OverlapPolicyCode = SimulationWorldLayoutCodes.Disallow,
+                SpatialRealizationCode = SimulationWorldLayoutCodes.ReservedCorridor,
+                DistanceToTransitionMeters = Math.Round(distance, 3),
+                HeadingAlignment01 = Math.Round(alignment, 6),
+                PreparationTargetCode = SimulationAreaSetHandoverCodes.Known,
+                SemanticDepthCode = "H4",
+                ArtifactAvailabilityCode = SimulationAreaSetHandoverCodes.H5Reserved,
+                ResidencyStateCode = SimulationAreaSetHandoverCodes.NotResident,
+                SimulationAccessStateCode = access,
+                ActivationAuthorityCode = SimulationAreaSetHandoverCodes.PreviewConfirmWorldTick,
+                RequiredCapabilityCodes = Array.Empty<string>(),
+                BlockingReasonCodes = blockers.OrderBy(value => value, StringComparer.Ordinal).ToArray(),
+                RequiresActualE5Package = true,
+                RequiresE6Grounding = false,
+                CanRequestTraversal = false,
+                CanActivate = false,
+            };
+            response.CandidateHashSha256 = Hash(string.Join("|", new[]
+            {
+                definition.WorldLayoutHashSha256,
+                current,
+                response.TargetAreaSetStableId,
+                response.RelationStableId,
+                response.SpatialRealizationCode,
+                response.DistanceToTransitionMeters.ToString("0.000", CultureInfo.InvariantCulture),
+                response.HeadingAlignment01.ToString("0.000000", CultureInfo.InvariantCulture),
+                response.ArtifactAvailabilityCode,
+                string.Join(",", response.BlockingReasonCodes),
             }));
             return response;
         }

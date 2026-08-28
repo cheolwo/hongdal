@@ -119,6 +119,9 @@ Require ([string] $policy.realityGroundingDefaults.applicationStateCode -eq "Not
 Require (-not [bool] $policy.realityGroundingDefaults.requiredForScenarioExecution) "WorldGroundingMustNotBlockScenario"
 Require (@($policy.realityGroundingDefaults.globalRequiredEvidencePurposeCodes).Count -eq 0) "WorldGroundingGlobalRequirementsForbidden"
 Require (@($policy.physicalCorridors).Count -eq 3) "PhysicalCorridorCount"
+Require (@($policy.areaAnchors).Count -eq 5) "AreaAnchorCount"
+Require (@($policy.areaAnchors.canonicalAreaRoleCode | Sort-Object -Unique).Count -eq 5) "AreaAnchorRoleCount"
+Require (@($policy.reservedConnections).Count -eq 1) "ReservedConnectionCount"
 Require ([bool] $policy.presentationOnly -and -not [bool] $policy.isOperationalState) "AuthorityBoundary"
 
 $actualAreaById = @{}
@@ -238,11 +241,14 @@ foreach ($areaId in @($areaTransforms.Keys | Sort-Object)) {
     $entry = $areaLocal[$areaId]
     $transform = $areaTransforms[$areaId]
     $placementHash = Text-Hash (Stable-Json $transform)
-    $role = [string] $entry.AreaDocument.areaRoleCode
+    $sourceRole = [string] $entry.AreaDocument.areaRoleCode
+    $role = if ($sourceRole -eq "CityHub") { "Hub" } else { $sourceRole }
+    [object[]] $legacyRoles = if ($sourceRole -eq $role) { @() } else { @($sourceRole) }
     $areaInstances += [ordered]@{
         areaSetInstanceStableId = $areaId
         blueprintStableId = [string] $entry.BlueprintStableId
         areaRoleCode = $role
+        legacyAreaRoleCodes = @($legacyRoles)
         loadPolicyCode = [string] $entry.AreaDocument.loadPolicyCode
         placementTransform = $transform
         graphInstances = @($entry.GraphInstances)
@@ -250,6 +256,58 @@ foreach ($areaId in @($areaTransforms.Keys | Sort-Object)) {
         placementHashSha256 = $placementHash
         instanceHashSha256 = Text-Hash (Stable-Json ([ordered]@{ area = $areaId; blueprint = [string] $entry.BlueprintStableId; placement = $placementHash; graphs = @($entry.GraphInstances.instanceHashSha256) }))
     }
+}
+
+$areaAnchors = @()
+foreach ($anchorPolicy in @($policy.areaAnchors | Sort-Object areaSetStableId)) {
+    $areaId = [string] $anchorPolicy.areaSetStableId
+    $state = [string] $anchorPolicy.placementStateCode
+    Require (@("Composed", "Reserved") -contains $state) "AreaAnchorState:$areaId"
+    $fixed = Placement "ScenarioLocalMeters" ([double] $anchorPolicy.localXMeters) ([double] $anchorPolicy.localZMeters) ([double] $anchorPolicy.rotationDegrees)
+    if ($state -eq "Composed") {
+        Require ($areaTransforms.ContainsKey($areaId)) "ComposedAreaAnchorMissing:$areaId"
+        $actualTransform = $areaTransforms[$areaId]
+        Require ((Pose-Distance $fixed $actualTransform) -le 0.000001) "ComposedAreaAnchorPositionChanged:$areaId"
+        Require (([Math]::Abs((Normalize-Rotation ([double] $fixed.rotationDegrees - [double] $actualTransform.rotationDegrees)))) -le 0.000001) "ComposedAreaAnchorRotationChanged:$areaId"
+        Require ([bool] $anchorPolicy.canTraverse -and [bool] $anchorPolicy.canActivate) "ComposedAreaAnchorMustBeUsable:$areaId"
+    }
+    else {
+        Require (-not $areaTransforms.ContainsKey($areaId)) "ReservedAreaAnchorMustNotBeComposed:$areaId"
+        Require (-not [bool] $anchorPolicy.canTraverse -and -not [bool] $anchorPolicy.canActivate) "ReservedAreaAnchorMustBeBlocked:$areaId"
+    }
+    $core = [ordered]@{
+        areaSetStableId = $areaId
+        canonicalAreaRoleCode = [string] $anchorPolicy.canonicalAreaRoleCode
+        legacyAreaRoleCodes = @($anchorPolicy.legacyAreaRoleCodes | Sort-Object -Unique)
+        placementStateCode = $state
+        areaCharacterProfileCode = [string] $anchorPolicy.areaCharacterProfileCode
+        placementRuleCodes = @($anchorPolicy.placementRuleCodes | Sort-Object -Unique)
+        fixedPlacementTransform = $fixed
+        canPrefetchMetadata = [bool] $anchorPolicy.canPrefetchMetadata
+        canTraverse = [bool] $anchorPolicy.canTraverse
+        canActivate = [bool] $anchorPolicy.canActivate
+    }
+    $core.anchorHashSha256 = Text-Hash (Stable-Json $core)
+    $areaAnchors += $core
+}
+
+$anchorById = @{}; foreach ($anchor in $areaAnchors) { $anchorById[[string] $anchor.areaSetStableId] = $anchor }
+$reservedConnections = @()
+foreach ($source in @($policy.reservedConnections | Sort-Object relationStableId)) {
+    $fromId = [string] $source.fromAreaSetStableId
+    $toId = [string] $source.toAreaSetStableId
+    Require ($anchorById.ContainsKey($fromId) -and $anchorById.ContainsKey($toId)) "ReservedConnectionAnchorMissing:$($source.relationStableId)"
+    Require ([string] $source.spatialRealizationCode -eq "ReservedCorridor") "ReservedConnectionRealization:$($source.relationStableId)"
+    Require ([string] $anchorById[$toId].placementStateCode -eq "Reserved") "ReservedConnectionTargetMustBeReserved:$($source.relationStableId)"
+    $core = [ordered]@{
+        relationStableId = [string] $source.relationStableId
+        fromAreaSetInstanceStableId = $fromId
+        toAreaSetInstanceStableId = $toId
+        spatialRealizationCode = "ReservedCorridor"
+        relationKindCode = [string] $source.relationKindCode
+    }
+    $core.connectionHashSha256 = Text-Hash (Stable-Json $core)
+    $reservedConnections += $core
 }
 
 $corridorByRelation = @{}; foreach ($item in $corridorInstances) { $corridorByRelation[[string] $item.relationStableId] = $item }
@@ -266,6 +324,17 @@ foreach ($relation in @($actual.network.relations | Sort-Object relationStableId
         corridorInstanceStableId = if ($null -ne $physical) { [string] $physical.corridorInstanceStableId } else { "" }
     }
 }
+foreach ($reserved in $reservedConnections) {
+    $relations += [ordered]@{
+        relationStableId = [string] $reserved.relationStableId
+        fromAreaSetInstanceStableId = [string] $reserved.fromAreaSetInstanceStableId
+        toAreaSetInstanceStableId = [string] $reserved.toAreaSetInstanceStableId
+        relationKindCode = [string] $reserved.relationKindCode
+        spatialRealizationCode = "ReservedCorridor"
+        corridorInstanceStableId = ""
+    }
+}
+$relations = @($relations | Sort-Object relationStableId)
 
 $overlapRules = @()
 $areaIds = @($areaInstances.areaSetInstanceStableId | Sort-Object)
@@ -293,7 +362,9 @@ $definition = [ordered]@{
     coordinateSpaceCode = "ScenarioLocalMeters"
     worldGroundingPolicyCode = [string] $policy.worldGroundingPolicyCode
     areaSetInstances = @($areaInstances)
+    areaAnchors = @($areaAnchors)
     corridorInstances = @($corridorInstances)
+    reservedConnections = @($reservedConnections)
     relations = @($relations)
     overlapRules = @($overlapRules)
     worldLayoutHashSha256 = ""
@@ -359,11 +430,14 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- H5: ``$($definition.worldLayoutStableId)``")
 [void] $builder.AppendLine("- H4 AreaSet 인스턴스: ``$($areaInstances.Count)``")
+[void] $builder.AppendLine("- 고정 영역 앵커: ``$($areaAnchors.Count)`` (조립 ``$(@($areaAnchors | Where-Object placementStateCode -eq 'Composed').Count)`` / 예약 ``$(@($areaAnchors | Where-Object placementStateCode -eq 'Reserved').Count)``)")
 [void] $builder.AppendLine("- 물리 회랑: ``$($corridorInstances.Count)``")
+[void] $builder.AppendLine("- 예약 회랑: ``$($reservedConnections.Count)``")
 [void] $builder.AppendLine("- 현실 결속: ``$($definition.worldGroundingPolicyCode) / $($binding.worldGroundingStateCode)``")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("E6가 없어도 이 H5는 ScenarioRelative 권위 세계다. E6는 H5 이하 상대 X/Z 배치를 바꾸지 않는다.")
 [void] $builder.AppendLine("DEM·도로는 전역 필수 자료가 아니며 선택한 현실 결속 프로필의 준비도에만 참여한다.")
+[void] $builder.AppendLine("예약 City 앵커는 위치와 특징만 고정하며 Actual E5 Graph·통행·활성화를 의미하지 않는다.")
 $markdown = Normalize $builder.ToString()
 
 $jsonPath = Resolve-RepoPath $OutputPath
@@ -373,7 +447,7 @@ if ($Mode -eq "Check") {
     Require (Test-Path -LiteralPath $markdownPath) "MarkdownOutputMissing"
     Require ((Normalize ([IO.File]::ReadAllText($jsonPath))) -ceq $json) "JsonOutputStale"
     Require ((Normalize ([IO.File]::ReadAllText($markdownPath))) -ceq $markdown) "MarkdownOutputStale"
-    Write-Output "H5WorldLayoutValid:AreaSets=$($areaInstances.Count);Corridors=$($corridorInstances.Count);Grounding=Optional/NotApplied"
+    Write-Output "H5WorldLayoutValid:AreaSets=$($areaInstances.Count);Anchors=$($areaAnchors.Count);Corridors=$($corridorInstances.Count);Reserved=$($reservedConnections.Count);Grounding=Optional/NotApplied"
     exit 0
 }
 
@@ -384,4 +458,4 @@ foreach ($pair in @(@($jsonPath, $json), @($markdownPath, $markdown))) {
         [IO.File]::WriteAllText($pair[0], [string] $pair[1], [Text.UTF8Encoding]::new($false))
     }
 }
-Write-Output "H5WorldLayoutGenerated:AreaSets=$($areaInstances.Count);Corridors=$($corridorInstances.Count);Grounding=Optional/NotApplied"
+Write-Output "H5WorldLayoutGenerated:AreaSets=$($areaInstances.Count);Anchors=$($areaAnchors.Count);Corridors=$($corridorInstances.Count);Reserved=$($reservedConnections.Count);Grounding=Optional/NotApplied"

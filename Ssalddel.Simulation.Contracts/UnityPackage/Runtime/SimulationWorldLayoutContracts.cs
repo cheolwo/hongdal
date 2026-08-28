@@ -30,6 +30,17 @@ namespace Ssalddel.Simulation.Contracts
         public const string ContainmentAllowed = "ContainmentAllowed";
         public const string AbstractTravel = "AbstractTravel";
         public const string PhysicalCorridor = "PhysicalCorridor";
+        public const string ReservedCorridor = "ReservedCorridor";
+        public const string Composed = "Composed";
+        public const string Reserved = "Reserved";
+        public const string Hub = "Hub";
+        public const string LegacyCityHub = "CityHub";
+        public const string City = "City";
+
+        public static string NormalizeAreaRoleCode(string value) =>
+            string.Equals(value, LegacyCityHub, StringComparison.Ordinal)
+                ? Hub
+                : value ?? string.Empty;
     }
 
     public sealed class SimulationWorldPlacementTransformResponse
@@ -73,6 +84,7 @@ namespace Ssalddel.Simulation.Contracts
         public string AreaSetInstanceStableId { get; set; } = string.Empty;
         public string BlueprintStableId { get; set; } = string.Empty;
         public string AreaRoleCode { get; set; } = string.Empty;
+        public string[] LegacyAreaRoleCodes { get; set; } = Array.Empty<string>();
         public string LoadPolicyCode { get; set; } = string.Empty;
         public SimulationWorldPlacementTransformResponse PlacementTransform { get; set; } = new();
         public SimulationWorldGraphInstanceResponse[] GraphInstances { get; set; } =
@@ -81,6 +93,33 @@ namespace Ssalddel.Simulation.Contracts
             Array.Empty<SimulationWorldConnectorPoseResponse>();
         public string PlacementHashSha256 { get; set; } = string.Empty;
         public string InstanceHashSha256 { get; set; } = string.Empty;
+    }
+
+    public sealed class SimulationWorldAreaAnchorResponse
+    {
+        public string AreaSetStableId { get; set; } = string.Empty;
+        public string CanonicalAreaRoleCode { get; set; } = string.Empty;
+        public string[] LegacyAreaRoleCodes { get; set; } = Array.Empty<string>();
+        public string PlacementStateCode { get; set; } =
+            SimulationWorldLayoutCodes.Composed;
+        public string AreaCharacterProfileCode { get; set; } = string.Empty;
+        public string[] PlacementRuleCodes { get; set; } = Array.Empty<string>();
+        public SimulationWorldPlacementTransformResponse FixedPlacementTransform { get; set; } = new();
+        public bool CanPrefetchMetadata { get; set; } = true;
+        public bool CanTraverse { get; set; }
+        public bool CanActivate { get; set; }
+        public string AnchorHashSha256 { get; set; } = string.Empty;
+    }
+
+    public sealed class SimulationWorldReservedConnectionResponse
+    {
+        public string RelationStableId { get; set; } = string.Empty;
+        public string FromAreaSetInstanceStableId { get; set; } = string.Empty;
+        public string ToAreaSetInstanceStableId { get; set; } = string.Empty;
+        public string SpatialRealizationCode { get; set; } =
+            SimulationWorldLayoutCodes.ReservedCorridor;
+        public string RelationKindCode { get; set; } = string.Empty;
+        public string ConnectionHashSha256 { get; set; } = string.Empty;
     }
 
     public sealed class SimulationWorldCorridorInstanceResponse
@@ -140,8 +179,12 @@ namespace Ssalddel.Simulation.Contracts
         public string WorldGroundingPolicyCode { get; set; } = SimulationWorldLayoutCodes.Optional;
         public SimulationWorldAreaSetInstanceResponse[] AreaSetInstances { get; set; } =
             Array.Empty<SimulationWorldAreaSetInstanceResponse>();
+        public SimulationWorldAreaAnchorResponse[] AreaAnchors { get; set; } =
+            Array.Empty<SimulationWorldAreaAnchorResponse>();
         public SimulationWorldCorridorInstanceResponse[] CorridorInstances { get; set; } =
             Array.Empty<SimulationWorldCorridorInstanceResponse>();
+        public SimulationWorldReservedConnectionResponse[] ReservedConnections { get; set; } =
+            Array.Empty<SimulationWorldReservedConnectionResponse>();
         public SimulationWorldLayoutRelationResponse[] Relations { get; set; } =
             Array.Empty<SimulationWorldLayoutRelationResponse>();
         public SimulationWorldOverlapRuleResponse[] OverlapRules { get; set; } =

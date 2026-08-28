@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-h5-layout-policy.v1",
-  "revision": "simulation-world-h5-layout-policy.r3",
-  "outputRevision": 2,
+  "revision": "simulation-world-h5-layout-policy.r4",
+  "outputRevision": 3,
   "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
   "worldIntentStableId": "theory-world:nature-farm-city-town",
   "areaSetNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
@@ -13,6 +13,87 @@
     "globalRequiredEvidencePurposeCodes": []
   },
   "rootAreaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+  "areaAnchors": [
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+      "canonicalAreaRoleCode": "NatureHome",
+      "legacyAreaRoleCodes": [],
+      "placementStateCode": "Composed",
+      "areaCharacterProfileCode": "nature-woodland-recovery.r1",
+      "placementRuleCodes": ["IrregularTerrain", "LowBuildingDensity", "ThreatOuterRing", "WoodlandClearingCore"],
+      "localXMeters": 0.0,
+      "localZMeters": 0.0,
+      "rotationDegrees": 0.0,
+      "canPrefetchMetadata": true,
+      "canTraverse": true,
+      "canActivate": true
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+      "canonicalAreaRoleCode": "Farm",
+      "legacyAreaRoleCodes": [],
+      "placementStateCode": "Composed",
+      "areaCharacterProfileCode": "farm-crossroad-potato-production.r1",
+      "placementRuleCodes": ["CrossroadFourFields", "FenceContinuityWithEntrances", "GentleWorkSlope", "NoRidgeBuilding", "ProductionProcessingSeparation"],
+      "localXMeters": 634.910789,
+      "localZMeters": -93.977416,
+      "rotationDegrees": 209.013842,
+      "canPrefetchMetadata": true,
+      "canTraverse": true,
+      "canActivate": true
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "canonicalAreaRoleCode": "Hub",
+      "legacyAreaRoleCodes": ["CityHub"],
+      "placementStateCode": "Composed",
+      "areaCharacterProfileCode": "hub-flat-logistics-junction.r1",
+      "placementRuleCodes": ["FlatHardscape", "VehicleTurningRadius", "InboundInspectionPutawaySequence", "OutboundStagingSeparation"],
+      "localXMeters": 395.256719,
+      "localZMeters": -564.642079,
+      "rotationDegrees": 128.503119,
+      "canPrefetchMetadata": true,
+      "canTraverse": true,
+      "canActivate": true
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+      "canonicalAreaRoleCode": "Town",
+      "legacyAreaRoleCodes": [],
+      "placementStateCode": "Composed",
+      "areaCharacterProfileCode": "town-lowrise-market-life.r1",
+      "placementRuleCodes": ["LowRiseMixedUse", "PedestrianMarketSpine", "ResidentNeedReturnRoute", "ServiceTrafficControl"],
+      "localXMeters": -384.825022,
+      "localZMeters": -1929.888118,
+      "rotationDegrees": 124.211245,
+      "canPrefetchMetadata": true,
+      "canTraverse": true,
+      "canActivate": true
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:city-service.v1",
+      "canonicalAreaRoleCode": "City",
+      "legacyAreaRoleCodes": [],
+      "placementStateCode": "Reserved",
+      "areaCharacterProfileCode": "city-dense-service-grid.r1",
+      "placementRuleCodes": ["DenseServiceGrid", "LargeServiceFacilities", "PublicSpaceNetwork", "ReservedUntilActualE5"],
+      "localXMeters": -980.157889,
+      "localZMeters": -2971.799236,
+      "rotationDegrees": 124.211245,
+      "canPrefetchMetadata": true,
+      "canTraverse": false,
+      "canActivate": false
+    }
+  ],
+  "reservedConnections": [
+    {
+      "relationStableId": "area-set-relation:h5:towntocity",
+      "fromAreaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+      "toAreaSetStableId": "area-set:sim:pyeongchang:city-service.v1",
+      "relationKindCode": "PlayerTraversal",
+      "spatialRealizationCode": "ReservedCorridor"
+    }
+  ],
   "physicalCorridors": [
     {
       "relationCode": "NatureToFarm",

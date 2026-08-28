@@ -96,6 +96,48 @@ public sealed class SimulationAreaSetHandoverPlannerTests
     }
 
     [Fact]
+    public void Town에서_City는_H4메타데이터후보로만보이고_통행과활성화가차단된다()
+    {
+        var planner = new SimulationAreaSetHandoverPlanner(Reader());
+        var plan = planner.Plan(new SimulationAreaSetHandoverPlanRequest
+        {
+            RequestEpoch = "epoch:handover:reserved-city",
+            FocusL3CellKey = SimulationLhWorldService.L3CellKey(
+                SimulationLhWorldService.CenterL3X - 3,
+                SimulationLhWorldService.CenterL3Y - 15),
+            MovementDirectionCode = SimulationLhWorldCodes.SouthWest,
+            CurrentAreaSetStableId = "area-set:sim:pyeongchang:town-market.v1",
+            AreaAccess = new SimulationPlayerAreaAccessStateSnapshot
+            {
+                CurrentAreaSetStableId = "area-set:sim:pyeongchang:town-market.v1",
+                AccessEntries = new[]
+                {
+                    new SimulationPlayerAreaAccessSnapshot
+                    {
+                        AreaSetStableId = "area-set:sim:pyeongchang:city-service.v1",
+                        AccessStateCode = SimulationAreaAccessCodes.Granted,
+                    },
+                },
+            },
+        });
+
+        var city = Assert.Single(plan.Candidates, value =>
+            value.TargetAreaSetStableId == "area-set:sim:pyeongchang:city-service.v1");
+        Assert.Equal(SimulationWorldLayoutCodes.ReservedCorridor,
+            city.SpatialRealizationCode);
+        Assert.Equal(SimulationAreaSetHandoverCodes.H5Reserved,
+            city.ArtifactAvailabilityCode);
+        Assert.Equal("H4", city.SemanticDepthCode);
+        Assert.Contains(SimulationAreaSetHandoverCodes.AreaSetPlacementReserved,
+            city.BlockingReasonCodes);
+        Assert.Contains(SimulationAreaSetHandoverCodes.AreaSetCorridorReserved,
+            city.BlockingReasonCodes);
+        Assert.False(city.CanRequestTraversal);
+        Assert.False(city.CanActivate);
+        Assert.False(plan.ChangesCurrentAreaSet);
+    }
+
+    [Fact]
     public async Task LH_HTTP_Preview는_세션현재AreaSet의_인계후보를함께제공한다()
     {
         using var factory = CreateFactory();

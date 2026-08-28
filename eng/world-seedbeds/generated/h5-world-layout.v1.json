@@ -1,12 +1,12 @@
 {
   "schemaVersion": "simulation-world-h5-spatial-output.v1",
-  "revision": "simulation-world-h5-spatial-output.r2",
-  "policyRevision": "simulation-world-h5-layout-policy.r3",
+  "revision": "simulation-world-h5-spatial-output.r3",
+  "policyRevision": "simulation-world-h5-layout-policy.r4",
   "generatedAtRuleCode": "DeterministicNoWallClock",
   "worldLayoutDefinition": {
     "schemaVersion": "simulation-world-layout-definition.v1",
     "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
-    "worldLayoutRevision": 2,
+    "worldLayoutRevision": 3,
     "worldIntentStableId": "theory-world:nature-farm-city-town",
     "areaSetNetworkStableId": "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1",
     "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -16,6 +16,9 @@
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:farm-production.v1",
         "blueprintStableId": "h4-blueprint:farm-production-processing-region",
         "areaRoleCode": "Farm",
+        "legacyAreaRoleCodes": [
+          null
+        ],
         "loadPolicyCode": "OnDemand",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -315,7 +318,10 @@
       {
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
         "blueprintStableId": "h4-blueprint:logistics-hub-region",
-        "areaRoleCode": "CityHub",
+        "areaRoleCode": "Hub",
+        "legacyAreaRoleCodes": [
+          "CityHub"
+        ],
         "loadPolicyCode": "OnDemand",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -616,6 +622,9 @@
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:nature-home.v1",
         "blueprintStableId": "h4-blueprint:nature-home-exploration-region",
         "areaRoleCode": "NatureHome",
+        "legacyAreaRoleCodes": [
+          null
+        ],
         "loadPolicyCode": "Persistent",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -846,6 +855,9 @@
         "areaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
         "blueprintStableId": "h4-blueprint:lowrise-market-region",
         "areaRoleCode": "Town",
+        "legacyAreaRoleCodes": [
+          null
+        ],
         "loadPolicyCode": "OnDemand",
         "placementTransform": {
           "coordinateSpaceCode": "ScenarioLocalMeters",
@@ -1061,15 +1073,15 @@
               {
                 "connectorStableId": "stub:actual-e5:town-resident-service-loop:egress",
                 "coordinateSpaceCode": "ParentLocalMeters",
-                "localXMeters": 170.0,
-                "localZMeters": -140.72,
-                "rotationDegrees": 125.26795,
+                "localXMeters": -170.0,
+                "localZMeters": -250.0,
+                "rotationDegrees": 221.420146,
                 "widthMeters": 6.0,
                 "directionCode": "Egress",
                 "travelTypeCodes": [
                   "PlayerTraversal"
                 ],
-                "connectorPoseHashSha256": "b175b0634ecc72a17c34f181f8025e16bcfe7ec8897476ad711a28a934a1bf2d"
+                "connectorPoseHashSha256": "30810d8a8c90bbc572b5bb6bd10b613981ff09fb39a43e164152d1d951f0a1cf"
               }
             ],
             "sourcePatternHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278",
@@ -1198,19 +1210,149 @@
           {
             "connectorStableId": "stub:actual-e5:town-resident-service-loop:egress",
             "coordinateSpaceCode": "ParentLocalMeters",
-            "localXMeters": -790.0,
-            "localZMeters": 339.28,
-            "rotationDegrees": 125.26795,
+            "localXMeters": -1130.0,
+            "localZMeters": 230.0,
+            "rotationDegrees": 221.420146,
             "widthMeters": 6.0,
             "directionCode": "Egress",
             "travelTypeCodes": [
               "PlayerTraversal"
             ],
-            "connectorPoseHashSha256": "3407c990faeccf53feca936f4b45c38f2379ee06a9d6f49974d9adf6895236d1"
+            "connectorPoseHashSha256": "905861362d79dce271c4983b3a5e7fd473205e1087ca2660e8b650ad6d550622"
           }
         ],
         "placementHashSha256": "316f550af37ddc055ccc7f5f65ce30e8cced2b786b14003fe776ce1c08c76da6",
         "instanceHashSha256": "8624b989619d02631d45951e2d506be6678cf6e7192990f86e0090b78de435de"
+      }
+    ],
+    "areaAnchors": [
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:city-service.v1",
+        "canonicalAreaRoleCode": "City",
+        "legacyAreaRoleCodes": [],
+        "placementStateCode": "Reserved",
+        "areaCharacterProfileCode": "city-dense-service-grid.r1",
+        "placementRuleCodes": [
+          "DenseServiceGrid",
+          "LargeServiceFacilities",
+          "PublicSpaceNetwork",
+          "ReservedUntilActualE5"
+        ],
+        "fixedPlacementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": -980.157889,
+          "localZMeters": -2971.799236,
+          "rotationDegrees": 124.211245,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "canPrefetchMetadata": true,
+        "canTraverse": false,
+        "canActivate": false,
+        "anchorHashSha256": "5663812410b270df59eab6d8e50a8fcc354ac8544d9f17760a2a7925e02a0532"
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "canonicalAreaRoleCode": "Farm",
+        "legacyAreaRoleCodes": [],
+        "placementStateCode": "Composed",
+        "areaCharacterProfileCode": "farm-crossroad-potato-production.r1",
+        "placementRuleCodes": [
+          "CrossroadFourFields",
+          "FenceContinuityWithEntrances",
+          "GentleWorkSlope",
+          "NoRidgeBuilding",
+          "ProductionProcessingSeparation"
+        ],
+        "fixedPlacementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": 634.910789,
+          "localZMeters": -93.977416,
+          "rotationDegrees": 209.013842,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "canPrefetchMetadata": true,
+        "canTraverse": true,
+        "canActivate": true,
+        "anchorHashSha256": "87d52dd0f2bf99ea52d7dd05d31332d91877d5153a30eec92705ae6851b48d63"
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "canonicalAreaRoleCode": "Hub",
+        "legacyAreaRoleCodes": [
+          "CityHub"
+        ],
+        "placementStateCode": "Composed",
+        "areaCharacterProfileCode": "hub-flat-logistics-junction.r1",
+        "placementRuleCodes": [
+          "FlatHardscape",
+          "InboundInspectionPutawaySequence",
+          "OutboundStagingSeparation",
+          "VehicleTurningRadius"
+        ],
+        "fixedPlacementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": 395.256719,
+          "localZMeters": -564.642079,
+          "rotationDegrees": 128.503119,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "canPrefetchMetadata": true,
+        "canTraverse": true,
+        "canActivate": true,
+        "anchorHashSha256": "f11788b7d2d6d3f0bdfeb59084e71607b108956b5a58baafbf9e5577b7abca63"
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "canonicalAreaRoleCode": "NatureHome",
+        "legacyAreaRoleCodes": [],
+        "placementStateCode": "Composed",
+        "areaCharacterProfileCode": "nature-woodland-recovery.r1",
+        "placementRuleCodes": [
+          "IrregularTerrain",
+          "LowBuildingDensity",
+          "ThreatOuterRing",
+          "WoodlandClearingCore"
+        ],
+        "fixedPlacementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": 0.0,
+          "localZMeters": 0.0,
+          "rotationDegrees": 0.0,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "canPrefetchMetadata": true,
+        "canTraverse": true,
+        "canActivate": true,
+        "anchorHashSha256": "e753d30bbf0213549f16c977debc69cf08c77653474ffcccd22d54b8e5d2659c"
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "canonicalAreaRoleCode": "Town",
+        "legacyAreaRoleCodes": [],
+        "placementStateCode": "Composed",
+        "areaCharacterProfileCode": "town-lowrise-market-life.r1",
+        "placementRuleCodes": [
+          "LowRiseMixedUse",
+          "PedestrianMarketSpine",
+          "ResidentNeedReturnRoute",
+          "ServiceTrafficControl"
+        ],
+        "fixedPlacementTransform": {
+          "coordinateSpaceCode": "ScenarioLocalMeters",
+          "localXMeters": -384.825022,
+          "localZMeters": -1929.888118,
+          "rotationDegrees": 124.211245,
+          "sizeVariantCode": "Reference",
+          "mirrorCode": "None"
+        },
+        "canPrefetchMetadata": true,
+        "canTraverse": true,
+        "canActivate": true,
+        "anchorHashSha256": "4bdb5db9725ea769cd30ee90b20218cac2e0911a78632ccd7d769351c6fa1724"
       }
     ],
     "corridorInstances": [
@@ -1356,6 +1498,16 @@
         "instanceHashSha256": "4ae2d4b64fabc0e06f41e28008d22da51df69be71da80f9afb43d52707ec3e5f"
       }
     ],
+    "reservedConnections": [
+      {
+        "relationStableId": "area-set-relation:h5:towntocity",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:city-service.v1",
+        "spatialRealizationCode": "ReservedCorridor",
+        "relationKindCode": "PlayerTraversal",
+        "connectionHashSha256": "ab58bb6a2f74ea7f1ecd87265c54f8fc9f2846a2273f65c58bd9c9415c9e76ed"
+      }
+    ],
     "relations": [
       {
         "relationStableId": "area-set-relation:actual-e5:cityhubtonature",
@@ -1420,6 +1572,14 @@
         "relationKindCode": "PlayerTraversal",
         "spatialRealizationCode": "AbstractTravel",
         "corridorInstanceStableId": ""
+      },
+      {
+        "relationStableId": "area-set-relation:h5:towntocity",
+        "fromAreaSetInstanceStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "toAreaSetInstanceStableId": "area-set:sim:pyeongchang:city-service.v1",
+        "relationKindCode": "PlayerTraversal",
+        "spatialRealizationCode": "ReservedCorridor",
+        "corridorInstanceStableId": ""
       }
     ],
     "overlapRules": [
@@ -1460,22 +1620,22 @@
         "corridorInstanceStableId": ""
       }
     ],
-    "worldLayoutHashSha256": "71f8c3726d8819d7dd429845fe4f33f02b0838f5d63f5d3bb9074cdfe68d7923",
+    "worldLayoutHashSha256": "587044c6cc38afea28ba2f54b54fd2b1cda9be41178804b246a47e2faefd2069",
     "presentationOnly": true,
     "isOperationalState": false
   },
   "worldGroundingBinding": {
     "schemaVersion": "simulation-world-grounding-binding.v1",
     "groundingBindingStableId": "grounding-binding:sim:pyeongchang:nature-farm-hub-town.v1",
-    "groundingBindingRevision": 2,
+    "groundingBindingRevision": 3,
     "worldLayoutStableId": "world-layout:sim:pyeongchang:nature-farm-hub-town.v1",
-    "worldLayoutRevision": 2,
-    "worldLayoutHashSha256": "71f8c3726d8819d7dd429845fe4f33f02b0838f5d63f5d3bb9074cdfe68d7923",
+    "worldLayoutRevision": 3,
+    "worldLayoutHashSha256": "587044c6cc38afea28ba2f54b54fd2b1cda9be41178804b246a47e2faefd2069",
     "placementAuthorityCode": "ScenarioRelative",
     "worldGroundingStateCode": "NotApplied",
     "e6AnchorStableId": "",
     "groundingEvidenceHashSha256": "",
-    "bindingHashSha256": "57e8a2430a5e063034f05a7a3139e8899106ba625d5d1b54544e65d1746eb4be",
+    "bindingHashSha256": "303f7fd1a37fdf1f94e2630ef124eaf3a191ed2a3c2a16a87d71cc405c390ceb",
     "presentationOnly": true,
     "isOperationalState": false
   },

@@ -15,12 +15,13 @@ public sealed class SimulationWorldLayoutTests
     private const string LayoutId = "world-layout:sim:pyeongchang:nature-farm-hub-town.v1";
 
     [Fact]
-    public void H5는_네지역과_세물리회랑을_부모좌표계로읽는다()
+    public void H5는_네조립지역과_다섯고정앵커_세물리회랑을_부모좌표계로읽는다()
     {
         Assert.True(Reader().TryRead(out var catalog, out var errorCode), errorCode);
 
         Assert.Equal(LayoutId, catalog.Definition.WorldLayoutStableId);
         Assert.Equal(4, catalog.Definition.AreaSetInstances.Length);
+        Assert.Equal(5, catalog.Definition.AreaAnchors.Length);
         Assert.Equal(3, catalog.Definition.CorridorInstances.Length);
         Assert.All(catalog.Definition.AreaSetInstances, area =>
         {
@@ -34,6 +35,41 @@ public sealed class SimulationWorldLayoutTests
             item.SpatialRealizationCode == SimulationWorldLayoutCodes.PhysicalCorridor));
         Assert.Equal(5, catalog.Definition.Relations.Count(item =>
             item.SpatialRealizationCode == SimulationWorldLayoutCodes.AbstractTravel));
+        Assert.Single(catalog.Definition.Relations, item =>
+            item.SpatialRealizationCode == SimulationWorldLayoutCodes.ReservedCorridor);
+        var hub = Assert.Single(catalog.Definition.AreaSetInstances, item =>
+            item.AreaSetInstanceStableId == "area-set:sim:pyeongchang:logistics-hub.v1");
+        Assert.Equal(SimulationWorldLayoutCodes.Hub, hub.AreaRoleCode);
+        Assert.Contains(SimulationWorldLayoutCodes.LegacyCityHub, hub.LegacyAreaRoleCodes);
+    }
+
+    [Fact]
+    public void 다섯영역좌표와특징은고정되고_City는예약상태다()
+    {
+        Assert.True(Reader().TryRead(out var catalog, out var errorCode), errorCode);
+
+        var anchors = catalog.Definition.AreaAnchors.ToDictionary(
+            item => item.CanonicalAreaRoleCode, StringComparer.Ordinal);
+        AssertAnchor(anchors["NatureHome"], 0d, 0d,
+            "nature-woodland-recovery.r1", SimulationWorldLayoutCodes.Composed, true);
+        AssertAnchor(anchors["Farm"], 634.910789d, -93.977416d,
+            "farm-crossroad-potato-production.r1", SimulationWorldLayoutCodes.Composed, true);
+        AssertAnchor(anchors[SimulationWorldLayoutCodes.Hub], 395.256719d, -564.642079d,
+            "hub-flat-logistics-junction.r1", SimulationWorldLayoutCodes.Composed, true);
+        Assert.Contains(SimulationWorldLayoutCodes.LegacyCityHub,
+            anchors[SimulationWorldLayoutCodes.Hub].LegacyAreaRoleCodes);
+        AssertAnchor(anchors["Town"], -384.825022d, -1929.888118d,
+            "town-lowrise-market-life.r1", SimulationWorldLayoutCodes.Composed, true);
+        AssertAnchor(anchors[SimulationWorldLayoutCodes.City], -980.157889d, -2971.799236d,
+            "city-dense-service-grid.r1", SimulationWorldLayoutCodes.Reserved, false);
+        Assert.True(anchors[SimulationWorldLayoutCodes.City].CanPrefetchMetadata);
+        Assert.False(anchors[SimulationWorldLayoutCodes.City].CanTraverse);
+        Assert.Single(catalog.Definition.ReservedConnections, value =>
+            value.FromAreaSetInstanceStableId == "area-set:sim:pyeongchang:town-market.v1"
+            && value.ToAreaSetInstanceStableId == "area-set:sim:pyeongchang:city-service.v1");
+        Assert.Equal(SimulationWorldLayoutCodes.Hub,
+            SimulationWorldLayoutCodes.NormalizeAreaRoleCode(
+                SimulationWorldLayoutCodes.LegacyCityHub));
     }
 
     [Fact]
@@ -92,6 +128,29 @@ public sealed class SimulationWorldLayoutTests
     }
 
     [Fact]
+    public void 구판H5의_CityHub역할은읽기호환으로유지한다()
+    {
+        var legacyPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+        try
+        {
+            var legacyJson = File.ReadAllText(CatalogPath())
+                .Replace("\"worldLayoutRevision\": 3", "\"worldLayoutRevision\": 2", StringComparison.Ordinal)
+                .Replace("\"groundingBindingRevision\": 3", "\"groundingBindingRevision\": 2", StringComparison.Ordinal)
+                .Replace("\"areaRoleCode\": \"Hub\"", "\"areaRoleCode\": \"CityHub\"", StringComparison.Ordinal);
+            File.WriteAllText(legacyPath, legacyJson);
+
+            var reader = new FileSimulationWorldLayoutCatalogReader(legacyPath);
+            Assert.True(reader.TryRead(out var catalog, out var errorCode), errorCode);
+            Assert.Contains(catalog.Definition.AreaSetInstances, item =>
+                item.AreaRoleCode == SimulationWorldLayoutCodes.LegacyCityHub);
+        }
+        finally
+        {
+            if (File.Exists(legacyPath)) File.Delete(legacyPath);
+        }
+    }
+
+    [Fact]
     public async Task WorldStream_API가_H5정의와_E6결속_준비도를분리해제공한다()
     {
         using var factory = new WebApplicationFactory<Program>();
@@ -108,12 +167,32 @@ public sealed class SimulationWorldLayoutTests
         Assert.Equal(HttpStatusCode.OK, definitionResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, bindingResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, readinessResponse.StatusCode);
-        Assert.Equal(4, (await definitionResponse.Content
-            .ReadFromJsonAsync<SimulationWorldLayoutDefinitionResponse>())!.AreaSetInstances.Length);
+        var definition = (await definitionResponse.Content
+            .ReadFromJsonAsync<SimulationWorldLayoutDefinitionResponse>())!;
+        Assert.Equal(4, definition.AreaSetInstances.Length);
+        Assert.Equal(5, definition.AreaAnchors.Length);
+        Assert.Single(definition.ReservedConnections);
         Assert.Equal(SimulationWorldLayoutCodes.NotApplied, (await bindingResponse.Content
             .ReadFromJsonAsync<SimulationWorldGroundingBindingResponse>())!.WorldGroundingStateCode);
         Assert.Equal(SimulationWorldLayoutCodes.Partial, (await readinessResponse.Content
             .ReadFromJsonAsync<SimulationWorldGroundingReadinessResponse>())!.GroundingReadinessStateCode);
+    }
+
+    private static void AssertAnchor(
+        SimulationWorldAreaAnchorResponse anchor,
+        double x,
+        double z,
+        string profile,
+        string state,
+        bool canActivate)
+    {
+        Assert.Equal(x, anchor.FixedPlacementTransform.LocalXMeters, 6);
+        Assert.Equal(z, anchor.FixedPlacementTransform.LocalZMeters, 6);
+        Assert.Equal(profile, anchor.AreaCharacterProfileCode);
+        Assert.Equal(state, anchor.PlacementStateCode);
+        Assert.Equal(canActivate, anchor.CanActivate);
+        Assert.NotEmpty(anchor.PlacementRuleCodes);
+        Assert.Equal(64, anchor.AnchorHashSha256.Length);
     }
 
     private static FileSimulationWorldLayoutCatalogReader Reader() => new(CatalogPath());

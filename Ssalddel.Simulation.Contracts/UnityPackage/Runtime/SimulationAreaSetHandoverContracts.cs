@@ -6,7 +6,7 @@ namespace Ssalddel.Simulation.Contracts
     public static class SimulationAreaSetHandoverCodes
     {
         public const string SchemaVersion = "area-set-handover-plan.v1";
-        public const string PlannerRevision = "area-set-handover-planner.r1";
+        public const string PlannerRevision = "area-set-handover-planner.r2";
 
         public const string Known = "Known";
         public const string H3PrepareRequested = "H3PrepareRequested";
@@ -15,10 +15,13 @@ namespace Ssalddel.Simulation.Contracts
             "H1TraversalPreparationRequested";
 
         public const string H5Known = "H5Known";
+        public const string H5Reserved = "H5Reserved";
         public const string NotAvailable = "NotAvailable";
         public const string NotResident = "NotResident";
         public const string AccessUnknown = "AccessUnknown";
         public const string PreviewConfirmWorldTick = "PreviewConfirmWorldTick";
+        public const string AreaSetPlacementReserved = "AreaSetPlacementReserved";
+        public const string AreaSetCorridorReserved = "AreaSetCorridorReserved";
     }
 
     [SsalddelCodeMetadata(

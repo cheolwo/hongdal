@@ -74,6 +74,11 @@ public sealed class FileSimulationWorldLayoutCatalogReader :
         Require(definition.SchemaVersion == SimulationWorldLayoutCodes.DefinitionSchemaVersion, "WorldLayoutDefinitionSchemaMismatch");
         Require(definition.CoordinateSpaceCode == SimulationWorldLayoutCodes.ScenarioLocalMeters, "WorldLayoutCoordinateSpaceInvalid");
         Require(definition.AreaSetInstances.Length == 4 && definition.CorridorInstances.Length == 3, "WorldLayoutInstanceCountInvalid");
+        Require(definition.AreaSetInstances.All(item =>
+                item.AreaRoleCode == SimulationWorldLayoutCodes.NormalizeAreaRoleCode(item.AreaRoleCode)
+                || (definition.WorldLayoutRevision < 3
+                    && item.AreaRoleCode == SimulationWorldLayoutCodes.LegacyCityHub)),
+            "WorldLayoutAreaRoleNotCanonical");
         Require(definition.AreaSetInstances.All(item => item.PlacementTransform.CoordinateSpaceCode == SimulationWorldLayoutCodes.ScenarioLocalMeters), "WorldLayoutAreaCoordinateSpaceInvalid");
         Require(definition.CorridorInstances.All(item => item.PlacementTransform.CoordinateSpaceCode == SimulationWorldLayoutCodes.ScenarioLocalMeters), "WorldLayoutCorridorCoordinateSpaceInvalid");
         Require(definition.AreaSetInstances.SelectMany(item => item.GraphInstances).All(item =>
@@ -84,8 +89,35 @@ public sealed class FileSimulationWorldLayoutCatalogReader :
                 && definition.Relations.Where(item => item.SpatialRealizationCode == SimulationWorldLayoutCodes.PhysicalCorridor)
                     .All(item => definition.CorridorInstances.Any(corridor => corridor.CorridorInstanceStableId == item.CorridorInstanceStableId))
                 && definition.Relations.Where(item => item.SpatialRealizationCode == SimulationWorldLayoutCodes.AbstractTravel)
+                    .All(item => string.IsNullOrEmpty(item.CorridorInstanceStableId))
+                && definition.Relations.Where(item => item.SpatialRealizationCode == SimulationWorldLayoutCodes.ReservedCorridor)
                     .All(item => string.IsNullOrEmpty(item.CorridorInstanceStableId)),
             "WorldLayoutRelationRealizationInvalid");
+        if (definition.WorldLayoutRevision >= 3)
+        {
+            Require(definition.AreaAnchors.Length == 5
+                    && definition.AreaAnchors.Select(item => item.CanonicalAreaRoleCode)
+                        .Distinct(StringComparer.Ordinal).Count() == 5,
+                "WorldLayoutAreaAnchorCountInvalid");
+            Require(definition.AreaAnchors.Count(item => item.PlacementStateCode == SimulationWorldLayoutCodes.Composed) == 4
+                    && definition.AreaAnchors.Count(item => item.PlacementStateCode == SimulationWorldLayoutCodes.Reserved) == 1,
+                "WorldLayoutAreaAnchorStateInvalid");
+            Require(definition.AreaAnchors.Where(item => item.PlacementStateCode == SimulationWorldLayoutCodes.Composed)
+                    .All(anchor => anchor.CanPrefetchMetadata && anchor.CanTraverse && anchor.CanActivate
+                        && definition.AreaSetInstances.Any(instance => instance.AreaSetInstanceStableId == anchor.AreaSetStableId)),
+                "WorldLayoutComposedAnchorInvalid");
+            Require(definition.AreaAnchors.Where(item => item.PlacementStateCode == SimulationWorldLayoutCodes.Reserved)
+                    .All(anchor => anchor.CanPrefetchMetadata && !anchor.CanTraverse && !anchor.CanActivate
+                        && definition.AreaSetInstances.All(instance => instance.AreaSetInstanceStableId != anchor.AreaSetStableId)),
+                "WorldLayoutReservedAnchorInvalid");
+            Require(definition.ReservedConnections.Length == 1
+                    && definition.ReservedConnections.All(item =>
+                        item.SpatialRealizationCode == SimulationWorldLayoutCodes.ReservedCorridor
+                        && definition.AreaAnchors.Any(anchor => anchor.AreaSetStableId == item.FromAreaSetInstanceStableId)
+                        && definition.AreaAnchors.Any(anchor => anchor.AreaSetStableId == item.ToAreaSetInstanceStableId
+                            && anchor.PlacementStateCode == SimulationWorldLayoutCodes.Reserved)),
+                "WorldLayoutReservedConnectionInvalid");
+        }
         Require(IsHash(definition.WorldLayoutHashSha256) && definition.PresentationOnly && !definition.IsOperationalState,
             "WorldLayoutAuthorityInvalid");
         Require(binding.SchemaVersion == SimulationWorldLayoutCodes.GroundingBindingSchemaVersion
