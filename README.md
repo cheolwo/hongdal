@@ -1,5 +1,119 @@
 # 살뜰 (Ssalddel)
 
+살뜰은 **정보 공개형 커뮤니티와 실제 업무 도구**, 그리고 같은 도메인을 플레이 가능한 세계로 검증하는 **Simulation·Unity 게임 프로젝트**를 함께 개발한다. 커뮤니티에서는 사람들이 정보를 비교하고 참여·협력 과정을 투명하게 기록하며, 게임에서는 플레이어가 Nature·Farm·Hub·Town·City에서 직접 선택하고 일하고 살아가면서 세계를 변화시킨다.
+
+## 프로젝트를 한눈에 보기
+
+| 축 | 무엇을 만드는가 | 현재 권위 경계 |
+| --- | --- | --- |
+| 커뮤니티·업무 | 정보 공개, 참여, 공동 원장과 역할별 WebApp | 서버의 업무 원장과 명시적 동의·권한 |
+| Simulation Core | 플레이어·NPC·자원·시설·시간·작업·결과 | Solo의 `LocalProcess`, Hosted의 `RemoteHost`가 같은 규칙 실행 |
+| Unity 게임 | 이동·선택·카메라·공간·건물·애니메이션·UI·Audio | canonical `SimulationWorldShell`이 권위 상태를 입력과 표현으로 연결 |
+
+현재 대표 게임 개발은 Nature에서 생존 기반을 만들고 회복 방법을 배우는 플레이부터 시작한다. 플레이어는 도구를 얻고 자원을 모으며 거점·불·건설·Recipe·수면·위협 대응을 선택할 수 있다. Nature 정착은 의무가 아니며 이후 Farm·Hub·Town·City에서 각 영역의 독립적인 생활·업무 폐루프를 선택할 수 있게 확장한다.
+
+Unity GameObject나 화면은 권위 상태를 직접 변경하지 않는다.
+
+```text
+플레이어 입력
+  → Preview: 가능 여부·비용·위험 확인, 상태 무변경
+  → Confirm: 명시적 선택 확정
+  → Task / Realtime / WorldTick
+  → Effect와 WorldRevision
+  → 최신 상태 사본
+  → Unity 공간·캐릭터·UI·Audio 표현
+```
+
+## 처음 참여하는 사람의 읽기 순서
+
+1. 이 README에서 제품과 게임 개발 구조를 파악한다.
+2. [AI 공용 프로젝트 컨텍스트](docs/ProjectOverview/GptProjectContext.md)에서 시스템별 책임과 현재 경계를 읽는다.
+3. [확정 결정](docs/AI/DECISIONS.md)과 [현재 작업](docs/AI/CURRENT_WORK.md)에서 최신 기준과 실제 검증 상태를 확인한다.
+4. 게임 작업이면 [현재 Codex PlayableLoop Goal](docs/AI/generated/codex-playable-loop-goals.md)에서 활성 폐루프·WI·차단·다음 의존성을 확인한다.
+5. [문답 기록 routing](docs/Architecture/PlayableLoops/PlanningSessions/README.md)에서 해당 주제의 질문·답변·남은 미정을 읽는다.
+6. 활성 Goal이 참조하는 `Approved` 기획서와 E7 작업 명세만 구현 입력으로 사용한다.
+7. 코드 위치는 [Simulation·Unity 코드 지도](docs/AI/generated/simulation-unity-code-map.md)에서 찾고, 완료 여부는 [현재 완료 원장](docs/AI/authority-maps/07_CURRENT_COMPLETION_LEDGER.md)에서 확인한다.
+
+## 문답에서 개발까지
+
+게임 기획은 한 번에 거대한 명세를 확정하지 않는다. 기획 스레드가 한 번에 핵심 질문 하나를 제시하고, 답변을 문답 기록에 판본화한다. 질문은 특정 성장 체계에만 치우치지 않고 Unity 게임을 완성하는 데 필요한 구성요소를 균형 있게 채우도록 설계한다.
+
+```text
+핵심 질문 하나
+  → 사용자 답변과 해석 확인
+  → 상황·선택·대가·실패·회복·귀환 정리
+  → WI·H·권위·표현·저장 영향 기록
+  → 3~5개 답변 또는 한 구성요소가 안정되면 합성
+  → Approved 기획 revision + hash + 작업 명세
+  → 개발 스레드에 좁은 에비던스 상한으로 인계
+  → 코드·시험·Runtime 증거 반환
+  → 다음 질문 또는 가장 이른 E 단계 재개
+```
+
+질문 균형은 단순히 분야별 질문 수를 맞추는 일이 아니다. 플레이어 경험, Simulation 규칙, WI·Task, 조작·카메라, H 공간, 건물·배치·자산, 캐릭터·NPC·애니메이션, UI·Audio·FX, 성장·경제, 외부 자료, Save·온라인, Unity 조립·성능, 시험·Game View·빌드의 공백을 살핀다. 세부 기준은 [PlayableLoop 문답 정밀화 체계](docs/Architecture/PlayableLoop문답정밀화체계.md)를 따른다.
+
+현재 문답은 주제별로 분리돼 있다.
+
+- [Nature 거점·수면·날씨·방어](docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md)
+- [플레이어 내면·명상·계획](docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md)
+- [Nature 자원·LandUse·건설](docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md)
+- [약초·Recipe·조합 제작](docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md)
+- [저장·Load·재진입](docs/Architecture/PlayableLoops/PlanningSessions/저장재진입/save-load-runtime.inquiry.r1.md)
+
+## 게임 개발 체계 용어
+
+| 체계 | 답하는 질문 | 핵심 경계 |
+| --- | --- | --- |
+| `PlayableLoop` | 플레이어가 어떤 상황에서 선택하고 성공·실패·회복·귀환하는가? | 여러 WI가 다음 선택으로 돌아오는 실제 플레이 단위 |
+| `WI` | 세계에서 한 번에 어떤 의미 있는 상태를 바꾸는가? | Preview·Confirm·Task·Effect와 단일 권위 책임 |
+| `H1~H5` | 행동 공간부터 세계 배치까지 무엇을 어떻게 포함하는가? | 공간 조립 깊이이며 에비던스 성숙도와 별개 |
+| `E1~E10` | 논리와 표현이 실제 증거로 어디까지 검증됐는가? | 통합 E는 Logic·Presentation 중 낮은 단계 |
+| `G1~G5` | 각 에비던스 구간을 어떤 관리 체계로 통과시키는가? | G 완료가 E 승격을 자동 의미하지 않음 |
+| `EvidencePackage` | 어떤 revision·환경·시험·화면이 무엇을 증명하는가? | 코드·시험·Runtime·Game View·운영 증거를 분리 |
+
+### H 공간 포함 체계
+
+```text
+H1 행동·작업 공간
+  → H2 여러 H1의 블록
+  → H3 여러 H2의 경관과 이동·업무 폐루프
+  → H4 여러 H3의 위치 독립 AreaSet 청사진
+  → H5 AreaSet 인스턴스와 물리 회랑의 세계 배치
+```
+
+플레이어는 H1을 직접 배치·복구·연결할 수 있고 H2·H3의 성장을 유도할 수 있다. 상위 공간의 실제 성립은 필요한 WI·연결·용량·폐루프를 Simulation 규칙이 판정한다. 자세한 정의와 현재 검증 상태는 [H1~H5 공간 포함 계층 조사](docs/Architecture/H1-H5공간포함계층조사.md)를 따른다.
+
+### 에비던스 체계
+
+`E`는 기능 개수나 공간 크기가 아니라 **Evidence, 즉 검증된 증거의 성숙도**를 뜻한다.
+
+| 단계 | 핵심 질문 |
+| --- | --- |
+| E1 | 플레이어 약속과 권위 계약이 확정됐는가? |
+| E2 | 계약을 실행할 Core·Adapter가 준비됐는가? |
+| E3 | 선택과 결과가 시험·저장·재생에서 결정적인가? |
+| E4 | WI의 주체·자원·시간·H 문맥이 결속됐는가? |
+| E5 | 선택과 결과가 권위 세계에서 실제로 발현되는가? |
+| E6 | 의미·인과·배치·피드백·귀환 결함이 정제됐는가? |
+| E7 | 사람이 저장 Scene에서 실제 입력으로 폐루프를 끝낼 수 있는가? |
+| E8 | 같은 E7 폐루프가 Save·Replay·Local/Remote·재진입에서 반복 안정적인가? |
+| E9 | 같은 영역의 안정 Core 둘 이상이 논리·표현으로 조화롭고 사람이 승인했는가? |
+| E10 | 불변 후보가 제한 운영 관찰을 통과했는가? |
+
+각 PlayableUnit은 E7에서 E1로 영향을 내려 검토하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1에서 E7로 다시 조립한다. 결함이 발견되면 같은 Goal에서 가장 이른 책임 단계로 돌아간다. E8~E10은 E7 뒤의 별도 수평 캠페인이다. 현재 기준은 [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](docs/Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md)다.
+
+### G 관리 체계
+
+| 관리 체계 | 주 구간 | 관리 책임 |
+| --- | --- | --- |
+| G1 | E1→E6 | 세계 성립, WI·H·결정성·정제 |
+| G2 | E6→E7 | 실제 입력·카메라·피드백·Game View |
+| G3 | E7→E8 | 반복 결정성·Save/Replay·Local/Remote 안정 |
+| G4 | E8→E9 | 여러 Core의 영역 조화와 사람 평가 |
+| G5 | E9→E10 | 불변 후보의 제한 운영과 관찰 |
+
+예를 들어 `G2 구현 완료`만으로 E7이 되지 않는다. 실제 저장 Scene, 입력, 권위 결과, Game View와 Console 증거가 같은 후보 revision에서 닫혀야 한다.
+
 <p align="center">
   <a href="https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/">
     <strong>01~05 역할별 상시 체험 포털 열기 →</strong>
@@ -28,7 +142,7 @@
 
 ## 운영 업무 Simulation · Unity
 
-[Ssalddel Unity](https://github.com/cheolwo/unity)는 농장·수확·물류 거점·판로·도시로 이어지는 살뜰의 운영 업무를 공간과 상호작용으로 검증하는 Unity 프로젝트입니다. 생산물 stable ID와 서버 revision을 유지하면서 `Preview → Confirm → WorldTick → 최신 상태 재조회` 흐름을 게임 월드에서 표현합니다.
+[Ssalddel Unity](https://github.com/cheolwo/unity)는 살뜰의 Nature 생존과 Farm·Hub·Town·City의 독립적인 생활·업무 폐루프를 공간과 상호작용으로 검증하는 Unity 프로젝트입니다. 고유 식별자와 권위 revision을 유지하면서 `Preview → Confirm → Task·Realtime·WorldTick → 최신 상태 재조회` 흐름을 게임 월드에서 표현합니다. 영역 간 운송은 각 영역의 내부 폐루프가 성립한 뒤 선택하는 별도 통합 작업입니다.
 
 <p align="center">
   <a href="https://github.com/cheolwo/unity">
@@ -38,49 +152,21 @@
 
 > 현재 Unity 화면은 개발용 Simulation입니다. 실제 판매·결제·배차·수출·정산을 실행하지 않으며, 운영 상태의 최종 권위는 서버에 있습니다. 게임 Simulation Core는 Solo에서 Unity 내부 Local Runtime, Hosted Multiplayer에서만 Simulation 서버가 실행합니다.
 
-현재 세계 구축은 공공데이터에서 출발하지 않습니다. 게임 플레이와 세계 의도에서 필요한 WI와 H 공간을 상향식으로 조립하고, AreaSet이 요구한 현실 근거만 E6에서 연결합니다.
+세계 구축은 공공데이터나 Synty 팩 이름에서 바로 시작하지 않습니다. 먼저 PlayableLoop가 요구하는 WI와 H 공간 능력을 정하고, 배치·실행 엔진이 이를 결정적인 세계 계획으로 조립합니다. 공공데이터는 필요한 현실 근거에만 결속하고, Synty 자산은 Simulation의 의미를 바꾸지 않는 표현 후보로 사용합니다.
 
 ```text
-게임 기획과 세계 의도
-├─ 플레이어 약속과 PlayableLoop
-│  └─ 진입 → 선택 → WI → 성공·실패 → 회복·귀환
-├─ 플레이어 경험
-│  ├─ Nature 체류·탐험·위협·회복
-│  ├─ Farm 생산·수확·출하
-│  ├─ City/Hub 물류·검수·보관
-│  └─ Town 시장·생활·소비
-├─ WI 세계 상호작용 단위
-│  └─ 행위자·시작 조건·공간 요구·예약·Task·Effect
-└─ 상향식 H 공간 설계 재고
-   ├─ 기준 경관 문법 52개 의미군 × A/B/C = 156개 표현 변형
-   ├─ H1 작업공간 모판
-   ├─ H2 블록 모판
-   ├─ H3 경관 모판
-   └─ H4 지역 모판
-      ↓
-이론 공간 생산 공장
-├─ H2 TheoryQualified 24개
-├─ H3 TheoryQualified 13개
-└─ E5TheoryQualified AreaSet 4개
-   ↓
-AreaSet 세계 설계
-└─ LandscapeGraph 공간 조립
-   ├─ Node·Edge·외부 Connector
-   ├─ 공간 역할·공간 능력·업무 용량
-   ├─ E6 플레이 전 정제·선택형 현실 결속
-   │  └─ 선택한 프로필의 DataRequirement·EvidenceBinding·DerivedArtifact
-   └─ Simulation Core
-      └─ Preview → Confirm → WorldTick → 최신 상태 재조회
-         ├─ Solo: Unity 내부 Local Runtime
-         └─ Hosted: Simulation 서버 Host
-            ↓
-         Unity SimulationWorldShell 표현
-            └─ E7 실제 플레이·Save / Replay 검증
+플레이어 약속과 PlayableLoop
+  → WI: 행위자·조건·선택·Task·Effect
+  → H: 행동 공간·블록·경관·AreaSet·세계 배치
+  → LH·Sky·실외 배치·실내 배치 엔진
+  → Simulation Core의 권위 상태와 WorldRevision
+  → canonical SimulationWorldShell의 입력·공간·캐릭터·UI·Audio 표현
+  → Logic·Presentation·통합 EvidencePackage
 ```
 
-`E5TheoryQualified`는 사람 검토 없이 이론상 공간 구조와 연결이 닫힌 상태이며 실제 지역·공공데이터·Unity Runtime 증거는 아닙니다. 공공데이터 기반 경관과 계절 방어의 상세 기준은 [공공데이터 기반 Synty 경관 생활·농장 생존 Simulation 기획과 구현 기준](docs/Architecture/PublicDataSyntyFarmSurvivalGamePlan.md)을 따르고, Unity의 상세 구조는 [Ssalddel Unity README](https://github.com/cheolwo/unity#한눈에-보는-상향식-세계-구축-구조)에서 확인합니다.
+이 과정에서 Synty 원본 팩은 출처이지 게임 영역이나 기능의 권위 분류가 아닙니다. 자산은 지면·식생·실외 구조·실내 설비·도구·건설 상태 같은 기능 역할로 분류한 뒤 WI의 현재 권위 상태를 표현할 때 선택합니다. Prefab이 생성됐다는 사실만으로 자원·건물·NPC 상태가 바뀌지는 않습니다.
 
-계획·코드·DB·Runtime·Game View를 같은 완료로 섞지 않기 위해, 현재 남은 작업과 증거 단계는 [Simulation·Unity 미완료 실행 트리](docs/AI/generated/simulation-unity-execution-tree.md)에서 한눈에 확인합니다. 이 트리는 `eng/execution-ledgers/simulation-unity.json`에서 자동 생성되며 첫 종단 완결 대상은 대관령 중앙 L2 `kr5186:l2:700:1145`입니다.
+공간·WI 결속은 [세계 상호작용 단위 중심 공간·Simulation 통합](docs/Architecture/세계상호작용단위중심공간Simulation통합.md), H 정의와 실제 검증 상태는 [H1~H5 공간 포함 계층 조사](docs/Architecture/H1-H5공간포함계층조사.md), 현재 코드 위치는 [Simulation·Unity 코드 지도](docs/AI/generated/simulation-unity-code-map.md)에서 확인합니다. 계획·코드·시험·Runtime·Game View는 서로 다른 증거이며 하나를 다른 하나의 완료로 대신하지 않습니다.
 
 <p align="center">
   <a href="docs/ProjectOverview/page-docs/">
@@ -120,7 +206,7 @@ AreaSet 세계 설계
   <img src="docs/assets/changes/2026-07-28-figma-code-convergence/admin-mobile-srp.png" alt="Admin Mobile 화면" width="900">
 </p>
 
-## 게임 개발 업무 순서
+## 에비던스 기반 게임 개발 업무 순서
 
 Ssalddel의 Simulation·Unity 작업은 현재 목표와 증거 상태에서 시작해 플레이어가 이해할 수 있는 가장 작은 선택 폐루프를 고릅니다. 한 `PlayableUnit`은 E7 플레이 약속부터 E1 계약까지 하향 분해하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1부터 E7까지 실제 증거를 다시 확인합니다. 완성된 각 E7은 별도 E8 반복 안정성 캠페인으로 검증하고, 같은 영역의 안정 Core 둘 이상은 E9 영역 조화·사람 승인, E10 제한 운영 캠페인으로 검증합니다.
 
