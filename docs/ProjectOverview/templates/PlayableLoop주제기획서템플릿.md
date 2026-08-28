@@ -7,6 +7,10 @@
 - 기획 revision: `[name].design.r1`
 - 원천 기획 문서:
   - `docs/...`
+- 문답 정밀화 기록:
+  - `docs/...`
+- 마지막으로 반영한 문답 revision:
+- 문답에서 남은 승인 차단 미정:
 
 ## 플레이어 약속과 재미
 
@@ -49,6 +53,21 @@
 - 실외·실내 배치 요구:
 - Synty 자산 후보와 대체 표현:
 - Traversal, Collider, NavMesh 요구:
+
+## 전문 심화 연구 판정과 재결속
+
+| 분야 | 필요성 | 연구 문서 참조 또는 NotRequired 사유 | 상태 | 기획서 반영 항목 |
+| --- | --- | --- | --- | --- |
+| 건물 | `Required | NotRequired` |  |  |  |
+| 공간 | `Required | NotRequired` |  |  |  |
+| 배치 | `Required | NotRequired` |  |  |  |
+| 애니메이션 | `Required | NotRequired` |  |  |  |
+
+- `requiredDetailStudyRefs`의 모든 `Required` 연구가 `Accepted`인지:
+- 연구 결과로 다시 연 Logic E와 이유:
+- 연구 결과로 다시 연 Presentation E와 이유:
+- 연구끼리 충돌한 사항과 기획 판단:
+- 개발 인계에 고정할 측정값·자산 fallback·검증법:
 
 ## 저장·권위·외부 경계
 

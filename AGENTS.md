@@ -9,7 +9,9 @@ GPT Chat과 Codex는 대화 기록이 아니라 저장소 문서를 공용 기�
 1. [공용 프로젝트 컨텍스트](docs/ProjectOverview/GptProjectContext.md)
 2. [확정 결정](docs/AI/DECISIONS.md)
 3. [현재 작업](docs/AI/CURRENT_WORK.md)
-4. 작업 경로에 가까운 `AGENTS.md`와 관련 Architecture 문서
+4. 게임 구현이면 [Codex PlayableLoop Goal 상태](docs/AI/generated/codex-playable-loop-goals.md)에서 활성 Goal·WI·기획서·작업 명세를 확인
+5. 활성 PlayableLoop의 `planningGate.designDocumentRef` 기획서, 그 기획서가 `Required`로 연결한 `Accepted` 전문 심화 연구, E7 작업 명세
+6. 작업 경로에 가까운 `AGENTS.md`와 관련 Architecture 문서
 
 Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전체 Ssalddel 도메인을 `World`, `Data`, `Object`, `Interaction`, `Simulation` 관점에서 다루되, 실제 구현은 검증 가능한 좁은 vertical slice로 진행한다. 영역 개발에서는 Farm·Hub·City 각각의 독립 완결 slice를 먼저 만들고, 영역 간 운송 경로를 기본 slice로 삼지 않는다. 서버는 운영 상태의 최종 권위이며 Unity의 simulation과 operational data를 명확히 구분한다.
 
@@ -105,6 +107,8 @@ Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전
 
 ## 구현 단위
 
+- PlayableLoop 기획 스레드는 [PlayableLoop 문답 정밀화 체계](docs/Architecture/PlayableLoop문답정밀화체계.md)에 따라 한 번에 핵심 질문 하나만 제시하고, 답변을 의도·확정 후보·미정·영향·다음 질문으로 정리한다. 사용자가 안전하게 정차하거나 대기할 때만 답변하도록 하며 이동 중 즉답을 요구하지 않는다. 확인된 결정은 판본화된 문답 기록과 주제 기획서에 반영하고 대화 기억만 개발 명세로 넘기지 않는다.
+- 게임 개발 스레드는 대화 기억이나 대기열 제목만으로 다음 기능을 구현하지 않는다. [주제 기획 기반 PlayableLoop 개발 체계](docs/Architecture/주제기획기반PlayableLoop개발체계.md)에 따라 활성 Goal의 `Approved` 기획서, 기획 revision·hash·승인 근거, E7 작업 명세와 현재 파이프라인 차단을 먼저 읽고 그 범위만 구현한다. 기획서가 없거나 hash가 다르거나 핵심 선택·대가·실패·회복·귀환이 `미정`이면 구현을 시작하지 않고 기획 관문으로 돌려보낸다. 건물·공간·배치·애니메이션처럼 구체 결정이 플레이 경험을 좌우하면 [PlayableLoop 전문 심화 연구 분기·재결속 체계](docs/Architecture/PlayableLoop전문심화연구분기재결속체계.md)에 따라 `Required` 연구를 분기하고, `Accepted` 기준선이 기획서와 작업 명세에 다시 결속되기 전에는 해당 범위를 구현하지 않는다. 구현 중 플레이어 약속이나 연구 기준선을 바꿀 필요가 생겨도 개발 스레드가 조용히 결정하지 않으며, 현재 Goal에 발견 사항과 가장 이른 재개 E를 남기고 연구·기획 revision 재승인을 기다린다.
 - 게임 작업은 [플레이어 중심 게임 개발 업무 구조](docs/Architecture/플레이어중심게임개발업무구조.md)에 따라 플레이어가 보는 상황·욕구·선택·대가·재료 획득·조립·결과·다음 선택을 먼저 적는다. 여러 WI가 성공·실패·회복·귀환까지 닫히는 단위는 [플레이 폐루프와 증거 묶음 개발 체계](docs/Architecture/플레이폐루프와증거묶음개발체계.md)의 PlayableLoop로 등록하고, 시험·Runtime·화면·Hosted·운영 증거는 범위·제외·revision·무효화 조건을 가진 EvidencePackage로 분리한다. 이 관점과 연결 객체는 E/G/H/WI를 대체하지 않으며 Unity 또는 플레이어에게 상태 권위를 주지 않는다. 플레이어는 H1 조립을 선택하고 H2·H3 성장을 유도할 수 있지만 상위 공간 성립은 Simulation 규칙이 판정한다.
 - 각 PlayableLoop는 [플레이 폐루프 논리·표현·결과 순환 개발 방법론](docs/Architecture/플레이폐루프논리시각이중순환체계.md)에 따라 `Logic`과 `Presentation`을 따로 판정하고 통합 E를 낮은 값으로 계산한다. 결과는 별도 성숙도 축이 아니라 권위 결과·표현 결과·회복·귀환이 같은 revision에서 이어지는 통합 관문이다. 표현 검증에서 상태나 H 계약 누락이 드러나면 같은 Goal을 유지한 채 가장 이른 논리 E를 다시 연다.
 - 표현 궤적 E4~E7을 승격하기 전에 `eng/execution-ledgers/playable-loop-presentation-validation-modules.json`의 공통 모듈과 해당 폐루프 기능 프로필의 조건 모듈을 결정하고 `manage-playable-loop-presentation-validation.ps1 -Mode Validate`를 통과시킨다. 자동 사전 검증과 실제 Play Mode·Game View 증거는 서로 대신하지 않으며 차단 실패는 `openFeedbackItems`에 가장 이른 재개 E로 남긴다.
