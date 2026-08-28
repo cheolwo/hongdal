@@ -23,6 +23,7 @@ namespace Ssalddel.Unity.Cards
         public const string TeamRole = "TeamRole";
         public const string BattleSnapshot = "BattleSnapshot";
         public const string ConceptInformation = "ConceptInformation";
+        public const string RecipeKnowledge = "RecipeKnowledge";
         public const string ResearchSeedbed = "ResearchSeedbed";
     }
 
