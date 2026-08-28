@@ -18,7 +18,7 @@
 | `topic:nature-workbench-foundation.v1` | `playable-loop:nature-workbench-foundation.v1` | NotStarted | Queued | `WI-CON-01` | E7 | E6 | E6 | 기획서 작성 |
 | `topic:nature-building-learning.v1` | `playable-loop:nature-building-learning.v1` | NotStarted | Queued | `WI-CON-01` | E5 | E1 | E1 | 기획서 작성 |
 | `topic:nature-field-supply-return.v1` | `playable-loop:nature-field-supply-return.v1` | NotStarted | Queued | `WI-NATURE-16` | E4 | E1 | E1 | 기획서 작성 |
-| `topic:nature-basic-herbal-recovery.v1` | `playable-loop:nature-basic-herbal-recovery.v1` | Approved | Active | `WI-ACTOR-03` | E3 | E1 | E1 | Goal 활성화 가능 |
+| `topic:nature-basic-herbal-recovery.v1` | `playable-loop:nature-basic-herbal-recovery.v1` | Approved | Active | `WI-ACTOR-03` | E4 | E3 | E3 | Goal 활성화 가능 |
 | `topic:nature-base-reflection.v1` | `playable-loop:nature-base-reflection.v1` | Draft | Queued | `WI-REFLECT-01` | E3 | E1 | E1 | 필수 절 보완·검토 요청 |
 | `topic:town-order-consume-return.v1` | `playable-loop:town-order-consume-return.v1` | NotStarted | Queued | `WI-ORDER-01` | E4 | E1 | E1 | 기획서 작성 |
 | `topic:town-arcana-context.v1` | `playable-loop:town-arcana-context.v1` | NotStarted | Queued | `WI-CARD-01` | E4 | E1 | E1 | 기획서 작성 |

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "codex-playable-loop-goals.v3",
-  "revision": "codex-playable-loop-goals.r27",
+  "revision": "codex-playable-loop-goals.r28",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "worldInteractionDeliveryPriorityPath": "eng/execution-ledgers/world-interaction-delivery-priorities.json",
   "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
@@ -49,18 +49,18 @@
     "goalStateCode": "Active",
     "activeMaturityTrackCode": "Logic",
     "activeWorldInteractionId": "WI-ACTOR-03",
-    "baselineRevision": "world-interaction-delivery-priorities.r26",
+    "baselineRevision": "world-interaction-delivery-priorities.r27",
     "workOrderRef": "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json",
-    "workOrderTargetRevision": "nature-basic-herbal-recovery.design.r2",
+    "workOrderTargetRevision": "nature-basic-herbal-recovery.design.r3",
     "pipelineValidation": {
       "profileKey": "playable-loop:nature-basic-herbal-recovery.v1|WI-ACTOR-03",
-      "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r2",
+      "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r3",
       "logicStatusCode": "Passed",
-      "presentationStatusCode": "Blocked",
-      "integratedStatusCode": "Blocked",
+      "presentationStatusCode": "Passed",
+      "integratedStatusCode": "Passed",
       "earliestReopenEvidenceStageCode": "E1",
-      "evidenceRefs": ["evidence:nature-basic-herbal-recovery-logic-e4-20260828", "test:SimulationPlayerKnowledgeTests:12/12", "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json"],
-      "blockerCodes": ["LogicE5PlusDeferredByDeliveryCap", "PresentationDeferredByPlanning"]
+      "evidenceRefs": ["evidence:nature-basic-herbal-recovery-logic-e4-20260828", "evidence:nature-basic-herbal-recovery-presentation-e3-20260828", "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json"],
+      "blockerCodes": ["PromotionBeyondIntegratedE3DeferredByDeliveryCap"]
     }
   },
   "items": [

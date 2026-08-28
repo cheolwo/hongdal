@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-playable-loop-catalog.v6",
-  "revision": "ssalddel-playable-loop-catalog.r23",
+  "revision": "ssalddel-playable-loop-catalog.r24",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -495,10 +495,10 @@
       "planningGate": {
         "topicStableId": "topic:nature-basic-herbal-recovery.v1",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
-        "designRevision": "nature-basic-herbal-recovery.design.r2",
-        "designHashSha256": "7D8A824FC4E121694B6DAE9ACC28D696E57DC70D34432595F156B365EBE0C324",
+        "designRevision": "nature-basic-herbal-recovery.design.r3",
+        "designHashSha256": "879F74092538A50BC6B0E8AFF5C4CEA2F4C18AE9BAA757467AA7E02B5C63B5C1",
         "statusCode": "Approved",
-        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md#q-072"
+        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
       },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
@@ -514,25 +514,25 @@
       "requiredHCapabilities": [],
       "independentExecutionRequired": true,
       "saveCheckpointCodes": [],
-      "currentEvidenceStage": "E1",
-      "nextClosureTargetStage": "E2",
+      "currentEvidenceStage": "E3",
+      "nextClosureTargetStage": "E4",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
         "logic": { "trackCode": "Logic", "currentStage": "E4", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": ["evidence:nature-basic-herbal-recovery-logic-e4-20260828"], "blockers": ["Logic E5 이상은 새 기획 revision과 delivery 승인 전 열지 않는다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["표현·공간·Unity 증거는 후속 승인 범위다."] }
+        "presentation": { "trackCode": "Presentation", "currentStage": "E3", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": ["evidence:nature-basic-herbal-recovery-presentation-e3-20260828"], "blockers": ["실제 카드 서랍 배선·공간·Unity 입력 증거는 후속 승인 범위다."] }
       },
       "openFeedbackItems": [
         { "feedbackId": "feedback:nature-basic-herbal-recovery:save-boundary", "trackCode": "Logic", "reopenStage": "E1", "summary": "지식 원장의 저장이 필요해질 때 기존 Save 판본을 임의 변경하지 말고 별도 승인 작업 명세로 되돌린다.", "statusCode": "Open" }
       ],
-      "evidencePackageRefs": ["evidence:nature-basic-herbal-recovery-logic-e3-20260828", "evidence:nature-basic-herbal-recovery-logic-e4-20260828"],
+      "evidencePackageRefs": ["evidence:nature-basic-herbal-recovery-logic-e3-20260828", "evidence:nature-basic-herbal-recovery-logic-e4-20260828", "evidence:nature-basic-herbal-recovery-presentation-e3-20260828"],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json",
       "designDocumentRef": "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
-      "sourcePlanningDocumentRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"],
+      "sourcePlanningDocumentRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"],
       "predecessorLoopStableIds": [],
-      "blockers": ["Presentation E2 이상, Save/Replay, Unity, 약초 채집·달이기·섭취는 후속 승인 전 구현하지 않는다."],
-      "nextAction": "Logic E4에서 정지하고 새 기획 revision/hash와 다음 delivery 승인을 기다린다."
+      "blockers": ["통합 E4 이상, Save/Replay, 실제 Unity 배선, 약초 채집·달이기·섭취는 후속 승인 전 구현하지 않는다."],
+      "nextAction": "통합 E3에서 정지하고 다음 Goal 후보인 Farm 첫 밭갈기 기획·연구 관문을 준비한다."
     },
     {
       "priority": 8,

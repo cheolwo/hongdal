@@ -2,8 +2,8 @@
 
 > 이 문서는 C# E 책임 Attribute와 현재 E 책임 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 후보 타입: `612`
-- 책임 지정: `609`
+- 후보 타입: `615`
+- 책임 지정: `612`
 - 사유 있는 제외: `3`
 - 미분류: `0`
 - 메서드 책임: `17`
@@ -12,9 +12,9 @@
 
 | E | G | 모듈 | 대표 | 보조 |
 | --- | --- | --- | ---: | ---: |
-| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 42 | 0 |
-| `E2` | `G1` | `E2실행경계Module` 실행 경계 | 169 | 0 |
-| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 192 | 1 |
+| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 43 | 0 |
+| `E2` | `G1` | `E2실행경계Module` 실행 경계 | 170 | 0 |
+| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 195 | 1 |
 | `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 40 | 0 |
 | `E5` | `G1` | `E5세계발현Module` 세계 발현 | 7 | 0 |
 | `E6` | `G1` | `E6세계정제Module` 세계 정제 | 21 | 0 |
@@ -47,9 +47,9 @@
 
 ### 아직 하위 모듈을 지정하지 않은 기존 책임
 
-- `E1`: `31`개
-- `E2`: `141`개
-- `E3`: `169`개
+- `E1`: `32`개
+- `E2`: `142`개
+- `E3`: `172`개
 
 ## 미분류 후보
 
@@ -227,6 +227,7 @@
 | `Ssalddel.Simulation.Contracts.SimulationWorldLayoutDefinitionResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldStreamRecipeResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationYouTube학습원문관측Snapshot` | `E1` | `E1.WorldInteractionContract` | `` | `WI-REFLECT-01` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.Simulation작업참여PolicyCatalogSnapshot` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.Simulation플레이어지식InitialStateRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.경영SimulationSession생성Request` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationBattleInstanceState` | `E1` | `` | `` | `` | `Annotated` |
@@ -246,6 +247,7 @@
 | `Ssalddel.Simulation.Domain.Simulation결정적환경발생DecisionEngine` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation승인학습자료파생원장` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-REFLECT-01` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation자원효과묶음Validator` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Domain.Simulation작업참여PolicyCatalog` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation집중판정Policy` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation플레이어지식Aggregate` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.경영SimulationSessionAggregate` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
@@ -364,6 +366,7 @@
 | `Ssalddel.Simulation.Tests.SimulationTeamRoleCardTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationTurnClosingTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationUnityCodeMetadataTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationWorkParticipationPolicyTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldActualE5SpatialTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldAreaSetLandscapeGraphTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationWorldAssetPlacementTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -481,6 +484,7 @@
 | `Ssalddel.Unity.Tests.SimulationTeamObservationPresentationTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.SimulationTeamRoleCardPresentationTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.SimulationWorldEventProjectionTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Tests.Simulation처방지식CardFamilyTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.TraditionalMarketHubVerticalSliceTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.UnityCodeMetadataTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Tests.UrbanMarketManagerRuntimeTests` | `E3` | `` | `` | `` | `Annotated` |
@@ -503,6 +507,7 @@
 | `Ssalddel.Unity.Battles.BattleSupportCommandFactory` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Battles.LocalCombatInputCommandFactory` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Cards.CardWorkspaceCoordinator` | `E7` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Unity.Cards.처방지식CardFamilyProjector` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Community.CommunityMarketSquareApiRepository` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Community.CommunityMarketSquareLoadCoordinator` | `E7` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Unity.Community.CommunityMarketSquareMapper` | `E7` | `` | `` | `` | `Annotated` |

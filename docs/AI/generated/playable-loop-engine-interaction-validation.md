@@ -2,7 +2,7 @@
 
 > `eng/execution-ledgers/playable-loop-engine-interaction-validation.json`와 `eng/execution-ledgers/playable-loops.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 대장 revision: `playable-loop-engine-interaction-validation.r7`
+- 대장 revision: `playable-loop-engine-interaction-validation.r8`
 - 성숙도 축: 기존 `Logic`·`Presentation` 유지
 - 엔진 상호작용: 두 궤적을 같은 WI·Command·Revision으로 묶는 통합 관문
 - Save/Replay canonical hash 포함: `false`

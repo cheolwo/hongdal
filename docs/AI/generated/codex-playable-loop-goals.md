@@ -2,7 +2,7 @@
 
 > 이 문서는 `eng/execution-ledgers/codex-playable-loop-goals.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- Goal 원장 개정: `codex-playable-loop-goals.r27`
+- Goal 원장 개정: `codex-playable-loop-goals.r28`
 - Goal WIP: `1/1`
 - WI WIP: `1/1`
 - 주제 기획 관문: `Approved` / `topic:nature-basic-herbal-recovery.v1`
@@ -19,13 +19,13 @@ E7 PlayClosed까지 닫는다.
 기록에서 기초 처방을 배우고 약초를 모아 따뜻한 차를 달여 마심으로써 체온과 질병 위험을 관리한다.
 
 현재 기준:
-- 현재 폐루프 증거 단계: E1
-- 현재 WI 증거 단계: E5
+- 현재 폐루프 증거 단계: E3
+- 현재 WI 증거 단계: E3
 - 현재 성숙도 궤적: Logic
 - 현재 작업 WI: WI-ACTOR-03 지식 습득
-- 파이프라인 관문: Logic Passed / Presentation Blocked / 통합 Blocked
+- 파이프라인 관문: Logic Passed / Presentation Passed / 통합 Passed
 - 파이프라인 재개 E: E1
-- 기준 revision: world-interaction-delivery-priorities.r26 / nature-basic-herbal-recovery.design.r2
+- 기준 revision: world-interaction-delivery-priorities.r27 / nature-basic-herbal-recovery.design.r3
 
 운영 규칙:
 - 동시에 하나의 WI만 구현한다.
@@ -52,7 +52,7 @@ E7 PlayClosed까지 닫는다.
 
 | 현재 WI | 현재 E | 현재 증거 | 남은 차단 | 다음 최저 의존성 |
 | --- | --- | --- | --- | --- |
-| `WI-ACTOR-03` 지식 습득 | 폐루프 E1 / WI E5 → E7 | evidence:nature-basic-herbal-recovery-logic-e3-20260828<br>evidence:nature-basic-herbal-recovery-logic-e4-20260828 | Presentation E2 이상, Save/Replay, Unity, 약초 채집·달이기·섭취는 후속 승인 전 구현하지 않는다. | `WI-ACTOR-03 E5` |
+| `WI-ACTOR-03` 지식 습득 | 폐루프 E3 / WI E3 → E7 | evidence:nature-basic-herbal-recovery-logic-e3-20260828<br>evidence:nature-basic-herbal-recovery-logic-e4-20260828<br>evidence:nature-basic-herbal-recovery-presentation-e3-20260828 | 통합 E4 이상, Save/Replay, 실제 Unity 배선, 약초 채집·달이기·섭취는 후속 승인 전 구현하지 않는다. | `WI-ACTOR-03 E5` |
 
 ## Goal 대기열
 

@@ -8,7 +8,7 @@
       "managementSystem": "G1",
       "koreanName": "\uD575\uC2EC \uACC4\uC57D",
       "technicalName": "E1\uD575\uC2EC\uACC4\uC57DModule",
-      "primaryCount": 42,
+      "primaryCount": 43,
       "secondaryCount": 0
     },
     {
@@ -16,7 +16,7 @@
       "managementSystem": "G1",
       "koreanName": "\uC2E4\uD589 \uACBD\uACC4",
       "technicalName": "E2\uC2E4\uD589\uACBD\uACC4Module",
-      "primaryCount": 169,
+      "primaryCount": 170,
       "secondaryCount": 0
     },
     {
@@ -24,7 +24,7 @@
       "managementSystem": "G1",
       "koreanName": "\uD68C\uADC0 \uC99D\uAC70",
       "technicalName": "E3\uD68C\uADC0\uC99D\uAC70Module",
-      "primaryCount": 192,
+      "primaryCount": 195,
       "secondaryCount": 1
     },
     {
@@ -3655,6 +3655,25 @@
       ]
     },
     {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.Simulation\uC791\uC5C5\uCC38\uC5ECPolicyCatalogSnapshot",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.Simulation\uC791\uC5C5\uCC38\uC5ECPolicyCatalogSnapshot",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation\uC791\uC5C5\uCC38\uC5ECPolicyContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uD50C\uB808\uC774\uC5B4\u00B7NPC \uC791\uC5C5 \uCC38\uC5EC\uC758 Solo \uAC00\uB2A5 \uBC94\uC704, \uB3C4\uC6C0 \uAD8C\uD55C\uACFC \uD638\uD61C\u00B7\uC804\uBB38 \uBCF4\uC218 \uACBD\uACC4\uB97C \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "\uBE44\uC2E4\uD589 \uC815\uCC45 \uACC4\uC57D\uC774\uBA70 WI Confirm, \uC791\uC5C5 \uBC30\uC815, \uAD00\uACC4 \uC218\uCE58, Save \uB610\uB294 Unity \uD45C\uD604\uC744 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.Simulation\uD50C\uB808\uC774\uC5B4\uC9C0\uC2DDInitialStateRequest",
       "isCoverageCandidate": false,
       "assemblyName": "Ssalddel.Simulation.Contracts",
@@ -4050,6 +4069,25 @@
       "primaryEvidenceStage": "E1",
       "responsibility": "\uAD6C\uC131 \uC694\uC18C\uC758 \uD575\uC2EC \uACC4\uC57D\uACFC \uBD88\uBCC0 \uACBD\uACC4\uB97C \uC815\uC758\uD55C\uB2E4.",
       "boundary": "\uACC4\uC57D\uACFC \uB3C4\uBA54\uC778 \uC815\uC758\uB294 \uC2E4\uD589 \uC704\uCE58\uB098 E \uB2E8\uACC4 \uB2EC\uC131 \uC99D\uAC70\uB97C \uC18C\uC720\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Domain:Ssalddel.Simulation.Domain.Simulation\uC791\uC5C5\uCC38\uC5ECPolicyCatalog",
+      "isCoverageCandidate": false,
+      "assemblyName": "Ssalddel.Simulation.Domain",
+      "componentName": "Ssalddel.Simulation.Domain.Simulation\uC791\uC5C5\uCC38\uC5ECPolicyCatalog",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation\uC791\uC5C5\uCC38\uC5ECPolicyCatalog.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E2",
+      "responsibility": "\uC791\uC5C5 \uBA74\uC801\u00B7\uD604\uC7A5 \uB09C\uB3C4\u00B7\uB3C4\uAD6C \uAC00\uB2A5\uC131\uACFC \uB3C4\uC6C0 \uD589\uC704 \uC885\uB958\uB97C \uACF5\uD1B5 \uC791\uC5C5 \uCC38\uC5EC \uC815\uCC45\uC73C\uB85C \uACB0\uC815\uC801\uC73C\uB85C \uD310\uC815\uD55C\uB2E4.",
+      "boundary": "\uD310\uC815 \uACB0\uACFC\uB9CC \uBC18\uD658\uD558\uBA70 Farm \uC791\uC5C5, NPC \uC774\uB3D9, \uAE30\uC5EC \uC6D0\uC7A5 \uB610\uB294 WorldRevision\uC744 \uC9C1\uC811 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -6383,6 +6421,25 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationWorkParticipationPolicyTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Tests",
+      "componentName": "Ssalddel.Simulation.Tests.SimulationWorkParticipationPolicyTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Tests/SimulationWorkParticipationPolicyTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uC791\uC5C5 \uCC38\uC5EC \uACF5\uD1B5 \uC815\uCC45\uC758 Solo \uAC00\uB2A5\u00B7\uD611\uB825 \uAD8C\uC7A5\u00B7\uB3C4\uC6C0 \uAD8C\uD55C\u00B7\uD638\uD61C \uBCF4\uC218 \uD310\uC815\uC744 \uC790\uB3D9\uC2DC\uD5D8\uC73C\uB85C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC2E4\uC81C Farm WI, NPC \uC774\uB3D9, Save \uB610\uB294 Unity Play Mode \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Simulation.Tests:Ssalddel.Simulation.Tests.SimulationWorldActualE5SpatialTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Simulation.Tests",
@@ -8618,6 +8675,25 @@
       "stepKeys": []
     },
     {
+      "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.Simulation\uCC98\uBC29\uC9C0\uC2DDCardFamilyTests",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity.Tests",
+      "componentName": "Ssalddel.Unity.Tests.Simulation\uCC98\uBC29\uC9C0\uC2DDCardFamilyTests",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity.Tests/Simulation\uCC98\uBC29\uC9C0\uC2DDCardFamilyTests.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "\uCC98\uBC29 \uC9C0\uC2DD \uCE74\uB4DC \uAC00\uC871\uC758 \uC0C1\uD0DC \uAD6C\uBD84, \uACB0\uC815\uC131, Revision \uACBD\uACC4\uB97C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC790\uB3D9 \uC2DC\uD5D8\uC740 \uC2E4\uC81C Unity Scene\u00B7Game View \uC99D\uAC70\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
       "componentId": "Ssalddel.Unity.Tests:Ssalddel.Unity.Tests.TraditionalMarketHubVerticalSliceTests",
       "isCoverageCandidate": true,
       "assemblyName": "Ssalddel.Unity.Tests",
@@ -9037,6 +9113,25 @@
       "primaryEvidenceStage": "E7",
       "responsibility": "\uD50C\uB808\uC774\uC5B4 \uC785\uB825\u00B7\uD654\uBA74\u00B7\uD53C\uB4DC\uBC31\uACFC \uD50C\uB808\uC774 \uACBD\uD5D8 \uD45C\uD604\uC744 \uC870\uC728\uD55C\uB2E4.",
       "boundary": "Unity \uD45C\uD604\uC740 \uAD8C\uC704 \uC0C1\uD0DC \uBCC0\uACBD\uC774\uB098 \uC2E4\uC81C \uD50C\uB808\uC774 \uC644\uB8CC\uB97C \uB300\uC2E0\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "primarySubmoduleKey": "",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [],
+      "workOrderIds": [],
+      "featureKeys": [],
+      "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Unity:Ssalddel.Unity.Cards.\uCC98\uBC29\uC9C0\uC2DDCardFamilyProjector",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Unity",
+      "componentName": "Ssalddel.Unity.Cards.\uCC98\uBC29\uC9C0\uC2DDCardFamilyProjector",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Unity/Runtime/Cards/Simulation\uCC98\uBC29\uC9C0\uC2DDCardFamily.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E3",
+      "responsibility": "Simulation \uC9C0\uC2DD \uC0C1\uD0DC \uC0AC\uBCF8\uC744 \uACB0\uC815\uC801\uC778 \uCC98\uBC29 \uCE74\uB4DC \uAC00\uC871\uC73C\uB85C \uAC80\uC99D\uD55C\uB2E4.",
+      "boundary": "\uC77D\uAE30 \uC804\uC6A9 \uD22C\uC601\uC740 \uC9C0\uC2DD \uC2B5\uB4DD Confirm\uACFC \uAD8C\uC704 \uC0C1\uD0DC \uBCC0\uACBD\uC744 \uC218\uD589\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -12782,8 +12877,8 @@
     }
   ],
   "coverage": {
-    "candidateTypeCount": 612,
-    "annotatedTypeCount": 609,
+    "candidateTypeCount": 615,
+    "annotatedTypeCount": 612,
     "excludedTypeCount": 3,
     "uncoveredTypeCount": 0,
     "annotatedMethodCount": 17

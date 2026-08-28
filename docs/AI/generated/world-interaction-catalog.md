@@ -2,7 +2,7 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interactions.json`와 참조된 단일 책임·조립 흐름·음양 사분면 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 대장 개정: `simulation-world-interactions.r31`
+- 대장 개정: `simulation-world-interactions.r32`
 - 증거 단계 개정: `simulation-evidence-stages.r13`
 - WI 발생원 개정: `world-interaction-trigger-sources.r7`
 - WI 단일 책임 개정: `simulation-world-interaction-responsibilities.r5`
@@ -35,7 +35,7 @@ WI는 한 행위자의 한 의도와 하나의 주요 권위 결과를 관통하
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 물품 획득 · `WI-ACTOR-01` | 1 | 행위자 의도 | 단일 책임 | 양(陽) | `ItemAcquired` | PlayerOrNpc | PlayerDriven, NpcDriven | WorldItemAvailable, ActorDoesNotOwnItem → ItemOwnedInInventory | 완료 · `E3→E3` | 진행 중 · `E5→E7` |
 | 장착 상태 변경 · `WI-ACTOR-02` | 2 | 행위자 의도 | 단일 책임 | 음(陰) | `ItemEquipmentChanged` | PlayerOrNpc | PlayerDriven, NpcDriven | ItemOwnedInInventory, ItemEquipped → EquipmentStateChanged | 완료 · `E3→E3` | 진행 중 · `E5→E7` |
-| 지식 습득 · `WI-ACTOR-03` | 3 | 행위자 의도 | 단일 책임 | 음(陰) | `RecipeKnowledgeAdded` | PlayerDirect | PlayerDriven, NpcDriven | ReadableKnowledgeSourceAvailable, RecipeNotKnown → RecipeKnown | 완료 · `E3→E3` | 진행 중 · `E5→E7` |
+| 지식 습득 · `WI-ACTOR-03` | 3 | 행위자 의도 | 단일 책임 | 음(陰) | `RecipeKnowledgeAdded` | PlayerDirect | PlayerDriven, NpcDriven | ReadableKnowledgeSourceAvailable, RecipeNotKnown → RecipeKnown | 완료 · `E3→E3` | 진행 중 · `E3→E7` |
 
 ## 메이저 아르카나 작업군 (`CARD`)
 

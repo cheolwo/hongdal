@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-evidence-package-catalog.v3",
-  "revision": "ssalddel-evidence-package-catalog.r28",
+  "revision": "ssalddel-evidence-package-catalog.r29",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
@@ -89,6 +89,28 @@
         { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260828-174501/Ssalddel.Simulation.Tests.trx", "sha256": "89697441e4cde8e3bb6fa4cac88d5d02ddef2aedb306df45bf0db82202c8769d", "retentionCode": "LocalOnly" }
       ],
       "invalidationTriggers": ["SimulationPlayerKnowledgeService Query·Preview·Confirm 규칙 변경", "LocalSimulationRuntime PlayerKnowledge Adapter 변경", "SimulationPlayerKnowledgeController route 또는 HTTP 오류 매핑 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-basic-herbal-recovery-presentation-e3-20260828",
+      "title": "Nature 기초 약초 회복 처방 지식 카드 Presentation E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-basic-herbal-recovery.v1", "WI-ACTOR-03"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "nature-basic-herbal-recovery.design.r3/worktree-20260828",
+      "executedAt": "2026-08-28T19:14:14+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Unity 읽기 전용 카드 투영 단위시험",
+      "scope": "실제 shared contract 상태 사본을 Unity wire 모델로 JSON 왕복한 뒤 같은 WorldRevision의 지식 원장과 Preview를 Known·Readable·Blocked 카드로 결정적으로 투영했다. Recipe·출처·차단 사유 정렬, CardWorkspace 가족 결합, PresentationOnly와 권위 불변을 확인했다. 집중 카드 회귀 8/8, Unity 전체 회귀 515/515가 통과했다.",
+      "exclusions": ["실제 Unity checkout과 SimulationWorldShell 배선", "GameObject·Prefab·카드 서랍 조작 UI", "Play Mode·Game View", "카드 Confirm", "Save/Replay", "약초 채집·달이기·섭취·약효"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity/Runtime/Cards/Simulation처방지식CardFamily.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity.Tests/Simulation처방지식CardFamilyTests.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260828-herbal-knowledge-presentation-e3/herbal-knowledge-presentation-e3-targeted.trx", "sha256": "c9670b8383bb967641d4e21a818d6b6cf3c80bfbe04e52d864abf2cca78f17d3", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260828-herbal-knowledge-presentation-e3/herbal-knowledge-presentation-e3-unity-regression.trx", "sha256": "15da3d9d90f9367a2cb4103f306177d2b0118e1025eb5f57eec8d8463c6f3b5e", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["플레이어 지식 원장 또는 지식 습득 Preview의 wire 속성 변경", "RecipeKnowledge 카드 상태·정렬·권위 경계 변경", "CardWorkspace 가족 결합 규칙 변경"]
     },
     {
       "evidenceId": "evidence:hub-npc-routine-core-20260825",

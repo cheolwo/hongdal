@@ -4,11 +4,11 @@
 
 - 주제 고유 식별자: `topic:nature-basic-herbal-recovery.v1`
 - PlayableLoop 고유 식별자: `playable-loop:nature-basic-herbal-recovery.v1`
-- 기획 revision: `nature-basic-herbal-recovery.design.r2`
+- 기획 revision: `nature-basic-herbal-recovery.design.r3`
 - 원천 기획 문서:
   - `docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md`
-- 마지막으로 반영한 문답 revision: `Q-072`
-- 문답에서 남은 승인 차단 미정: 약초 종류·조합·정밀 수치, 실제 조리 배치와 애니메이션은 후속 기획 대상으로 남긴다. 이번 판본의 첫 개발 인계에는 영향을 주지 않는다.
+- 마지막으로 반영한 문답 revision: `Q-089` 개발 전환 요청. 이 주제의 직접 결정은 Q-045~Q-050, Q-061~Q-064, Q-068~Q-071이다.
+- 문답에서 남은 승인 차단 미정: 약초 종류·조합·정밀 수치, 실제 조리 배치와 애니메이션은 후속 기획 대상으로 남긴다. 이번 판본은 기존 `WI-ACTOR-03`의 읽기 전용 Recipe 지식 카드 투영만 E3까지 추가 승인한다.
 
 ## 플레이어 약속과 재미
 
@@ -44,9 +44,9 @@
 ## 논리·표현 요구
 
 - 논리적으로 반드시 성립할 상태와 규칙: 지식 습득 Preview는 무변경이며 Confirm만 지식 원장·행위 기록·WorldRevision을 변경한다. 같은 처방의 재확정은 중복 항목을 만들지 않는다.
-- 플레이어가 화면과 소리로 식별해야 할 대상: 처방 기록, 읽을 수 있음, 이미 아는 처방, 습득 성공. 단, 이번 첫 인계에서는 화면 구현을 하지 않는다.
-- 결과가 같은 revision임을 보여줄 피드백: 후속 표현 단계에서는 지식 원장 상태 사본과 습득 알림이 같은 권위 revision을 읽어야 한다.
-- 공통 표현 검증 모듈 외 조건 모듈: 이번 Logic E1~E3 인계에는 적용하지 않는다.
+- 플레이어가 표현에서 식별해야 할 대상: 처방 기록, 읽을 수 있음, 이미 아는 처방, 현재 차단 상태. E2~E3에서는 실제 화면을 만들지 않고 카드 서랍이 소비할 결정적 관점별 조회 결과를 만든다.
+- 결과가 같은 revision임을 보여줄 피드백: 지식 원장과 Preview의 `WorldRevision`이 다르면 투영을 거부하고, 카드 가족 상태 사본의 `SourceRevision`은 해당 권위 revision과 같아야 한다.
+- 공통 표현 검증 모듈 외 조건 모듈: E3에서는 Recipe 지식 카드 가족의 결정성·읽기 전용 경계·상태 구분 자동시험을 적용한다. 실제 GameObject·입력·Game View는 E4 이후 별도 승인한다.
 
 ## H 공간과 자산 요구
 
@@ -59,16 +59,16 @@
 
 | 분야 | 필요성 | 연구 문서 참조 또는 NotRequired 사유 | 상태 | 기획서 반영 항목 |
 | --- | --- | --- | --- | --- |
-| 건물 | `NotRequired` | 첫 WI는 건물 구조를 만들지 않는 지식 원장 계약이다. | `NotRequired` | Presentation E4 전에 다시 판정 |
-| 공간 | `NotRequired` | 첫 WI Logic E1~E3는 실제 배치·접근 공간을 다루지 않는다. | `NotRequired` | Presentation E4 전에 다시 판정 |
-| 배치 | `NotRequired` | 처방 기록과 식물의 실제 배치는 첫 인계 범위 밖이다. | `NotRequired` | Presentation E4 전에 다시 판정 |
-| 애니메이션 | `NotRequired` | 첫 WI는 읽기·달이기 애니메이션을 구현하지 않는다. | `NotRequired` | Presentation E4 전에 다시 판정 |
+| 건물 | `NotRequired` | E3 Recipe 지식 카드 투영은 건물 구조를 만들지 않는다. | `NotRequired` | Presentation E4 전에 다시 판정 |
+| 공간 | `NotRequired` | E3 관점별 조회 결과는 실제 배치·접근 공간을 다루지 않는다. | `NotRequired` | Presentation E4 전에 다시 판정 |
+| 배치 | `NotRequired` | 처방 기록과 식물의 실제 배치는 E3 범위 밖이다. | `NotRequired` | Presentation E4 전에 다시 판정 |
+| 애니메이션 | `NotRequired` | E3는 읽기·달이기 애니메이션을 구현하지 않는다. | `NotRequired` | Presentation E4 전에 다시 판정 |
 
-- `requiredDetailStudyRefs`의 모든 `Required` 연구가 `Accepted`인지: 이번 인계에는 `Required` 연구가 없다.
+- `requiredDetailStudyRefs`의 모든 `Required` 연구가 `Accepted`인지: E3 카드 상태 사본 인계에는 `Required` 연구가 없다.
 - 연구 결과로 다시 연 Logic E와 이유: 없음.
 - 연구 결과로 다시 연 Presentation E와 이유: Presentation E4를 시작할 때 네 분야를 다시 판정한다.
 - 연구끼리 충돌한 사항과 기획 판단: 없음.
-- 개발 인계에 고정할 측정값·자산 fallback·검증법: `RecipeStableId` 멱등 추가, Preview 무변경, Confirm revision 증가, LocalProcess 단위시험. 약효 수치와 Synty 표현은 고정하지 않는다.
+- 개발 인계에 고정할 측정값·자산 fallback·검증법: `RecipeStableId` 멱등 추가, Preview 무변경, Confirm revision 증가, 카드의 권위 revision 일치, 입력 순서와 무관한 결정적 카드 정렬, 읽기 가능·이미 앎·차단 구분 자동시험. 약효 수치와 Synty 표현은 고정하지 않는다.
 
 ## 저장·권위·외부 경계
 
@@ -79,9 +79,9 @@
 
 ## 제외 범위와 승인
 
-- 이번 주제에서 하지 않는 것: 실제 약초 채집·달이기·섭취, 약효 수치, 심한 질병 치료, Recipe 전수, Unity Scene·배치·애니메이션·Play Mode·Game View, Save 판본 증가, 자동 저장 구현.
-- 검토할 사람 또는 근거: `nature-night-day2.inquiry.r1`의 Q-045~Q-050과 2026-08-28 사용자 개발 인계 요청.
-- 승인 근거 참조: `docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md#q-050-결정-스냅샷`
+- 이번 주제에서 하지 않는 것: 실제 약초 채집·달이기·섭취, 약효 수치, 심한 질병 치료, Recipe 전수, 카드에서 Confirm 실행, Unity Scene·배치·애니메이션·Play Mode·Game View, Save 판본 증가, 자동 저장 구현.
+- 검토할 사람 또는 근거: `nature-night-day2.inquiry.r1`의 Q-045~Q-050·Q-061~Q-064·Q-068~Q-071과 2026-08-28 Q-089 뒤 E3 개발 전환 요청.
+- 승인 근거 참조: `docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md`
 - 승인 상태: `Approved`
 
 ## 첫 개발 인계 결과
@@ -97,3 +97,11 @@
 - 허용: 기존 Application 서비스의 `LocalSimulationRuntime` Adapter, 동일 서비스에 연결되는 RemoteHost API/Adapter, Query·Preview·Confirm 계약, LocalProcess/RemoteHost 결과 동등성 집중시험
 - 금지: Save 판본·자동 저장, Presentation E2 이상, Unity Scene·자산·배치·애니메이션, 약초 채집·달이기·섭취, Recipe 카드 UI, Logic E5 이상 승격 주장
 - 완료 표현: `Logic E4 / Presentation E1 / 통합 E1` 이하로만 기록한다.
+
+## 세 번째 개발 인계 상한
+
+- 활성 WI: `WI-ACTOR-03` 지식 습득을 유지한다.
+- 목표: 기존 Logic E4를 보존하면서 Presentation E2~E3를 추가해 통합 에비던스 `E3`까지 올린다.
+- 허용: `Simulation플레이어지식LedgerSnapshot`과 같은 revision의 `Simulation지식습득PreviewSnapshot`을 읽는 Recipe 지식 카드 가족 투영, 읽기 가능·이미 앎·차단 상태, 결정적 정렬, 카드 서랍 공통 계약 소비, 집중 자동시험.
+- 금지: 카드에서 지식 습득 Confirm 실행, Unity Scene·GameObject·실제 UI 배선, 실제 입력, Play Mode·Game View, Save 판본, 약초 채집·달이기·섭취·약효.
+- 완료 표현: `Logic E4 / Presentation E3 / 통합 E3` 이하로 기록한다.

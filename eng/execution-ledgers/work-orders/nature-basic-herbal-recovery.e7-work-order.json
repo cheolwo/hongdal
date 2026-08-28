@@ -3,16 +3,16 @@
   "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-NATURE-BASIC-HERBAL-RECOVERY",
-  "title": "Nature 기초 약초 회복 - 지식 습득 첫 인계",
+  "title": "Nature 기초 약초 회복 - 지식 습득 통합 E3 인계",
   "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
   "activeWorldInteractionId": "WI-ACTOR-03",
   "targetEvidenceStage": "E7",
-  "currentEvidenceStage": "E1",
-  "promotionEligible": false,
+  "currentEvidenceStage": "E3",
+  "promotionEligible": true,
   "deliveryCap": {
-    "currentDispatchTargetStage": "E4",
+    "currentDispatchTargetStage": "E3",
     "promotionBeyondStageAllowed": false,
-    "reason": "첫 인계 Logic E3 완료 뒤 같은 WI의 LocalProcess·RemoteHost 실행 경계만 한 단계 검증하고 표현·저장·약효 규칙은 확정하지 않는다."
+    "reason": "기존 Logic E4를 보존하고 Recipe 지식 카드의 읽기 전용 Presentation E2~E3만 추가해 통합 E3에서 정지한다."
   },
   "iterationState": {
     "currentPass": "UpwardAssemblyAndValidation",
@@ -43,20 +43,20 @@
     },
     "presentation": {
       "trackCode": "Presentation",
-      "currentEvidenceStage": "E1",
+      "currentEvidenceStage": "E3",
       "downwardPlan": [
         { "code": "E7", "disposition": "Blocked", "summary": "Game View 실제 입력 증거는 후속 범위다." },
         { "code": "E6", "disposition": "Blocked", "summary": "피드백 판독성 정제는 후속 범위다." },
         { "code": "E5", "disposition": "Blocked", "summary": "같은 revision의 상태 사본 표현은 후속 범위다." },
-        { "code": "E4", "disposition": "Blocked", "summary": "Unity 표현 계약과 H 결속은 후속 범위다." },
-        { "code": "E3", "disposition": "Blocked", "summary": "표현 시험 모판은 만들지 않는다." },
-        { "code": "E2", "disposition": "Blocked", "summary": "읽기·습득 표현 언어는 후속 문답으로 정한다." },
-        { "code": "E1", "disposition": "Defined", "summary": "향후 플레이어가 처방 단서와 습득 결과를 구분할 수 있어야 한다." }
+        { "code": "E4", "disposition": "Blocked", "summary": "Unity Scene·실제 카드 서랍 배선과 H 결속은 후속 범위다." },
+        { "code": "E3", "disposition": "Affected", "summary": "같은 revision·결정적 정렬·읽기 전용 경계와 Known/Readable/Blocked 상태 구분을 자동시험으로 검증한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "Simulation 지식 원장과 Preview를 CardWorkspace가 소비할 RecipeKnowledge 가족 상태 사본으로 투영한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "Recipe 카드는 제작 허가가 아니라 읽을 수 있음·이미 앎·차단을 보여 주는 읽기 전용 정보 관리 표현이다." }
       ],
       "upwardValidation": [
         { "code": "E1", "status": "Passed", "evidenceRefs": ["topic:nature-basic-herbal-recovery.v1"] },
-        { "code": "E2", "status": "Blocked", "evidenceRefs": [] },
-        { "code": "E3", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Unity/Runtime/Cards/Simulation처방지식CardFamily.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["evidence:nature-basic-herbal-recovery-presentation-e3-20260828", "Ssalddel.Unity.Tests/Simulation처방지식CardFamilyTests.cs"] },
         { "code": "E4", "status": "Blocked", "evidenceRefs": [] },
         { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
         { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
@@ -65,20 +65,20 @@
     }
   },
   "integratedGate": {
-    "currentEvidenceStage": "E1",
-    "status": "Blocked",
-    "candidateRevision": "nature-basic-herbal-recovery.design.r2",
-    "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"],
-    "openFeedbackRefs": ["지식 원장 저장이 필요하면 Logic E1에서 별도 Save 판본 승인을 받는다.", "Logic E5 이상과 Presentation E2~E7은 후속 기획·인계 전 승격하지 않는다."]
+    "currentEvidenceStage": "E3",
+    "status": "Passed",
+    "candidateRevision": "nature-basic-herbal-recovery.design.r3",
+    "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "evidence:nature-basic-herbal-recovery-logic-e3-20260828", "evidence:nature-basic-herbal-recovery-presentation-e3-20260828"],
+    "openFeedbackRefs": ["지식 원장 저장이 필요하면 Logic E1에서 별도 Save 판본 승인을 받는다.", "E4 이상 실제 공간·Scene·입력과 약초 채집·달이기·섭취는 후속 기획·인계 전 승격하지 않는다."]
   },
   "pipelineValidation": {
     "profileKey": "playable-loop:nature-basic-herbal-recovery.v1|WI-ACTOR-03",
-    "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r2",
+    "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r3",
     "logicStatusCode": "Passed",
-    "presentationStatusCode": "Blocked",
-    "integratedStatusCode": "Blocked",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
     "earliestReopenEvidenceStageCode": "E1",
-    "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "evidence:nature-basic-herbal-recovery-logic-e4-20260828", "test:SimulationPlayerKnowledgeTests:12/12"],
-    "blockerCodes": ["LogicE5PlusDeferredByDeliveryCap", "PresentationDeferredByPlanning"]
+    "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "evidence:nature-basic-herbal-recovery-logic-e4-20260828", "evidence:nature-basic-herbal-recovery-presentation-e3-20260828"],
+    "blockerCodes": ["PromotionBeyondIntegratedE3DeferredByDeliveryCap"]
   }
 }

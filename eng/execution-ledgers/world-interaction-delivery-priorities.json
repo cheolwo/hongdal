@@ -1,6 +1,6 @@
 {
   "schemaVersion": "world-interaction-delivery-priorities.v1",
-  "revision": "world-interaction-delivery-priorities.r26",
+  "revision": "world-interaction-delivery-priorities.r27",
   "lastVerifiedDate": "2026-08-28",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
@@ -12,10 +12,16 @@
   "activeWork": {
     "worldInteractionId": "WI-ACTOR-03",
     "workStateCode": "Active",
-    "currentEvidenceStage": "E5",
+    "currentEvidenceStage": "E3",
     "targetEvidenceStage": "E7",
-    "startedReason": "승인된 Nature 기초 약초 회복 기획 r2에서 첫 WI인 지식 습득의 Logic E4 실행 경계까지만 닫는다.",
+    "startedReason": "승인된 Nature 기초 약초 회복 기획 r3에서 WI-ACTOR-03의 기존 Logic E4를 보존하고 Recipe 지식 카드 Presentation을 E3까지 닫아 통합 E3를 만든다.",
     "stageReviews": [
+      {
+        "stageCode": "E3",
+        "resultCode": "Passed",
+        "summary": "지식 원장과 Preview의 같은 revision을 읽어 Recipe 지식 카드를 결정적으로 투영하고 읽기 가능·이미 앎·차단 상태와 권위 불변을 자동시험으로 검증했다.",
+        "evidenceRefs": ["evidence:nature-basic-herbal-recovery-presentation-e3-20260828", "Ssalddel.Unity.Tests/Simulation처방지식CardFamilyTests.cs"]
+      },
       {
         "stageCode": "E4",
         "resultCode": "Passed",
@@ -35,7 +41,7 @@
         "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"],
         "refinement": {
           "playerQuestion": "플레이어가 처방을 읽을 수 있고 이미 아는지, 습득이 성공했는지 구분할 수 있는가?",
-          "answer": "이번 인계는 질문을 확정했지만 실제 표현 답변은 후속 Presentation 작업으로 남긴다.",
+          "answer": "E3 관점별 조회 결과는 읽기 가능·이미 앎·차단을 구분한다. 실제 카드 서랍 배선과 화면 판독성은 E4 이상 후속 Presentation 작업으로 남긴다.",
           "costAndRisk": "지식 습득 자체는 자원을 소비하지 않으며 승인되지 않은 저장·원격·약효 규칙을 열지 않는다.",
           "feedback": "후속 표현은 같은 WorldRevision의 지식 원장과 행위 기록을 읽어야 한다.",
           "returnOrNextChoice": "습득 뒤 다시 탐색·휴식 또는 후속 재료 선택으로 돌아간다.",

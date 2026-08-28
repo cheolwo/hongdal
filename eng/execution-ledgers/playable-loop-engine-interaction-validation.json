@@ -1,6 +1,6 @@
 {
   "schemaVersion": "playable-loop-engine-interaction-validation.v2",
-  "revision": "playable-loop-engine-interaction-validation.r7",
+  "revision": "playable-loop-engine-interaction-validation.r8",
   "evidenceTrackCodes": ["Logic", "Presentation"],
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "principles": {
@@ -60,7 +60,7 @@
     }
   },
   "profileOverrides": [
-    { "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1", "worldInteractionId": "WI-ACTOR-03", "displayNameKo": "기초 처방 지식 습득", "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r2", "changeSemanticCodes": ["PlayerProgressChanged"], "presentationConsumerCodes": ["World.Presentation"] },
+    { "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1", "worldInteractionId": "WI-ACTOR-03", "displayNameKo": "기초 처방 지식 습득", "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r3", "changeSemanticCodes": ["PlayerProgressChanged"], "presentationConsumerCodes": ["World.Presentation"] },
     { "loopStableId": "playable-loop:nature-tactical-self-navigation.v1", "worldInteractionId": "WI-NATURE-05", "displayNameKo": "전술 이동 뒤 벌목 도끼 획득", "profileRevision": "nature-tactical-self-navigation.engine-interaction.r1", "changeSemanticCodes": ["ActorStateChanged", "InventoryChanged"], "presentationConsumerCodes": ["Placement.Exterior", "World.Presentation"] },
     { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-13", "displayNameKo": "거점 보관", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["InventoryChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] },
     { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-14", "displayNameKo": "오두막 수면과 새벽 전환", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["ActorStateChanged", "TimeStateChanged", "AtmosphereChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["LH.Surface", "Sky.Presentation", "Placement.Exterior", "Placement.Interior", "Lighting.Directional", "World.Presentation"] },
