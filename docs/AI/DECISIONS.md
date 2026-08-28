@@ -3031,3 +3031,24 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 승인 경계: 문답의 `Confirmed`·`Closed`는 E 증거나 기획 승인 상태가 아니다. 플레이어 약속과 선택·대가·회복·귀환, WI, Logic·Presentation, H, 저장·권위와 전문 연구 판정을 기획서로 합성하고 별도 승인해야 한다.
 - 재개 경계: 기록은 현재 질문 ID, 마지막 확인 질문 ID, 미정과 다음 질문을 보존한다. 대화가 중단되면 같은 위치에서 재개하고 이미 확인한 질문을 처음부터 반복하지 않는다.
 - 상세 기준: [PlayableLoop 문답 정밀화 체계](../Architecture/PlayableLoop문답정밀화체계.md)와 [문답 정밀화 기록 템플릿](../ProjectOverview/templates/PlayableLoop문답정밀화기록템플릿.md)을 따른다.
+
+## D-278 명상은 실행 WI가 아닌 비실행 상위 WI군으로 구체 플레이어 행위를 묶는다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 분류 경계: 모든 구체적 플레이어 WI는 `wi-family:meditation` 상위 분류 후보로 전수 판정한다. `PlayerDirect`, `PlayerOrOperation`, `LearningOnly`는 `Bound`, `OperationOnly`와 의미 있는 플레이어 행위가 아닌 WI는 사유 있는 `NotApplicable`로 기록한다.
+- 실행 경계: 명상 WI군은 `MetadataOnly`이며 자체 `Preview`, `Confirm`, `Task`, `Effect`, 비용·예약 또는 `WorldRevision`을 만들지 않는다. 구체 WI가 권위 완료된 뒤 같은 `ActionRecord`를 기존 `MeditationProgressionApply`가 소비한다.
+- 책임 경계: 명상 WI군 결속은 구체 WI의 결과·물질 보상·분야 숙련을 재정의하지 않고 개별 집중 Profile 승인도 대신하지 않는다. 실제 Actor가 NPC이거나 자동 실행이면 Player 결속 가능 WI라도 개인 명상 기여를 지급하지 않는다.
+- 호환 경계: 첫 리팩토링은 `meditation-wi-family-catalog.r1`과 명상 적용 관문만 추가한다. 저장 payload와 `simulation-save.v29`, 현재 Perfect·Good 수치는 유지한다. `Q-122`에서 확인한 의미 있는 완료의 기본 회복은 별도 Profile revision·상한·감쇠·Save 증거를 갖춘 후속 변경으로 남긴다.
+- 상세 기준: [전 행위 몰입과 명상 숙련·행위 원장 통합 체계](../Architecture/전행위몰입과명상숙련행위원장통합체계.md)와 [플레이어 내면·명상 문답](../Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md)을 따른다.
+
+## D-279 Farm 작업 참여는 초기 Solo 가능성과 후속 협력 성장을 공통 비실행 정책으로 연결한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 시작 경계: 첫 농지의 기본 적합도 조사와 소규모 개간은 플레이어 혼자 완결할 수 있다. NPC·다른 플레이어·대형 장비가 없다는 이유로 초반 Farm 진행을 차단하지 않는다.
+- 성장 경계: 면적과 급경사·암석·배수·먼 수원 같은 현장 난도가 증가할수록 시간·피로·도구 내구도·부상 부담이 커지고 협력자·전문가·장비의 효율이 높아진다. 현재 도구로 물리적으로 수행할 수 없는 경우만 별도 차단한다.
+- 권한 경계: 잡초 제거·정리·소량 운반·이미 Confirm된 작업 보조는 기본 자동 허용하되 플레이어가 끌 수 있다. 자원 소비·수확/처분·지형 변경·건설/철거·새 작업 확정은 명시적 Confirm 또는 사전 위임을 요구한다.
+- 호혜 경계: 가벼운 도움은 즉시 결제 대신 호혜 기여로 기록하고 식사·선물·맞도움 등으로 보답할 수 있다. 전문 기술·장시간·위험·장비 노동은 시작 전에 보수·보급·시간·위험 부담을 합의한다.
+- 구현 경계: 첫 판본 `work-participation-policy.r1`은 기존 Farm 작업·NPC 배정·협동 건설 기여가 소비할 비실행 판정 계약이다. 자체 WI·Preview·Confirm·Task·Effect·WorldRevision·Save 상태를 만들지 않으며 활성 Goal이나 Farm E를 승격하지 않는다.
+- 상세 기준: [Q-001~Q-130 개발 뼈대 인계](../Architecture/Q001-Q130개발뼈대인계.md)와 [건물·공간·배치 문답](../Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md)을 따른다.

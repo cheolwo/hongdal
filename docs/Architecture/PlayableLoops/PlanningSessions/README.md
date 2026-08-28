@@ -15,10 +15,16 @@
 | 주제 | 권위 문답 문서 | 이관 질문 | 다음 기록 위치 |
 | --- | --- | --- | --- |
 | Nature 거점·수면·날씨·방어 | [Nature 거점·수면 문답](Nature거점수면/nature-shelter-sleep.inquiry.r1.md) | Q-001~005, Q-023~035 | 같은 파일 |
-| 플레이어 내면·명상·계획 | [플레이어 내면·명상 문답](플레이어내면명상/player-mind-meditation.inquiry.r1.md) | Q-006~022, Q-040~044, Q-065~067 | 같은 파일 |
+| 플레이어 내면·명상·계획 | [플레이어 내면·명상 문답](플레이어내면명상/player-mind-meditation.inquiry.r1.md) | Q-006~022, Q-040~044, Q-065~067, Q-122~125 | 같은 파일 |
 | Nature 자원·LandUse·건설 | [Nature 자원·건설 문답](Nature자원건설/nature-resource-construction.inquiry.r1.md) | Q-036~039, Q-051~060 | 같은 파일 |
 | 약초·Recipe·조합 제작 | [약초 Recipe 제작 문답](약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md) | Q-045~050, Q-061~064, Q-068~071 | 같은 파일 |
 | 저장·Load·재진입 | [저장·재진입 문답](저장재진입/save-load-runtime.inquiry.r1.md) | Q-072~076 | `Q-076`부터 같은 파일 |
+| 영역별 건물·공간·배치·협력 | [건물·공간·배치 문답](건물공간배치/building-spatial-placement.inquiry.r1.md) | Q-077~121, Q-126~130 | 같은 파일 |
+
+## 개발 뼈대 인계
+
+- Q-001~Q-130의 주제별 코드 연결과 아직 실행 규칙으로 승격하지 않은 범위는 [Q-001~Q-130 개발 뼈대 인계](../../Q001-Q130개발뼈대인계.md)를 따른다.
+- 문답 범위가 넓어져도 활성 Goal과 WI WIP는 각각 1을 유지하며, 공통 비실행 정책을 추가한 사실만으로 개별 PlayableLoop의 E를 승격하지 않는다.
 
 ## 호환 아카이브
 

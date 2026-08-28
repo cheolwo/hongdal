@@ -16,6 +16,37 @@ Unity Sky Engine Projector
 
 Unity의 `Transform`, `ParticleSystem`, `AudioSource`, 카메라와 Renderer는 `WorldTick`, 날씨 코드, 전이 진행률 또는 번개 순번을 변경하지 않는다.
 
+## 공공 기상 관측을 포함하는 관리 경계
+
+사람이 프로젝트를 탐색하고 기획할 때 기상청 관측·예보, Simulation 대기 규칙과 Unity 하늘 표현을 하나의 `Sky Engine` 문맥에서 찾을 수 있게 한다. 다만 외부 수집, 권위 판정과 표현 책임을 한 클래스나 Unity Component에 합치지는 않는다.
+
+```text
+Sky Engine 관리 묶음
+├─ Sky Observation
+│  ├─ 기상청 ASOS·예보 Source Registration
+│  ├─ 원문·단위·품질·관측소·시각·hash
+│  └─ Unavailable / Stale / Incomplete
+├─ Sky Input Profile
+│  ├─ 새 세계 또는 게임 하루 시작 경계에서 입력 고정
+│  ├─ SourceType·SourceSnapshotHash·RuleRevision
+│  └─ 플레이 도중 외부 응답으로 교체 금지
+├─ Simulation World Atmosphere
+│  ├─ 시간대·구름·강수·바람·번개 권위 상태
+│  ├─ WorldTick·Save·Replay·Local/Remote 동등성
+│  └─ Farm·Nature 등 영역별 규칙이 읽는 공통 날씨 상태
+└─ Unity Sky Presentation
+   └─ 조명·안개·구름·비·번개·음향·차폐
+```
+
+- 기상청 Client와 원문 저장은 서버 Data/Adapter 경계가 소유하고 Unity `SkyEnginePresenter`가 API를 직접 호출하지 않는다.
+- 승인 관측은 새 세계 또는 게임 하루 시작 경계에서 품질 검사를 통과한 `SkyInputProfileSnapshot` 후보로 고정한다. 이미 시작된 하루는 외부 응답 갱신으로 바뀌지 않는다.
+- 외부 관측은 강수 상태의 근거가 될 수 있지만 개별 밭의 토양수분이나 작물 생육을 직접 결정하지 않는다.
+- Farm은 같은 권위 대기 상태의 강수와 별도 관수 Effect를 읽고 토양 보수력·배수·증발산·유출 규칙으로 다음 토양수분을 계산한다.
+- 예보는 다음 날 계획 Preview에 사용할 수 있지만 확정된 과거 WorldTick의 관측을 대체하지 않는다.
+- 결측·오래됨·미승인 관측을 0mm나 맑음으로 바꾸지 않는다. 명시적 Fixture 또는 게임 기후 Profile을 사용한다면 SourceType을 분리하고 사용자에게 근거 차이를 표시한다.
+
+이 묶음은 탐색·기획·운영을 쉽게 하기 위한 모듈 경계다. 외부 관측값, Simulation 상태와 Unity 표현의 권위가 같아졌다는 뜻은 아니다.
+
 ## 첫 프로필
 
 - 고유 식별자: `world-atmosphere:nature-night-day2.fixture.r1`
@@ -85,4 +116,4 @@ Solo `LocalProcess`와 Hosted `RemoteHost`는 같은 Simulation Core 규칙을 �
 
 ## 후속 범위
 
-계절·지역별 날씨 확률, 젖음·시야·이동 비용 같은 게임 효과, 현실 기상 관측, 다중 지역 미기후와 외부 Sky 플러그인은 별도 작업 명세에서 권위·저장·실패 복구를 다시 검토한 뒤 추가한다.
+계절·지역별 날씨 확률, 젖음·시야·이동 비용 같은 게임 효과, 승인 현실 기상 관측의 실제 `SkyInputProfileSnapshot` 결속, 다중 지역 미기후와 외부 Sky 플러그인은 별도 작업 명세에서 권위·저장·실패 복구를 다시 검토한 뒤 추가한다.

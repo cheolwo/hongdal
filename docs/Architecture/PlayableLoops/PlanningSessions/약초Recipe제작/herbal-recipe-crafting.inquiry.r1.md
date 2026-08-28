@@ -31,8 +31,9 @@
 
 ## 기존 개발 인계
 
-- `WI-ACTOR-03 지식 습득`: `Logic E4 / Presentation E1 / 통합 E1`
-- Save/Replay·Unity·Recipe UI·채집·달이기·섭취·약효는 아직 미구현이다.
+- `WI-ACTOR-03 지식 습득`: `Logic E4 / Presentation E3 / 통합 E3`
+- 같은 WorldRevision의 지식 원장과 Preview를 `Known / Readable / Blocked` 처방 카드 상태로 결정적으로 투영하는 읽기 사본까지 구현했다.
+- Save/Replay·실제 Unity Scene 배선·Recipe UI 조작·Play Mode·Game View·채집·달이기·섭취·약효는 아직 미구현이다.
 
 ## 다음 질문 후보
 
