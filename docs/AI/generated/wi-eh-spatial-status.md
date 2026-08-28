@@ -2,12 +2,12 @@
 
 > 이 문서는 E/H 원장·공간 재고·공식 H 정의를 대조해 자동 생성한다. 직접 수정하지 않는다.
 
-- WI: `65개` · E3: `60개`
+- WI: `66개` · E3: `61개`
 - E4/H1 실행 성립: `14개`
 - E5/H3 실제 공간 결속: `15개`
 - H1~H4 설계 후보 계보만 존재: `21개`
 - 필수 공간 설계 누락: `5개`
-- 공간 비적용: `10개`
+- 공간 비적용: `11개`
 - 공식 H 정의: `H1 8 / H2 0 / H3 5 / H4 1`
 
 후보 H2·H3·H4 계보와 Graph binding은 설계 입력이며 E 단계나 실제 배치를 자동 승격하지 않는다.
@@ -18,6 +18,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 물품 획득 · `WI-ACTOR-01` | `E3/E5` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 | 장착 상태 변경 · `WI-ACTOR-02` | `E3/E5` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
+| 지식 습득 · `WI-ACTOR-03` | `E3/E5` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 
 ## 메이저 아르카나 (`CARD`)
 
@@ -90,7 +91,7 @@
 | 안전 거점으로 긴급 후퇴 · `WI-NATURE-02` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P1` | `DesignCandidateOnly` |  |
 | 훼손된 자연 경로 복원 · `WI-NATURE-03` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P1` | `DesignCandidateOnly` |  |
 | 탐사대 안전 회복 · `WI-NATURE-04` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P1` | `DesignCandidateOnly` |  |
-| 벌목 도끼 획득 · `WI-NATURE-05` | `E3/E6` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` | E5PlacementReferenceMissing |
+| 벌목 도끼 획득 · `WI-NATURE-05` | `E3/E7` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` | E5PlacementReferenceMissing |
 | 나무 벌목 작업 시작 · `WI-NATURE-06` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 오두막을 지을 터 선정 · `WI-NATURE-07` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 오두막 건설 작업 시작 · `WI-NATURE-08` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |

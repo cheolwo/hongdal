@@ -213,6 +213,7 @@ foreach ($wave in @($ledger.waves | Sort-Object order)) {
         $status = $statusById[[string] $priority.worldInteractionId]
         $loopsText = if (@($priority.playableLoopRefs).Count -eq 0) { "후속 정의" } else { @($priority.playableLoopRefs) -join "<br>" }
         $workState = if ([string] $priority.worldInteractionId -eq $activeId) { $activeWorkState }
+            elseif ([string] $wi.integration.currentStage -eq "E7") { "E7Closed" }
             elseif ([string] $priority.completionRoleCode -eq "DeferredIntegration") { "Deferred" }
             else { "Queued" }
         $npcE8 = if ($requiredNpcE8 -contains [string] $priority.worldInteractionId) { "Required" }
@@ -270,6 +271,7 @@ $contract = [Text.StringBuilder]::new()
 [void] $contract.AppendLine("        private static readonly SimulationWI실행우선순위Definition[] 항목들 =")
 [void] $contract.AppendLine("        {")
 foreach ($priority in @($ledger.items | Sort-Object { [int] $waveByCode[[string] $_.deliveryWaveCode].order }, orderInWave)) {
+    $wi = $catalogById[[string] $priority.worldInteractionId]
     $loopArgs = @($priority.playableLoopRefs | ForEach-Object {
             '"{0}"' -f (Escape-CSharp ([string] $_))
         }) -join ", "
@@ -280,6 +282,7 @@ foreach ($priority in @($ledger.items | Sort-Object { [int] $waveByCode[[string]
         "new[] { $loopArgs }"
     }
     $workState = if ([string] $priority.worldInteractionId -eq $activeId) { $activeWorkState }
+        elseif ([string] $wi.integration.currentStage -eq "E7") { "E7Closed" }
         elseif ([string] $priority.completionRoleCode -eq "DeferredIntegration") { "Deferred" }
         else { "Queued" }
     $npcE8 = if ($requiredNpcE8 -contains [string] $priority.worldInteractionId) { "Required" }

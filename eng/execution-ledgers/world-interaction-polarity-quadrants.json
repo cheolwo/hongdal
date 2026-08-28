@@ -34,7 +34,7 @@
     "WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-06", "WI-WORLD-05"
   ],
   "fixedYinWorldInteractionIds": [
-    "WI-ACTOR-02",
+    "WI-ACTOR-02", "WI-ACTOR-03",
     "WI-CARD-01", "WI-CITY-01", "WI-CITY-03", "WI-CITY-04",
     "WI-001", "WI-HUB-03", "WI-MARKET-02", "WI-MARKET-03",
     "WI-NATURE-04", "WI-NATURE-12", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-NATURE-17",

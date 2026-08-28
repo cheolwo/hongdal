@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-BASIC-HERBAL-RECOVERY",
+  "title": "Nature 기초 약초 회복 - 지식 습득 첫 인계",
+  "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+  "activeWorldInteractionId": "WI-ACTOR-03",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E4",
+    "promotionBeyondStageAllowed": false,
+    "reason": "첫 인계 Logic E3 완료 뒤 같은 WI의 LocalProcess·RemoteHost 실행 경계만 한 단계 검증하고 표현·저장·약효 규칙은 확정하지 않는다."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "지식 원장의 소유 경계, 멱등 규칙 또는 RecipeStableId 의미가 달라지면 Logic E1을 다시 연다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력 폐루프는 이번 인계 범위 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "난이도·피드백·약효 정제는 후속 문답 뒤 수행한다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "지식 습득과 공간 발현 결속은 후속 범위다." },
+        { "code": "E4", "disposition": "Affected", "summary": "같은 Application 서비스를 LocalSimulationRuntime과 RemoteHost HTTP Adapter가 호출하고 동일 결과를 만드는지 집중시험 12/12로 검증했다." },
+        { "code": "E3", "disposition": "Affected", "summary": "Preview 무변경, Confirm 멱등성, 예상 revision 불일치와 거부 경계를 집중 단위시험 8/8로 검증했다." },
+        { "code": "E2", "disposition": "Affected", "summary": "KnownRecipeStableIds와 승인 지식 출처, 지식 습득 Preview/Confirm을 순수 Domain/Application 계약으로 구현했다." },
+        { "code": "E1", "disposition": "Defined", "summary": "WI-ACTOR-03은 RecipeStableId 하나를 플레이어 지식 원장에 멱등 추가하는 단일 책임이다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayerKnowledgeContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerKnowledge.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayerKnowledgeService.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationPlayerKnowledgeTests.cs", "test:SimulationPlayerKnowledgeTests:8/8"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["evidence:nature-basic-herbal-recovery-logic-e4-20260828", "test:SimulationPlayerKnowledgeTests:12/12"] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "Game View 실제 입력 증거는 후속 범위다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "피드백 판독성 정제는 후속 범위다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "같은 revision의 상태 사본 표현은 후속 범위다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "Unity 표현 계약과 H 결속은 후속 범위다." },
+        { "code": "E3", "disposition": "Blocked", "summary": "표현 시험 모판은 만들지 않는다." },
+        { "code": "E2", "disposition": "Blocked", "summary": "읽기·습득 표현 언어는 후속 문답으로 정한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "향후 플레이어가 처방 단서와 습득 결과를 구분할 수 있어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["topic:nature-basic-herbal-recovery.v1"] },
+        { "code": "E2", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E3", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "Blocked",
+    "candidateRevision": "nature-basic-herbal-recovery.design.r2",
+    "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"],
+    "openFeedbackRefs": ["지식 원장 저장이 필요하면 Logic E1에서 별도 Save 판본 승인을 받는다.", "Logic E5 이상과 Presentation E2~E7은 후속 기획·인계 전 승격하지 않는다."]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-basic-herbal-recovery.v1|WI-ACTOR-03",
+    "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r2",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Blocked",
+    "integratedStatusCode": "Blocked",
+    "earliestReopenEvidenceStageCode": "E1",
+    "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "evidence:nature-basic-herbal-recovery-logic-e4-20260828", "test:SimulationPlayerKnowledgeTests:12/12"],
+    "blockerCodes": ["LogicE5PlusDeferredByDeliveryCap", "PresentationDeferredByPlanning"]
+  }
+}

@@ -2,10 +2,10 @@
 
 > `eng/execution-ledgers/playable-loop-presentation-validation-modules.json`와 `eng/execution-ledgers/playable-loops.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 모듈 대장: `playable-loop-presentation-validation-modules.r3`
+- 모듈 대장: `playable-loop-presentation-validation-modules.r4`
 - 공통 모듈: `5`
 - 조건 모듈: `10`
-- 적용 PlayableUnit: `16`
+- 적용 PlayableUnit: `17`
 
 ## 공통 관문
 
@@ -29,6 +29,7 @@
 | `playable-loop:nature-base-reflection.v1` | 공통만 적용 | actual-camera-input-result-return, player-scale-spacing, presentation-binding, state-difference-readability, visual-source-bounds |
 | `playable-loop:nature-building-learning.v1` | 공통만 적용 | actual-camera-input-result-return, player-scale-spacing, presentation-binding, state-difference-readability, visual-source-bounds |
 | `playable-loop:nature-regional-threat-recovery.v1` | 공통만 적용 | actual-camera-input-result-return, player-scale-spacing, presentation-binding, state-difference-readability, visual-source-bounds |
+| `playable-loop:nature-tactical-self-navigation.v1` | GroundSurface, Actor, CameraOcclusion | actor-grounding-identification, actual-camera-input-result-return, camera-occlusion, player-scale-spacing, presentation-binding, state-difference-readability, surface-clearance, visual-source-bounds |
 | `playable-loop:farm-crop-cycle.v1` | 공통만 적용 | actual-camera-input-result-return, player-scale-spacing, presentation-binding, state-difference-readability, visual-source-bounds |
 | `playable-loop:farm-pack-store-return.v1` | 공통만 적용 | actual-camera-input-result-return, player-scale-spacing, presentation-binding, state-difference-readability, visual-source-bounds |
 | `playable-loop:farm-player-placement.v1` | 공통만 적용 | actual-camera-input-result-return, player-scale-spacing, presentation-binding, state-difference-readability, visual-source-bounds |

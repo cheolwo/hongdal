@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-TACTICAL-SELF-NAVIGATION",
+  "title": "Nature 전술 자기 캐릭터 선택·이동과 도끼 접근",
+  "playableUnitStableId": "playable-loop:nature-tactical-self-navigation.v1",
+  "activeWorldInteractionId": "WI-NATURE-05",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E7",
+  "promotionEligible": true,
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "실제 선택·이동·재집중·도끼 획득에서 논리 또는 표현 차이가 발견되면 해당 트랙의 가장 이른 E1~E7을 다시 연다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E7",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Gap", "summary": "실제 조작 뒤 WI-NATURE-05와 저장 재진입을 LocalProcess·RemoteHost에서 확인해야 한다." },
+        { "code": "E6", "disposition": "Affected", "summary": "선택·이동은 표현이고 도끼 Confirm만 권위 변화라는 경계를 플레이 전에 설명한다." },
+        { "code": "E5", "disposition": "ReusedWithVerification", "summary": "기존 도끼 획득 Confirm·행위 기록·revision 전이를 재사용한다." },
+        { "code": "E4", "disposition": "ReusedWithVerification", "summary": "기존 ToolPickupPoint와 플레이어 접근 능력을 재사용한다." },
+        { "code": "E3", "disposition": "ReusedWithVerification", "summary": "WI-NATURE-05 멱등·Save/Replay·Local/Remote 시험을 재사용한다." },
+        { "code": "E2", "disposition": "ReusedWithVerification", "summary": "기존 Nature Runtime과 HTTP Adapter를 변경하지 않는다." },
+        { "code": "E1", "disposition": "Defined", "summary": "표현 이동은 WI가 아니며 도끼 소유권 이전만 WI-NATURE-05가 담당한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["WI-NATURE-05"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["nature-survival.realtime.r5"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["SimulationActorEquipmentTests"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["spatial:actual-e5:wi-nature-05"] },
+        { "code": "E5", "status": "Passed", "evidenceRefs": ["simulation-action-manifestation.v1"] },
+        { "code": "E6", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature전술자기캐릭터이동.md"] },
+        { "code": "E7", "status": "Passed", "evidenceRefs": ["evidence:nature-tactical-axe-hosted-parity-20260828"] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E7",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Gap", "summary": "canonical Scene에서 클릭·박스 선택·우클릭·방향키·이중 Backspace·도끼 획득을 실제 입력으로 완주한다." },
+        { "code": "E6", "disposition": "Affected", "summary": "선택 사각형·선택 원·목적지와 캐릭터 재집중을 Game View에서 판독한다." },
+        { "code": "E5", "disposition": "Affected", "summary": "자기 캐릭터만 선택하고 기존 지형·이동 Gate를 소비한다." },
+        { "code": "E4", "disposition": "Defined", "summary": "포인터·키보드 입력 우선순위와 전술 카메라 결속을 정의한다." },
+        { "code": "E3", "disposition": "Defined", "summary": "선택 수학과 실제 입력 시험 모판을 준비한다." },
+        { "code": "E2", "disposition": "Defined", "summary": "방향키 캐릭터·WASD 카메라·Backspace 두 번이라는 표현 언어를 고정한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어가 자기 캐릭터와 현재 조작 결과를 식별할 수 있어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["topic:nature-tactical-self-navigation.v1"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["D-273"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["test:플레이어전술조작Tests:3/3"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["Assets/Ssalddel/Presentation/World/플레이어전술조작Controller.cs"] },
+        { "code": "E5", "status": "Passed", "evidenceRefs": ["test:전술자기캐릭터조작PlayModeTests:1/1"] },
+        { "code": "E6", "status": "Passed", "evidenceRefs": ["source:SkyEnginePresenter-authority-readiness-guard", "source:공간TileStreamingCompositionRoot-local-adapter-order", "runtime:SimulationWorldShell:Fixture+LocalLhEngine:remote-request-0", "game-view:artifacts/local/validation/nature-tactical/SimulationWorldShell-tactical-selection-move.png"] },
+        { "code": "E7", "status": "Passed", "evidenceRefs": ["test:Nature도끼확보E7PlayModeTests:1/1", "evidence:nature-tactical-axe-playmode-20260828", "game-view:Assets/artifacts/local/validation/nature-tactical/SimulationWorldShell-nature-tactical-axe-acquired-e7.png"] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E7",
+    "status": "Passed",
+    "candidateRevision": "nature-tactical-self-navigation.r1/simulation-save.v28",
+    "evidenceRefs": ["test:SimulationActorEquipmentTests:5/5", "test:플레이어전술조작Tests:3/3", "test:전술자기캐릭터조작PlayModeTests:1/1", "test:Nature도끼확보E7PlayModeTests:1/1", "runtime:SimulationWorldShell:Fixture+LocalLhEngine:remote-request-0", "game-view:Assets/artifacts/local/validation/nature-tactical/SimulationWorldShell-nature-tactical-before-axe-e7.png", "game-view:Assets/artifacts/local/validation/nature-tactical/SimulationWorldShell-nature-tactical-axe-acquired-e7.png"],
+    "openFeedbackRefs": []
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-tactical-self-navigation.v1|WI-NATURE-05",
+    "profileRevision": "nature-tactical-self-navigation.engine-interaction.r1",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E7",
+    "evidenceRefs": ["test:SimulationActorEquipmentTests:5/5", "test:플레이어전술조작Tests:3/3", "test:전술자기캐릭터조작PlayModeTests:1/1", "test:Nature도끼확보E7PlayModeTests:1/1", "source:플레이어전술조작Controller", "source:Nature생존AutoBootstrap.sceneLoaded", "source:공용AnimationAdapter.procedural-pose-owner", "source:Nature감각표현Presenter.harvest-pose-only", "runtime:SimulationWorldShell:Fixture+LocalLhEngine:remote-request-0", "game-view:Assets/artifacts/local/validation/nature-tactical/SimulationWorldShell-nature-tactical-before-axe-e7.png", "game-view:Assets/artifacts/local/validation/nature-tactical/SimulationWorldShell-nature-tactical-axe-acquired-e7.png"],
+    "blockerCodes": []
+  }
+}

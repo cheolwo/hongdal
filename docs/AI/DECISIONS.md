@@ -2958,3 +2958,76 @@ Unity는 로컬 플레이어 입력과 관찰 카메라를 분리한다. 관찰 
 - 소비 경계: LH·Sky·실외·실내·World Presentation은 행위 원장 또는 같은 Revision 상태 사본을 자신의 생명주기에서 독립 조회한다. 엔진은 파이프라인에 종속되어 즉시 호출될 필요가 없고 권위 Revision을 변경할 수 없다.
 - 저장·증거: 권위 원본은 `명상경험Milli`이며 `simulation-save.v29`가 Challenge·명상 기여·행위 원장 계보를 봉인한다. 자동 Logic E5는 Unity 실제 입력·상태창·Game View Presentation E7을 대신하지 않는다.
 - 상세 기준: [전 행위 몰입과 명상 숙련·행위 원장 통합 체계](../Architecture/전행위몰입과명상숙련행위원장통합체계.md)와 [벌목 집중과 명상 숙련 체계](../Architecture/벌목집중과명상숙련체계.md)를 따른다.
+
+## D-272 Solo를 유지하면서 공식 지속 세계와 서버 권위 비공개 협동방을 분리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 실행 방식: Solo는 `LocalProcess`를 유지한다. 비공개 협동방과 공식 지속 세계는 모두 개발사 `RemoteHost`의 같은 Simulation Core를 권위로 사용하며 플레이어 PC를 권위 P2P Host로 만들지 않는다.
+- 세계 수명: 비공개방은 2~4명 초대형이고 전원 이탈 시 상태 사본을 정지한다. 공식 세계는 접속자가 없어도 활성 상태 사본을 유지하며 첫 기준은 Nature AreaSet 4개, AreaSet당 32명, 전체 128명이다. 이 숫자는 첫 용량 계약이며 운영 부하 검증 완료를 뜻하지 않는다.
+- 세션 결속: 각 온라인 AreaSet은 세계·AreaSet·규칙 revision에서 계산한 서로 다른 `RemoteHost` Simulation 세션 식별자를 상태 사본에 봉인한다. 연결 참가자의 명시적 Provision 요청은 해당 식별자로 프로세스 내부 Nature Runtime을 결정적으로 준비하고 참가자별 Actor·인벤토리·도끼·Nature Mind를 등록한다. 같은 AreaSet 참가자는 공식 지속 세계와 비공개 협동방 모두 하나의 세션을 공유하며, 다른 AreaSet 세션의 행위 기록은 현재 기여로 받아들이지 않는다.
+- 공유 경계: 서로 다른 온라인 세계 사이에는 서버가 권위 행위 기록으로 검증한 명상 경험만 계정 원장에 공유한다. 아이템·재료·장비·분야 숙련·건축물·NPC·위협·세계 시간·공동 목표는 세계별로 격리하고 Solo 저장을 온라인에 import하지 않는다.
+- 협동 경계: 첫 소통은 자유 텍스트·음성 없이 고정 신호만 허용한다. 2~4명 파티는 같은 AreaSet에서 성립하며 AreaSet 전환은 전원 수용 가능할 때만 같은 revision에서 원자적으로 수행한다.
+- 권위·보안: HTTP와 SignalR은 JWT 행위자를 서버에서 확정하고 예상 World·AreaSet·Session revision과 명령 payload hash를 검증한다. 공개 벌목 route는 대상·Challenge·입력 시점만 받고 Actor·완료 시간·보상량은 서버가 정한다. 완료 행위 기록의 계정 명상은 서버가 자동 인계하며 클라이언트가 임의 명상·목표 수치를 제출하는 공개 route는 두지 않는다.
+- 저장·재접속 경계: 기존 개인 `simulation-save.v29`와 별도로 `simulation-online-world-checkpoint.v1`을 Simulation Session DB에 보관한다. 협동 Actor·플레이어별 분야/명상 Profile·행위 기록 hash는 v29 Save/Replay로 복원하며 재접속은 마지막 cursor 이후 권위 기록만 같은 hash chain 순서로 반환한다. 현재 프로세스 재접속과 저장·재생 결정성은 검증했지만 온라인 Runtime의 운영 재기동 자동 적재, Unity 다중 입력·Play Mode·Game View와 운영 배포는 별도 증거다.
+- 성숙도 경계: 첫 협동 WI는 `WI-NATURE-06 벌목`으로 제한한다. 단일 권위 `ActiveWork` 충돌, 두 Actor의 순차 완료, 각 Actor 및 계정 명상 계보를 자동시험으로 검증했지만 이 기반은 현재 PlayableLoop Goal이나 E 증거를 자동 승격하지 않는다.
+- 상세 기준: [공식 지속 세계와 비공개 협동방 체계](../Architecture/공식지속세계와비공개협동방체계.md)를 따른다.
+
+## D-273 전술 시점은 자기 캐릭터 선택·이동과 카메라 탐색 입력을 분리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 플레이어 약속: F3 전술 시점에서 자기 캐릭터를 좌클릭 또는 빈 지면 박스 드래그로 선택하고, 선택된 캐릭터는 지면 우클릭 목적지나 방향키로 이동한다.
+- 입력 경계: 방향키는 선택된 자기 캐릭터 이동, WASD는 RTS 카메라 이동을 담당한다. Backspace를 450ms 안에 두 번 누르면 카메라를 자기 캐릭터에 재집중하며 기존 F 재집중은 호환 입력으로 유지한다.
+- 선택 경계: 첫 판본은 자기 캐릭터 한 명만 선택한다. 온라인 참가자의 위치·선택·다중 유닛 명령은 포함하지 않고 Farm 농지 선택·작업 초안 입력을 기존 우선순위 안에서 보존한다.
+- 권위 경계: 선택·CharacterController 이동·카메라·선택 원·목적지는 `PresentationOnly`이며 `WorldTick`과 `WorldRevision`을 변경하지 않는다. 세계 변화 증거는 이동 뒤 실행하는 `WI-NATURE-05 벌목 도끼 획득` Preview·Confirm·행위 기록에서 성립한다.
+- Goal 경계: 새 승인 주제 `topic:nature-tactical-self-navigation.v1`과 `playable-loop:nature-tactical-self-navigation.v1`을 활성 Goal로 둔다. 기존 `nature-night-day2` 구현·증거는 삭제하지 않고 `Deferred`로 보존한다.
+- 대장 경계: 전술 Core 추가 뒤 전수 관문은 17개 PlayableUnit과 56개 Loop-WI 조합이다.
+- 대체 관계: D-116의 전술 카메라·PresentationOnly 원칙은 유지하고, D-116의 WASD·방향키 카메라 이동과 단일 클릭 선택 입력 배정만 이 결정이 대체한다. D-266의 16개 Goal 수와 D-268의 16개 PlayableUnit·55개 Loop-WI 고정 수는 이 결정이 대체한다.
+- 상세 기준: [Nature 전술 자기 캐릭터 이동](../Architecture/PlayableLoops/Nature전술자기캐릭터이동.md)과 [Unity Landscape Rendering Pipeline](../Architecture/UnityLandscapeRenderingPipeline.md)을 따른다.
+
+## D-274 다섯 영역 위치를 H5 상대좌표로 고정하고 City는 예약 상태로 분리한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 위치 권위: Nature·Farm·Hub·Town·City는 `ScenarioLocalMeters`의 `WorldAreaAnchor`로 고정한다. E6·DEM·도로·토지피복은 앵커를 이동시키지 않으며 위치 변경은 새 WorldLayout revision으로만 수행한다.
+- 영역 분리: 기존 네 Actual E5 AreaSet 좌표를 보존하고 `CityHub`는 Hub의 읽기 호환 별칭으로만 유지한다. 신규 H5 결과의 정규 역할은 `Hub`이며 City는 `area-set:sim:pyeongchang:city-service.v1`로 분리한다.
+- 예약 경계: City는 고정 위치와 특징 Profile만 가진 `Reserved` 앵커다. 메타데이터 선행 적재는 허용하지만 Actual E5 Graph와 승인 회랑 전에는 통행·활성화·WI 실행을 거부한다. Town–City는 같은 이유로 `ReservedCorridor`다.
+- 영역 특징: Nature는 숲·회복·위협, Farm은 십자 농로·네 밭·완만한 작업 지형, Hub는 평탄 물류 동선, Town은 저층 시장 생활권, City는 고밀도 서비스권 규칙을 앵커 Profile로 소유한다.
+- Goal 경계: 폐루프는 고정 앵커 안에서 H1~H3와 Logic·Presentation을 성숙시키며 공간 고정만으로 E를 승격하지 않는다. 현재 전술 Goal을 먼저 닫고 Day2→작업대→Nature 현장 왕복→Farm→Hub→Town→City Core 순서를 유지한다.
+- 상세 기준: [H5 세계 배치와 E6 플레이 전 정제·선택형 GIS 결속](../Architecture/H5세계배치와선택형E6결속.md)을 따른다.
+
+## D-275 플레이 폐루프 기획과 개발은 승인 기획서를 저장소 인계면으로 사용한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 스레드 책임: 기획 스레드는 플레이어 약속·재미·선택·대가·성공·실패·회복·귀환과 WI·Logic·Presentation·H·저장·권위·제외 범위를 구체화한다. 별도 요청이 없으면 제품 코드를 구현하거나 활성 Goal을 교체하지 않는다.
+- 개발 입력: 개발 스레드는 대화 기억이나 대기열 제목을 구현 명세로 사용하지 않는다. 생성 Goal 상태판, `Approved` 기획서와 일치하는 revision·SHA-256·승인 근거, E7 작업 명세, 파이프라인 프로필과 활성 WI를 순서대로 읽고 승인 범위만 구현한다.
+- 차단 규칙: 기획서가 없거나 hash가 다르거나 핵심 선택·대가·실패·회복·귀환이 미정이면 Goal 활성화와 구현을 차단한다. 개발 중 기획 충돌을 발견하면 `openFeedbackItems`와 가장 이른 재개 E를 기록하고 기획 revision 재승인으로 돌려보낸다.
+- 개발 재량: 플레이어 약속과 권위·저장 경계를 바꾸지 않는 내부 클래스 분리, 시험 보조 코드, 성능 최적화는 개발 스레드가 결정할 수 있다. 플레이어 경험 의미나 WI 책임이 달라지면 기획 재승인이 필요하다.
+- 증거 경계: 기획서는 현재 E나 시험·Runtime·Game View 완료를 소유하지 않는다. 구현·증거 상태는 PlayableLoop·Goal·EvidencePackage 원장과 생성 상태판만 소유한다.
+- 대체 관계: D-269의 기획 승인 우선 원칙을 유지하고, 당시 특정 활성 Goal에만 붙였던 이전 예외 설명은 현재 원장과 생성 상태판을 읽는 일반 규칙으로 대체한다.
+- 상세 기준: [주제 기획 기반 PlayableLoop 개발 체계](../Architecture/주제기획기반PlayableLoop개발체계.md), [Codex PlayableLoop Goal 운영 체계](../Architecture/CodexPlayableLoopGoal운영체계.md), `AGENTS.md`를 따른다.
+
+## D-276 구체 설계는 전문 심화 연구로 분기한 뒤 PlayableLoop에 재결속한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 체계 경계: 건물·공간·배치·애니메이션의 구체 설계를 새 E·G·H·Goal로 만들지 않는다. PlayableLoop 기획에서 필요한 연구만 분기하고 검토된 기준선을 같은 기획서와 E7 작업 명세에 다시 결속한다.
+- 필요성 판정: 각 분야는 `Required` 또는 사유 있는 `NotRequired`로 판정한다. 플레이어 선택·대가·회복, H Capability, 권위·저장, 실제 입력·카메라·접촉·판독 또는 자산 fallback에 영향을 주면 `Required`다.
+- 상태 관문: 연구 상태는 `Required → Draft → Reviewed → Accepted → Obsolete`를 사용한다. 모든 `Required` 연구가 `Accepted`되고 기획서에 반영되기 전에는 해당 신규·의미 변경 기획을 `Approved`로 올리지 않는다.
+- 증거 경계: 연구 `Accepted`는 설계 기준선 승인일 뿐 E 승격이나 코드·Scene·Play Mode·Game View 완료가 아니다. 실행 증거는 Goal·E7 작업 명세·EvidencePackage만 소유한다.
+- 피드백 경계: 구현이 기준선과 다르면 구현 결함으로 고치고, 기준선 자체가 틀리면 영향받은 연구와 가장 이른 Logic 또는 Presentation E를 다시 연다. 개발 스레드는 충돌한 연구를 임의로 선택하지 않는다.
+- 적용 경계: 다음 신규 기획서와 의미 변경 revision부터 필수다. 현재 활성 Goal의 이미 승인된 범위를 소급 무효화하지 않으며 첫 적용 후보는 Nature 보관·수면·다음 날 계획 반환이다.
+- 상세 기준: [PlayableLoop 전문 심화 연구 분기·재결속 체계](../Architecture/PlayableLoop전문심화연구분기재결속체계.md), [PlayableLoop 주제 기획서 템플릿](../ProjectOverview/templates/PlayableLoop주제기획서템플릿.md), [전문 심화 연구 템플릿](../ProjectOverview/templates/PlayableLoop전문심화연구템플릿.md)을 따른다.
+
+## D-277 짧은 정차·대기 문답을 PlayableLoop 기획의 공식 Draft 절차로 사용한다
+
+- 상태: `Accepted`
+- 결정일: 2026-08-28
+- 진행 단위: 기획 스레드는 한 회차에 핵심 질문 하나를 제시한다. 답변 뒤 사용자의 의도, 확정 후보, 미정·충돌, 영향 대상과 다음 질문을 정리하고 의미를 확인받는다.
+- 안전 경계: 이동 중 즉시 답변을 요구하지 않는다. 사용자가 안전하게 정차했거나 대기 중일 때만 이어가며 긴 비교·화면 확인은 별도 회차로 보낸다. 게임 기획에 불필요한 실제 배달 위치·고객·연락처·운행 정보는 기록하지 않는다.
+- 저장 경계: 대화 원문이나 AI 기억은 개발 인계 자료가 아니다. 확인된 결정은 판본화된 문답 정밀화 기록에 요약하고 주제 기획서의 `sourcePlanningDocumentRefs`로 결속한다.
+- 승인 경계: 문답의 `Confirmed`·`Closed`는 E 증거나 기획 승인 상태가 아니다. 플레이어 약속과 선택·대가·회복·귀환, WI, Logic·Presentation, H, 저장·권위와 전문 연구 판정을 기획서로 합성하고 별도 승인해야 한다.
+- 재개 경계: 기록은 현재 질문 ID, 마지막 확인 질문 ID, 미정과 다음 질문을 보존한다. 대화가 중단되면 같은 위치에서 재개하고 이미 확인한 질문을 처음부터 반복하지 않는다.
+- 상세 기준: [PlayableLoop 문답 정밀화 체계](../Architecture/PlayableLoop문답정밀화체계.md)와 [문답 정밀화 기록 템플릿](../ProjectOverview/templates/PlayableLoop문답정밀화기록템플릿.md)을 따른다.

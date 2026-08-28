@@ -2,8 +2,8 @@
     "schemaVersion":  "simulation-world-interaction-eh-status.v1",
     "revision":  "simulation-world-interaction-eh-status.r1",
     "generatedFrom":  {
-                          "worldInteractionCatalogRevision":  "simulation-world-interactions.r28",
-                          "spatialPriorityRevision":  "simulation-world-interaction-spatial-priorities.r10",
+                          "worldInteractionCatalogRevision":  "simulation-world-interactions.r31",
+                          "spatialPriorityRevision":  "simulation-world-interaction-spatial-priorities.r12",
                           "designKnowledgeRevision":  "simulation-world-spatial-design-knowledge.r3",
                           "resourceInventoryRevision":  "simulation-world-spatial-resource-inventory.r10",
                           "compositionPlanStableId":  "wi-spatial-composition-plan:reference-play-01-harvest-shipping.v1",
@@ -12,13 +12,13 @@
                           "p2CompositionPlanRevision":  2
                       },
     "summary":  {
-                    "totalWorldInteractions":  65,
-                    "implementationE3Count":  60,
+                    "totalWorldInteractions":  66,
+                    "implementationE3Count":  61,
                     "establishedH1Count":  14,
                     "establishedH3Count":  15,
                     "candidateLineageCount":  21,
                     "missingRequiredCount":  5,
-                    "notApplicableCount":  10,
+                    "notApplicableCount":  11,
                     "officialH1DefinitionCount":  8,
                     "officialH2DefinitionCount":  0,
                     "definedH3Count":  5,
@@ -76,6 +76,51 @@
                       "groupDisplayName":  "행위자 공통 물품·장착",
                       "sequence":  2,
                       "title":  "장착 상태 변경",
+                      "interactionKindCode":  "Command",
+                      "implementationEvidenceStage":  "E3",
+                      "integrationEvidenceStage":  "E5",
+                      "spatialParticipationCode":  "NotRequired",
+                      "priorityCode":  "P5",
+                      "spatialDesignStateCode":  "NotApplicable",
+                      "highestEstablishedHLevelCode":  "",
+                      "approvedH1DefinitionRefs":  [
+
+                                                   ],
+                      "interactionH1CandidateRefs":  [
+
+                                                     ],
+                      "expressionH1CandidateRefs":  [
+
+                                                    ],
+                      "h2CandidateRefs":  [
+
+                                          ],
+                      "h3CandidateRefs":  [
+
+                                          ],
+                      "h4CandidateRefs":  [
+
+                                          ],
+                      "graphBindingRefs":  [
+
+                                           ],
+                      "e5PlacementCandidateRefs":  [
+
+                                                   ],
+                      "requiredSpatialCapabilityCodes":  [
+
+                                                         ],
+                      "lhEngineHandoffStateCode":  "NotApplicable",
+                      "warningCodes":  [
+
+                                       ]
+                  },
+                  {
+                      "worldInteractionId":  "WI-ACTOR-03",
+                      "groupCode":  "ACTOR",
+                      "groupDisplayName":  "행위자 공통 물품·장착",
+                      "sequence":  3,
+                      "title":  "지식 습득",
                       "interactionKindCode":  "Command",
                       "implementationEvidenceStage":  "E3",
                       "integrationEvidenceStage":  "E5",
@@ -1867,7 +1912,7 @@
                       "title":  "벌목 도끼 획득",
                       "interactionKindCode":  "Command",
                       "implementationEvidenceStage":  "E3",
-                      "integrationEvidenceStage":  "E6",
+                      "integrationEvidenceStage":  "E7",
                       "spatialParticipationCode":  "Required",
                       "priorityCode":  "P1",
                       "spatialDesignStateCode":  "EstablishedH1",
@@ -3572,5 +3617,5 @@
                           },
     "presentationOnly":  true,
     "isOperationalState":  false,
-    "contentHashSha256":  "11a20f41f0e4160c299f1348691937f41a2c2e444a42ffc41311af70f4a3a6f9"
+    "contentHashSha256":  "e02f8a98ca2070189da94e5f5b52273d08a28ebc4986cda2d06c4eb2ff0f9408"
 }

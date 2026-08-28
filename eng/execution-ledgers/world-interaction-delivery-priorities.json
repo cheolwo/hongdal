@@ -1,7 +1,7 @@
 {
   "schemaVersion": "world-interaction-delivery-priorities.v1",
-  "revision": "world-interaction-delivery-priorities.r22",
-  "lastVerifiedDate": "2026-08-27",
+  "revision": "world-interaction-delivery-priorities.r26",
+  "lastVerifiedDate": "2026-08-28",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "wiEhStatusPath": "eng/world-seedbeds/generated/wi-eh-status.v1.json",
@@ -10,45 +10,45 @@
   "workInProgressLimit": 1,
   "defaultIndividualTargetEvidenceStage": "E7",
   "activeWork": {
-    "worldInteractionId": "WI-NATURE-15",
+    "worldInteractionId": "WI-ACTOR-03",
     "workStateCode": "Active",
-    "currentEvidenceStage": "E6",
+    "currentEvidenceStage": "E5",
     "targetEvidenceStage": "E7",
-    "startedReason": "밤→Day2 Core의 논리 E7과 실제 입력 기계 폐루프를 보존하면서 Day2 계획 선택의 Game View 판독·미감·사람 수용을 정제한다.",
+    "startedReason": "승인된 Nature 기초 약초 회복 기획 r2에서 첫 WI인 지식 습득의 Logic E4 실행 경계까지만 닫는다.",
     "stageReviews": [
       {
         "stageCode": "E4",
         "resultCode": "Passed",
-        "summary": "오두막·새벽 계획 기준점과 WI-NATURE-14·15의 권위·표현 문맥을 결속했다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json"]
+        "summary": "LocalSimulationRuntime과 RemoteHost HTTP Adapter가 같은 Application 서비스를 호출하며 Query·Preview·Confirm 결과가 일치한다.",
+        "evidenceRefs": ["evidence:nature-basic-herbal-recovery-logic-e4-20260828", "test:SimulationPlayerKnowledgeTests:12/12"]
       },
       {
         "stageCode": "E5",
-        "resultCode": "Passed",
-        "summary": "수면·새벽 자동 해제·계획 선택·Day2Ready와 대기 상태를 canonical Scene에 발현했다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json", "evidence:nature-night-day2-wi15-playmode-20260826"]
+        "resultCode": "Pending",
+        "summary": "지식 출처의 실제 H 결속과 같은 revision 표현은 후속 승인 범위다.",
+        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json"]
       },
       {
         "stageCode": "E6",
-        "resultCode": "Partial",
-        "summary": "비 크기와 LH 진단 경계는 정리했지만 Day2 계획판의 선택·비용·다음 행동 판독과 주변 구도 정제가 남았다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json"],
+        "resultCode": "Pending",
+        "summary": "플레이어 피드백 정제는 표현 문답과 자산 연구 뒤 수행한다.",
+        "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"],
         "refinement": {
-          "playerQuestion": "새벽에 세 확장안의 차이와 다음 행동을 한눈에 이해할 수 있는가?",
-          "answer": "작업대·보관대·방책의 비용과 효과, 현재 선택과 다음 건설 행동을 계획판에 함께 표시한다.",
-          "costAndRisk": "Unity 표현은 계획 선택이나 Day2Ready를 직접 변경하지 않고 권위 상태 사본만 표시한다.",
-          "feedback": "선택 전 세 후보와 선택 후 확정 상태·부족 재료·다음 행동을 구분한다.",
-          "returnOrNextChoice": "계획을 고른 뒤 저장하거나 작업대 건설 위치 선택으로 돌아간다.",
+          "playerQuestion": "플레이어가 처방을 읽을 수 있고 이미 아는지, 습득이 성공했는지 구분할 수 있는가?",
+          "answer": "이번 인계는 질문을 확정했지만 실제 표현 답변은 후속 Presentation 작업으로 남긴다.",
+          "costAndRisk": "지식 습득 자체는 자원을 소비하지 않으며 승인되지 않은 저장·원격·약효 규칙을 열지 않는다.",
+          "feedback": "후속 표현은 같은 WorldRevision의 지식 원장과 행위 기록을 읽어야 한다.",
+          "returnOrNextChoice": "습득 뒤 다시 탐색·휴식 또는 후속 재료 선택으로 돌아간다.",
           "realityGroundingCode": "NotApplied",
           "authorityCode": "SimulationCore",
-          "presentationBoundary": "계획판·하늘·강수·LH 경계 표현은 WorldRevision을 변경하지 않는다."
+          "presentationBoundary": "표현은 지식 원장과 WorldRevision을 변경하지 않는다."
         }
       },
       {
         "stageCode": "E7",
         "resultCode": "Pending",
-        "summary": "자동 실제 입력 폐루프는 통과했지만 사람 직접 입력·Game View 판독·비와 천둥 청음 수용이 남았다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json"]
+        "summary": "실제 입력·Play Mode·Game View는 이번 인계에서 수행하지 않는다.",
+        "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"]
       }
     ]
   },
@@ -120,7 +120,7 @@
       "order": 1,
       "title": "Nature 행동 폐루프",
       "areaCode": "Nature",
-      "expectedWorldInteractionCount": 22,
+      "expectedWorldInteractionCount": 23,
       "entryRule": "현재 E5 황혼 대응부터 시작해 생활거점·Day2·현장 보급을 순서대로 닫는다.",
       "exitRule": "Nature 필수 Core가 E7 PlayClosed이고 선택 Extension의 상태가 별도로 표시된다."
     },
@@ -173,12 +173,13 @@
   "items": [
     { "worldInteractionId": "WI-ACTOR-01", "deliveryWaveCode": "D1", "orderInWave": 1, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Shared" },
     { "worldInteractionId": "WI-ACTOR-02", "deliveryWaveCode": "D1", "orderInWave": 2, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Shared" },
+    { "worldInteractionId": "WI-ACTOR-03", "deliveryWaveCode": "D1", "orderInWave": 23, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-basic-herbal-recovery.v1"], "syntyTrackCode": "Shared" },
     { "worldInteractionId": "WI-NATURE-01", "deliveryWaveCode": "D1", "orderInWave": 10, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-02", "deliveryWaveCode": "D1", "orderInWave": 12, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-03", "deliveryWaveCode": "D1", "orderInWave": 13, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-04", "deliveryWaveCode": "D1", "orderInWave": 14, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-11", "deliveryWaveCode": "D1", "orderInWave": 11, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
-    { "worldInteractionId": "WI-NATURE-05", "deliveryWaveCode": "D1", "orderInWave": 3, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-05", "deliveryWaveCode": "D1", "orderInWave": 3, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1", "playable-loop:nature-tactical-self-navigation.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-06", "deliveryWaveCode": "D1", "orderInWave": 4, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-07", "deliveryWaveCode": "D1", "orderInWave": 5, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },
     { "worldInteractionId": "WI-NATURE-08", "deliveryWaveCode": "D1", "orderInWave": 6, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Construction" },

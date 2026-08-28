@@ -1,6 +1,6 @@
 {
   "schemaVersion": "playable-loop-presentation-validation-modules.v1",
-  "revision": "playable-loop-presentation-validation-modules.r3",
+  "revision": "playable-loop-presentation-validation-modules.r4",
   "trackCode": "Presentation",
   "appliesToLoopLevelCodes": ["PlayableUnit"],
   "allowedEvidenceStageCodes": ["E4", "E5", "E6", "E7"],
@@ -215,6 +215,10 @@
     }
   ],
   "loopProfiles": [
+    {
+      "loopStableId": "playable-loop:nature-tactical-self-navigation.v1",
+      "featureCodes": ["GroundSurface", "Actor", "CameraOcclusion"]
+    },
     {
       "loopStableId": "playable-loop:nature-shelter-foundation.v1",
       "featureCodes": ["GroundSurface", "Building", "CameraOcclusion"]

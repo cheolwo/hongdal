@@ -2,8 +2,8 @@
 
 > 이 문서는 C# E 책임 Attribute와 현재 E 책임 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 후보 타입: `592`
-- 책임 지정: `589`
+- 후보 타입: `612`
+- 책임 지정: `609`
 - 사유 있는 제외: `3`
 - 미분류: `0`
 - 메서드 책임: `17`
@@ -12,10 +12,10 @@
 
 | E | G | 모듈 | 대표 | 보조 |
 | --- | --- | --- | ---: | ---: |
-| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 38 | 0 |
-| `E2` | `G1` | `E2실행경계Module` 실행 경계 | 158 | 0 |
-| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 188 | 1 |
-| `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 38 | 0 |
+| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 42 | 0 |
+| `E2` | `G1` | `E2실행경계Module` 실행 경계 | 169 | 0 |
+| `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 192 | 1 |
+| `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 40 | 0 |
 | `E5` | `G1` | `E5세계발현Module` 세계 발현 | 7 | 0 |
 | `E6` | `G1` | `E6세계정제Module` 세계 정제 | 21 | 0 |
 | `E7` | `G2` | `E7플레이경험폐루프Module` 플레이 경험 폐루프 | 151 | 0 |
@@ -31,25 +31,25 @@
 | --- | --- | --- | --- | ---: | ---: |
 | `E1` | `E1전투위협계약Module` 전투·위협 계약 | `E1.CombatThreatContract` | 전투 입력·관찰·위협 압력과 결과 경계를 정의한다. | 1 | 0 |
 | `E1` | `E1저장재생계약Module` 저장·재생 계약 | `E1.SaveReplayContract` | Save schema·Command Log·Replay hash의 호환 계약을 정의한다. | 2 | 0 |
-| `E1` | `E1세션권위계약Module` 세션 권위 계약 | `E1.SessionAuthorityContract` | Session 식별자·Revision·시간과 상태 권위의 불변 경계를 정의한다. | 2 | 0 |
+| `E1` | `E1세션권위계약Module` 세션 권위 계약 | `E1.SessionAuthorityContract` | Session 식별자·Revision·시간과 상태 권위의 불변 경계를 정의한다. | 4 | 0 |
 | `E1` | `E1공간계약Module` 공간 계약 | `E1.SpatialContract` | H·AreaSet·Graph·Handover의 안정 식별자와 구조 계약을 정의한다. | 1 | 0 |
 | `E1` | `E1세계상호작용계약Module` 세계 상호작용 계약 | `E1.WorldInteractionContract` | WI 목적·StableId·허용 발생원과 Preview·Confirm 계약을 정의한다. | 3 | 0 |
 | `E2` | `E2로컬권위AdapterModule` 로컬 권위 Adapter | `E2.LocalAuthorityAdapter` | Solo LocalProcess에서 공통 Simulation Core를 실행한다. | 1 | 0 |
-| `E2` | `E2원격HostAdapterModule` 원격 Host Adapter | `E2.RemoteHostAdapter` | Hosted Server에서 같은 Core를 HTTP 경계로 노출한다. | 3 | 0 |
+| `E2` | `E2원격HostAdapterModule` 원격 Host Adapter | `E2.RemoteHostAdapter` | Hosted Server에서 같은 Core를 HTTP 경계로 노출한다. | 11 | 0 |
 | `E2` | `E2세션실행Module` 세션 실행 | `E2.SessionExecution` | Session 생성·조회·Tick·Save/Load의 공통 실행 포트를 제공한다. | 4 | 0 |
 | `E2` | `E2Unity권위ClientModule` Unity 권위 Client | `E2.UnityAuthorityClient` | Unity 입력을 Local 또는 Remote 권위 포트에 전달한다. | 1 | 0 |
-| `E2` | `E2세계상호작용실행Module` 세계 상호작용 실행 | `E2.WorldInteractionExecution` | Farm·Nature WI Preview·Confirm 실행 포트를 제공한다. | 10 | 0 |
+| `E2` | `E2세계상호작용실행Module` 세계 상호작용 실행 | `E2.WorldInteractionExecution` | Farm·Nature WI Preview·Confirm 실행 포트를 제공한다. | 11 | 0 |
 | `E3` | `E3계약회귀Module` 계약 회귀 | `E3.ContractRegression` | StableId·요청·응답·WI metadata 계약의 회귀를 검증한다. | 4 | 0 |
-| `E3` | `E3결정성검증Module` 결정성 검증 | `E3.DeterminismRegression` | 같은 Seed·명령·시간이 같은 canonical 상태를 만드는지 검증한다. | 6 | 0 |
+| `E3` | `E3결정성검증Module` 결정성 검증 | `E3.DeterminismRegression` | 같은 Seed·명령·시간이 같은 canonical 상태를 만드는지 검증한다. | 8 | 0 |
 | `E3` | `E3로컬원격동등성Module` 로컬·원격 동등성 | `E3.LocalRemoteParityRegression` | LocalProcess와 RemoteHost가 같은 권위 결과를 만드는지 검증한다. | 2 | 0 |
 | `E3` | `E3저장재생검증Module` 저장·재생 검증 | `E3.SaveReplayRegression` | Save schema 호환·복원·Replay hash 회귀를 검증한다. | 4 | 1 |
 | `E3` | `E3Unity소비자회귀Module` Unity 소비자 회귀 | `E3.UnityConsumerRegression` | Unity Adapter·Projection이 권위 계약을 임의 변경하지 않는지 검증한다. | 5 | 0 |
 
 ### 아직 하위 모듈을 지정하지 않은 기존 책임
 
-- `E1`: `29`개
-- `E2`: `139`개
-- `E3`: `167`개
+- `E1`: `31`개
+- `E2`: `141`개
+- `E3`: `169`개
 
 ## 미분류 후보
 
@@ -90,6 +90,8 @@
 | `Ssalddel.Simulation.Application.ISimulationNatureWorldInteractionRuntime.PreviewNaturePartyRecoveryAsync` | `E2` | `` | `` | `WI-NATURE-04` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationNatureWorldInteractionRuntime.PreviewNatureRestorationAsync` | `E2` | `` | `` | `WI-NATURE-03` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationNatureWorldInteractionRuntime.PreviewNatureThreatObservationAsync` | `E2` | `` | `` | `WI-NATURE-01` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationOnlineWorldCheckpointStore` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulationPlayerKnowledgeRuntime` | `E4` | `` | `` | `WI-ACTOR-03` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationRuntime` | `E2` | `E2.SessionExecution` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationRuntimeModules` | `E2` | `E2.SessionExecution` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationSessionGameplayRuntime` | `E2` | `E2.SessionExecution` | `` | `` | `Annotated` |
@@ -109,10 +111,12 @@
 | `Ssalddel.Simulation.Application.ISimulationWorld상호작용GraphReadinessStore` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationWorld업무규칙집결Store` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.ISimulationWorld파생원장Store` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.ISimulation플레이어지식Store` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.InMemorySimulationPlayableLoopEngineTraceSink` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.InMemorySimulationTeamMemberPoseStore` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.InMemorySimulationTeamObservationPolicyStore` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.InMemorySimulationTeamObservationSessionStore` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.InMemorySimulation플레이어지식Store` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.I경영SimulationSessionStore` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.I세계상호작용E1핵심계약Module` | `E1` | `E1.WorldInteractionContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.I세계상호작용E2실행경계Module` | `E2` | `E2.WorldInteractionExecution` | `` | `` | `Annotated` |
@@ -148,6 +152,10 @@
 | `Ssalddel.Simulation.Application.SimulationNatureWorldCellAssemblyEngine` | `E5` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationNature공간변화ProjectionBuilder` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationNature세계자산배치Service` | `E5` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationOnlineCooperativeLoggingService` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationOnlineMeditationBridgeService` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationOnlineNatureSessionProvisioningService` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.SimulationOnlineWorldService` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationPlayableLoopEngineInteractionValidator` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationRealityContextService` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.SimulationRegionalIncidentService` | `E2` | `` | `` | `` | `Annotated` |
@@ -188,6 +196,7 @@
 | `Ssalddel.Simulation.Application.Simulation분리세계자산배치Coordinator` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.Simulation타로객체반응PreviewService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.Simulation타로화물운송PreviewService` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Application.Simulation플레이어지식Service` | `E2` | `E2.WorldInteractionExecution` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.경영SimulationSessionService` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.경영SimulationSession생명주기Service` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Application.경영SimulationWorldGameplayService` | `E2` | `` | `` | `` | `Annotated` |
@@ -211,16 +220,19 @@
 | `Ssalddel.Simulation.Contracts.SimulationLocalCombatActionConfirmRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationLocalCombatControlModeConfirmRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationLocalCombatObserverInterventionConfirmRequest` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.SimulationOnlineWorldDirectorySnapshot` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationSessionSaveRequest` | `E1` | `E1.SaveReplayContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldLandscapeCompositionTileResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldLandscapeGraphResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldLayoutDefinitionResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationWorldStreamRecipeResponse` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.SimulationYouTube학습원문관측Snapshot` | `E1` | `E1.WorldInteractionContract` | `` | `WI-REFLECT-01` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.Simulation플레이어지식InitialStateRequest` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.경영SimulationSession생성Request` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationBattleInstanceState` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationCombatScalePolicy` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationNatureThreatPressurePolicy` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Domain.SimulationOnlineWorldCoordinator` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationTeamObservationPolicy` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationWorldLandscapeGraphAssembler` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.SimulationWorldSynty경관Validator` | `E4` | `` | `` | `` | `Annotated` |
@@ -235,6 +247,7 @@
 | `Ssalddel.Simulation.Domain.Simulation승인학습자료파생원장` | `E2` | `E2.WorldInteractionExecution` | `` | `WI-REFLECT-01` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation자원효과묶음Validator` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.Simulation집중판정Policy` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Domain.Simulation플레이어지식Aggregate` | `E1` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.경영SimulationSessionAggregate` | `E1` | `E1.SessionAuthorityContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.경영SimulationSessionAggregate.ExecuteWorldInteraction` | `E5` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Domain.도심마트4주DemandScenarioBuilder` | `E1` | `` | `` | `` | `Annotated` |
@@ -245,9 +258,11 @@
 | `Ssalddel.Simulation.Domain.도심마트주문자집단SimulationWorldGraphBuilder` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Infrastructure.FileSimulationLocalSaveSlotStore` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Infrastructure.InMemorySimulationBattleInstanceStore` | `E2` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Infrastructure.InMemorySimulationOnlineWorldCheckpointStore` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Infrastructure.InMemorySimulationSessionSaveStore` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Infrastructure.InMemory경영SimulationSessionStore` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Persistence.SimulationFarmRealityEvidenceStore` | `E6` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Persistence.SimulationOnlineWorldCheckpointStore` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Persistence.SimulationSessionDbContextDesignTimeFactory` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Persistence.SimulationSessionSaveStore` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Persistence.SimulationWorldAreaSetGraphStore` | `E4` | `` | `` | `` | `Annotated` |
@@ -271,6 +286,8 @@
 | `Ssalddel.Simulation.Server.Controllers.SimulationIntegratedWorldController` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationLhWorldController` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationNatureSurvivalController` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Server.Controllers.SimulationOnlineWorldsController` | `E2` | `E2.RemoteHostAdapter` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Server.Controllers.SimulationPlayerKnowledgeController` | `E4` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationRealityContextController` | `E6` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationSurvivalTarotController` | `E2` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Server.Controllers.SimulationTeamObservationController` | `E2` | `` | `` | `` | `Annotated` |
@@ -323,10 +340,14 @@
 | `Ssalddel.Simulation.Tests.SimulationLogisticsMovementTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNatureMindTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNaturePlayFlowCycleTests` | `E4` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationNatureShelterStabilityTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNatureSurvivalTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationNatureTacticalStabilityTests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNature생활거점동등성Tests` | `E3` | `E3.DeterminismRegression` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationNpcWorkforceTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationOnlineWorldTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationPlayableLoopEngineInteractionTests` | `E3` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Tests.SimulationPlayerKnowledgeTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationRealityContextTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationRegionalIncidentTests` | `E3` | `` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Tests.SimulationRuntimeRenderingPipelineTests` | `E3` | `` | `` | `` | `Annotated` |

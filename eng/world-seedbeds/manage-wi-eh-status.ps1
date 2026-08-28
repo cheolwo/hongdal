@@ -86,7 +86,7 @@ foreach ($binding in @($actualE5.interactionSpatialCatalog.bindings)) {
 }
 
 Require ([string] $worldCatalog.revision -eq [string] $priority.worldInteractionCatalogRevision) "PriorityWorldCatalogRevisionMismatch"
-Require (@($worldCatalog.items).Count -eq 65) "WorldInteractionCountMustBe65"
+Require (@($worldCatalog.items).Count -eq 66) "WorldInteractionCountMustBe66"
 Require ([string] $priority.schemaVersion -eq "simulation-world-interaction-spatial-priorities.v1") "PrioritySchemaInvalid"
 Require ([string] $compositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "CompositionPlanSchemaInvalid"
 Require ([string] $p2CompositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "P2CompositionPlanSchemaInvalid"
@@ -294,12 +294,12 @@ $summary = [ordered]@{
     definedH3Count = 5
     definedH4Count = 1
 }
-Require ($summary.implementationE3Count -eq 60) "ImplementationE3CountMustBe60"
+Require ($summary.implementationE3Count -eq 61) "ImplementationE3CountMustBe61"
 Require ($summary.establishedH1Count -eq 14) "EstablishedH1CountMustBe14"
 Require ($summary.establishedH3Count -eq 15) "EstablishedH3CountMustBe15"
 Require ($summary.candidateLineageCount -eq 21) "CandidateLineageCountMustBe21"
 Require ($summary.missingRequiredCount -eq 5) "MissingRequiredCountMustBe5"
-Require ($summary.notApplicableCount -eq 10) "NotApplicableCountMustBe10"
+Require ($summary.notApplicableCount -eq 11) "NotApplicableCountMustBe11"
 Require ($summary.officialH2DefinitionCount -eq 0) "OfficialH2MustRemainZero"
 $missingSpatialIds = @($rows | Where-Object {
     $_.warningCodes -contains "RequiredSpatialDesignMissing"

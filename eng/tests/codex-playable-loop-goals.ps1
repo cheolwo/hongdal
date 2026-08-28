@@ -5,6 +5,8 @@ $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $manager = Join-Path $repositoryRoot "eng/execution-ledgers/manage-codex-playable-loop-goals.ps1"
 $inputPath = Join-Path $repositoryRoot "eng/execution-ledgers/codex-playable-loop-goals.json"
 $outputPath = Join-Path $repositoryRoot "docs/AI/generated/codex-playable-loop-goals.md"
+$ledger = Get-Content -LiteralPath $inputPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$expectedGoalCount = @($ledger.items).Count
 
 $first = & $manager -Mode Write
 $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $outputPath).Hash
@@ -15,23 +17,22 @@ if ((Get-FileHash -Algorithm SHA256 -LiteralPath $outputPath).Hash -ne $hash -or
     (Get-Item -LiteralPath $outputPath).LastWriteTimeUtc.Ticks -ne $ticks) {
     throw "CodexPlayableLoopGoalOutputIsNotDeterministic"
 }
-if ($check -notmatch "CodexPlayableLoopGoalsValid:Goals=16") {
+if ($check -notmatch "CodexPlayableLoopGoalsValid:Goals=$expectedGoalCount") {
     throw "CodexPlayableLoopGoalValidationDidNotComplete"
 }
 
 $generated = Get-Content -LiteralPath $outputPath -Raw -Encoding UTF8
+$expectedGoalWip = if ([string] $ledger.activeGoal.goalStateCode -eq "Completed") { 0 } else { 1 }
+$expectedWiWip = $expectedGoalWip
 foreach ($expected in @(
-    "playable-loop:nature-shelter-foundation.v1",
-    "playable-loop:nature-base-reflection.v1",
-    "playable-loop:nature-regional-threat-recovery.v1",
-    "WI-NATURE-15",
-    "현재 성숙도 궤적: Presentation",
-    "E7 PlayClosed",
-    "폐루프 E4 / WI E6 → E7",
-    "파이프라인 관문: Logic Passed / Presentation Blocked / 통합 Blocked",
+    [string] $ledger.activeGoal.loopStableId,
+    [string] $ledger.activeGoal.activeWorldInteractionId,
+    "현재 성숙도 궤적: $($ledger.activeGoal.activeMaturityTrackCode)",
+    "$($ledger.activeGoal.targetEvidenceStage) $($ledger.activeGoal.targetClosureStateCode)",
+    "파이프라인 관문: Logic $($ledger.activeGoal.pipelineValidation.logicStatusCode) / Presentation $($ledger.activeGoal.pipelineValidation.presentationStatusCode) / 통합 $($ledger.activeGoal.pipelineValidation.integratedStatusCode)",
     "Nature → Farm → Hub → Town → City",
-    "Goal WIP: ``1/1``",
-    "WI WIP: ``1/1``")) {
+    "Goal WIP: ``$expectedGoalWip/1``",
+    "WI WIP: ``$expectedWiWip/1``")) {
     if (-not $generated.Contains($expected)) {
         throw "CodexPlayableLoopGoalGeneratedEntryMissing:$expected"
     }
@@ -51,13 +52,15 @@ function Read-Ledger() {
 }
 function Require-Rejected([string] $Name, [object] $Ledger, [string] $ExpectedCode) {
     $path = Join-Path $artifactDirectory "$Name.json"
+    $generatedPath = Join-Path $artifactDirectory "$Name.md"
     [IO.File]::WriteAllText($path, ($Ledger | ConvertTo-Json -Depth 40), $utf8)
     $arguments = @(
         "-NoProfile",
         "-ExecutionPolicy", "Bypass",
         "-File", $manager,
-        "-Mode", "Check",
-        "-InputPath", (Relative $path)
+        "-Mode", "Write",
+        "-InputPath", (Relative $path),
+        "-OutputPath", (Relative $generatedPath)
     )
     $failureText = ""
     try {
@@ -90,21 +93,27 @@ $wrongWi.activeGoal.activeWorldInteractionId = "WI-FARM-01"
 Require-Rejected "wi-outside-loop" $wrongWi "NextWorldInteractionOutsideLoop"
 
 $missingPlayableUnit = Read-Ledger
-$missingPlayableUnit.items = @($missingPlayableUnit.items | Select-Object -First 15)
+$missingPlayableUnit.items = @($missingPlayableUnit.items |
+    Select-Object -First ($expectedGoalCount - 1))
 Require-Rejected "missing-playable-unit" $missingPlayableUnit `
     "PlayableUnitGoalCoverageCountInvalid"
 
 $extensionBeforeCore = Read-Ledger
-$coreOrder = $extensionBeforeCore.items[10].queueOrder
-$extensionBeforeCore.items[10].queueOrder = $extensionBeforeCore.items[11].queueOrder
-$extensionBeforeCore.items[11].queueOrder = $coreOrder
+$lastCore = $extensionBeforeCore.items | Where-Object completionRoleCode -eq "Core" |
+    Sort-Object queueOrder | Select-Object -Last 1
+$firstExtension = $extensionBeforeCore.items |
+    Where-Object completionRoleCode -eq "Extension" |
+    Sort-Object queueOrder | Select-Object -First 1
+$coreOrder = $lastCore.queueOrder
+$lastCore.queueOrder = $firstExtension.queueOrder
+$firstExtension.queueOrder = $coreOrder
 Require-Rejected "extension-before-core" $extensionBeforeCore `
     "CoreGoalAfterExtensionPhase"
 
 $unapprovedCatalog = Get-Content -LiteralPath (Join-Path $repositoryRoot `
     "eng/execution-ledgers/playable-loops.json") -Raw -Encoding UTF8 | ConvertFrom-Json
 $unapprovedUnit = $unapprovedCatalog.items | Where-Object `
-    loopStableId -eq "playable-loop:nature-night-day2.v1"
+    loopStableId -eq ([string] $ledger.activeGoal.loopStableId)
 $unapprovedUnit.planningGate.statusCode = "NotStarted"
 $unapprovedCatalogPath = Join-Path $artifactDirectory "unapproved-active-catalog.json"
 [IO.File]::WriteAllText($unapprovedCatalogPath, `
@@ -116,8 +125,15 @@ Require-Rejected "unapproved-active-goal" $unapprovedGoal `
 
 $legacyTransferredCatalog = Get-Content -LiteralPath (Join-Path $repositoryRoot `
     "eng/execution-ledgers/playable-loops.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+$legacyActiveUnit = $legacyTransferredCatalog.items | Where-Object `
+    loopStableId -eq ([string] $ledger.activeGoal.loopStableId)
+$legacyActiveUnit.planningGate.statusCode = "LegacyActiveMigration"
+$differentPlayableUnit = $legacyTransferredCatalog.items | Where-Object {
+    $_.loopLevelCode -eq "PlayableUnit" -and
+    $_.loopStableId -ne [string] $ledger.activeGoal.loopStableId
+} | Select-Object -First 1
 $legacyTransferredCatalog.designDocumentationPolicy.legacyActiveMigrationLoopStableId = `
-    "playable-loop:nature-workbench-foundation.v1"
+    [string] $differentPlayableUnit.loopStableId
 $legacyTransferredCatalogPath = Join-Path $artifactDirectory `
     "legacy-transferred-catalog.json"
 [IO.File]::WriteAllText($legacyTransferredCatalogPath, `
@@ -127,7 +143,7 @@ $legacyTransferredGoal.playableLoopCatalogPath = Relative $legacyTransferredCata
 Require-Rejected "legacy-transferred-goal" $legacyTransferredGoal `
     "LegacyPlanningGateTransferred"
 
-Write-Output "CodexPlayableLoopGoalTestsPassed:Positive=3;Negative=8;Goals=16"
+Write-Output "CodexPlayableLoopGoalTestsPassed:Positive=3;Negative=8;Goals=$expectedGoalCount"
 Write-Output $first
 Write-Output $second
 Write-Output $check

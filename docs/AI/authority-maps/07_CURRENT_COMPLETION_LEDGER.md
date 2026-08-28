@@ -4,10 +4,10 @@
 > CoreClosed는 E5 핵심 폐루프, ExtendedClosed는 선택형 확장 E5, PlayClosed는 E7 핵심 플레이 폐루프, WorldClosed는 E8 개별 안정성을 거친 둘 이상의 Core가 E9 영역 조화·사람 승인을 통과한 집계를 뜻한다.
 > Nature 시범 루프는 논리·시각 성숙도를 별도로 기록하며 통합 E는 두 축 중 낮은 단계다. WI 음양 분류는 개발 성숙도 축과 무관하다.
 
-- 플레이 폐루프 대장: `ssalddel-playable-loop-catalog.r19`
-- 증거 묶음 대장: `ssalddel-evidence-package-catalog.r24`
-- 플레이 단위·집계: `23`
-- 등록 증거 묶음: `32`
+- 플레이 폐루프 대장: `ssalddel-playable-loop-catalog.r20`
+- 증거 묶음 대장: `ssalddel-evidence-package-catalog.r25`
+- 플레이 단위·집계: `24`
+- 등록 증거 묶음: `34`
 
 ## 판정 기준
 
@@ -34,6 +34,7 @@
 | 7 | `playable-loop:nature-base-reflection.v1` Nature 거점 성찰·다음 원정 준비 | PlayableUnit/Extension | 1 | E3 | E1 | E1→E2/E7 | Open | Defined | 1 | 공용 E1~E3 계약·시험을 기준선으로 삼아 WI-REFLECT-01과 기존 Nature 오두막 H1을 결속한다. |
 | 8 | `playable-loop:nature-building-learning.v1` Nature 건물 발전·배움 확장 | PlayableUnit/Extension | 2 | E5 | E1 | E1→E2/E7 | Open | InProgress | 1 | 기존 StableId를 유지한 채 배움터 Extension의 NPC 생활 주기를 E7→E1로 검토하고 가장 낮은 미완료 의존성부터 구현한다. |
 | 9 | `playable-loop:nature-regional-threat-recovery.v1` Nature 지역 위협 후퇴·복원·회복 | PlayableUnit/Extension | 4 | E3 | E1 | E1→E2/E7 | Open | Defined | 1 | Nature 핵심 첫날 폐루프와 분리된 Extension Goal로 선택될 때 WI-NATURE-02부터 E4→E7을 진행한다. |
+| 10 | `playable-loop:nature-tactical-self-navigation.v1` Nature 전술 자기 캐릭터 선택·이동 | PlayableUnit/Core | 1 | E7 | E7 | E7→E7/E7 | PlayClosed | Validated | 2 | E7 PlayClosed 상태를 유지하고 다음 승인 Nature 내부 폐루프의 가장 이른 미완료 증거를 연다. |
 | 20 | `playable-loop:farm-internal-production.v1` Farm 독립 생산·보관 영역 집계 | AreaAggregate/Aggregate | 0 | - | - | E1→E2/E9 | Open | InProgress | 1 | 생산 주기와 포장·내부 보관 반환을 별도 Fixture로 닫은 뒤 영역 집계를 올린다. |
 | 21 | `playable-loop:farm-crop-cycle.v1` Farm 경작·성장·수확 | PlayableUnit/Core | 4 | E3 | E1 | E1→E2/E7 | Open | InProgress | 1 | 감자 독립 Fixture로 경작→수확 Lot과 재시도 상태를 닫는다. |
 | 22 | `playable-loop:farm-pack-store-return.v1` Farm 집하·포장·내부 보관 반환 | PlayableUnit/Core | 2 | E3 | E1 | E1→E2/E7 | Open | InProgress | 1 | 새 WI를 성급히 만들지 않고 WI-FARM-06 완료 결과에 내부 보관·재생산 반환 계약을 먼저 확정한다. |
@@ -52,6 +53,7 @@
 ## 영역 집계와 자식 상태
 
 - **Nature 생존 생활거점 영역 집계** `Open`
+  - 필수 Core: `playable-loop:nature-tactical-self-navigation.v1` — E7, PlayClosed
   - 필수 Core: `playable-loop:nature-shelter-foundation.v1` — E7, PlayClosed
   - 필수 Core: `playable-loop:nature-twilight-return.v1` — E7, PlayClosed
   - 필수 Core: `playable-loop:nature-night-day2.v1` — E4, Open
@@ -142,6 +144,8 @@
 | `evidence:nature-shelter-explicit-equipment-e7-20260827` Nature 명시적 장착·생활거점 canonical PlayMode E7 | Presentation | UnityPlayMode | Passed/Superseded | E5, E6, E7 | canonical SimulationWorldShell에서 실제 Input System I 입력과 장착 상태창 버튼으로 MainHand 장착·해제·미장착 벌목 차단·재장착을 거쳐 벌목·지면 통나무 획득·오두막·보관·저장·Scene 재진입을 완주했다. Nature생존E7폐루프PlayModeTests 전체 6/6, Nature 감각 표현 1/1, H 계층 실증 EditMode 2/2가 통과했다. 사람 직접 Game View에서는 Nature 전환과 도끼 획득 및 HUD 권위 전이를 확인했고, 자동화 화상 키보드가 자기 창에 입력을 소비해 사람 직접 I 장착 조작은 별도 수용 증거로 남겼다. | 사람 직접 I 장착·해제 반복과 최종 미감·실제 청음 수용 / RemoteHost Unity 프로세스의 실제 네트워크 실행 / E8 동일 후보 revision 반복 안정성 캠페인 / 운영 Provider와 운영 DB |
 | `evidence:nature-shelter-hosted-parity-20260825` Nature 생활거점 LocalProcess·RemoteHost 동등성 | Logic | HostedParity | Passed/Current | E5, E7 | 현재 Simulation revision에서 취소 전 2초 진행, 취소, 재수확, 나무 3개 벌목, 오두막 건설, 입장·퇴장과 저장·복원을 LocalProcess와 RemoteHost HTTP에 동일하게 적용했다. 두 실행 위치는 최종 revision 15, simulation-save.v23, 저장 revision과 Replay hash가 일치했고 Local slot 복원과 RemoteHost replay-verifications도 같은 완료 상태를 복원했다. 전용 전체 동등성 1/1과 Nature·Local Runtime 집중 회귀 44/44가 통과했다. | 별도 UnityPlayMode EvidencePackage가 소유하는 사람 수동 완주와 Game View / 선택형 실제 음향 청취 / 운영 Provider와 운영 DB |
 | `evidence:nature-shelter-playmode-20260825` Nature 생활거점 실제 입력·수동 완주 E7 | Presentation | UnityPlayMode | Passed/Superseded | E5, E6, E7 | 실제 Editor Play Mode에서 도끼 획득, 첫 벌목 취소·자원 무변경, 재시도와 세 나무 벌목, 오두막 도면 배치·건설, 입장·퇴장, HUD 저장과 Play Mode 재진입 복원을 사람이 수동 완주했다. 복원 Game View는 Day 2, 도끼 보유, 통나무 0, 그루터기 3개와 오두막 완성을 기록했고 Console 오류는 0개였다. 같은 Unity revision에서 실제 Input System 전체 폐루프 PlayMode 1/1(27.49초), 감각 표현 PlayMode 1/1(2.92초), 하단 UI 입력 경계 EditMode 1/1이 통과했다. 최신 Simulation revision에서는 Nature·Local Runtime 집중 회귀 44/44와 취소·재수확·오두막·저장·복원 전체 LocalProcess·RemoteHost 동등성 1/1이 통과했다. 오두막 우선 접근은 이미 가까운 플레이어를 외벽 밖 안전 반경까지 이격한다. 음향 진단은 48 kHz Stereo, Listener 활성과 절차형 행동 효과음 4개 결속을 기록했다. | 현재 연결된 Windows 재생 종단점이 없어 수행하지 못한 선택형 실제 음향 청취 / 승인 Nature Ambient·BGM 선택 채널 / 운영 Provider와 운영 DB |
+| `evidence:nature-tactical-axe-hosted-parity-20260828` Nature 전술 도끼 획득 LocalProcess·RemoteHost E7 동등성 | Logic | HostedParity | Passed/Current | E3, E5, E7 | SimulationActorEquipmentTests 5/5가 통과했다. WI-NATURE-05 도끼 획득과 MainHand 장착의 권위 상태 hash가 LocalProcess와 RemoteHost에서 일치했고, 장착 상태 Save/Restore/Replay hash와 획득·장착 분리 규칙도 같은 시험 묶음에서 검증했다. | Unity 실제 입력과 Game View / 후속 벌목 WI-NATURE-06 / 운영 Provider와 운영 DB |
+| `evidence:nature-tactical-axe-playmode-20260828` Nature 전술 도끼 접근·획득·저장 재진입 canonical E7 | Presentation | UnityPlayMode | Passed/Current | E5, E6, E7 | Nature도끼확보E7PlayModeTests 1/1이 실제 마우스 입력, Synty 도끼 충돌체, 권위 revision 증가, 저장과 canonical Scene 재진입 복원을 검증했다. 공용 절차형 Idle과 Nature 벌목 감각 표현의 뼈 작성 책임을 분리해 T자 bind pose 회귀도 함께 차단했다. 실제 Play Mode에서는 도끼 획득 전후 revision 45→46, HasAxe=true, 저장 revision 46, 월드 도끼 비활성을 확인했고 최종 Console 오류는 0건이었다. | 후속 벌목·오두막 폐루프 승격 / 사람의 최종 미감·청음 승인 / RemoteHost Unity 프로세스 실제 네트워크 실행 |
 | `evidence:nature-twilight-e8-logic-20260827` Nature 황혼 대응·귀환 고정 후보 E8 논리 반복 안정성 | Logic | HostedParity | Passed/Current | E8 | ObserverOperation과 DirectAction 두 황혼 대응 명령열을 세 차례 실행해 매회 2/2 통과했다. 각 실행은 전투 결과·Battle Replay hash·최종 WorldRevision·simulation-save.v27 저장 hash의 LocalProcess/RemoteHost 동등성과 RemoteHost 패키지의 Local slot 복원을 검증했다. | Unity 실제 전투·후퇴 입력 / 사람의 논리·표현 조화와 재미·몰입·완성도 승인 / 운영 Provider와 운영 DB |
 | `evidence:nature-twilight-e8-presentation-20260827` Nature 황혼 후퇴·직접 개입 E8 실제 입력·재진입 안정성 | Presentation | UnityPlayMode | Passed/Current | E8 | 실제 O/R 후퇴와 O/F/좌클릭 직접 개입 두 경로를 네 차례 각각 2/2 통과했다. 두 경로 모두 결과 저장 뒤 canonical Scene을 다시 열어 같은 SessionStableId·WorldRevision·EncounterResolved·LastCombatResultCode를 복원했고, 마지막 cursor 4300~4400 구간의 신규 Console 오류는 0건이었다. | ObserverOperation 전술 일시정지·비상 카드 사람 조작 / 사람의 최종 미감·청음과 E9 승인 / RemoteHost Unity 프로세스 실제 네트워크 실행 |
 | `evidence:nature-twilight-wi11-hosted-parity-20260826` Nature 황혼 이중 참여 LocalProcess·RemoteHost 동등성 | Logic | HostedParity | Passed/Current | E3, E5, E7 | ObserverOperation과 DirectAction 각각에 동일한 황혼 관찰·Fight·전투 명령열을 적용해 결과 코드, 최종 World revision, Battle Replay hash, simulation-save.v23 Replay hash를 일치시켰다. RemoteHost 저장 묶음을 Local slot 실제 복원 경로로 읽어 Battle Store와 Nature EncounterResolved·결과 상태를 함께 복원했다. 전용 동등성 2/2와 Nature 회귀 40/40이 통과했다. | 별도 UnityPlayMode EvidencePackage가 소유하는 실제 입력과 Game View / 운영 Provider와 운영 DB |

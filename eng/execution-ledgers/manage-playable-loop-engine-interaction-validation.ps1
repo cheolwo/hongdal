@@ -102,12 +102,12 @@ foreach ($loop in $playableUnits) {
         $override = if ($overrideByKey.ContainsKey($key)) {
             $overrideByKey[$key]
         } else { $null }
-        $consumers = if ($null -ne $override) {
+        $consumers = @(if ($null -ne $override) {
             @($override.presentationConsumerCodes)
-        } else { @($areaProperty.Value.presentationConsumerCodes) }
-        $changes = if ($null -ne $override) {
+        } else { @($areaProperty.Value.presentationConsumerCodes) })
+        $changes = @(if ($null -ne $override) {
             @($override.changeSemanticCodes)
-        } else { @($areaProperty.Value.changeSemanticCodes) }
+        } else { @($areaProperty.Value.changeSemanticCodes) })
         Require ($consumers.Count -gt 0) "PresentationConsumersMissing:$key"
         Require ($changes.Count -gt 0) "ChangeSemanticsMissing:$key"
         $requirements = [Collections.Generic.List[object]]::new()

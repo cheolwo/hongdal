@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-evidence-package-catalog.v3",
-  "revision": "ssalddel-evidence-package-catalog.r24",
+  "revision": "ssalddel-evidence-package-catalog.r28",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
@@ -46,6 +46,50 @@
     "External"
   ],
   "packages": [
+    {
+      "evidenceId": "evidence:nature-basic-herbal-recovery-logic-e3-20260828",
+      "title": "Nature 기초 약초 회복 지식 습득 Logic E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-basic-herbal-recovery.v1", "WI-ACTOR-03"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "worktree:2026-08-28-nature-basic-herbal-recovery-logic-e3",
+      "executedAt": "2026-08-28T17:09:48+09:00",
+      "environment": "Windows; .NET 10; 순수 Domain/Application; LocalProcess 단위시험",
+      "scope": "RecipeStableId와 플레이어 지식 원장 계약, Preview 무변경, Confirm 멱등 추가·같은 WorldRevision 행위 기록, 접근 불가·알 수 없는 처방·revision 불일치 거부, Application Store 경계, 집중 시험 8/8",
+      "exclusions": ["Save/Replay", "RemoteHost API", "Unity Scene·자산·배치·애니메이션", "Play Mode·Game View", "약초 채집·달이기·섭취·약효·질병 단계"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationPlayerKnowledgeTests.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json", "sha256": "", "retentionCode": "Tracked" }
+      ],
+      "invalidationTriggers": ["RecipeStableId 의미 또는 승인 지식 출처 관계 변경", "Preview·Confirm 멱등성 또는 WorldRevision·행위 기록 원자성 변경", "플레이어 지식 원장을 기존 Save 판본에 포함하는 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-basic-herbal-recovery-logic-e4-20260828",
+      "title": "Nature 기초 약초 회복 지식 습득 Logic E4 실행 경계 동등성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-basic-herbal-recovery.v1", "WI-ACTOR-03"],
+      "evidenceStageCodes": ["E4"],
+      "sourceRevision": "nature-basic-herbal-recovery.design.r2/worktree-20260828",
+      "executedAt": "2026-08-28T17:35:13+09:00",
+      "environment": "Windows; .NET 10; LocalSimulationRuntime; ASP.NET Core RemoteHost HTTP Adapter",
+      "scope": "동일한 초기 상태와 Query·Preview·Confirm 입력에서 LocalProcess와 RemoteHost의 상태 hash·KnownRecipeStableIds·행위 기록 StableId·WorldRevision이 일치했다. 반복 Confirm 멱등성과 알 수 없는 처방·접근 불가·revision 불일치 거부에서도 동일 오류와 무변경 상태를 확인했다. 집중시험 12/12, 런타임·HTTP 회귀 30/30, Simulation 전체 시험 962/962가 통과했다.",
+      "exclusions": ["Save/Replay와 자동 저장", "Logic E5 이상", "Presentation E2 이상", "Unity Scene·자산·배치·애니메이션", "Play Mode·Game View", "약초 채집·달이기·섭취·약효·질병 단계"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Server/Controllers/SimulationPlayerKnowledgeController.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationPlayerKnowledgeTests.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260828-player-knowledge-e4/player-knowledge-e4.trx", "sha256": "9ec2611ec644de563ee418bf161c16b55da6114a29d6f96aa075591c601f12b1", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260828-player-knowledge-e4/player-knowledge-e4-regression.trx", "sha256": "7fa920ad95c82e2c3bafaf79612da9862d85176d4af82b63d418f193c32ff897", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260828-174501/Ssalddel.Simulation.Tests.trx", "sha256": "89697441e4cde8e3bb6fa4cac88d5d02ddef2aedb306df45bf0db82202c8769d", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["SimulationPlayerKnowledgeService Query·Preview·Confirm 규칙 변경", "LocalSimulationRuntime PlayerKnowledge Adapter 변경", "SimulationPlayerKnowledgeController route 또는 HTTP 오류 매핑 변경"]
+    },
     {
       "evidenceId": "evidence:hub-npc-routine-core-20260825",
       "title": "Hub 운영 유래 WI NPC 루틴 Core",
@@ -1365,6 +1409,89 @@
         { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-twilight-e8-20260827/nature-twilight-e8-direct-final.png", "sha256": "5a39cdd30e8882717e5bdec2449af550c5a521462e701898dfe36f60bdb18084", "retentionCode": "LocalOnly" }
       ],
       "invalidationTriggers": ["SimulationWorldShell O/R/F·직접 전투 입력 배선 변경", "황혼 전투 결과 저장·Scene 재진입 복원 변경", "Nature 결과·귀환 HUD 또는 전투 카메라 표현 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-tactical-axe-hosted-parity-20260828",
+      "title": "Nature 전술 도끼 획득 LocalProcess·RemoteHost E7 동등성",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-tactical-self-navigation.v1"],
+      "evidenceStageCodes": ["E3", "E5", "E7"],
+      "sourceRevision": "nature-tactical-self-navigation.r1/simulation-save.v28/worktree-20260828",
+      "executedAt": "2026-08-28T13:18:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; Solo LocalProcess and ASP.NET Core RemoteHost HTTP boundary",
+      "scope": "SimulationActorEquipmentTests 5/5가 통과했다. WI-NATURE-05 도끼 획득과 MainHand 장착의 권위 상태 hash가 LocalProcess와 RemoteHost에서 일치했고, 장착 상태 Save/Restore/Replay hash와 획득·장착 분리 규칙도 같은 시험 묶음에서 검증했다.",
+      "exclusions": ["Unity 실제 입력과 Game View", "후속 벌목 WI-NATURE-06", "운영 Provider와 운영 DB"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationActorEquipmentTests.cs", "sha256": "", "retentionCode": "Tracked" }
+      ],
+      "invalidationTriggers": ["WI-NATURE-05 획득 규칙 또는 ActorEquipment 상태 hash 변경", "LocalProcess·RemoteHost Adapter 변경", "simulation-save.v28 저장·복원 정규형 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-tactical-axe-playmode-20260828",
+      "title": "Nature 전술 도끼 접근·획득·저장 재진입 canonical E7",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-tactical-self-navigation.v1"],
+      "evidenceStageCodes": ["E5", "E6", "E7"],
+      "sourceRevision": "nature-tactical-self-navigation.r1/simulation-save.v28/worktree-20260828",
+      "executedAt": "2026-08-28T13:43:00+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess; Synty POLYGON Nature",
+      "scope": "Nature도끼확보E7PlayModeTests 1/1이 실제 마우스 입력, Synty 도끼 충돌체, 권위 revision 증가, 저장과 canonical Scene 재진입 복원을 검증했다. 공용 절차형 Idle과 Nature 벌목 감각 표현의 뼈 작성 책임을 분리해 T자 bind pose 회귀도 함께 차단했다. 실제 Play Mode에서는 도끼 획득 전후 revision 45→46, HasAxe=true, 저장 revision 46, 월드 도끼 비활성을 확인했고 최종 Console 오류는 0건이었다.",
+      "exclusions": ["후속 벌목·오두막 폐루프 승격", "사람의 최종 미감·청음 승인", "RemoteHost Unity 프로세스 실제 네트워크 실행"],
+      "artifactReferences": [
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/Assets/artifacts/local/validation/nature-tactical/SimulationWorldShell-nature-tactical-before-axe-e7.png", "sha256": "f4c6049de33efd7d0d0b0ec20f3c4fa74dc3c2a0a4f45288ce31b5e77a3d3829", "retentionCode": "External" },
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/Assets/artifacts/local/validation/nature-tactical/SimulationWorldShell-nature-tactical-axe-acquired-e7.png", "sha256": "49cebc6dbbc6844faa55bd9aec934383f8c0fa0d5ed8d77a73d53bb8e1cafae4", "retentionCode": "External" },
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/PlayMode/Nature도끼확보E7PlayModeTests.cs", "sha256": "", "retentionCode": "External" }
+      ],
+      "invalidationTriggers": ["SimulationWorldShell 전술 선택·도끼 입력·저장 재진입 배선 변경", "공용AnimationAdapter 또는 Nature감각표현Presenter 뼈 작성 순서 변경", "WI-NATURE-05 Synty 도끼 H1 배치 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-tactical-e8-logic-20260828",
+      "title": "Nature 전술 도끼 획득 E8 결정성·저장·원장 계보",
+      "evidenceKindCode": "HostedParity",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-tactical-self-navigation.v1"],
+      "evidenceStageCodes": ["E8"],
+      "sourceRevision": "nature-tactical-self-navigation.r1/simulation-save.v28",
+      "executedAt": "2026-08-28T14:50:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; Solo LocalProcess 3회와 ASP.NET Core RemoteHost 1회",
+      "scope": "같은 도끼 획득 Command를 LocalProcess에서 3회, RemoteHost에서 1회 실행했다. Replay·장비·행위 원장·플레이어 분야 성장·행위 기록·파이프라인 Trace digest가 모두 일치했고 Save/Restore/Replay 정규형은 simulation-save.v28로 검증됐다. 집중 시험은 7/7 통과했다.",
+      "exclusions": ["Unity 실제 입력과 Game View", "후속 WI-NATURE-06 벌목", "운영 Provider와 운영 DB"],
+      "artifactReferences": [
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-tactical-e8/candidate-manifest.json", "sha256": "62932785bba80f12e3e79795a81e135058ed3c3305f3c6c594deed764d698c3a", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/nature-tactical-e8-server/nature-tactical-e8.trx", "sha256": "686557c5fa7bfe60ba78d6d15b4b240b858ad58e111f60053556081027f29b18", "retentionCode": "LocalOnly" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationNatureTacticalStabilityTests.cs", "sha256": "e04d9189fd9eaeb30fb13ba0c7fd227bff6fcd9dc5b6433672621add2fbec744", "retentionCode": "Tracked" }
+      ],
+      "invalidationTriggers": ["WI-NATURE-05 Command·행위 원장·플레이어 성장 계보 변경", "LocalProcess 또는 RemoteHost Adapter 변경", "simulation-save.v28 정규형 변경", "engine interaction profile revision 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-tactical-e8-presentation-20260828",
+      "title": "Nature 전술 도끼 획득 E8 실제 입력·저장 재진입 Game View",
+      "evidenceKindCode": "UnityPlayMode",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-tactical-self-navigation.v1"],
+      "evidenceStageCodes": ["E8"],
+      "sourceRevision": "nature-tactical-self-navigation.r1/simulation-save.v28",
+      "executedAt": "2026-08-28T14:49:25+09:00",
+      "environment": "Unity 6000.5.6f1; canonical SimulationWorldShell; Windows; Input System; Solo LocalProcess",
+      "scope": "실제 마우스 입력으로 도끼를 획득하고 저장한 뒤 canonical Scene을 다시 열어 같은 SessionStableId·WorldRevision·HasAxe를 복원하는 시험을 독립적으로 2회 통과했다. 두 실행 모두 Nature 탐험 탭과 실제 1인칭 관점이 일치하는 Game View를 남겼고 각 실행 후 Console 오류는 0건이었다.",
+      "exclusions": ["사람의 최종 미감·청음과 E9 조화 승인", "RemoteHost Unity 프로세스 실제 네트워크 실행", "후속 벌목·오두막 폐루프"],
+      "artifactReferences": [
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-tactical-e8/nature-tactical-e8-playmode-20260828-054859033.json", "sha256": "3b16b435aca2925152dc788409e9fb66ab950a794c6ff2416729acaebaaf7c6e", "retentionCode": "External" },
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-tactical-e8/SimulationWorldShell-nature-tactical-restored-20260828-054859004.png", "sha256": "f91b5d6dddf84ba8a4f91bc7e88e8e62fa3054698f84ff0531f71849c7a4f271", "retentionCode": "External" },
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-tactical-e8/nature-tactical-e8-playmode-20260828-054925133.json", "sha256": "dbf626cca3b899b32a7aae7f874fec712e5633535b8a70bd8abf0e4974d8d92a", "retentionCode": "External" },
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-tactical-e8/SimulationWorldShell-nature-tactical-restored-20260828-054925104.png", "sha256": "db19582707df4eaed85d71419a7abc9e083e9679278d54def194d73e0f5b1f3d", "retentionCode": "External" }
+      ],
+      "invalidationTriggers": ["SimulationWorldShell Nature 탐험 탭·실제 입력·카메라 배선 변경", "도끼 획득 저장·Scene 재진입 복원 변경", "Nature HUD 또는 Synty H1 도끼 배치 변경"]
     }
   ]
 }

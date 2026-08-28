@@ -3,7 +3,7 @@
 > `eng/execution-ledgers/post-e7-evidence-campaigns.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
 - 증거 모델: `horizontal-dual-cycle-evidence.r3`
-- E8 개별 안정 후보: `16`
+- E8 개별 안정 후보: `17`
 - E9 영역 조화·사람 승인 후보: `4`
 - E9 보류 영역: `2`
 - E10 제한 운영 창: `1`
@@ -15,6 +15,7 @@
 | --- | --- | --- | --- | --- |
 | `playable-loop:nature-shelter-foundation.v1` | E7 | Blocked | False | 기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다. |
 | `playable-loop:nature-twilight-return.v1` | E7 | Blocked | False | 기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다. |
+| `playable-loop:nature-tactical-self-navigation.v1` | E7 | Passed | True |  |
 | `playable-loop:nature-night-day2.v1` | E4 | WaitingForE7 | False | 행위 원장·표현 cursor 통합 관문을 E5부터 다시 닫아야 한다. |
 | `playable-loop:nature-workbench-foundation.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:nature-field-supply-return.v1` | E1 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |

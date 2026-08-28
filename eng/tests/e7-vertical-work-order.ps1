@@ -41,4 +41,25 @@ try { & $manager -InputPath $gateRelative | Out-Null }
 catch { $gateRejected = $_.Exception.Message.Contains("PresentationE5RequiresLogicE5") }
 if (-not $gateRejected) { throw "E7VerticalPresentationLogicGateWasAccepted" }
 
-Write-Output "E7VerticalWorkOrderTestsPassed:Stages=7;Tracks=2;Target=E7"
+$playableLoops = Get-Content -LiteralPath (Join-Path $repositoryRoot `
+    "eng/execution-ledgers/playable-loops.json") -Raw -Encoding UTF8 |
+    ConvertFrom-Json
+$registeredWorkOrderRefs = @($playableLoops.items |
+    ForEach-Object {
+        $property = $_.PSObject.Properties['workOrderRefs']
+        if ($null -ne $property) { @($property.Value) }
+    } |
+    Where-Object { -not [string]::IsNullOrWhiteSpace([string] $_) } |
+    Sort-Object -Unique)
+foreach ($workOrderRef in $registeredWorkOrderRefs) {
+    $workOrderPath = Join-Path $repositoryRoot ([string] $workOrderRef)
+    if (-not (Test-Path -LiteralPath $workOrderPath)) {
+        throw "RegisteredE7VerticalWorkOrderMissing:$workOrderRef"
+    }
+    $workOrderResult = & $manager -InputPath ([string] $workOrderRef)
+    if ([string] $workOrderResult -notmatch '^E7VerticalWorkOrderValid:') {
+        throw "RegisteredE7VerticalWorkOrderValidationFailed:${workOrderRef}:$workOrderResult"
+    }
+}
+
+Write-Output "E7VerticalWorkOrderTestsPassed:Stages=7;Tracks=2;Target=E7;Registered=$($registeredWorkOrderRefs.Count)"

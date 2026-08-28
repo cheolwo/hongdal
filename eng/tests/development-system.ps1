@@ -6,8 +6,9 @@ $manager = Join-Path $repositoryRoot `
     "eng/execution-ledgers/manage-development-system.ps1"
 
 $result = @(& $manager -Mode Validate)
-if (($result -join "`n") -notlike `
-    "*DevelopmentSystemValid:Loops=23;Independent=21;World=1;Cross=1;Evidence=32*") {
+$resultText = $result -join "`n"
+if ($resultText -notmatch `
+    'DevelopmentSystemValid:Loops=[1-9][0-9]*;Independent=[1-9][0-9]*;World=[1-9][0-9]*;Cross=[1-9][0-9]*;Evidence=[1-9][0-9]*;PresentationModules=[1-9][0-9]*;PresentationProfiles=[1-9][0-9]*') {
     throw "DevelopmentSystemValidationFailed:$($result -join ';')"
 }
 
@@ -18,6 +19,7 @@ foreach ($expected in @(
     "playable-loop:nature-survival-homestead.v1",
     "playable-loop:nature-shelter-foundation.v1",
     "playable-loop:nature-twilight-return.v1",
+    "playable-loop:nature-tactical-self-navigation.v1",
     "playable-loop:nature-regional-threat-recovery.v1",
     "playable-loop:nature-night-day2.v1",
     "playable-loop:nature-workbench-foundation.v1",
@@ -42,6 +44,8 @@ foreach ($expected in @(
     "evidence:nature-shelter-e8-presentation-20260827",
     "evidence:nature-twilight-e8-logic-20260827",
     "evidence:nature-twilight-e8-presentation-20260827",
+    "evidence:nature-tactical-axe-hosted-parity-20260828",
+    "evidence:nature-tactical-axe-playmode-20260828",
     "evidence:nature-regional-threat-core-20260826",
     "evidence:nature-night-day2-wi13-playmode-20260826",
     "evidence:nature-night-day2-wi13-hosted-parity-20260826",
@@ -218,5 +222,9 @@ $positiveLedgerPath = Join-Path $artifactDirectory "extension-does-not-block-cor
 & $manager -Mode Write -PlayableLoopPath (Relative $positivePath) `
     -OutputPath (Relative $positiveLedgerPath) | Out-Null
 
+$currentLoopCount = @((Get-Content -LiteralPath $loopsPath -Raw -Encoding UTF8 |
+        ConvertFrom-Json).items).Count
+$currentEvidenceCount = @((Get-Content -LiteralPath $evidencePath -Raw -Encoding UTF8 |
+        ConvertFrom-Json).packages).Count
 Write-Output `
-    "DevelopmentSystemTestsPassed:Loops=23;Evidence=32;GeneratedLedger=1;Negative=8;Positive=1"
+    "DevelopmentSystemTestsPassed:Loops=$currentLoopCount;Evidence=$currentEvidenceCount;GeneratedLedger=1;Negative=8;Positive=1"

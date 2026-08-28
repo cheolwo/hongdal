@@ -10,7 +10,7 @@
   "currentEvidenceStage": "E1",
   "promotionEligible": false,
   "iterationState": {
-    "currentPass": "DeferredByActiveGoal",
+    "currentPass": "StableOrExplicitlyBlocked",
     "nextReopenCondition": "현재 nature-night-day2 Goal 완료 뒤 같은 PlayableUnit의 승인 기획 판본으로 활성화하고 Unity 실제 입력·표현 궤적을 연다."
   },
   "changeImpactReviewRef": "docs/Architecture/벌목집중과명상숙련체계.md",
@@ -21,10 +21,10 @@
       "downwardPlan": [
         { "code": "E7", "disposition": "Affected", "summary": "집중 입력을 포함한 설명 없는 실제 벌목 완주를 다시 검증한다." },
         { "code": "E6", "disposition": "Affected", "summary": "성공·실패·취소·다음 행동 설명과 회복 경로를 검증한다." },
-        { "code": "E5", "disposition": "Implemented", "summary": "공통 실행 파이프라인에서 벌목 완료 행위 기록과 현장·명상·개인 회복 효과를 같은 개정 계보로 결속했다." },
-        { "code": "E4", "disposition": "Implemented", "summary": "WI-NATURE-06 Task와 선택적 FocusTiming Challenge를 결속했다." },
-        { "code": "E3", "disposition": "Implemented", "summary": "정수 판정, 작은 Milli 기여, 중복 방지, v29 Save/Replay 시험을 추가했다." },
-        { "code": "E2", "disposition": "Implemented", "summary": "LocalProcess 서비스와 RemoteHost HTTP 입력 경계를 추가했다." },
+        { "code": "E5", "disposition": "ReusedWithVerification", "summary": "공통 실행 파이프라인에서 벌목 완료 행위 기록과 현장·명상·개인 회복 효과를 같은 개정 계보로 결속한 구현을 재검증한다." },
+        { "code": "E4", "disposition": "ReusedWithVerification", "summary": "WI-NATURE-06 Task와 선택적 FocusTiming Challenge 결속을 재검증한다." },
+        { "code": "E3", "disposition": "ReusedWithVerification", "summary": "정수 판정, 작은 Milli 기여, 중복 방지, v29 Save/Replay 시험을 재검증한다." },
+        { "code": "E2", "disposition": "ReusedWithVerification", "summary": "LocalProcess 서비스와 RemoteHost HTTP 입력 경계를 재검증한다." },
         { "code": "E1", "disposition": "Defined", "summary": "기본 벌목 성공과 집중 수행 품질을 분리한다." }
       ],
       "upwardValidation": [
@@ -44,8 +44,8 @@
         { "code": "E7", "disposition": "Gap", "summary": "canonical SimulationWorldShell에서 실제 Space 입력과 Game View 수용 증거가 없다." },
         { "code": "E6", "disposition": "Gap", "summary": "집중 결과와 명상·분야 성장 피드백의 가독성을 검증하지 않았다." },
         { "code": "E5", "disposition": "Gap", "summary": "Unity가 같은 권위 개정의 Challenge와 결과를 소비하는 Adapter가 없다." },
-        { "code": "E4", "disposition": "Planned", "summary": "벌목 마지막 구간 게이지와 결과 피드백 기준점을 사용한다." },
-        { "code": "E3", "disposition": "Planned", "summary": "기존 Nature HUD와 상태창을 재사용한다." },
+        { "code": "E4", "disposition": "Defined", "summary": "벌목 마지막 구간 게이지와 결과 피드백 기준점을 사용한다." },
+        { "code": "E3", "disposition": "Defined", "summary": "기존 Nature HUD와 상태창을 재사용한다." },
         { "code": "E2", "disposition": "Defined", "summary": "깊은 집중·안정된 집중·집중 빗나감·집중 놓침을 사용한다." },
         { "code": "E1", "disposition": "Defined", "summary": "플레이어는 벌목 성공과 집중 품질을 서로 구분해 이해한다." }
       ],

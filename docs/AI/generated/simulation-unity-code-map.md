@@ -6,13 +6,19 @@
 Simulation·Unity
 ├─ Simulation 세션 생명주기 [simulation-session-lifecycle]
 │  ├─ 010 contract.base-reflection-learning-material · Contract · Definition
+│  ├─ 010 contract.online-world · Contract · Query
 │  ├─ 010 contract.session-create · Contract · Definition
 │  ├─ 020 api.session-lifecycle · Api · Confirm
 │  ├─ 020 api.world-gameplay · Api · Confirm
 │  ├─ 020 domain.approved-learning-ledger · Domain · Persistence
+│  ├─ 021 api.online-world · Api · Confirm
+│  ├─ 030 application.online-world · Application · Confirm
 │  ├─ 030 application.session-lifecycle · Application · Confirm
 │  ├─ 030 application.world-gameplay · Application · Confirm
 │  ├─ 030 domain.base-reflection · Domain · Tick
+│  ├─ 031 application.online-nature-session-provision · Application · Confirm
+│  ├─ 032 application.online-cooperative-logging · Application · Confirm
+│  ├─ 040 domain.online-world · Domain · Tick
 │  ├─ 040 domain.session-aggregate · Domain · Tick
 │  └─ 050 infrastructure.session-store · Infrastructure · Persistence
 ├─ 병렬 경영-전투 [simulation-parallel-battle]
@@ -98,6 +104,11 @@ Simulation·Unity
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: 시청 시간·재생 상태·API key·원문 전체는 Simulation 보상 계약에 포함하지 않는다.
+- **010 contract.online-world** — [SimulationOnlineWorldDirectorySnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationOnlineWorldContracts.cs) · 공식 지속 세계와 비공개 협동방의 조회·변경 계약을 정의한다.
+  - 계층/단계: `Contract / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 온라인 세계 계약은 Solo 저장이나 운영 상태를 가져오지 않는다.
 - **010 contract.session-create** — [경영SimulationSession생성Request](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/경영SimulationSessionContracts.cs) · Simulation 세션 생성 입력과 초기 World 문맥을 정의한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
@@ -118,6 +129,16 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: Provider를 호출하거나 운영 DB를 쓰지 않고 사람 승인 Publication만 Simulation 파생 원장에 보관한다.
+- **021 api.online-world** — [SimulationOnlineWorldsController](../../../Ssalddel.Simulation.Server/Controllers/SimulationOnlineWorldsController.cs) · 인증된 플레이어의 공식 지속 세계와 비공개 협동 방 경계를 제공한다.
+  - 계층/단계: `Api / Confirm`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: JWT 행위자를 서버에서 확정하고 운영 DB·운영 업무 상태를 변경하지 않는다.
+- **030 application.online-world** — [SimulationOnlineWorldService](../../../Ssalddel.Simulation.Application/RuntimeCore/SimulationOnlineWorldService.cs) · 온라인 세계 조회·합류·파티·신호와 상태 사본 저장을 조율한다.
+  - 계층/단계: `Application / Confirm`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `PersistentRead | PersistentWrite | StateMutation`
+  - 경계: 검증된 온라인 Simulation 상태만 변경하며 운영 원장을 호출하지 않는다.
 - **030 application.session-lifecycle** — [경영SimulationSession생명주기Service](../../../Ssalddel.Simulation.Application/RuntimeCore/경영SimulationSession생명주기Service.cs) · 세션 생성·조회·Tick·저장·복원을 조율한다.
   - 계층/단계: `Application / Confirm`
   - 읽기/쓰기: `SimulationState → SimulationState`
@@ -133,6 +154,21 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → SimulationState`
   - 부수효과: `StateMutation`
   - 경계: 보상은 게임 안 성찰 선택에만 귀속하며 영상 재생·시청 시간·외부 Provider 결과를 읽지 않는다.
+- **031 application.online-nature-session-provision** — [SimulationOnlineNatureSessionProvisioningService](../../../Ssalddel.Simulation.Application/RuntimeCore/SimulationOnlineNatureSessionProvisioningService.cs) · 온라인 AreaSet에 결속된 Nature RemoteHost 세션을 결정적으로 준비한다.
+  - 계층/단계: `Application / Confirm`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: 현재 Nature Core는 단일 Actor만 지원한다. 세션 준비를 다중 Actor 협동 완료로 승격하지 않는다.
+- **032 application.online-cooperative-logging** — [SimulationOnlineCooperativeLoggingService](../../../Ssalddel.Simulation.Application/RuntimeCore/SimulationOnlineCooperativeLoggingService.cs) · JWT 참가자를 AreaSet Actor로 결속해 협동 벌목·집중·재접속을 조율한다.
+  - 계층/단계: `Application / Confirm`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: Simulation 행위와 계정 명상만 변경하며 운영 상태와 Unity 표현을 변경하지 않는다.
+- **040 domain.online-world** — [SimulationOnlineWorldCoordinator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationOnlineWorldCoordinator.cs) · 온라인 세계·AreaSet·파티·계정 명상 원장의 결정적 상태 전이를 소유한다.
+  - 계층/단계: `Domain / Tick`
+  - 읽기/쓰기: `SimulationState → SimulationState`
+  - 부수효과: `StateMutation`
+  - 경계: 온라인 Simulation 상태만 소유하고 Solo 저장·운영 상태·Unity 표현을 변경하지 않는다.
 - **040 domain.session-aggregate** — [경영SimulationSessionAggregate](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/경영SimulationSession.cs) · 결정적 세션 상태와 개정·Tick 상태 전이를 소유한다.
   - 계층/단계: `Domain / Tick`
   - 읽기/쓰기: `SimulationState → SimulationState`

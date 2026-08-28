@@ -2,16 +2,16 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interactions.json`와 참조된 단일 책임·조립 흐름·음양 사분면 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 대장 개정: `simulation-world-interactions.r28`
+- 대장 개정: `simulation-world-interactions.r31`
 - 증거 단계 개정: `simulation-evidence-stages.r13`
 - WI 발생원 개정: `world-interaction-trigger-sources.r7`
 - WI 단일 책임 개정: `simulation-world-interaction-responsibilities.r5`
 - WI 조립 흐름 개정: `simulation-world-interaction-flows.r3`
 - WI 음양·수행주체 사분면 개정: `world-interaction-polarity-quadrants.r5`
-- 마지막 확인일: `2026-08-27`
+- 마지막 확인일: `2026-08-28`
 - 기본 구현 완료선: `E3 자동 시험 통과`
 - 실제 공간·공공데이터·Unity 통합 목표선: `E7 실제 플레이 폐루프`
-- 전체 항목: `65`
+- 전체 항목: `66`
 
 ## 읽는 법
 
@@ -25,7 +25,7 @@ WI는 한 행위자의 한 의도와 하나의 주요 권위 결과를 관통하
 
 | 분류 | 수 |
 | --- | ---: |
-| 명시적 명령 | 53 |
+| 명시적 명령 | 54 |
 | 자동 상태 전이 | 11 |
 | 공유 정책 | 1 |
 
@@ -35,6 +35,7 @@ WI는 한 행위자의 한 의도와 하나의 주요 권위 결과를 관통하
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 물품 획득 · `WI-ACTOR-01` | 1 | 행위자 의도 | 단일 책임 | 양(陽) | `ItemAcquired` | PlayerOrNpc | PlayerDriven, NpcDriven | WorldItemAvailable, ActorDoesNotOwnItem → ItemOwnedInInventory | 완료 · `E3→E3` | 진행 중 · `E5→E7` |
 | 장착 상태 변경 · `WI-ACTOR-02` | 2 | 행위자 의도 | 단일 책임 | 음(陰) | `ItemEquipmentChanged` | PlayerOrNpc | PlayerDriven, NpcDriven | ItemOwnedInInventory, ItemEquipped → EquipmentStateChanged | 완료 · `E3→E3` | 진행 중 · `E5→E7` |
+| 지식 습득 · `WI-ACTOR-03` | 3 | 행위자 의도 | 단일 책임 | 음(陰) | `RecipeKnowledgeAdded` | PlayerDirect | PlayerDriven, NpcDriven | ReadableKnowledgeSourceAvailable, RecipeNotKnown → RecipeKnown | 완료 · `E3→E3` | 진행 중 · `E5→E7` |
 
 ## 메이저 아르카나 작업군 (`CARD`)
 
@@ -107,7 +108,7 @@ WI는 한 행위자의 한 의도와 하나의 주요 권위 결과를 관통하
 | 안전 거점으로 긴급 후퇴 · `WI-NATURE-02` | 2 | 행위자 의도 | 단일 책임 | 양(陽) | `PartyRetreatedToSafeCore` | PlayerDirect | PlayerDriven, NpcDriven | ThreatObserved, EncounterActive → RetreatedToSafeCore | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 | 훼손된 자연 경로 복원 · `WI-NATURE-03` | 3 | 행위자 의도 | 단일 책임 | 실행 문맥 판정 | `NatureRouteRestored` | PlayerDirect | PlayerDriven, NpcDriven | ThreatObserved, CauseResolved → NatureRouteRestored | 완료 · `E3→E3` | 미선정 · `E1→E7` |
 | 탐사대 안전 회복 · `WI-NATURE-04` | 4 | 행위자 의도 | 단일 책임 | 음(陰) | `PartyRecovered` | PlayerDirect | PlayerDriven, NpcDriven | RetreatedToSafeCore, NatureRouteRestored → PartyRecovered | 완료 · `E3→E3` | 미선정 · `E1→E7` |
-| 벌목 도끼 획득 · `WI-NATURE-05` | 5 | 행위자 의도 | 단일 책임 | 양(陽) | `AxeAcquired` | PlayerDirect | PlayerDriven, NpcDriven | AxeAvailable, PlayerWithoutAxe → AxeOwnedInInventory | 완료 · `E3→E3` | 진행 중 · `E6→E7` |
+| 벌목 도끼 획득 · `WI-NATURE-05` | 5 | 행위자 의도 | 단일 책임 | 양(陽) | `AxeAcquired` | PlayerDirect | PlayerDriven, NpcDriven | AxeAvailable, PlayerWithoutAxe → AxeOwnedInInventory | 완료 · `E3→E3` | 완료 · `E7→E7` |
 | 나무 벌목 작업 시작 · `WI-NATURE-06` | 6 | 행위자 의도 | 원자적 부수 효과 | 양(陽) | `TreeFelled` | PlayerDirect | PlayerDriven, NpcDriven | WoodcuttingCapabilityEquipped, TreeStanding, PlayerIdle → HarvestWorkScheduled | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | 오두막을 지을 터 선정 · `WI-NATURE-07` | 7 | 행위자 의도 | 단일 책임 | 실행 문맥 판정 | `CabinBlueprintPlaced` | PlayerDirect | PlayerDriven, NpcDriven | CabinPlanned, BuildingSiteAvailable → CabinBlueprintPlaced | 완료 · `E3→E3` | 진행 중 · `E4→E7` |
 | 오두막 건설 작업 시작 · `WI-NATURE-08` | 8 | 행위자 의도 | 원자적 부수 효과 | 실행 문맥 판정 | `CabinOperational` | PlayerDirect | PlayerDriven, NpcDriven | CabinBlueprintPlaced, TimberAvailable, PlayerIdle → CabinBuildScheduled | 완료 · `E3→E3` | 진행 중 · `E4→E7` |

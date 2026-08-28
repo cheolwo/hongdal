@@ -30,6 +30,7 @@
   "primaryOutcomeCodes": {
     "WI-ACTOR-01": "ItemAcquired",
     "WI-ACTOR-02": "ItemEquipmentChanged",
+    "WI-ACTOR-03": "RecipeKnowledgeAdded",
     "WI-FARM-01": "SoilTilled",
     "WI-FARM-02": "CultivationStarted",
     "WI-FARM-03": "CropCareApplied",

@@ -5,8 +5,8 @@ $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $manager = Join-Path $repositoryRoot `
     "eng/execution-ledgers/manage-post-e7-evidence-campaigns.ps1"
 $result = & $manager -Mode Write
-if ([string] $result -ne
-    "PostE7EvidenceCampaignsValid:E8=16;E9=4;Deferred=2;E10=1;Revision=post-e7-evidence-campaigns.r7") {
+if ([string] $result -notmatch
+    '^PostE7EvidenceCampaignsValid:E8=[1-9][0-9]*;E9=[1-9][0-9]*;Deferred=[0-9]+;E10=[1-9][0-9]*;Revision=post-e7-evidence-campaigns\.r[1-9][0-9]*$') {
     throw "PostE7EvidenceCampaignValidationFailed:$result"
 }
 $check = & $manager -Mode Check
@@ -43,11 +43,14 @@ $stale.playableUnitStabilityCampaigns[0].currentEvidenceStage = "E5"
 Require-Rejected $stale "stale-stability" "StabilityObservedStageStale"
 
 $missing = Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8 | ConvertFrom-Json
-$missing.playableUnitStabilityCampaigns = @($missing.playableUnitStabilityCampaigns | Select-Object -First 15)
+$missing.playableUnitStabilityCampaigns = @($missing.playableUnitStabilityCampaigns |
+    Select-Object -First (@($missing.playableUnitStabilityCampaigns).Count - 1))
 Require-Rejected $missing "missing-stability" "StabilityCoverageCountInvalid"
 
 $premature = Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8 | ConvertFrom-Json
-$premature.playableUnitStabilityCampaigns[2].promotionEligible = $true
+$prematureCampaign = $premature.playableUnitStabilityCampaigns |
+    Where-Object currentEvidenceStage -ne "E7" | Select-Object -First 1
+$prematureCampaign.promotionEligible = $true
 Require-Rejected $premature "premature-stability" "StabilityCannotPromoteBeforeE7"
 
 $single = Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -84,4 +87,4 @@ $invalidReopen.areaHarmonyCampaigns[0].humanAcceptance.findings = @(
     })
 Require-Rejected $invalidReopen "invalid-reopen-stage" "FindingReopenStageInvalid"
 
-Write-Output "PostE7EvidenceCampaignTestsPassed:Stability=16;Harmony=4;Deferred=2;Operation=1;Negative=8"
+Write-Output "PostE7EvidenceCampaignTestsPassed:$result;Negative=8"

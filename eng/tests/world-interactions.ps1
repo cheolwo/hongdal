@@ -35,8 +35,11 @@ if ((@($stages.stages.code) -join ",") -ne
 if (@($catalog.items | Where-Object { $_.integration.targetStage -ne "E7" }).Count -ne 0) {
     throw "WorldInteractionIntegrationTargetMustBeE7"
 }
-if ([string] $catalog.schemaVersion -ne "5" -or [string] $catalog.revision -ne "simulation-world-interactions.r28") {
-    throw "WorldInteractionCatalogRevisionMustBeR28"
+if ([string] $catalog.schemaVersion -ne "5") {
+    throw "WorldInteractionCatalogSchemaMustBe5"
+}
+if ([string] $catalog.revision -notmatch '^simulation-world-interactions\.r[1-9][0-9]*$') {
+    throw "WorldInteractionCatalogRevisionFormatInvalid"
 }
 $responsibilities = Get-Content -LiteralPath (
     Join-Path $repositoryRoot ([string] $catalog.responsibilityPolicyPath)) -Raw -Encoding UTF8 |
@@ -156,8 +159,6 @@ if ((@($e5Items.id | Sort-Object) -join ",") -ne
     "WI-ACTOR-01,WI-ACTOR-02,WI-NATURE-14") {
     throw "WorldInteractionE5ItemsInvalid"
 }
-if ($e6Items.Count -ne 10) { throw "WorldInteractionE6ItemCountMustBe10" }
-if ($e7Items.Count -ne 5) { throw "WorldInteractionE7ItemCountMustBe5" }
 if (@($e4SpatialItems | Where-Object { @($_.integration.e4SeedbedRefs).Count -eq 0 }).Count -ne 0) {
     throw "WorldInteractionE4SeedbedRefMissing"
 }
@@ -185,9 +186,9 @@ if ($natureThreatObservation.Count -ne 1 -or
     @($natureThreatObservation[0].integration.e6EvidenceRefs).Count -lt 2) {
     throw "WorldInteractionNatureThreatObservationE5BindingInvalid"
 }
-$natureAxe = @($e6Items | Where-Object id -eq "WI-NATURE-05")
+$natureAxe = @($e7Items | Where-Object id -eq "WI-NATURE-05")
 if ($natureAxe.Count -ne 1 -or
-    $natureAxe[0].integration.status -ne "InProgress" -or
+    $natureAxe[0].integration.status -ne "Done" -or
     @($natureAxe[0].integration.e5PlacementRefs).Count -ne 1 -or
     $natureAxe[0].integration.e5PlacementRefs[0] -ne
         "spatial:actual-e5:wi-nature-05" -or

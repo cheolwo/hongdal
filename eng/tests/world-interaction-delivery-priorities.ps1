@@ -3,8 +3,12 @@ Set-StrictMode -Version Latest
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $script = Join-Path $repositoryRoot "eng/execution-ledgers/manage-world-interaction-delivery-priorities.ps1"
+$ledger = Join-Path $repositoryRoot "eng/execution-ledgers/world-interaction-delivery-priorities.json"
 $markdown = Join-Path $repositoryRoot "docs/AI/generated/world-interaction-delivery-priorities.md"
 $contract = Join-Path $repositoryRoot "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldInteractionDeliveryPriorities.generated.cs"
+$definition = Get-Content -LiteralPath $ledger -Raw -Encoding UTF8 | ConvertFrom-Json
+$expectedActiveWorldInteractionId = [string]$definition.activeWork.worldInteractionId
+$expectedActiveEvidenceStage = [string]$definition.activeWork.currentEvidenceStage
 
 $first = & $script -Mode Write
 $markdownHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $markdown).Hash
@@ -28,8 +32,8 @@ if ($catalog -notmatch "public string 실행파동Code" -or
     $catalog -notmatch "public string 목표EvidenceStage" -or
     $catalog -notmatch "public string 개발작업상태Code" -or
     $catalog -notmatch "public string NpcE8정책Code" -or
-    $catalog -notmatch 'ActiveWorldInteractionId = "WI-NATURE-15"' -or
-    $catalog -notmatch 'ActiveEvidenceStage = "E6"' -or
+    $catalog -notmatch ('ActiveWorldInteractionId = "' + [regex]::Escape($expectedActiveWorldInteractionId) + '"') -or
+    $catalog -notmatch ('ActiveEvidenceStage = "' + [regex]::Escape($expectedActiveEvidenceStage) + '"') -or
     $catalog -notmatch "WorkInProgressLimit = 1" -or
     $catalog -notmatch "SimulationWI실행우선순위Catalog") {
     throw "WorldInteractionDeliveryPriorityContractShapeInvalid"
