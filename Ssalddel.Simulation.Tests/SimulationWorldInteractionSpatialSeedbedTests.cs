@@ -15,8 +15,8 @@ public sealed class SimulationWorldInteractionSpatialSeedbedTests
         var first = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
         var second = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
 
-        Assert.Equal("simulation-world-interaction-spatial-seedbeds.r7", first.Revision);
-        Assert.Equal("simulation-world-interactions.r28",
+        Assert.Equal("simulation-world-interaction-spatial-seedbeds.r8", first.Revision);
+        Assert.Equal("simulation-world-interactions.r31",
             first.WorldInteractionCatalogRevision);
         Assert.Equal("pyeongchang-landscape-grammar.v1",
             first.LandscapeGrammarRevision);

@@ -27,6 +27,13 @@ namespace Ssalddel.Simulation.Domain
                     package.FocusMeditationBaseSchemaVersion,
                     baseReplayHash,
                     package.PlayerDomainProfile?.StateHashSha256 ?? string.Empty,
+                    package.PlayerDomainProfiles == null
+                    || package.PlayerDomainProfiles.Length <= 1
+                        ? string.Empty
+                        : string.Join(",", package.PlayerDomainProfiles
+                            .OrderBy(value => value.PlayerStableId,
+                                StringComparer.Ordinal)
+                            .Select(value => value.StateHashSha256)),
                     Simulation집중판정Codes.MeditationRuleRevision,
                     경영SimulationSessionAggregate.CalculateNatureFocusStateHash(
                         package.Snapshot.NatureSurvival),

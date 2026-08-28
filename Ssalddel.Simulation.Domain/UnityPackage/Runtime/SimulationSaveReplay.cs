@@ -39,6 +39,9 @@ namespace Ssalddel.Simulation.Domain
                     ?? actionManifestationLedgerState;
                 var playerDomainProfile = request.PlayerDomainProfile
                     ?? playerDomainProfileState;
+                var playerDomainProfiles = request.PlayerDomainProfiles?.Length > 0
+                    ? request.PlayerDomainProfiles
+                    : GetPlayerDomainProfiles();
                 if ((actionManifestationLedger == null) !=
                     (playerDomainProfile == null))
                     throw new SimulationContractException(
@@ -134,6 +137,9 @@ namespace Ssalddel.Simulation.Domain
                         .CloneActionManifestationLedger(actionManifestationLedger),
                     PlayerDomainProfile = SimulationSaveReplayCloner
                         .ClonePlayerDomainProfile(playerDomainProfile),
+                    PlayerDomainProfiles = playerDomainProfiles.Select(value =>
+                        SimulationSaveReplayCloner.ClonePlayerDomainProfile(
+                            value)!).ToArray(),
                 };
                 if (worldAssetPlacement != null)
                 {

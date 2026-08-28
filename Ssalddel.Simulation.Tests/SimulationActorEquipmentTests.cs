@@ -287,7 +287,7 @@ public sealed class SimulationActorEquipmentTests
             TargetStableId = "resource:nature-tree:01",
         });
 
-    private static 경영SimulationSession생성Request CreateRequest(
+    internal static 경영SimulationSession생성Request CreateRequest(
         Guid? clientRequestId = null)
         => new()
         {

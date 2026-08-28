@@ -100,6 +100,8 @@ namespace Ssalddel.Simulation.Contracts
             WorldAssetPlacementState { get; set; }
         public Simulation행위기록LedgerSnapshot? ActionManifestationLedger { get; set; }
         public Simulation플레이어분야ProfileSnapshot? PlayerDomainProfile { get; set; }
+        public Simulation플레이어분야ProfileSnapshot[] PlayerDomainProfiles
+            { get; set; } = Array.Empty<Simulation플레이어분야ProfileSnapshot>();
     }
 
     public sealed class SimulationSessionRestoreRequest
@@ -217,6 +219,8 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationActorEquipmentStateSnapshot? ActorEquipment { get; set; }
         public Simulation행위기록LedgerSnapshot? ActionManifestationLedger { get; set; }
         public Simulation플레이어분야ProfileSnapshot? PlayerDomainProfile { get; set; }
+        public Simulation플레이어분야ProfileSnapshot[] PlayerDomainProfiles
+            { get; set; } = Array.Empty<Simulation플레이어분야ProfileSnapshot>();
     }
 
     public sealed class SimulationSessionRestoreResult

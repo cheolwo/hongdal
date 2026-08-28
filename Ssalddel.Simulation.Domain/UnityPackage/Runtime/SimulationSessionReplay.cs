@@ -24,6 +24,8 @@ namespace Ssalddel.Simulation.Domain
                 basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
                 var restored = Restore(basePackage);
                 restored.RestoreNatureFocusState(package.Snapshot.NatureSurvival);
+                restored.RestoreAdditionalPlayerDomainProfiles(
+                    package.PlayerDomainProfiles);
                 return restored;
             }
             if (string.Equals(package.SchemaVersion,

@@ -62,6 +62,18 @@ namespace Ssalddel.Simulation.Contracts
             "WI-NATURE-17";
         public const string CollectDroppedTimberWorldInteractionId =
             "WI-NATURE-18";
+        public const string TacticalSelfNavigationPlayableLoopStableId =
+            "playable-loop:nature-tactical-self-navigation.v1";
+        public const string ShelterFoundationPlayableLoopStableId =
+            "playable-loop:nature-shelter-foundation.v1";
+        public const string TwilightReturnPlayableLoopStableId =
+            "playable-loop:nature-twilight-return.v1";
+        public const string NightDay2PlayableLoopStableId =
+            "playable-loop:nature-night-day2.v1";
+        public const string BuildingLearningPlayableLoopStableId =
+            "playable-loop:nature-building-learning.v1";
+        public const string FieldSupplyReturnPlayableLoopStableId =
+            "playable-loop:nature-field-supply-return.v1";
         public const string Fight = "Fight";
         public const string Retreat = "Retreat";
         public const string Victory = "Victory";
@@ -159,6 +171,26 @@ namespace Ssalddel.Simulation.Contracts
                 PrepareFieldSupplyDelegated =>
                     PrepareFieldSupplyDelegatedWorldInteractionId,
                 CollectDroppedTimber => CollectDroppedTimberWorldInteractionId,
+                _ => string.Empty,
+            };
+
+        /// <summary>
+        /// Nature 행동의 권위 행위 기록과 Unity 표현 Trace가 같은
+        /// PlayableLoop 주제를 사용하도록 단일 결속을 제공합니다.
+        /// </summary>
+        public static string PlayableLoopStableIdForAction(string actionCode)
+            => actionCode switch
+            {
+                AcquireAxe => TacticalSelfNavigationPlayableLoopStableId,
+                BeginHarvest or PlaceCabinBlueprint or BeginCabinBuild or
+                    EnterCabin or LeaveCabin or CancelActiveWork or
+                    CollectDroppedTimber => ShelterFoundationPlayableLoopStableId,
+                ResolveEncounter => TwilightReturnPlayableLoopStableId,
+                StoreAtCabin or SleepInCabin or SelectExpansionPlan =>
+                    NightDay2PlayableLoopStableId,
+                BeginBuildingConstruction => BuildingLearningPlayableLoopStableId,
+                PrepareFieldSupply or PrepareFieldSupplyDelegated =>
+                    FieldSupplyReturnPlayableLoopStableId,
                 _ => string.Empty,
             };
 
@@ -268,8 +300,18 @@ namespace Ssalddel.Simulation.Contracts
             = Simulation집중판정Codes.Standard;
         public SimulationNatureResourceNodeInitialStateRequest[] ResourceNodes { get; set; }
             = Array.Empty<SimulationNatureResourceNodeInitialStateRequest>();
+        public SimulationNatureCooperativeActorInitialStateRequest[]
+            CooperativeActors { get; set; }
+            = Array.Empty<SimulationNatureCooperativeActorInitialStateRequest>();
         public Simulation영역건물발전CatalogSnapshot? BuildingProgressionCatalog
             { get; set; }
+    }
+
+    public sealed class SimulationNatureCooperativeActorInitialStateRequest
+    {
+        public string ActorStableId { get; set; } = string.Empty;
+        public decimal InventoryCapacityUnits { get; set; } = 24m;
+        public long RegisteredWorldRevision { get; set; }
     }
 
     public sealed class SimulationNatureResourceNodeInitialStateRequest
@@ -397,6 +439,8 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<SimulationNatureResourceNodeSnapshot>();
         public SimulationNatureDroppedTimberSnapshot[] DroppedTimber { get; set; }
             = Array.Empty<SimulationNatureDroppedTimberSnapshot>();
+        public SimulationNatureCooperativeActorSnapshot[] CooperativeActors
+            { get; set; } = Array.Empty<SimulationNatureCooperativeActorSnapshot>();
         public SimulationNatureActiveWorkSnapshot? ActiveWork { get; set; }
         public Simulation집중판정ChallengeSnapshot? ActiveFocusChallenge { get; set; }
         public Simulation집중판정ResultSnapshot? LastFocusResult { get; set; }
@@ -441,12 +485,22 @@ namespace Ssalddel.Simulation.Contracts
     public sealed class SimulationNatureActiveWorkSnapshot
     {
         public string OriginCommandId { get; set; } = string.Empty;
+        public string ActorStableId { get; set; } = string.Empty;
         public string WorkKindCode { get; set; } = string.Empty;
         public string TargetStableId { get; set; } = string.Empty;
         public int RequiredWorkSeconds { get; set; }
         public int CompletedWorkSeconds { get; set; }
         public int ReservedTimberQuantity { get; set; }
         public int ReservedRebuildPartQuantity { get; set; }
+    }
+
+    public sealed class SimulationNatureCooperativeActorSnapshot
+    {
+        public string ActorStableId { get; set; } = string.Empty;
+        public decimal InventoryCapacityUnits { get; set; }
+        public bool HasAxe { get; set; }
+        public int TimberQuantity { get; set; }
+        public long RegisteredWorldRevision { get; set; }
     }
 
     public sealed class Simulation플레이어기회Snapshot

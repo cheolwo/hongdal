@@ -116,6 +116,30 @@ namespace Ssalddel.Simulation.Application
         ISimulationFarmWorldInteractionRuntime FarmWorldInteractions { get; }
         ISimulationNatureWorldInteractionRuntime NatureWorldInteractions { get; }
         ISimulationBattleRuntime Battles { get; }
+        ISimulationPlayerKnowledgeRuntime PlayerKnowledge { get; }
+    }
+
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E4,
+        "WI-ACTOR-03 지식 습득의 조회·Preview·Confirm 공통 실행 경계를 제공한다.",
+        Boundary = "LocalProcess와 RemoteHost Adapter는 같은 Application 서비스를 호출하며 규칙을 복제하지 않는다.",
+        WorldInteractionIds = new[] {
+            Simulation플레이어지식Codes.지식습득WorldInteractionId })]
+    public interface ISimulationPlayerKnowledgeRuntime
+    {
+        ValueTask<Simulation플레이어지식LedgerSnapshot> GetPlayerKnowledgeAsync(
+            string ledgerStableId,
+            CancellationToken cancellationToken = default);
+        ValueTask<Simulation지식습득PreviewSnapshot>
+            PreviewPlayerKnowledgeAsync(
+                string ledgerStableId,
+                Simulation지식습득PreviewRequest request,
+                CancellationToken cancellationToken = default);
+        ValueTask<Simulation지식습득ConfirmResult>
+            ConfirmPlayerKnowledgeAsync(
+                string ledgerStableId,
+                Simulation지식습득ConfirmRequest request,
+                CancellationToken cancellationToken = default);
     }
 
     [SsalddelEvidenceResponsibility(

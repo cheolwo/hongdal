@@ -265,14 +265,14 @@ public sealed class SimulationWorldInteractionMaturityTests
     }
 
     [Fact]
-    public void WI_65개는_발생원과별개로_원천과조작정책을_분류한다()
+    public void WI_66개는_발생원과별개로_원천과조작정책을_분류한다()
     {
         using var document = JsonDocument.Parse(File.ReadAllText(
             SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog));
         var items = document.RootElement.GetProperty("items")
             .EnumerateArray().ToArray();
 
-        Assert.Equal(65, items.Length);
+        Assert.Equal(66, items.Length);
         Assert.All(items, item =>
         {
             Assert.Contains(item.GetProperty("originCode").GetString(),
@@ -293,15 +293,15 @@ public sealed class SimulationWorldInteractionMaturityTests
     }
 
     [Fact]
-    public void WI_65개는_절차단계대신_한국어기능명과단일책임을노출한다()
+    public void WI_66개는_절차단계대신_한국어기능명과단일책임을노출한다()
     {
         using var document = JsonDocument.Parse(File.ReadAllText(
             SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog));
         var root = document.RootElement;
         var items = root.GetProperty("items").EnumerateArray().ToArray();
 
-        Assert.Equal(65, Simulation세계상호작용이름Catalog.All.Count);
-        Assert.Equal(65, items.Length);
+        Assert.Equal(66, Simulation세계상호작용이름Catalog.All.Count);
+        Assert.Equal(66, items.Length);
         foreach (var item in items)
         {
             var id = item.GetProperty("id").GetString()!;

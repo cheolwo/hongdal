@@ -13,24 +13,24 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class SimulationWorldInteractionDeliveryPriorityTests
 {
     [Fact]
-    public void WI_65개는_한번씩배정되고_다음확장계획하나만E6활성이다()
+    public void WI_66개는_한번씩배정되고_지식습득하나만E5다음관문으로활성이다()
     {
         var all = SimulationWI실행우선순위Catalog.All;
 
-        Assert.Equal(65, all.Count);
-        Assert.Equal(65, all.Select(item => item.WorldInteractionId)
+        Assert.Equal(66, all.Count);
+        Assert.Equal(66, all.Select(item => item.WorldInteractionId)
             .Distinct(StringComparer.Ordinal).Count());
         Assert.Equal(1, SimulationWI실행우선순위Catalog.WorkInProgressLimit);
-        Assert.Equal("WI-NATURE-15",
+        Assert.Equal("WI-ACTOR-03",
             SimulationWI실행우선순위Catalog.ActiveWorldInteractionId);
-        Assert.Equal("E6",
+        Assert.Equal("E5",
             SimulationWI실행우선순위Catalog.ActiveEvidenceStage);
 
         var active = Assert.Single(all, item =>
             item.개발작업상태Code == "Active");
-        Assert.Equal("WI-NATURE-15", active.WorldInteractionId);
+        Assert.Equal("WI-ACTOR-03", active.WorldInteractionId);
         Assert.Equal("D1", active.실행파동Code);
-        Assert.Equal(17, active.파동내순서);
+        Assert.Equal(23, active.파동내순서);
         Assert.Equal("E7", active.목표EvidenceStage);
         Assert.Equal("NotApplicable", active.NpcE8정책Code);
     }

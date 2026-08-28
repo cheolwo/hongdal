@@ -20,7 +20,8 @@ namespace Ssalddel.Simulation.Application
     public sealed class LocalSimulationRuntime : ISimulationRuntimeModules,
         ISimulationSessionRuntime, ISimulationNatureSurvivalRuntime,
         ISimulationSessionGameplayRuntime, ISimulationWorldInteractionRuntime,
-        ISimulationBattleRuntime, ISimulationActorEquipmentRuntime, IDisposable
+        ISimulationBattleRuntime, ISimulationActorEquipmentRuntime,
+        ISimulationPlayerKnowledgeRuntime, IDisposable
     {
         private readonly SemaphoreSlim commandGate = new SemaphoreSlim(1, 1);
         private readonly ISimulationSessionSaveStore saveStore;
@@ -32,6 +33,7 @@ namespace Ssalddel.Simulation.Application
         private readonly SimulationRegionalIncidentService regionalIncidents;
         private readonly InMemorySimulationTeamObservationPolicyStore battlePolicies;
         private readonly SimulationBattleInstanceService battles;
+        private readonly Simulation플레이어지식Service playerKnowledge;
         private readonly ISimulationPlayableLoopEngineTraceSink engineTraceSink;
 
         public LocalSimulationRuntime(
@@ -40,7 +42,8 @@ namespace Ssalddel.Simulation.Application
             ISimulationLocalSaveSlotStore localSaveSlotStore,
             ISimulationBattleWorldReconciler? battleReconciler = null,
             SimulationBattleInstanceService? battleService = null,
-            ISimulationPlayableLoopEngineTraceSink? playableLoopEngineTraceSink = null)
+            ISimulationPlayableLoopEngineTraceSink? playableLoopEngineTraceSink = null,
+            Simulation플레이어지식Service? playerKnowledgeService = null)
         {
             this.sessionStore = sessionStore
                 ?? throw new ArgumentNullException(nameof(sessionStore));
@@ -54,6 +57,9 @@ namespace Ssalddel.Simulation.Application
             battlePolicies = new InMemorySimulationTeamObservationPolicyStore();
             battles = battleService ?? new SimulationBattleInstanceService(
                 sessionStore, battlePolicies, new LocalSimulationBattleInstanceStore());
+            playerKnowledge = playerKnowledgeService
+                ?? new Simulation플레이어지식Service(
+                    new InMemorySimulation플레이어지식Store());
             var sessions = new 경영SimulationSessionAccessor(sessionStore);
             lifecycle = new 경영SimulationSession생명주기Service(
                 sessions, saveStore, battleReconciler ?? battles);
@@ -88,6 +94,27 @@ namespace Ssalddel.Simulation.Application
         public ISimulationNatureWorldInteractionRuntime NatureWorldInteractions => this;
         public ISimulationBattleRuntime Battles => this;
         public ISimulationActorEquipmentRuntime ActorEquipment => this;
+        public ISimulationPlayerKnowledgeRuntime PlayerKnowledge => this;
+
+        public ValueTask<Simulation플레이어지식LedgerSnapshot>
+            GetPlayerKnowledgeAsync(string ledgerStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => playerKnowledge.Get(ledgerStableId),
+                cancellationToken);
+
+        public ValueTask<Simulation지식습득PreviewSnapshot>
+            PreviewPlayerKnowledgeAsync(string ledgerStableId,
+                Simulation지식습득PreviewRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => playerKnowledge.Preview(ledgerStableId, request),
+                cancellationToken);
+
+        public ValueTask<Simulation지식습득ConfirmResult>
+            ConfirmPlayerKnowledgeAsync(string ledgerStableId,
+                Simulation지식습득ConfirmRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => playerKnowledge.Confirm(ledgerStableId, request),
+                cancellationToken);
 
         public ValueTask<SimulationActorEquipmentStateSnapshot>
             GetActorEquipmentAsync(string sessionStableId,

@@ -220,6 +220,25 @@ namespace Ssalddel.Simulation.Application
                     .Select(Clone).ToArray();
         }
 
+        /// <summary>
+        /// 한 PlayableLoop의 여러 WI·Command를 E8 반복 안정성에서 같은 순서로
+        /// 비교할 수 있도록 비권위 추적 사본을 반환한다.
+        /// </summary>
+        public SimulationPlayableLoopEngineTraceEntry[] SnapshotForLoop(
+            string playableLoopStableId)
+        {
+            lock (gate)
+                return entries.Where(value => string.Equals(
+                        value.PlayableLoopStableId,
+                        playableLoopStableId ?? string.Empty,
+                        StringComparison.Ordinal))
+                    .OrderBy(value => value.BeforeAuthorityRevision)
+                    .ThenBy(value => value.CommandId,
+                        StringComparer.Ordinal)
+                    .ThenBy(value => value.Sequence)
+                    .Select(Clone).ToArray();
+        }
+
         private static bool SameCommand(
             SimulationPlayableLoopEngineTraceEntry left,
             SimulationPlayableLoopEngineTraceEntry right) =>

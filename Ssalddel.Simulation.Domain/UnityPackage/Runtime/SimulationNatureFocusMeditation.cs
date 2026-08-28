@@ -170,6 +170,40 @@ namespace Ssalddel.Simulation.Domain
                 natureActiveFocusChallenge = CloneFocusChallenge(
                     saved.ActiveFocusChallenge);
                 natureLastFocusResult = CloneFocusResult(saved.LastFocusResult);
+                foreach (var actor in saved.CooperativeActors
+                    ?? Array.Empty<SimulationNatureCooperativeActorSnapshot>())
+                {
+                    if (natureCooperativeActors.ContainsKey(actor.ActorStableId))
+                        continue;
+                    worldInventoryPlayers[actor.ActorStableId] =
+                        new SimulationWorldPlayerInventorySnapshot
+                        {
+                            PlayerStableId = actor.ActorStableId,
+                            InventoryCapacityUnits = actor.InventoryCapacityUnits,
+                            ManagedContainerStableIds = Array.Empty<string>(),
+                        };
+                    if (actor.HasAxe)
+                        AddNaturePlayerItem(actor.ActorStableId,
+                            SimulationNatureSurvivalCodes.AxeItemCode,
+                            "기본 도끼", 1);
+                    if (actor.TimberQuantity > 0)
+                        AddNaturePlayerItem(actor.ActorStableId,
+                            SimulationNatureSurvivalCodes.TimberItemCode,
+                            "통나무", actor.TimberQuantity);
+                    natureCooperativeActors[actor.ActorStableId] =
+                        actor.RegisteredWorldRevision;
+                    if (!natureMindPlayers.ContainsKey(actor.ActorStableId))
+                    {
+                        var mind = new NatureMindPlayerState
+                        {
+                            PlayerStableId = actor.ActorStableId,
+                            InterpretationBandCode =
+                                SimulationNatureMindCodes.MixedBand,
+                        };
+                        natureMindPlayers.Add(actor.ActorStableId, mind);
+                        InitializeNaturePeriodState(mind);
+                    }
+                }
             }
         }
 

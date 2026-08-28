@@ -74,6 +74,10 @@ namespace Ssalddel.Simulation.Domain
                     source.ActionManifestationLedger),
                 PlayerDomainProfile = ClonePlayerDomainProfile(
                     source.PlayerDomainProfile),
+                PlayerDomainProfiles = (source.PlayerDomainProfiles
+                    ?? Array.Empty<Simulation플레이어분야ProfileSnapshot>())
+                    .Select(value => ClonePlayerDomainProfile(value)!)
+                    .ToArray(),
             };
 
         public static Simulation행위기록LedgerSnapshot?

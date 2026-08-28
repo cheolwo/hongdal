@@ -1,3 +1,7 @@
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Ssalddel.Simulation.Application;
@@ -44,6 +48,67 @@ public static class SimulationServerServiceCollectionExtensions
                 || !string.IsNullOrWhiteSpace(options.ConnectionStringName),
                 "Simulation Session DB 연결 문자열 이름이 필요합니다.")
             .ValidateOnStart();
+        services.AddOptions<SimulationIdentityOptions>()
+            .Bind(configuration.GetSection(SimulationIdentityOptions.SectionName))
+            .Validate(options => !options.Enabled
+                || (!string.IsNullOrWhiteSpace(options.Issuer)
+                    && !string.IsNullOrWhiteSpace(options.Audience)
+                    && options.SecretKey.Length >= 32),
+                "온라인 세계를 활성화하려면 issuer, audience와 32자 이상의 JWT secret이 필요합니다.")
+            .ValidateOnStart();
+
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer();
+        services.AddOptions<JwtBearerOptions>(
+                JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<SimulationIdentityOptions>>((options, configured) =>
+            {
+                var identityOptions = configured.Value;
+                var signingSecret = identityOptions.Enabled
+                    ? identityOptions.SecretKey
+                    : Convert.ToBase64String(
+                        RandomNumberGenerator.GetBytes(64));
+                var signingKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(signingSecret));
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = identityOptions.Enabled
+                        ? identityOptions.Issuer : "simulation-disabled",
+                    ValidateAudience = true,
+                    ValidAudience = identityOptions.Enabled
+                        ? identityOptions.Audience : "simulation-disabled",
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = signingKey,
+                    IssuerSigningKeyResolver = (_, _, _, _) =>
+                        new[] { signingKey },
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromSeconds(30),
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var token = context.Request.Query["access_token"];
+                        if (!string.IsNullOrWhiteSpace(token)
+                            && context.HttpContext.Request.Path.StartsWithSegments(
+                                SimulationOnlineWorldHub.HubPath))
+                            context.Token = token;
+                        return Task.CompletedTask;
+                    },
+                };
+            });
+        services.AddAuthorization(options => options.AddPolicy(
+            SimulationIdentityOptions.OnlineWorldPolicy,
+            policy => policy.RequireAuthenticatedUser()));
+        services.AddSignalR();
 
         var sharedOptions = configuration
             .GetSection(SimulationSharedPublicDataOptions.SectionName)
@@ -126,7 +191,13 @@ public static class SimulationServerServiceCollectionExtensions
         {
             services.AddSingleton<ISimulationSessionSaveStore,
                 InMemorySimulationSessionSaveStore>();
+            services.AddSingleton<ISimulationOnlineWorldCheckpointStore,
+                InMemorySimulationOnlineWorldCheckpointStore>();
         }
+        services.AddSingleton<SimulationOnlineWorldService>();
+        services.AddSingleton<SimulationOnlineMeditationBridgeService>();
+        services.AddSingleton<SimulationOnlineNatureSessionProvisioningService>();
+        services.AddSingleton<SimulationOnlineCooperativeLoggingService>();
         services.AddSingleton<경영SimulationSessionService>();
         services.AddSingleton<경영SimulationSessionAccessor>();
         services.AddSingleton<경영SimulationSession생명주기Service>();
@@ -192,6 +263,10 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddScoped<SimulationWorldExplorationService>();
         services.AddSingleton<SimulationWorldSurvivalInventoryService>();
         services.AddSingleton<SimulationActorEquipmentService>();
+        services.AddSingleton<InMemorySimulation플레이어지식Store>();
+        services.AddSingleton<ISimulation플레이어지식Store>(provider =>
+            provider.GetRequiredService<InMemorySimulation플레이어지식Store>());
+        services.AddSingleton<Simulation플레이어지식Service>();
         services.AddSingleton<I세계상호작용실행Pipeline,
             세계상호작용실행Pipeline>();
         services.AddSingleton<SimulationNatureSurvivalService>();

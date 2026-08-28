@@ -46,6 +46,9 @@ var simulationOptions = app.Services
     .GetRequiredService<IOptions<SimulationServerOptions>>()
     .Value;
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 if (args.Contains("--migrate-simulation-session-database",
         StringComparer.OrdinalIgnoreCase))
 {
@@ -278,6 +281,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 if (simulationOptions.Enabled)
 {
     app.MapControllers();
+    app.MapHub<SimulationOnlineWorldHub>(SimulationOnlineWorldHub.HubPath);
 }
 else
 {

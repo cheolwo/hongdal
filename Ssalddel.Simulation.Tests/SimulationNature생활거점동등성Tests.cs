@@ -688,15 +688,32 @@ public sealed class SimulationNature생활거점동등성Tests
         Assert.Equal(0, value.NatureSurvival.TimberQuantity);
     }
 
-    private static async Task<경영SimulationSessionSnapshot> RunLocalLoopAsync(
+    internal static async Task<경영SimulationSessionSnapshot> RunLocalLoopAsync(
         LocalSimulationRuntime runtime,
         string sessionStableId,
-        long initialRevision)
+        long initialRevision,
+        bool 장비원장및통나무회수규칙사용 = false)
     {
         var current = await runtime.Nature.ConfirmAsync(sessionStableId,
             Command("nature-shelter:axe", initialRevision,
                 SimulationNatureSurvivalCodes.AcquireAxe,
                 SimulationNatureSurvivalCodes.AxePickupStableId));
+        if (장비원장및통나무회수규칙사용)
+        {
+            var equipment = await runtime.ActorEquipment.GetActorEquipmentAsync(
+                sessionStableId);
+            await runtime.ActorEquipment.ConfirmActorEquipmentChangeAsync(
+                sessionStableId, new SimulationActorEquipmentChangeConfirmRequest
+                {
+                    CommandId = "nature-shelter:equip",
+                    ExpectedEquipmentRevision = equipment.EquipmentRevision,
+                    ActorStableId = "player:solo",
+                    OperationCode = SimulationActorEquipmentCodes.Equip,
+                    ItemInstanceStableId =
+                        SimulationNatureSurvivalCodes.AxePickupStableId,
+                    SlotCode = SimulationActorEquipmentCodes.MainHand,
+                });
+        }
         current = await runtime.Nature.ConfirmAsync(sessionStableId,
             Command("nature-shelter:cancel:start", current.Revision,
                 SimulationNatureSurvivalCodes.BeginHarvest,
@@ -717,6 +734,19 @@ public sealed class SimulationNature생활거점동등성Tests
             current = await runtime.Nature.AdvanceRealtimeAsync(sessionStableId,
                 Clock($"nature-shelter:tree:{index}:complete", current.Revision,
                     NatureSurvivalRules.HarvestWorkSeconds));
+            if (장비원장및통나무회수규칙사용)
+            {
+                var dropped = current.NatureSurvival.DroppedTimber.Single(value =>
+                    value.SourceResourceNodeStableId ==
+                    $"resource:nature-tree:{index:00}"
+                    && value.StateCode ==
+                    SimulationNatureSurvivalCodes.DroppedTimberAvailable);
+                current = await runtime.Nature.ConfirmAsync(sessionStableId,
+                    Command($"nature-shelter:tree:{index}:collect",
+                        current.Revision,
+                        SimulationNatureSurvivalCodes.CollectDroppedTimber,
+                        dropped.DroppedTimberStableId));
+            }
         }
 
         current = await runtime.Nature.ConfirmAsync(sessionStableId,
@@ -740,15 +770,36 @@ public sealed class SimulationNature생활거점동등성Tests
                 "facility:nature-cabin"));
     }
 
-    private static async Task<경영SimulationSessionSnapshot> RunRemoteLoopAsync(
+    internal static async Task<경영SimulationSessionSnapshot> RunRemoteLoopAsync(
         HttpClient client,
         string sessionStableId,
-        long initialRevision)
+        long initialRevision,
+        bool 장비원장및통나무회수규칙사용 = false)
     {
         var current = await RemoteConfirmAsync(client, sessionStableId,
             Command("nature-shelter:axe", initialRevision,
                 SimulationNatureSurvivalCodes.AcquireAxe,
                 SimulationNatureSurvivalCodes.AxePickupStableId));
+        if (장비원장및통나무회수규칙사용)
+        {
+            var equipment = await client.GetFromJsonAsync<
+                SimulationActorEquipmentStateSnapshot>(
+                $"/api/simulation/v1/sessions/{sessionStableId}/actor-equipment");
+            Assert.NotNull(equipment);
+            var equipResponse = await client.PostAsJsonAsync(
+                $"/api/simulation/v1/sessions/{sessionStableId}/actor-equipment/changes/confirm",
+                new SimulationActorEquipmentChangeConfirmRequest
+                {
+                    CommandId = "nature-shelter:equip",
+                    ExpectedEquipmentRevision = equipment!.EquipmentRevision,
+                    ActorStableId = "player:solo",
+                    OperationCode = SimulationActorEquipmentCodes.Equip,
+                    ItemInstanceStableId =
+                        SimulationNatureSurvivalCodes.AxePickupStableId,
+                    SlotCode = SimulationActorEquipmentCodes.MainHand,
+                });
+            Assert.Equal(HttpStatusCode.OK, equipResponse.StatusCode);
+        }
         current = await RemoteConfirmAsync(client, sessionStableId,
             Command("nature-shelter:cancel:start", current.Revision,
                 SimulationNatureSurvivalCodes.BeginHarvest,
@@ -769,6 +820,19 @@ public sealed class SimulationNature생활거점동등성Tests
             current = await RemoteAdvanceAsync(client, sessionStableId,
                 Clock($"nature-shelter:tree:{index}:complete", current.Revision,
                     NatureSurvivalRules.HarvestWorkSeconds));
+            if (장비원장및통나무회수규칙사용)
+            {
+                var dropped = current.NatureSurvival.DroppedTimber.Single(value =>
+                    value.SourceResourceNodeStableId ==
+                    $"resource:nature-tree:{index:00}"
+                    && value.StateCode ==
+                    SimulationNatureSurvivalCodes.DroppedTimberAvailable);
+                current = await RemoteConfirmAsync(client, sessionStableId,
+                    Command($"nature-shelter:tree:{index}:collect",
+                        current.Revision,
+                        SimulationNatureSurvivalCodes.CollectDroppedTimber,
+                        dropped.DroppedTimberStableId));
+            }
         }
 
         current = await RemoteConfirmAsync(client, sessionStableId,
@@ -852,7 +916,7 @@ public sealed class SimulationNature생활거점동등성Tests
             WorkInputHeld = true,
         };
 
-    private static void AssertClosedLoop(경영SimulationSessionSnapshot snapshot)
+    internal static void AssertClosedLoop(경영SimulationSessionSnapshot snapshot)
     {
         Assert.True(snapshot.NatureSurvival.HasAxe);
         Assert.Equal(0, snapshot.NatureSurvival.TimberQuantity);
@@ -864,7 +928,7 @@ public sealed class SimulationNature생활거점동등성Tests
             value.StateCode == SimulationNatureSurvivalCodes.Stump));
     }
 
-    private static 경영SimulationSession생성Request CreateRequest()
+    internal static 경영SimulationSession생성Request CreateRequest()
         => new()
         {
             ClientRequestId = Guid.Parse("138887fb-692e-4e41-a2f8-b7b7afc67b65"),
@@ -896,6 +960,32 @@ public sealed class SimulationNature생활거점동등성Tests
                     }).ToArray(),
             },
         };
+
+    internal static 경영SimulationSession생성Request
+        Create장비원장통나무회수생활거점Request()
+    {
+        var request = SimulationActorEquipmentTests.CreateRequest(
+            Guid.Parse("138887fb-692e-4e41-a2f8-b7b7afc67b65"));
+        request.ScenarioStableId = "scenario:nature-shelter-parity";
+        request.ScenarioDataRevision = "fixture.r2";
+        request.ScenarioSeed = 1234;
+        request.WorldContext.GameDateStartsOn = new DateTimeOffset(
+            2026, 8, 26, 0, 0, 0, TimeSpan.Zero);
+        request.NatureSurvival!.ProfileRevision =
+            SimulationNatureSurvivalCodes.ProfileRevisionR5;
+        request.NatureSurvival.BuildingProgressionCatalog =
+            Simulation영역건물발전Catalog.CreateDefault();
+        request.NatureSurvival.ResourceNodes = Enumerable.Range(1, 6)
+            .Select(index => new SimulationNatureResourceNodeInitialStateRequest
+            {
+                ResourceNodeStableId = $"resource:nature-tree:{index:00}",
+                H2StableId = SimulationNatureSurvivalCodes.HarvestH2StableId,
+                H1StableId = "h1-stock:nature-exploration-buffer",
+                LocalX = -8 + index * 2,
+                LocalZ = 8,
+            }).ToArray();
+        return request;
+    }
 
     private static 경영SimulationSession생성Request CreateR2Request()
     {

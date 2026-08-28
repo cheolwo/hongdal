@@ -51,6 +51,7 @@ namespace Ssalddel.Simulation.Contracts
         {
             new Simulation세계상호작용이름Definition("WI-ACTOR-01", "ACTOR", "행위자 공통 물품·장착", 1, "물품 획득", "ActorIntent", "ItemAcquired", "Atomic", "Yang", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-ACTOR-02", "ACTOR", "행위자 공통 물품·장착", 2, "장착 상태 변경", "ActorIntent", "ItemEquipmentChanged", "Atomic", "Yin", "Fixed", false),
+            new Simulation세계상호작용이름Definition("WI-ACTOR-03", "ACTOR", "행위자 공통 물품·장착", 3, "지식 습득", "ActorIntent", "RecipeKnowledgeAdded", "Atomic", "Yin", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-CARD-01", "CARD", "메이저 아르카나", 1, "현재 세계의 메이저 아르카나 활성화", "ActorIntent", "MajorArcanaActivated", "AtomicBundle", "Yin", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-CITY-01", "CITY", "도심 운영", 1, "도심 서비스 수요 확정", "ActorIntent", "CityDemandConfirmed", "Atomic", "Yin", "Fixed", false),
             new Simulation세계상호작용이름Definition("WI-CITY-02", "CITY", "도심 운영", 2, "도심 서비스용 지역 재고 배정", "AuthorityTransition", "CityInventoryAllocated", "AlternativeOutcomes", "NotApplicable", "NotApplicable", false),

@@ -21,6 +21,8 @@ namespace Ssalddel.Simulation.Domain
             appliedNatureSurvivalCommands =
                 new Dictionary<string, AppliedNatureSurvivalCommand>(StringComparer.Ordinal);
         private readonly HashSet<int> natureEncounterEvaluatedCycleIndices = new HashSet<int>();
+        private readonly Dictionary<string, long> natureCooperativeActors =
+            new Dictionary<string, long>(StringComparer.Ordinal);
         private SimulationNatureSurvivalInitialStateRequest? natureSurvivalCreationState;
         private string natureSurvivalInitialPayloadKey = "none";
         private int natureCycleIndex;
@@ -48,6 +50,68 @@ namespace Ssalddel.Simulation.Domain
             {
                 return CreateNatureSurvivalStateSnapshot();
             }
+        }
+
+        public SimulationNatureSurvivalStateSnapshot RegisterNatureCooperativeActor(
+            string actorStableId, decimal inventoryCapacityUnits = 24m)
+        {
+            RequireStableId(actorStableId,
+                "SimulationNatureCooperativeActorStableIdInvalid");
+            if (inventoryCapacityUnits <= 0m)
+                throw new SimulationContractException(
+                    "SimulationNatureInventoryCapacityInvalid");
+            lock (gate)
+            {
+                EnsureNatureSurvivalEnabled();
+                var actor = actorStableId.Trim();
+                if (string.Equals(actor,
+                        natureSurvivalCreationState!.PlayerStableId,
+                        StringComparison.Ordinal)
+                    || natureCooperativeActors.ContainsKey(actor))
+                    return CreateNatureSurvivalStateSnapshot();
+
+                RegisterNatureCooperativeActorCore(actor,
+                    inventoryCapacityUnits, Revision);
+                natureSurvivalCreationState.CooperativeActors =
+                    natureCooperativeActors.OrderBy(value => value.Key,
+                            StringComparer.Ordinal)
+                        .Select(value => new
+                            SimulationNatureCooperativeActorInitialStateRequest
+                            {
+                                ActorStableId = value.Key,
+                                InventoryCapacityUnits =
+                                    worldInventoryPlayers[value.Key]
+                                        .InventoryCapacityUnits,
+                                RegisteredWorldRevision = value.Value,
+                            }).ToArray();
+                return CreateNatureSurvivalStateSnapshot();
+            }
+        }
+
+        private void RegisterNatureCooperativeActorCore(string actor,
+            decimal inventoryCapacityUnits, long registeredWorldRevision)
+        {
+            worldInventoryPlayers.Add(actor,
+                    new SimulationWorldPlayerInventorySnapshot
+                    {
+                        PlayerStableId = actor,
+                        InventoryCapacityUnits = inventoryCapacityUnits,
+                        ManagedContainerStableIds = Array.Empty<string>(),
+                    });
+            AddNaturePlayerItem(actor,
+                SimulationNatureSurvivalCodes.AxeItemCode, "기본 도끼", 1);
+            if (!natureMindPlayers.ContainsKey(actor))
+            {
+                var mind = new NatureMindPlayerState
+                {
+                    PlayerStableId = actor,
+                    InterpretationBandCode =
+                        SimulationNatureMindCodes.MixedBand,
+                };
+                natureMindPlayers.Add(actor, mind);
+                InitializeNaturePeriodState(mind);
+            }
+            natureCooperativeActors.Add(actor, registeredWorldRevision);
         }
 
         public Simulation플레이어기회Snapshot[] GetNaturePlayerOpportunities()
@@ -325,6 +389,13 @@ namespace Ssalddel.Simulation.Domain
                     });
             }
             EnsureNaturePlayerInventory(request);
+            foreach (var actor in request.CooperativeActors
+                         .OrderBy(value => value.ActorStableId,
+                             StringComparer.Ordinal))
+                RegisterNatureCooperativeActorCore(
+                    actor.ActorStableId.Trim(),
+                    actor.InventoryCapacityUnits,
+                    actor.RegisteredWorldRevision);
         }
 
         private void EnsureNaturePlayerInventory(SimulationNatureSurvivalInitialStateRequest request)
@@ -353,9 +424,14 @@ namespace Ssalddel.Simulation.Domain
                 reasons.Add(SimulationNatureSurvivalCodes.Disabled);
             if (request.ObservedWorldRevision != Revision)
                 reasons.Add(SimulationNatureSurvivalCodes.ExpectedRevisionMismatch);
-            if (natureSurvivalCreationState != null
-                && !string.Equals(request.PlayerStableId.Trim(),
-                    natureSurvivalCreationState.PlayerStableId, StringComparison.Ordinal))
+            var actorStableId = request.PlayerStableId.Trim();
+            var isPrimaryActor = natureSurvivalCreationState != null
+                && string.Equals(actorStableId,
+                    natureSurvivalCreationState.PlayerStableId,
+                    StringComparison.Ordinal);
+            var isCooperativeActor = natureCooperativeActors.ContainsKey(
+                actorStableId);
+            if (!isPrimaryActor && !isCooperativeActor)
                 reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
 
             var action = request.ActionCode.Trim();
@@ -377,9 +453,11 @@ namespace Ssalddel.Simulation.Domain
                     reasons.Add(SimulationNatureSurvivalCodes.ResourceNodeNotFound);
                 else if (node.StateCode != SimulationNatureSurvivalCodes.Standing)
                     reasons.Add(SimulationNatureSurvivalCodes.ResourceNodeUnavailable);
-                if (!ActorHasEquippedCapability(
-                        natureSurvivalCreationState!.PlayerStableId,
-                        SimulationActorEquipmentCodes.Woodcutting))
+                if (!(isPrimaryActor
+                        ? ActorHasEquippedCapability(actorStableId,
+                            SimulationActorEquipmentCodes.Woodcutting)
+                        : NatureActorHasItem(actorStableId,
+                            SimulationNatureSurvivalCodes.AxeItemCode)))
                     reasons.Add(SimulationNatureSurvivalCodes.AxeRequired);
                 if (natureActiveWork != null)
                     reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
@@ -396,6 +474,10 @@ namespace Ssalddel.Simulation.Domain
                         reasons.Add(SimulationNatureSurvivalCodes.ExpeditionAlreadyPrepared);
                 }
                 workSeconds = NatureSurvivalRules.HarvestWorkSeconds;
+            }
+            else if (isCooperativeActor)
+            {
+                reasons.Add(SimulationNatureSurvivalCodes.ActionBlocked);
             }
             else if (action == SimulationNatureSurvivalCodes.CollectDroppedTimber)
             {
@@ -642,6 +724,7 @@ namespace Ssalddel.Simulation.Domain
                 natureActiveWork = new SimulationNatureActiveWorkSnapshot
                 {
                     OriginCommandId = request.CommandId.Trim(),
+                    ActorStableId = request.PlayerStableId.Trim(),
                     WorkKindCode = SimulationNatureSurvivalCodes.Harvest,
                     TargetStableId = NormalizeOptional(request.TargetStableId),
                     RequiredWorkSeconds = NatureSurvivalRules.HarvestWorkSeconds,
@@ -1058,6 +1141,19 @@ namespace Ssalddel.Simulation.Domain
                     .OrderBy(value => value.DroppedTimberStableId,
                         StringComparer.Ordinal)
                     .Select(CloneNatureDroppedTimber).ToArray(),
+                CooperativeActors = natureCooperativeActors
+                    .OrderBy(value => value.Key, StringComparer.Ordinal)
+                    .Select(value => new SimulationNatureCooperativeActorSnapshot
+                    {
+                        ActorStableId = value.Key,
+                        InventoryCapacityUnits = worldInventoryPlayers[value.Key]
+                            .InventoryCapacityUnits,
+                        HasAxe = NatureActorHasItem(value.Key,
+                            SimulationNatureSurvivalCodes.AxeItemCode),
+                        TimberQuantity = NatureActorItemQuantity(value.Key,
+                            SimulationNatureSurvivalCodes.TimberItemCode),
+                        RegisteredWorldRevision = value.Value,
+                    }).ToArray(),
                 ActiveWork = CloneNatureActiveWork(natureActiveWork),
                 ActiveFocusChallenge = CloneFocusChallenge(
                     natureActiveFocusChallenge),
@@ -1071,6 +1167,14 @@ namespace Ssalddel.Simulation.Domain
 
         private bool NaturePlayerHasItem(string itemCode)
             => NaturePlayerItemQuantity(itemCode) > 0;
+
+        private bool NatureActorHasItem(string actorStableId, string itemCode)
+            => NatureActorItemQuantity(actorStableId, itemCode) > 0;
+
+        private int NatureActorItemQuantity(string actorStableId,
+            string itemCode)
+            => decimal.ToInt32(PlayerItemQuantity(actorStableId, itemCode,
+                SimulationNatureSurvivalCodes.UnitEach));
 
         private int NaturePlayerItemQuantity(string itemCode)
         {
@@ -1435,6 +1539,17 @@ namespace Ssalddel.Simulation.Domain
                 if (!ids.Add(node.ResourceNodeStableId.Trim()))
                     throw new SimulationContractException("SimulationNatureResourceNodeDuplicate");
             }
+            foreach (var actor in request.CooperativeActors
+                ?? Array.Empty<SimulationNatureCooperativeActorInitialStateRequest>())
+            {
+                RequireStableId(actor.ActorStableId,
+                    "SimulationNatureCooperativeActorStableIdInvalid");
+                if (actor.InventoryCapacityUnits <= 0m
+                    || string.Equals(actor.ActorStableId.Trim(),
+                        request.PlayerStableId.Trim(), StringComparison.Ordinal))
+                    throw new SimulationContractException(
+                        "SimulationNatureCooperativeActorInvalid");
+            }
         }
 
         private static void ValidateNatureSurvivalPreviewRequest(
@@ -1473,7 +1588,7 @@ namespace Ssalddel.Simulation.Domain
             SimulationNatureSurvivalInitialStateRequest? request)
         {
             if (request == null) return "none";
-            return string.Join("|", new[]
+            var key = string.Join("|", new[]
             {
                 request.ProfileRevision.Trim(), request.PlayerStableId.Trim(),
                 request.AreaSetStableId.Trim(), request.H3StableId.Trim(),
@@ -1493,6 +1608,18 @@ namespace Ssalddel.Simulation.Domain
                         value.LocalZ.ToString("R", CultureInfo.InvariantCulture),
                     }))),
             });
+            if (request.CooperativeActors == null
+                || request.CooperativeActors.Length == 0) return key;
+            return key + "|" + string.Join(";", request.CooperativeActors
+                .OrderBy(value => value.ActorStableId, StringComparer.Ordinal)
+                .Select(value => string.Join(",", new[]
+                {
+                    value.ActorStableId.Trim(),
+                    value.InventoryCapacityUnits.ToString(
+                        CultureInfo.InvariantCulture),
+                    value.RegisteredWorldRevision.ToString(
+                        CultureInfo.InvariantCulture),
+                })));
         }
 
         private static string BuildNatureSurvivalActionPayloadKey(
@@ -1545,6 +1672,16 @@ namespace Ssalddel.Simulation.Domain
                         LocalX = value.LocalX,
                         LocalZ = value.LocalZ,
                     }).ToArray(),
+                CooperativeActors = (source.CooperativeActors
+                    ?? Array.Empty<SimulationNatureCooperativeActorInitialStateRequest>())
+                    .Select(value => new
+                        SimulationNatureCooperativeActorInitialStateRequest
+                        {
+                            ActorStableId = value.ActorStableId,
+                            InventoryCapacityUnits = value.InventoryCapacityUnits,
+                            RegisteredWorldRevision =
+                                value.RegisteredWorldRevision,
+                        }).ToArray(),
             };
 
         internal static SimulationNatureSurvivalStateSnapshot CloneNatureSurvivalState(
@@ -1586,6 +1723,16 @@ namespace Ssalddel.Simulation.Domain
                 ResourceNodes = source.ResourceNodes.Select(CloneNatureResourceNode).ToArray(),
                 DroppedTimber = source.DroppedTimber
                     .Select(CloneNatureDroppedTimber).ToArray(),
+                CooperativeActors = (source.CooperativeActors
+                    ?? Array.Empty<SimulationNatureCooperativeActorSnapshot>())
+                    .Select(value => new SimulationNatureCooperativeActorSnapshot
+                    {
+                        ActorStableId = value.ActorStableId,
+                        InventoryCapacityUnits = value.InventoryCapacityUnits,
+                        HasAxe = value.HasAxe,
+                        TimberQuantity = value.TimberQuantity,
+                        RegisteredWorldRevision = value.RegisteredWorldRevision,
+                    }).ToArray(),
                 ActiveWork = CloneNatureActiveWork(source.ActiveWork),
                 ActiveFocusChallenge = CloneFocusChallenge(
                     source.ActiveFocusChallenge),
@@ -1631,6 +1778,7 @@ namespace Ssalddel.Simulation.Domain
             => source == null ? null : new SimulationNatureActiveWorkSnapshot
             {
                 OriginCommandId = source.OriginCommandId,
+                ActorStableId = source.ActorStableId,
                 WorkKindCode = source.WorkKindCode,
                 TargetStableId = source.TargetStableId,
                 RequiredWorkSeconds = source.RequiredWorkSeconds,

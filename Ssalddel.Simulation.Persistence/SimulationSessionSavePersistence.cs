@@ -29,10 +29,47 @@ public sealed class SimulationSessionDbContext(
 {
     public DbSet<SimulationSession저장자료Entity> SessionSaves =>
         Set<SimulationSession저장자료Entity>();
+    public DbSet<SimulationOnlineWorld상태사본Entity> OnlineWorldCheckpoints =>
+        Set<SimulationOnlineWorld상태사본Entity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new SimulationSession저장자료Configuration());
+        modelBuilder.ApplyConfiguration(
+            new SimulationOnlineWorld상태사본Configuration());
+    }
+}
+
+public sealed class SimulationOnlineWorld상태사본Entity
+{
+    public string CheckpointStableId { get; set; } = string.Empty;
+    public string SchemaCode { get; set; } = string.Empty;
+    public long DirectoryRevision { get; set; }
+    public string CheckpointHashSha256 { get; set; } = string.Empty;
+    public string CheckpointJson { get; set; } = string.Empty;
+    public DateTimeOffset StoredAtUtc { get; set; }
+}
+
+internal sealed class SimulationOnlineWorld상태사본Configuration
+    : IEntityTypeConfiguration<SimulationOnlineWorld상태사본Entity>
+{
+    public void Configure(
+        EntityTypeBuilder<SimulationOnlineWorld상태사본Entity> builder)
+    {
+        builder.ToTable("시뮬레이션온라인세계_상태사본");
+        builder.HasKey(value => value.CheckpointStableId);
+        builder.Property(value => value.CheckpointStableId)
+            .HasColumnName("상태사본고유식별자").HasMaxLength(100).IsRequired();
+        builder.Property(value => value.SchemaCode)
+            .HasColumnName("스키마코드").HasMaxLength(100).IsRequired();
+        builder.Property(value => value.DirectoryRevision)
+            .HasColumnName("세계Directory개정번호");
+        builder.Property(value => value.CheckpointHashSha256)
+            .HasColumnName("상태사본SHA256").HasMaxLength(64).IsRequired();
+        builder.Property(value => value.CheckpointJson)
+            .HasColumnName("상태사본JSON").HasColumnType("longtext").IsRequired();
+        builder.Property(value => value.StoredAtUtc)
+            .HasColumnName("저장시각UTC").IsRequired();
     }
 }
 
@@ -213,6 +250,84 @@ public sealed class SimulationSessionSaveStore(
     }
 }
 
+[SsalddelEvidenceResponsibility(
+    SsalddelEvidenceStage.E2,
+    "Simulation Session DB에 온라인 세계 상태 사본을 저장·복원하는 Adapter를 제공한다.",
+    Boundary = "DB 코드와 EF 시험은 실제 migration 적용·재기동 또는 운영 배포 증거가 아니다.",
+    SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E2원격HostAdapter)]
+public sealed class SimulationOnlineWorldCheckpointStore(
+    IDbContextFactory<SimulationSessionDbContext> dbContextFactory)
+    : ISimulationOnlineWorldCheckpointStore
+{
+    private const string StableId = "online-world-checkpoint:current";
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+
+    public SimulationOnlineWorldCheckpointSnapshot? Find()
+    {
+        using var db = dbContextFactory.CreateDbContext();
+        var entity = db.OnlineWorldCheckpoints.AsNoTracking().SingleOrDefault(
+            value => value.CheckpointStableId == StableId);
+        if (entity == null) return null;
+        SimulationOnlineWorldCheckpointSnapshot checkpoint;
+        try
+        {
+            checkpoint = JsonSerializer.Deserialize<
+                SimulationOnlineWorldCheckpointSnapshot>(entity.CheckpointJson,
+                JsonOptions) ?? throw new InvalidOperationException(
+                    "SimulationOnlineWorldCheckpointCorrupted");
+        }
+        catch (JsonException error)
+        {
+            throw new InvalidOperationException(
+                "SimulationOnlineWorldCheckpointCorrupted", error);
+        }
+        if (entity.SchemaCode != checkpoint.SchemaCode
+            || entity.DirectoryRevision != checkpoint.DirectoryRevision
+            || entity.CheckpointHashSha256 != checkpoint.CheckpointHashSha256
+            || checkpoint.CheckpointHashSha256 !=
+                SimulationOnlineWorldCoordinator.CalculateCheckpointHash(
+                    checkpoint))
+            throw new InvalidOperationException(
+                "SimulationOnlineWorldCheckpointCorrupted");
+        return checkpoint;
+    }
+
+    public void Save(SimulationOnlineWorldCheckpointSnapshot checkpoint)
+    {
+        if (checkpoint == null) throw new ArgumentNullException(nameof(checkpoint));
+        if (checkpoint.CheckpointHashSha256 !=
+            SimulationOnlineWorldCoordinator.CalculateCheckpointHash(checkpoint))
+            throw new SimulationConflictException(
+                "SimulationOnlineWorldCheckpointInvalid");
+        using var db = dbContextFactory.CreateDbContext();
+        var entity = db.OnlineWorldCheckpoints.SingleOrDefault(value =>
+            value.CheckpointStableId == StableId);
+        if (entity == null)
+        {
+            entity = new SimulationOnlineWorld상태사본Entity
+            {
+                CheckpointStableId = StableId,
+            };
+            db.OnlineWorldCheckpoints.Add(entity);
+        }
+        else if (checkpoint.DirectoryRevision < entity.DirectoryRevision)
+        {
+            throw new SimulationConflictException(
+                "SimulationOnlineWorldCheckpointRevisionRegressed");
+        }
+
+        entity.SchemaCode = checkpoint.SchemaCode;
+        entity.DirectoryRevision = checkpoint.DirectoryRevision;
+        entity.CheckpointHashSha256 = checkpoint.CheckpointHashSha256;
+        entity.CheckpointJson = JsonSerializer.Serialize(checkpoint, JsonOptions);
+        entity.StoredAtUtc = DateTimeOffset.UtcNow;
+        db.SaveChanges();
+    }
+}
+
 internal sealed class SimulationSessionDatabaseReadinessProbe(
     IDbContextFactory<SimulationSessionDbContext> dbContextFactory)
     : ISimulationDatabaseReadinessProbe
@@ -245,6 +360,8 @@ public static class SimulationSessionPersistenceRegistration
                 }));
         services.AddSingleton<ISimulationSessionSaveStore,
             SimulationSessionSaveStore>();
+        services.AddSingleton<ISimulationOnlineWorldCheckpointStore,
+            SimulationOnlineWorldCheckpointStore>();
         services.AddSingleton<ISimulationDatabaseReadinessProbe,
             SimulationSessionDatabaseReadinessProbe>();
         return services;

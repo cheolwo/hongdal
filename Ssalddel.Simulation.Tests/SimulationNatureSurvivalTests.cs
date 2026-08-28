@@ -984,7 +984,7 @@ public sealed class SimulationNatureSurvivalTests
             result.StateCode);
         Assert.Equal("WI-NATURE-05", result.WorldInteractionId);
         Assert.NotNull(result.실행우선순위);
-        Assert.Equal("Queued", result.실행우선순위!.개발작업상태Code);
+        Assert.Equal("E7Closed", result.실행우선순위!.개발작업상태Code);
         Assert.Equal("E7", result.실행우선순위.목표EvidenceStage);
         Assert.Empty(result.MissingContextCodes);
     }
@@ -1072,7 +1072,7 @@ public sealed class SimulationNatureSurvivalTests
             manifestation.StateCode);
         Assert.Equal(SimulationWorldInteractionMaturityStateCodes.Manifested,
             e5.StateCode);
-        Assert.Equal("Queued", e5.실행우선순위!.개발작업상태Code);
+        Assert.Equal("E7Closed", e5.실행우선순위!.개발작업상태Code);
 
         var restored = SimulationSessionReplay.Restore(package);
         var restoredPackage = restored.CreateSavePackage(new()

@@ -72,6 +72,8 @@ namespace Ssalddel.Simulation.Domain
             Add(canonical, source.ActiveWork == null);
             if (source.ActiveWork != null)
             {
+                if (!string.IsNullOrEmpty(source.ActiveWork.ActorStableId))
+                    Add(canonical, source.ActiveWork.ActorStableId);
                 Add(canonical, source.ActiveWork.WorkKindCode);
                 Add(canonical, source.ActiveWork.TargetStableId);
                 Add(canonical, source.ActiveWork.RequiredWorkSeconds);
@@ -80,6 +82,20 @@ namespace Ssalddel.Simulation.Domain
                 {
                     Add(canonical, source.ActiveWork.ReservedTimberQuantity);
                     Add(canonical, source.ActiveWork.ReservedRebuildPartQuantity);
+                }
+            }
+            if (source.CooperativeActors != null
+                && source.CooperativeActors.Length > 0)
+            {
+                Add(canonical, source.CooperativeActors.Length);
+                foreach (var actor in source.CooperativeActors.OrderBy(value =>
+                             value.ActorStableId, StringComparer.Ordinal))
+                {
+                    Add(canonical, actor.ActorStableId);
+                    Add(canonical, actor.InventoryCapacityUnits);
+                    Add(canonical, actor.HasAxe);
+                    Add(canonical, actor.TimberQuantity);
+                    Add(canonical, actor.RegisteredWorldRevision);
                 }
             }
             Add(canonical, source.Cabin.CabinStableId);

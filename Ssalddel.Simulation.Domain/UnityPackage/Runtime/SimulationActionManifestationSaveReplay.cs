@@ -8,6 +8,10 @@ namespace Ssalddel.Simulation.Domain
     {
         private Simulation행위기록LedgerSnapshot? actionManifestationLedgerState;
         private Simulation플레이어분야ProfileSnapshot? playerDomainProfileState;
+        private readonly System.Collections.Generic.Dictionary<string,
+            Simulation플레이어분야ProfileSnapshot> playerDomainProfileStates =
+            new System.Collections.Generic.Dictionary<string,
+                Simulation플레이어분야ProfileSnapshot>(StringComparer.Ordinal);
 
         internal (Simulation행위발현Record 기록,
             Simulation분야성장적용Snapshot 성장적용,
@@ -97,10 +101,18 @@ namespace Ssalddel.Simulation.Domain
             var record = ledger.Append(draft);
             var reused = ledger.Snapshot().TailRecords.Length == beforeCount;
 
-            var playerDomain = playerDomainProfileState == null
+            var existingProfile = playerDomainProfileStates.TryGetValue(
+                    playerStableId, out var actorProfile)
+                ? actorProfile
+                : playerDomainProfileState != null
+                  && string.Equals(playerDomainProfileState.PlayerStableId,
+                      playerStableId, StringComparison.Ordinal)
+                    ? playerDomainProfileState
+                    : null;
+            var playerDomain = existingProfile == null
                 ? new Simulation플레이어분야Engine(playerStableId, catalog)
                 : Simulation플레이어분야Engine.Restore(
-                    playerDomainProfileState, catalog);
+                    existingProfile, catalog);
             var beforeProfileRevision = playerDomain.Snapshot().Revision;
             string status;
             string reason;
@@ -186,14 +198,19 @@ namespace Ssalddel.Simulation.Domain
             }
 
             actionManifestationLedgerState = ledger.Snapshot();
-            playerDomainProfileState = playerDomain.Snapshot();
+            var updatedProfile = playerDomain.Snapshot();
+            playerDomainProfileStates[playerStableId] = updatedProfile;
+            if (playerDomainProfileState == null
+                || string.Equals(playerDomainProfileState.PlayerStableId,
+                    playerStableId, StringComparison.Ordinal))
+                playerDomainProfileState = updatedProfile;
             return (record, new Simulation분야성장적용Snapshot
             {
                 상태Code = status,
                 사유Code = reason,
                 PlayerStableId = playerStableId,
                 BeforeProfileRevision = beforeProfileRevision,
-                AfterProfileRevision = playerDomainProfileState.Revision,
+                AfterProfileRevision = updatedProfile.Revision,
             }, meditation, reused);
         }
 
@@ -239,11 +256,61 @@ namespace Ssalddel.Simulation.Domain
                     actionManifestationLedgerState);
         }
 
+        public Simulation행위기록Page QueryActionManifestations(
+            Simulation행위기록Query query)
+        {
+            lock (gate)
+            {
+                if (actionManifestationLedgerState == null)
+                    return new Simulation행위기록Page
+                    {
+                        NextCursor = query.Cursor
+                            ?? new Simulation행위기록Cursor(),
+                    };
+                return Simulation행위발현Ledger.Restore(
+                    actionManifestationLedgerState).Query(query);
+            }
+        }
+
         public Simulation플레이어분야ProfileSnapshot? GetPlayerDomainProfile()
         {
             lock (gate)
                 return SimulationSaveReplayCloner.ClonePlayerDomainProfile(
                     playerDomainProfileState);
+        }
+
+        public Simulation플레이어분야ProfileSnapshot? GetPlayerDomainProfile(
+            string playerStableId)
+        {
+            lock (gate)
+            {
+                if (string.IsNullOrWhiteSpace(playerStableId)) return null;
+                if (playerDomainProfileStates.TryGetValue(
+                        playerStableId.Trim(), out var profile))
+                    return SimulationSaveReplayCloner.ClonePlayerDomainProfile(
+                        profile);
+                return playerDomainProfileState != null
+                    && string.Equals(playerDomainProfileState.PlayerStableId,
+                        playerStableId.Trim(), StringComparison.Ordinal)
+                    ? SimulationSaveReplayCloner.ClonePlayerDomainProfile(
+                        playerDomainProfileState)
+                    : null;
+            }
+        }
+
+        internal Simulation플레이어분야ProfileSnapshot[]
+            GetPlayerDomainProfiles()
+        {
+            var profiles = playerDomainProfileStates.Values.ToList();
+            if (playerDomainProfileState != null
+                && profiles.All(value => !string.Equals(value.PlayerStableId,
+                    playerDomainProfileState.PlayerStableId,
+                    StringComparison.Ordinal)))
+                profiles.Add(playerDomainProfileState);
+            return profiles.OrderBy(value => value.PlayerStableId,
+                    StringComparer.Ordinal)
+                .Select(value => SimulationSaveReplayCloner
+                    .ClonePlayerDomainProfile(value)!).ToArray();
         }
 
         internal void RestoreActionManifestationAndPlayerDomainState(
@@ -261,6 +328,20 @@ namespace Ssalddel.Simulation.Domain
             playerDomainProfileState = SimulationSaveReplayCloner
                 .ClonePlayerDomainProfile(
                     Simulation플레이어분야Engine.Restore(profile).Snapshot());
+            playerDomainProfileStates[playerDomainProfileState!.PlayerStableId]
+                = playerDomainProfileState;
+        }
+
+        internal void RestoreAdditionalPlayerDomainProfiles(
+            Simulation플레이어분야ProfileSnapshot[]? profiles)
+        {
+            foreach (var profile in profiles
+                ?? Array.Empty<Simulation플레이어분야ProfileSnapshot>())
+            {
+                var restored = Simulation플레이어분야Engine.Restore(profile)
+                    .Snapshot();
+                playerDomainProfileStates[restored.PlayerStableId] = restored;
+            }
         }
 
         private static string RequireActionPlayerStableId(

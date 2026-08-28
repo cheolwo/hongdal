@@ -137,29 +137,8 @@ namespace Ssalddel.Simulation.Application
                         request.TargetStableId, request.ChoiceCode,
                     }.Concat(preview.SpatialEvidenceReferenceIds).ToArray(),
                     TimeReferenceId = "simulation-time:nature-realtime",
-                    PlayableLoopStableId = request.ActionCode switch
-                    {
-                        SimulationNatureSurvivalCodes.AcquireAxe or
-                        SimulationNatureSurvivalCodes.BeginHarvest or
-                        SimulationNatureSurvivalCodes.PlaceCabinBlueprint or
-                        SimulationNatureSurvivalCodes.BeginCabinBuild or
-                        SimulationNatureSurvivalCodes.EnterCabin or
-                        SimulationNatureSurvivalCodes.LeaveCabin or
-                        SimulationNatureSurvivalCodes.CancelActiveWork or
-                        SimulationNatureSurvivalCodes.CollectDroppedTimber =>
-                            "playable-loop:nature-shelter-foundation.v1",
-                        SimulationNatureSurvivalCodes.ResolveEncounter =>
-                            "playable-loop:nature-twilight-return.v1",
-                        SimulationNatureSurvivalCodes.BeginBuildingConstruction =>
-                            "playable-loop:nature-building-learning.v1",
-                        SimulationNatureSurvivalCodes.PrepareFieldSupply =>
-                            "playable-loop:nature-field-supply-return.v1",
-                        SimulationNatureSurvivalCodes.StoreAtCabin or
-                        SimulationNatureSurvivalCodes.SleepInCabin or
-                        SimulationNatureSurvivalCodes.SelectExpansionPlan =>
-                            "playable-loop:nature-night-day2.v1",
-                        _ => string.Empty,
-                    },
+                    PlayableLoopStableId = SimulationNatureSurvivalCodes
+                        .PlayableLoopStableIdForAction(request.ActionCode),
                     AuthorityLocationCode = authorityLocationCode,
                     SpatialEvidenceStateCode =
                         preview.SpatialEvidenceStateCode,
