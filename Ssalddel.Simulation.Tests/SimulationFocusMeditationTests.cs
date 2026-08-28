@@ -180,6 +180,57 @@ public sealed class SimulationFocusMeditationTests
             Simulation집중판정Codes.ProfileExcluded);
     }
 
+    [Fact]
+    public void 명상WiFamily는_비실행상위분류이며_모든WI를전수판정한다()
+    {
+        var domains = Simulation기본플레이어분야Catalog.Create();
+        var catalog = Simulation기본명상WiFamilyCatalog.Create();
+
+        var family = Assert.Single(catalog.Families);
+        Assert.Equal(Simulation명상WiFamilyCodes.FamilyStableId,
+            family.WiFamilyStableId);
+        Assert.Equal(Simulation명상WiFamilyCodes.MetadataOnly,
+            family.ExecutionKindCode);
+        Assert.Equal(Simulation명상WiFamilyCodes.AfterActionRecord,
+            family.ApplicationPhaseCode);
+        Assert.False(family.IsExecutable);
+        Assert.False(family.OwnsPreviewConfirmTaskEffect);
+        Assert.Equal(domains.Wi결속들.Length, catalog.Bindings.Length);
+        Assert.DoesNotContain(domains.Wi결속들, value => string.Equals(
+            value.WorldInteractionId, family.WiFamilyStableId,
+            StringComparison.Ordinal));
+
+        foreach (var binding in domains.Wi결속들)
+        {
+            var familyBinding = Assert.Single(catalog.Bindings, value =>
+                value.WorldInteractionId == binding.WorldInteractionId);
+            var playerAction = binding.기여방식Code ==
+                               Simulation분야기여방식Codes.PlayerDirect
+                               || binding.기여방식Code ==
+                               Simulation분야기여방식Codes.PlayerOrOperation
+                               || binding.기여방식Code ==
+                               Simulation분야기여방식Codes.LearningOnly;
+            if (playerAction)
+            {
+                Assert.Equal(Simulation명상WiFamilyCodes.Bound,
+                    familyBinding.결속상태Code);
+                Assert.Equal(new[]
+                    {
+                        Simulation명상WiFamilyCodes.FamilyStableId,
+                    }, familyBinding.상위WiFamilyStableIds);
+                Assert.Empty(familyBinding.사유Code);
+            }
+            else
+            {
+                Assert.Equal(Simulation명상WiFamilyCodes.NotApplicable,
+                    familyBinding.결속상태Code);
+                Assert.Empty(familyBinding.상위WiFamilyStableIds);
+                Assert.False(string.IsNullOrWhiteSpace(
+                    familyBinding.사유Code));
+            }
+        }
+    }
+
     private static Simulation집중판정ChallengeSnapshot Challenge(string mode)
         => new()
         {

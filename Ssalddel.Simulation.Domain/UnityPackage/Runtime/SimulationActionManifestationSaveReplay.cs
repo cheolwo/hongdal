@@ -30,6 +30,9 @@ namespace Ssalddel.Simulation.Domain
                     draft.WorldInteractionId, StringComparison.Ordinal))
                 ?? throw new SimulationContractException(
                     "SimulationPlayerDomainWiBindingMissing");
+            var meditationFamilyBinding =
+                Simulation기본명상WiFamilyCatalog.Resolve(
+                    draft.WorldInteractionId);
             var playerStableId = RequireActionPlayerStableId(draft);
             var canApplyField = string.Equals(draft.TriggerSourceCode,
                                     SimulationWorldInteractionTriggerSourceCodes
@@ -60,6 +63,8 @@ namespace Ssalddel.Simulation.Domain
 
             var canApplyMeditation = focusResult != null
                 && focusResult.명상경험증가Milli > 0
+                && meditationFamilyBinding.결속상태Code ==
+                    Simulation명상WiFamilyCodes.Bound
                 && string.Equals(draft.TriggerSourceCode,
                     SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
                     StringComparison.Ordinal)
@@ -162,7 +167,11 @@ namespace Ssalddel.Simulation.Domain
             else if (!canApplyMeditation)
             {
                 meditation.상태Code = Simulation집중판정Codes.NotApplicable;
-                meditation.사유Code = "FocusActionNotPlayerDriven";
+                meditation.사유Code = meditationFamilyBinding.결속상태Code !=
+                    Simulation명상WiFamilyCodes.Bound
+                    ? "MeditationWiFamilyNotBound:" +
+                      meditationFamilyBinding.사유Code
+                    : "FocusActionNotPlayerDriven";
             }
             else
             {

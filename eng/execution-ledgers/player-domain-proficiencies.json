@@ -5,6 +5,18 @@
   "authoritativeCatalogSource": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerDomainCatalog.cs",
   "contractSource": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayerDomainProficiencyContracts.cs",
   "expectedWorldInteractionCount": 65,
+  "wiFamilies": [
+    {
+      "stableId": "wi-family:meditation",
+      "한국어명": "명상(정신 차림)",
+      "executionKindCode": "MetadataOnly",
+      "applicationPhaseCode": "AfterActionRecord",
+      "isExecutable": false,
+      "ownsPreviewConfirmTaskEffect": false,
+      "catalogSource": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationMeditationWiFamilyCatalog.cs",
+      "contractSource": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation명상WiFamilyContracts.cs"
+    }
+  ],
   "progressAxes": [
     { "code": "Understanding", "한국어명": "이해도", "sources": ["ApprovedMaterialReflection"] },
     { "code": "FieldProficiency", "한국어명": "현장 숙련도", "sources": ["PlayerFieldAction"] },
@@ -41,6 +53,8 @@
     { "code": "NatureNpcCraftReview", "worldInteractionId": "WI-REVIEW-01", "axis": "OperationalProficiency", "requires": ["player-delegation", "npc-completion", "player-review"] }
   ],
   "boundaries": {
+    "wiFamilyExecutesChildWorldInteraction": false,
+    "wiFamilyCreatesSecondPreviewConfirmTaskEffect": false,
     "npcCompletionAloneGrantsPlayerProgress": false,
     "understandingHidesAuthorizedFacts": false,
     "understandingChangesAmbientSpawn": false,
