@@ -758,6 +758,7 @@ namespace Ssalddel.Simulation.Domain
                 farmSoilTiles[workOrder.TargetStableId].StateCode =
                     SimulationFarmSurvivalCodes.Tilled;
                 EvaluateCollectibleRewardForFarmCompletion(workOrder);
+                CompleteFarmCropActionRecord(workOrder, "FarmSoilTilled");
                 return;
             }
             if (workOrder.ActionCode == SimulationFarmSurvivalCodes.Sowing)
@@ -770,7 +771,8 @@ namespace Ssalddel.Simulation.Domain
                     CultivationUnitStableId = cultivationStableId,
                     Revision = 1,
                     TileStableId = soil.SoilTileStableId,
-                    CultivationStableId = "cultivation:potato:" + soil.SoilTileStableId,
+                    CultivationStableId = "cultivation:potato:" + cultivationStableId.Substring(
+                        "cultivation-unit:potato:".Length),
                     ProductStableId = rule.ProductStableId,
                     CropVariantStableId = rule.CropVariantStableId,
                     StateCode = Simulation재배단위상태Codes.Growing,
@@ -783,6 +785,7 @@ namespace Ssalddel.Simulation.Domain
                         workOrder.WorkOrderStableId,
                     },
                 });
+                CompleteFarmCropActionRecord(workOrder, "CultivationUnitCreated");
                 return;
             }
             if (workOrder.ActionCode == SimulationFarmSurvivalCodes.CropCare)
@@ -790,6 +793,7 @@ namespace Ssalddel.Simulation.Domain
                 var cultivation = cultivationUnits[workOrder.TargetStableId];
                 cultivation.StateCode = Simulation재배단위상태Codes.HarvestReady;
                 cultivation.Revision++;
+                CompleteFarmCropActionRecord(workOrder, "CultivationUnitHarvestReady");
                 return;
             }
             if (workOrder.ActionCode == SimulationFarmSurvivalCodes.Harvesting)
@@ -824,6 +828,7 @@ namespace Ssalddel.Simulation.Domain
                     new[] { workOrder.WorkOrderStableId + ":production-effect" },
                     new[] { "HarvestLotCreated", "CultivationHarvested" },
                     WorldEventMutationRevision);
+                CompleteFarmCropActionRecord(workOrder, "HarvestLotCreated");
                 return;
             }
             if (workOrder.ActionCode == SimulationFarmSurvivalCodes.HarvestCollection)
@@ -903,6 +908,38 @@ namespace Ssalddel.Simulation.Domain
                     recoverableDamageUnits - repaired);
             }
             defense.Prepared = true;
+        }
+
+        private void CompleteFarmCropActionRecord(FarmWorkOrderState 작업, string 결과Code)
+        {
+            var 시작 = FindActionManifestation(작업.CommandId).기록;
+            // 기존 직접 Aggregate 호출·구판 Replay에는 Pipeline 시작 기록이 없다.
+            // 과거 기록을 새 규칙으로 만들거나 기본 노동 보상을 중복 적용하지 않는다.
+            if (시작 == null) return;
+            AppendActionManifestationAndProgression(new Simulation행위발현Record
+            {
+                WorldStableId = 시작.WorldStableId,
+                SessionStableId = SessionStableId,
+                PlayableLoopStableId = 시작.PlayableLoopStableId,
+                WorldInteractionId = 시작.WorldInteractionId,
+                CommandId = 작업.CommandId + ":completed",
+                TriggerSourceCode = 시작.TriggerSourceCode,
+                InitiatorStableId = 시작.InitiatorStableId,
+                ActorStableId = 시작.ActorStableId,
+                ActorKindCode = 시작.ActorKindCode,
+                TargetStableIds = 시작.TargetStableIds.ToArray(),
+                OutcomeStableId = "outcome:" + 작업.CommandId + ":completed",
+                PrimaryOutcomeCode = 결과Code,
+                결과분류Code = Simulation행위결과분류Codes.성공,
+                변화의미Codes = 시작.변화의미Codes.ToArray(),
+                SourceReferenceIds = new[] { 시작.행위기록StableId, 작업.WorkOrderStableId },
+                BeforeWorldRevision = Revision,
+                AfterWorldRevision = WorldEventMutationRevision,
+                AppliedWorldTick = 작업.CompletesWorldTick,
+                RuleRevision = RuleRevision,
+                SpatialRevision = 시작.SpatialRevision,
+                DataRevision = 시작.DataRevision,
+            });
         }
 
         private void RegisterFarmSupplyDecisionAndTask(
@@ -1065,8 +1102,18 @@ namespace Ssalddel.Simulation.Domain
                 || actionCode == SimulationFarmSurvivalCodes.FenceRepair
                 || IsFarmSupplyAction(actionCode);
 
-        private static string CultivationUnitStableId(string soilTileStableId)
-            => "cultivation-unit:potato:" + soilTileStableId;
+        private string CultivationUnitStableId(string soilTileStableId)
+        {
+            // 첫 재배 ID와 과거 Save/Replay 의미는 유지한다. 수확된 단위와 Lot은
+            // 삭제하지 않고 동일 밭의 다음 재배만 새 ID로 만든다.
+            var 기본Id = "cultivation-unit:potato:" + soilTileStableId;
+            var 다음Id = 기본Id;
+            var 주기 = 1;
+            while (cultivationUnits.ContainsKey(다음Id))
+                다음Id = 기본Id + ":cycle:" + (++주기).ToString(
+                    CultureInfo.InvariantCulture);
+            return 다음Id;
+        }
 
         private static string HarvestLotStableId(string cultivationUnitStableId)
             => "harvest-lot:" + cultivationUnitStableId;

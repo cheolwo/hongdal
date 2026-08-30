@@ -67,6 +67,7 @@ public sealed class WorldInteractionDownwardModuleSkeletonTests
     {
         var expectedWiIds = new[]
         {
+            "WI-FARM-01", "WI-FARM-02", "WI-FARM-03",
             "WI-FARM-04", "WI-FARM-05", "WI-FARM-06",
             "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03",
             "WI-NATURE-04", "WI-NATURE-05", "WI-NATURE-06",
@@ -138,7 +139,8 @@ public sealed class WorldInteractionDownwardModuleSkeletonTests
         Assert.All(farmWorkMethods, item =>
         {
             Assert.Equal(SsalddelEvidenceStage.E2, item.EvidenceStage);
-            Assert.Equal(new[] { "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" },
+            Assert.Equal(new[] { "WI-FARM-01", "WI-FARM-02", "WI-FARM-03",
+                "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" },
                 item.WorldInteractionIds);
         });
 

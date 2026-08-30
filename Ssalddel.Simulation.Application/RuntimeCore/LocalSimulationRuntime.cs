@@ -70,7 +70,9 @@ namespace Ssalddel.Simulation.Application
                 authorityLocationCode:
                     SimulationAuthorityLocation.LocalProcess.ToString());
             farm = new SimulationFarmSurvivalService(sessionStore,
-                worldInteractionPipeline: worldInteractionPipeline);
+                worldInteractionPipeline: worldInteractionPipeline,
+                authorityLocationCode:
+                    SimulationAuthorityLocation.LocalProcess.ToString());
             regionalIncidents = new SimulationRegionalIncidentService(sessions,
                 worldInteractionPipeline);
         }

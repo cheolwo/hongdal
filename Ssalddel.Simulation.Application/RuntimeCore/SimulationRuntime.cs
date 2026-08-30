@@ -181,7 +181,8 @@ namespace Ssalddel.Simulation.Application
         "Farm WI Preview·Confirm을 공통 Runtime 경계로 노출한다.",
         Boundary = "Farm 규칙을 Adapter에서 다시 구현하지 않는다.",
         SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E2세계상호작용실행,
-        WorldInteractionIds = new[] { "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" })]
+        WorldInteractionIds = new[] { "WI-FARM-01", "WI-FARM-02", "WI-FARM-03",
+            "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" })]
     public interface ISimulationFarmWorldInteractionRuntime
     {
         [SsalddelEvidenceResponsibility(
@@ -206,7 +207,8 @@ namespace Ssalddel.Simulation.Application
             SsalddelEvidenceStage.E2,
             "Farm 작업 WI의 실행 가능성과 결과 후보를 검토한다.",
             Boundary = "공통 Farm 작업 Preview 포트다.",
-            WorldInteractionIds = new[] { "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" })]
+            WorldInteractionIds = new[] { "WI-FARM-01", "WI-FARM-02", "WI-FARM-03",
+                "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" })]
         ValueTask<SimulationFarmWorkPreviewSnapshot> PreviewFarmWorkAsync(
             string sessionStableId,
             SimulationFarmWorkPreviewRequest request,
@@ -215,7 +217,8 @@ namespace Ssalddel.Simulation.Application
             SsalddelEvidenceStage.E2,
             "Farm 작업 WI를 권위 Session에 확정한다.",
             Boundary = "공통 Farm 작업 Confirm 포트다.",
-            WorldInteractionIds = new[] { "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" })]
+            WorldInteractionIds = new[] { "WI-FARM-01", "WI-FARM-02", "WI-FARM-03",
+                "WI-FARM-04", "WI-FARM-05", "WI-FARM-06" })]
         ValueTask<SimulationFarmSurvivalStateSnapshot> ConfirmFarmWorkAsync(
             string sessionStableId,
             SimulationFarmWorkConfirmRequest request,

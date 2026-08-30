@@ -31,6 +31,122 @@ public sealed class SimulationWorldInteractionFarmSupplyTests
     private const string PreparationSoil = "soil:wi-farm:preparation-1";
     private const string FarmFence = "defense:wi-farm:fence-1";
 
+    [Theory]
+    [InlineData("LocalProcess", true)]
+    [InlineData("RemoteHost", true)]
+    [InlineData("LocalProcess", false)]
+    [InlineData("RemoteHost", false)]
+    public void 독립Farm_두주기는_기존Lot과_체력경계를보존하며_SaveReplay된다(
+        string 권위위치, bool 처음부터경작된밭)
+    {
+        var 요청 = CreateRequest();
+        요청.Settlement = null;
+        요청.NpcWorkforce = null;
+        요청.FarmSurvival!.CultivationUnits = Array.Empty<Simulation재배단위Snapshot>();
+        if (처음부터경작된밭)
+            요청.FarmSurvival.SoilTiles[0].StateCode = SimulationFarmSurvivalCodes.Tilled;
+        요청.SpatialWorld!.Definitions = 요청.SpatialWorld.Definitions
+            .Where(x => x.FacilityStableId == FarmFacility).ToArray();
+        var 저장소 = new InMemory경영SimulationSessionStore();
+        var 세션 = 저장소.CreateOrGet(요청);
+        var 추적 = new InMemorySimulationPlayableLoopEngineTraceSink();
+        var 서비스 = new SimulationFarmSurvivalService(저장소,
+            worldInteractionPipeline: new 세계상호작용실행Pipeline(추적),
+            authorityLocationCode: 권위위치);
+        var 이전Lot = string.Empty;
+
+        void 실행(string 명령, string 대상, string 행위, string 공간, string wi)
+        {
+            var 전 = 세션.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = "save:farm:preview", ExpectedRevision = 세션.Revision });
+            var 미리보기 = 서비스.PreviewWork(세션.SessionStableId,
+                Preview(세션.Revision, 대상, 행위, 공간));
+            Assert.True(미리보기.CanConfirm, string.Join(",", 미리보기.BlockingReasonCodes));
+            Assert.Equal(전.ReplayHash, 세션.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = 전.SaveStableId, ExpectedRevision = 세션.Revision }).ReplayHash);
+            var 확정요청 = Confirm(명령, 세션.Revision, 대상, 행위, 공간);
+            var 확정 = 서비스.ConfirmWork(세션.SessionStableId, 확정요청);
+            서비스.ConfirmWork(세션.SessionStableId, 확정요청);
+            Assert.Equal(확정.WorldRevision, 세션.Revision);
+            var 작업중 = 세션.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = "save:farm:working:" + 명령, ExpectedRevision = 세션.Revision });
+            var 시작기록 = Assert.Single(작업중.ActionManifestationLedger!.TailRecords,
+                x => x.CommandId == 명령);
+            Assert.DoesNotContain(작업중.PlayerDomainProfile!.기여기록들,
+                x => x.SourceActionRecordStableId == 시작기록.행위기록StableId);
+            var 복원 = SimulationSessionReplay.Restore(작업중);
+            Assert.Equal(작업중.ReplayHash, 복원.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = 작업중.SaveStableId, ExpectedRevision = 복원.Revision }).ReplayHash);
+            세션.Advance(Tick(명령 + ":tick", 세션.Revision));
+            복원.Advance(Tick(명령 + ":tick", 복원.Revision));
+            var 완료 = 세션.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = "save:farm:complete:" + 명령, ExpectedRevision = 세션.Revision });
+            서비스.ConfirmWork(세션.SessionStableId, 확정요청);
+            Assert.Equal(완료.ReplayHash, 세션.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = 완료.SaveStableId, ExpectedRevision = 세션.Revision }).ReplayHash);
+            Assert.Equal(완료.ReplayHash, 복원.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = 완료.SaveStableId, ExpectedRevision = 복원.Revision }).ReplayHash);
+            var 완료기록 = Assert.Single(완료.ActionManifestationLedger!.TailRecords,
+                x => x.CommandId == 명령 + ":completed");
+            Assert.Equal(wi, 완료기록.WorldInteractionId);
+            Assert.Contains(시작기록.행위기록StableId, 완료기록.SourceReferenceIds);
+            Assert.Equal(세션.Revision, 완료기록.AfterWorldRevision);
+            var 성장 = Assert.Single(완료.PlayerDomainProfile!.기여기록들,
+                x => x.SourceActionRecordStableId == 완료기록.행위기록StableId);
+            Assert.True(성장.현장숙련도증가량 > 0);
+            var 발현 = Assert.Single(완료.WorldInteractionManifestations,
+                x => x.OriginCommandId == 명령);
+            Assert.Equal(wi, 발현.WorldInteractionId);
+            Assert.Equal(SimulationWorldInteractionMaturityStateCodes.Manifested, 발현.StateCode);
+            Assert.NotEmpty(발현.ResultStateCodes);
+            var 기록 = 추적.Snapshot("playable-loop:farm-crop-cycle.v1", wi, 명령);
+            Assert.NotEmpty(기록);
+            Assert.All(기록, x => Assert.Equal(권위위치, x.AuthorityLocationCode));
+            var 완료복원 = SimulationSessionReplay.Restore(완료);
+            Assert.Equal(완료.ReplayHash, 완료복원.CreateSavePackage(new SimulationSessionSaveRequest
+            { SaveStableId = 완료.SaveStableId, ExpectedRevision = 완료복원.Revision }).ReplayHash);
+        }
+
+        if (!처음부터경작된밭)
+            실행("till", PreparationSoil, SimulationFarmSurvivalCodes.Tilling,
+                PyeongchangSimulation공간StableIds.대관령Farm밭갈이공간, "WI-FARM-01");
+        for (var 주기 = 1; 주기 <= 2; 주기++)
+        {
+            실행("sow:" + 주기, PreparationSoil, SimulationFarmSurvivalCodes.Sowing,
+                PyeongchangSimulation공간StableIds.대관령Farm파종공간, "WI-FARM-02");
+            var 재배 = Assert.Single(세션.GetFarmSurvivalState().CultivationUnits,
+                x => x.StateCode == Simulation재배단위상태Codes.Growing);
+            실행("care:" + 주기, 재배.CultivationUnitStableId, SimulationFarmSurvivalCodes.CropCare,
+                PyeongchangSimulation공간StableIds.대관령Farm재배관리공간, "WI-FARM-03");
+            if (주기 == 2 && !처음부터경작된밭)
+            {
+                // 7작업×15는 기존 체력100을 초과한다. 새 회복 규칙을 만들지 않는다.
+                var 전 = 세션.CreateSavePackage(new SimulationSessionSaveRequest
+                { SaveStableId = "save:farm:stamina", ExpectedRevision = 세션.Revision });
+                var 거부 = 서비스.PreviewWork(세션.SessionStableId, Preview(세션.Revision,
+                    재배.CultivationUnitStableId, SimulationFarmSurvivalCodes.Harvesting,
+                    PyeongchangSimulation공간StableIds.대관령Farm수확공간));
+                Assert.Contains("SimulationFarmActorStaminaInsufficient", 거부.BlockingReasonCodes);
+                Assert.Throws<SimulationConflictException>(() => 서비스.ConfirmWork(
+                    세션.SessionStableId, Confirm("harvest:2", 세션.Revision,
+                        재배.CultivationUnitStableId, SimulationFarmSurvivalCodes.Harvesting,
+                        PyeongchangSimulation공간StableIds.대관령Farm수확공간)));
+                Assert.Equal(전.ReplayHash, 세션.CreateSavePackage(new SimulationSessionSaveRequest
+                { SaveStableId = 전.SaveStableId, ExpectedRevision = 세션.Revision }).ReplayHash);
+                Assert.Equal(이전Lot, Assert.Single(세션.GetFarmSurvivalState().HarvestLots)
+                    .HarvestLotStableId);
+                break;
+            }
+            실행("harvest:" + 주기, 재배.CultivationUnitStableId, SimulationFarmSurvivalCodes.Harvesting,
+                PyeongchangSimulation공간StableIds.대관령Farm수확공간, "WI-FARM-04");
+            var 상태 = 세션.GetFarmSurvivalState();
+            Assert.Equal(주기, 상태.HarvestLots.Length);
+            Assert.All(상태.HarvestLots, x => Assert.Equal(300m, x.Quantity));
+            if (주기 == 1) 이전Lot = Assert.Single(상태.HarvestLots).HarvestLotStableId;
+            else Assert.Contains(상태.HarvestLots, x => x.HarvestLotStableId == 이전Lot);
+        }
+    }
+
     [Fact]
     public void WI_FARM_01_02_03은_밭갈이_파종_재배관리를_예약과상태전이로완료한다()
     {

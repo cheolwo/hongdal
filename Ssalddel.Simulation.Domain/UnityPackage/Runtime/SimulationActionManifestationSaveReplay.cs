@@ -52,7 +52,11 @@ namespace Ssalddel.Simulation.Domain
                                         StringComparison.Ordinal)
                                     && draft.PrimaryOutcomeCode.EndsWith(
                                         ":TaskStarted",
-                                        StringComparison.Ordinal));
+                                        StringComparison.Ordinal))
+                                && !((draft.WorldInteractionId is "WI-FARM-01"
+                                        or "WI-FARM-02" or "WI-FARM-03" or "WI-FARM-04")
+                                    && draft.PrimaryOutcomeCode.EndsWith(
+                                        ":TaskStarted", StringComparison.Ordinal));
             if (canApplyField)
                 draft.변화의미Codes = (draft.변화의미Codes
                         ?? Array.Empty<string>())
@@ -371,6 +375,12 @@ namespace Ssalddel.Simulation.Domain
         {
             if (record.결과분류Code == Simulation행위결과분류Codes.취소)
                 return "CancelledActionHasNoProgress";
+            if ((record.WorldInteractionId == "WI-FARM-01"
+                    || record.WorldInteractionId == "WI-FARM-02"
+                    || record.WorldInteractionId == "WI-FARM-03"
+                    || record.WorldInteractionId == "WI-FARM-04")
+                && record.PrimaryOutcomeCode.EndsWith(":TaskStarted", StringComparison.Ordinal))
+                return "FarmTaskAwaitingCompletion";
             if (!string.Equals(record.TriggerSourceCode,
                     SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
                     StringComparison.Ordinal))

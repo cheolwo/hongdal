@@ -81,6 +81,15 @@ namespace Ssalddel.Simulation.Application
 
         public static 세계상호작용ExecutionHead[] All { get; } = new[]
         {
+            Create("WI-FARM-01",
+                nameof(ISimulationFarmWorldInteractionRuntime.PreviewFarmWorkAsync),
+                nameof(ISimulationFarmWorldInteractionRuntime.ConfirmFarmWorkAsync)),
+            Create("WI-FARM-02",
+                nameof(ISimulationFarmWorldInteractionRuntime.PreviewFarmWorkAsync),
+                nameof(ISimulationFarmWorldInteractionRuntime.ConfirmFarmWorkAsync)),
+            Create("WI-FARM-03",
+                nameof(ISimulationFarmWorldInteractionRuntime.PreviewFarmWorkAsync),
+                nameof(ISimulationFarmWorldInteractionRuntime.ConfirmFarmWorkAsync)),
             Create("WI-FARM-04",
                 nameof(ISimulationFarmWorldInteractionRuntime.PreviewFarmWorkAsync),
                 nameof(ISimulationFarmWorldInteractionRuntime.ConfirmFarmWorkAsync)),

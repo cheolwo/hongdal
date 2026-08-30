@@ -32,15 +32,19 @@ namespace Ssalddel.Simulation.Application
         private readonly I경영SimulationSessionStore store;
         private readonly ISimulationBattleResourceLockReader? battleLocks;
         private readonly I세계상호작용실행Pipeline worldInteractions;
+        private readonly string 권위위치Code;
 
         public SimulationFarmSurvivalService(I경영SimulationSessionStore store,
             ISimulationBattleResourceLockReader? battleResourceLocks = null,
-            I세계상호작용실행Pipeline? worldInteractionPipeline = null)
+            I세계상호작용실행Pipeline? worldInteractionPipeline = null,
+            string authorityLocationCode = "RemoteHost")
         {
             this.store = store ?? throw new ArgumentNullException(nameof(store));
             battleLocks = battleResourceLocks;
             worldInteractions = worldInteractionPipeline
                 ?? new 세계상호작용실행Pipeline();
+            권위위치Code = string.IsNullOrWhiteSpace(authorityLocationCode)
+                ? "Unknown" : authorityLocationCode.Trim();
         }
 
         public SimulationFarmSurvivalStateSnapshot Get(string sessionStableId)
@@ -70,6 +74,9 @@ namespace Ssalddel.Simulation.Application
                 throw new SimulationConflictException("BattleResourceLocked");
             var worldInteractionId = request.ActionCode switch
             {
+                SimulationFarmSurvivalCodes.Tilling => "WI-FARM-01",
+                SimulationFarmSurvivalCodes.Sowing => "WI-FARM-02",
+                SimulationFarmSurvivalCodes.CropCare => "WI-FARM-03",
                 SimulationFarmSurvivalCodes.Harvesting => "WI-FARM-04",
                 SimulationFarmSurvivalCodes.HarvestCollection => "WI-FARM-05",
                 SimulationFarmSurvivalCodes.OutboundPacking => "WI-FARM-06",
@@ -81,7 +88,9 @@ namespace Ssalddel.Simulation.Application
             var preview = aggregate.PreviewFarmWork(
                 new SimulationFarmWorkPreviewRequest
                 {
-                    ExpectedRevision = request.ExpectedRevision,
+                    // 추적용 Preview가 이미 처리한 명령의 멱등 재요청을 막지 않는다.
+                    // 실제 ExpectedRevision·payload 검증은 아래 권위 Confirm이 한다.
+                    ExpectedRevision = aggregate.Revision,
                     ActorStableId = request.ActorStableId,
                     TargetStableId = request.TargetStableId,
                     ActionCode = request.ActionCode,
@@ -90,7 +99,10 @@ namespace Ssalddel.Simulation.Application
                 });
             var successor = worldInteractionId switch
             {
-                "WI-FARM-04" => "WI-FARM-05",
+                "WI-FARM-01" => "WI-FARM-02",
+                "WI-FARM-02" => "WI-FARM-03",
+                "WI-FARM-03" => "WI-FARM-04",
+                "WI-FARM-04" => "FarmHarvestChoiceAvailable",
                 "WI-FARM-05" => "WI-FARM-06",
                 _ => "FarmInternalStorageOrNextProductionCycle",
             };
@@ -106,10 +118,11 @@ namespace Ssalddel.Simulation.Application
                         request.TargetStableId, request.ActionCode,
                     },
                     TimeReferenceId = "simulation-time:world-tick",
-                    PlayableLoopStableId = worldInteractionId == "WI-FARM-04"
+                    PlayableLoopStableId = worldInteractionId is "WI-FARM-01"
+                        or "WI-FARM-02" or "WI-FARM-03" or "WI-FARM-04"
                         ? "playable-loop:farm-crop-cycle.v1"
                         : "playable-loop:farm-pack-store-return.v1",
-                    AuthorityLocationCode = "RemoteHost",
+                    AuthorityLocationCode = 권위위치Code,
                     SpatialEvidenceStateCode =
                         SimulationWorldInteractionSpatialEvidenceCodes.Bound,
                     SpatialEvidenceReferenceIds = new[]
