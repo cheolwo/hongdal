@@ -267,6 +267,9 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<ISimulation플레이어지식Store>(provider =>
             provider.GetRequiredService<InMemorySimulation플레이어지식Store>());
         services.AddSingleton<Simulation플레이어지식Service>();
+        services.AddSingleton<ISimulation공동체방문자체류Store,
+            InMemorySimulation공동체방문자체류Store>();
+        services.AddSingleton<Simulation공동체방문자체류Service>();
         services.AddSingleton<I세계상호작용실행Pipeline,
             세계상호작용실행Pipeline>();
         services.AddSingleton<SimulationNatureSurvivalService>();

@@ -117,6 +117,7 @@ namespace Ssalddel.Simulation.Application
         ISimulationNatureWorldInteractionRuntime NatureWorldInteractions { get; }
         ISimulationBattleRuntime Battles { get; }
         ISimulationPlayerKnowledgeRuntime PlayerKnowledge { get; }
+        ISimulation방문자체류Runtime CommunityVisitors { get; }
     }
 
     [SsalddelEvidenceResponsibility(
