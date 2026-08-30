@@ -22,13 +22,35 @@ public sealed class 수출항만인수학당PreviewAdapterTests
     }
 
     [Fact]
-    public void CARD_BIZ_1B_UnityRuntime은서버ContractAssembly를직접참조하지않는다()
+    public void CARD_BIZ_1B_수출항만Adapter는공통계약과별개로명시적Wire매핑을유지한다()
     {
-        var runtimeReferences = typeof(수출항만인수학당PreviewAdapter).Assembly
-            .GetReferencedAssemblies();
+        var method = typeof(수출항만인수학당PreviewAdapter).GetMethod("Map")!;
+        Assert.Equal(typeof(수출항만인수PreviewApiModel), method.GetParameters()[0].ParameterType);
+        Assert.Equal(typeof(저녁학당업무Preview보강Input), method.ReturnType);
 
-        Assert.DoesNotContain(runtimeReferences,
-            value => value.Name == "Ssalddel.Simulation.Contracts");
+        var pendingTypes = new Stack<Type>(new[] { typeof(수출항만인수PreviewApiModel) });
+        var visitedTypes = new HashSet<Type>();
+        while (pendingTypes.TryPop(out var type))
+        {
+            if (!visitedTypes.Add(type)) continue;
+            Assert.NotEqual("Ssalddel.Simulation.Contracts", type.Assembly.GetName().Name);
+            if (type.IsArray) pendingTypes.Push(type.GetElementType()!);
+            else if (type.Assembly == typeof(수출항만인수PreviewApiModel).Assembly)
+                foreach (var property in type.GetProperties()) pendingTypes.Push(property.PropertyType);
+        }
+    }
+
+    [Theory]
+    [InlineData("Ssalddel")]
+    [InlineData("Ssalddel.Simulation.Domain")]
+    [InlineData("Ssalddel.Simulation.Application")]
+    [InlineData("Ssalddel.Simulation.Persistence")]
+    [InlineData("Ssalddel.Simulation.Api")]
+    public void CARD_BIZ_1B_표현Assembly는권위실행Assembly를참조하지않는다(string forbiddenAssembly)
+    {
+        // 공유 DTO의 참조 허용과 Domain/Application/DB 실행 의존성은 별개다.
+        Assert.DoesNotContain(typeof(수출항만인수학당PreviewAdapter).Assembly.GetReferencedAssemblies(),
+            value => value.Name == forbiddenAssembly);
     }
 
     [Fact]

@@ -51,7 +51,7 @@ namespace Ssalddel.Unity.Learning
 
     /// <summary>
     /// Simulation수출항만인수PreviewSnapshot의 Unity transport projection입니다.
-    /// 서버 contract assembly를 runtime에서 직접 참조하지 않고 같은 JSON field를 명시적으로 매핑합니다.
+    /// 이 Adapter는 공유 계약을 사용하는 다른 표현 모듈과 별개로 자체 transport model에 같은 JSON field를 명시적으로 매핑합니다.
     /// </summary>
     public sealed class 수출항만인수PreviewApiModel
     {
