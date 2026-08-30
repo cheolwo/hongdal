@@ -1,0 +1,298 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-WOODCUTTING-ANIMATION",
+  "title": "D359 Nature 도끼 벌목 한 동작 제작·상태 연결",
+  "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+  "activeWorldInteractionId": "WI-NATURE-06",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E7",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E5",
+    "promotionBeyondStageAllowed": false,
+    "reason": "첫 제작/통합 전달은 E5 이내. 실제 입력·연속 화면 검증은 수행하되 기존 상한/E를 자동 승격하지 않는다."
+  },
+  "iterationState": {
+    "currentPass": "DownwardImpactReview",
+    "nextReopenCondition": "Required 연구/원본/Rig/접촉/중단 기준선 또는 뼈 작성 충돌은 해당 Presentation E1~E4에서 수정; 권위 의미 변화만 기획 반환"
+  },
+  "parentWorkOrderRef": "eng/execution-ledgers/work-orders/nature-logging-focus-meditation.e7-work-order.json",
+  "topicPlanningBinding": {
+    "designDocumentRef": "docs/Architecture/PlayableLoops/Nature도끼벌목오두막기초.md",
+    "designRevision": "nature-shelter-foundation.design.r1",
+    "designHashSha256": "27FA2C4E1945A9BF68E38D517BF28F1D2482FE098A7379662CDDCEFA81BB7407",
+    "statusCode": "Approved",
+    "boundary": "D360 형식 결속 복원. D359 범위/원문 hash 및 Required 연구 관문·기존 증거 보존"
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+    "designRevision": "nature-woodcutting-animation.design.r1",
+    "designHashSha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642",
+    "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md"
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "기존 나무 벌목 준비·접촉·반복·완료 및 취소 후 이동/Idle 복귀",
+    "requiredHCapabilities": [
+      "기존 Nature 나무 InteractionAnchor/도구 Socket"
+    ],
+    "visualKeys": [
+      "animation:nature:axe-swing"
+    ],
+    "primaryAssetCandidateRefs": [
+      "현재 Nature 플레이어/장착 도끼: 적용 연구에서 원본 GUID/hash 동결"
+    ],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [
+      "Assets/Ssalddel/Presentation/World/Nature감각표현Presenter.cs"
+    ],
+    "placementIntent": "기존 canonical Scene/Actor/나무 배치 유지",
+    "interactionAnchorIntent": "기존 나무 접촉과 손도끼 결합; 세부 기술값 연구 결속",
+    "candidateRevisionOrFingerprint": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642",
+    "e5ReadinessCode": "Blocked",
+    "openGapRefs": [
+      "WoodcuttingContactQualityUnverified",
+      "SingleBoneWriterBindingPending"
+    ]
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E7",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "ReusedWithVerification",
+          "summary": "기존 완료/취소 결과와 반복 입력을 재검증, 이번 E 승격 없음"
+        },
+        {
+          "code": "E6",
+          "disposition": "ReusedWithVerification",
+          "summary": "취소·이동 복귀가 기존 규칙을 바꾸지 않음"
+        },
+        {
+          "code": "E5",
+          "disposition": "ReusedWithVerification",
+          "summary": "동일 Task/행위/보상 계보 유지"
+        },
+        {
+          "code": "E4",
+          "disposition": "ReusedWithVerification",
+          "summary": "LocalProcess/RemoteHost 공통 Core 불변"
+        },
+        {
+          "code": "E3",
+          "disposition": "ReusedWithVerification",
+          "summary": "Animation Event에 권위 쓰기 없음·중복/복원 회귀"
+        },
+        {
+          "code": "E2",
+          "disposition": "ReusedWithVerification",
+          "summary": "4초 Task·단일 완료 결과 불변"
+        },
+        {
+          "code": "E1",
+          "disposition": "ReusedWithVerification",
+          "summary": "새 WI/보상/Save 변경 없음"
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E7",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Affected",
+          "summary": "실제 입력 반복·완료·중단 연속 Game View 및 저장 재진입 분리"
+        },
+        {
+          "code": "E6",
+          "disposition": "Affected",
+          "summary": "접촉·발 고정·전환·중단/복귀 판독"
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "동결 FBX/Clip·단일 뼈작성자·기존 Scene 실제 Task 연결"
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "Required 적용 연구·실제 Actor/도끼 GUID/hash/Rig/FPS/접촉 기준선"
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "격리 Clip/Adapter 시험·권위 불변·재조회/복원"
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "준비→접촉→복귀·root motion/도구 socket 소유"
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "D359 한 스윙 표현 개선, 한 스윙은 한그루 완료가 아님"
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E7",
+    "status": "InProgress",
+    "candidateRevision": "nature-woodcutting-animation.design.r1",
+    "evidenceRefs": [],
+    "openFeedbackRefs": [
+      "기존 루프 E7 사본 보존. D359 변경의 E7/제작/실행 성공 증거가 아님."
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-shelter-foundation.v1|WI-NATURE-06",
+    "profileRevision": "nature-woodcutting-animation-support.r1",
+    "logicStatusCode": "Pending",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E4",
+    "evidenceRefs": [],
+    "blockerCodes": [
+      "WoodcuttingContactQualityUnverified",
+      "SingleBoneWriterBindingPending"
+    ]
+  },
+  "requiredStudies": [
+    {
+      "studyStableId": "study:nature-woodcutting:animation.r1",
+      "requirementCode": "Required",
+      "statusCode": "Accepted",
+      "documentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-애니메이션적용연구.md",
+      "studyHashSha256": "01150E4ECEF8D281284AC3B3213ACFF0670C026F4202B4E4C0A6A7841387586B",
+      "scope": "5.1 A만: 기존 imported Clip 구간 재생/블렌드·상태/진행토큰·명시적 뼈작성자 인계·집중시험. B 신규키프레임/bake/FBX/자동 자세 보정은 미착수, 실제 벌목 접촉 품질 미통과"
+    }
+  ],
+  "supportImplementation": {
+    "statusCode": "ExistingClipIntegrationInProgress",
+    "reportedLoopStageIsInherited": true,
+    "earliestUnverifiedEvidenceStage": "E4",
+    "authorityChangesAllowed": false,
+    "saveChangesAllowed": false,
+    "externalWriteOwnership": [
+      {
+        "repositoryRoot": "C:/Users/user/ssalddel",
+        "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+        "writePaths": [
+          "ArtSource/Blender/source/NatureWoodcuttingD359",
+          "ArtSource/Blender/exports/NatureWoodcuttingD359",
+          "ArtSource/Blender/validation/NatureWoodcuttingD359",
+          "Assets/Ssalddel/Presentation/NatureWoodcutting",
+          "Assets/Ssalddel/Presentation/NatureWoodcutting.meta",
+          "Assets/Ssalddel/Editor/NatureWoodcuttingValidation",
+          "Assets/Ssalddel/Editor/NatureWoodcuttingValidation.meta"
+        ],
+        "condition": "Accepted 5.1 A의 Unity 전용 코드/시험만 착수. ArtSource는 예약만 유지; 새 .blend/FBX/Clip곡선 및 vendor/방문자 자산 변경 금지"
+      },
+      {
+        "repositoryRoot": "C:/Users/user/ssalddel",
+        "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+        "writePaths": [
+          "Assets/Ssalddel/Presentation/World/공용AnimationAdapter.cs",
+          "Assets/Ssalddel/Experiments - 연구/CityFarmWorldIntegration/Tests/Editor/공용AnimationOwnershipTests.cs",
+          "Assets/Ssalddel/Experiments - 연구/CityFarmWorldIntegration/Tests/Editor/공용AnimationOwnershipTests.cs.meta",
+          "Assets/Ssalddel/Presentation/World/Nature감각표현Presenter.cs",
+          "Assets/Ssalddel/Bootstrap/Nature감각표현AutoBootstrap.cs"
+        ],
+        "condition": "연구 Accepted 및 소스 hash 재대조 후 단일 뼈작성자/Task 읽기 연결만"
+      },
+      {
+        "repositoryRoot": "C:/Users/user/ssalddel",
+        "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+        "writePaths": [
+          "artifacts/local/validation/nature-woodcutting-d359"
+        ],
+        "condition": "동결 소스/Clip/Task 상태·입력 절차 전달 후 Editor 단일 점유; dirty/저장 소유 먼저 확인"
+      }
+    ]
+  },
+  "runtimeEvidenceRefs": [],
+  "sceneEvidenceRefs": [],
+  "gameViewEvidenceRefs": []
+}

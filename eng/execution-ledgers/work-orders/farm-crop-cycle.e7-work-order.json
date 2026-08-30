@@ -44,12 +44,23 @@
     "fallbackPresentationRefs": [
       "기존 지면+상태 Outline/UI: Synty 실물 증거 아님"
     ],
-    "placementIntent": "승인 연구의 강변 H2 동선과 H1 생산 밭을 현행 Cell/H/CompositionKey/pivot으로 변환한다.",
+    "placementIntent": "D-320 추가 승인 연구 r2에 따라 Barn/Player native 비율을 보존하고 실측 회전 외곽·Player 접근 여유로 새 후보의 예약부지·마당·통로를 조정한다. r1 후보 및 거부 회귀는 보존한다.",
     "interactionAnchorIntent": "기존 Player의 실제 접근과 Preview/Confirm 연결. 배치 엔진은 권위를 변경하지 않는다.",
     "candidateRevisionOrFingerprint": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0",
     "e5ReadinessCode": "Conditional",
     "openGapRefs": [
-      "호환 변환·실제 Bounds·통행·두 주기·저장 재진입 미검증"
+      "실측9자산·구후보16/16 예상 거부 확인. 확대 후보 생성·통로/지지면 검증·실제 Scene 결속은 미완료.",
+      "Session·새 밭 두 주기·저장 재진입 미검증"
+    ],
+    "approvedStudyRefs": [
+      {
+        "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
+        "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0"
+      },
+      {
+        "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+        "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5"
+      }
     ]
   },
   "trackPlans": {
@@ -250,6 +261,15 @@
   },
   "requiredStudies": [
     {
+      "studyStableId": "study:farm-crop-cycle:landscape-ls01.r1",
+      "documentRef": "docs/Architecture/PlayableLoops/Farm경관-LS01-공간배치연구.md",
+      "requirementCode": "Required",
+      "statusCode": "Accepted",
+      "sha256": "90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F",
+      "scope": "D362 동일조건 비교·보존/거부 기준과 미측정12자산 읽기 실측 절차만 수용. Q393~396 수관/빛/Sky/상태 공급은 기술 공백 유지. 후보 승인·새 코드·Scene 조립·E 승격 아님; Editor는 개발 별도 슬롯 인계 뒤 사용",
+      "domains": ["공간", "배치"]
+    },
+    {
       "studyStableId": "study:farm-crop-cycle:spatial-placement.r1",
       "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
       "statusCode": "Accepted",
@@ -259,10 +279,39 @@
         "배치",
         "애니메이션"
       ]
+    },
+    {
+      "studyStableId": "study:farm-crop-cycle:spatial-placement.r2",
+      "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+      "statusCode": "Accepted",
+      "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+      "domains": [
+        "공간",
+        "배치"
+      ]
+    }
+  ],
+  "additionalApprovals": [
+    {
+      "designDocumentRef": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
+      "designRevision": "landscape-composition.inquiry.r2",
+      "designHashSha256": "ABF57E4907FAC5A152EA08CFC5AAEAF24C172C0731809B0B6AAF7785131731EC",
+      "statusCode": "Approved",
+      "approvalEvidenceRef": "docs/AI/DECISIONS.md",
+      "boundary": "D362 LS01 전체 방향 승인. 기존 Farm/확대연구r2/native크기/하천/통행/생산권위 불변, 구체 후보 시각승인·E 완료 아님. 먼저 Required 경관 연구 기준선 작성/검토"
+    },
+    {
+      "designDocumentRef": "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md",
+      "designRevision": "farm-life-delegation.fb01-addendum.r1",
+      "designHashSha256": "0D7F68CABCC68206AA78621EB2B700C4E70D5B9868F27DAD97332BCEAB9308A8",
+      "statusCode": "Approved",
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-fb01-harvest-delegation.e7-work-order.json",
+      "boundary": "D357 첫 지정밭 수확/보관·권한 정책부터. 기존 기획/연구/E 보존, 수확 지연곡선·피해 시험값을 확정하지 않는다."
     }
   ],
   "e5Execution": {
     "statusCode": "E5Pending",
+    "sceneValidationDispatchRef": "docs/Reports/FarmH2-D320-실제화면검증인계-2026-08-30.md",
     "dispatchRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md",
     "saveVersionReservation": {
       "baseline": "simulation-save.v29",
@@ -270,7 +319,8 @@
       "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
       "sharedBy": [
         "WI-ACTOR-03",
-        "WI-COMMUNITY-VISITOR-STAY"
+        "WI-COMMUNITY-VISITOR-STAY",
+        "WI-FARM-01"
       ],
       "preserveLegacyReadAndHash": true
     },
@@ -287,7 +337,7 @@
       "sceneVerified": false,
       "newSoilTwoCycleVerified": false,
       "preTilledTwoCycleVerified": true,
-      "blocker": "StaminaRecoveryRulesAwaitApprovedRevision"
+      "blocker": "StaminaAuthorityTimeActivitySessionBindingNotVerified"
     }
   },
   "wiExecutionSequence": [
@@ -295,5 +345,70 @@
     "WI-FARM-02",
     "WI-FARM-03",
     "WI-FARM-04"
-  ]
+  ],
+  "additionalApprovedWorkOrders": [
+    {
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-stamina-natural-recovery.e7-work-order.json",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/플레이어행동체력자연회복.md",
+        "designRevision": "player-stamina-natural-recovery.design.r1",
+        "designHashSha256": "ABA23E2CA9A0B48181D830539445C8EBA78CC2FB0E30255A9694ED2A3E5294BD",
+        "approvalEvidenceRef": "docs/AI/DECISIONS.md#d-319-행동-체력-자연-회복을-독립된-첫-실행-범위로-승인한다"
+      },
+      "scope": "자동 진행의 행동 체력 자연 회복 지원. 기존 WI01~04 유지.",
+      "targetTrackCode": "Logic",
+      "deliveryCap": "E5",
+      "promotionBeyondStageAllowed": false
+    }
+  ],
+  "landscapeConsumptionBinding": {
+    "decisionCode": "D-363",
+    "statusCode": "ImplementationInProgress",
+    "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "studyRef": "docs/Architecture/PlayableLoops/Farm경관-LS01-공간배치연구.md",
+    "studySha256": "90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F",
+    "candidateRevision": "farm-landscape-ls01.flat-ab.r1",
+    "candidateFileSha256": "3E2D3C7B395CB4B1622D5B7B38971CB84A66B69B1D3CA50ACC4F8062C79C97DE",
+    "intakeManifestSha256": "B3AE1C730AD3C9D115ED6D409DA22092D313CA7F05402B5719F3E4DBD0E22CE2",
+    "writePaths": [
+      "Ssalddel.Simulation.Application/Simulation경관배치소비검증Service.cs",
+      "Ssalddel.Simulation.Tests/Simulation경관배치소비검증Tests.cs",
+      "docs/Reports/Farm경관-LS01-배치소비경계-개발검토-2026-08-30.md"
+    ],
+    "scope": "기존 공통 배치 계획의 정규형hash/기대ID/등록CompositionKey/OwnerCell/상위H계보/Environment·Ambient·PresentationOnly/nativeScale1/유한TRS를 순수 검증하고 실제 조립에서 확인할 기대ID 사본을 반환한다. 성공은 BindingVerified만 의미하며 지지면·통로·겹침·실물 발현 성공을 대신하지 않는다. 원A 보존과 미등록·누락·중복·잘못된 소유·손상hash 거부를 집중시험한다.",
+    "excluded": ["B 후보 승인", "원A 변경", "공통 FarmH2 검사 완화", "새 LH/Save/게임규칙", "지지면·통행 성공 추정", "Unity/Scene 조립", "E 자동승격"],
+    "followUp": "공간 단일Prefab/구성키·소유·실측지지면 대응표와 공통 검사 재사용을 결속한 뒤 B 실제 변환·지면검사·조립을 순차 연결한다.",
+    "automaticEvidencePromotionAllowed": false
+  },
+  "landscapeComparisonPreparation": {
+    "decisionCode": "D-362",
+    "statusCode": "DataOnlyCandidateReceived",
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "studyRef": "docs/Architecture/PlayableLoops/Farm경관-LS01-공간배치연구.md",
+    "studySha256": "90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F",
+    "measurementSha256": "63150068BB9B76E84565F4427EA442AD208A72F051E8E73C8D2DEECE52323C90",
+    "measurementManifestSha256": "EA073E1C0A214073780AA72E13406F1106C04464DAE17937ADDF4340C269E4A6",
+    "sourceReportRef": "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md",
+    "sourceReportSha256AtIntake": "392AE40F38B43A7FB86E652DC22819F7086C0ADAE9D2F2DCFAFBCF433684A921",
+    "outputArtifactRoot": "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/comparison-preparation/",
+    "scope": "Q387~392의 데이터 전용 A/B 후보 준비. A는 D320 평지 Barn01 동결계획을 불변 참조, B는 별도 비권위 장식 변화분. 기존 치수/통로/하천/H소유/생산100제곱미터/Scale1 보존. 실측 pivot/회전외곽과 보호마스크·통행 여유 검사를 재사용하고 부족한 지지면/호환 근거는 차단으로 반환",
+    "candidateStatusCode": "UnapprovedCandidate",
+    "excluded": ["canonical 또는 PreviewScene 조립", "새 Unity 프로젝트 코드", "공통 계약/Adapter 변경", "원후보/공급자 원본 수정", "Q393~396 지원 완료 주장", "권위 상태/Save 변경", "GameView 및 E 승격"],
+    "requiresSeparateEditorLease": true,
+    "automaticEvidencePromotionAllowed": false
+  },
+  "spatialSupportDispatch": {
+    "decisionCode": "D-320",
+    "studyRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+    "studySha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+    "statusCode": "Assigned",
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "candidateStatusCode": "PendingGeneration",
+    "preserveOriginalCandidate": true,
+    "preserveNativeAssetAndPlayerScale": true,
+    "preserveProductionAreaSquareMeters": 100,
+    "sceneIntegrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "automaticEvidencePromotionAllowed": false
+  }
 }

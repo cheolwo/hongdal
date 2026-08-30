@@ -1,0 +1,258 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-FARM-FB01-HARVEST-DELEGATION",
+  "title": "FB01 수확 수용량·지정 위임 경계 — 첫 정책 시험",
+  "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+  "activeWorldInteractionId": "WI-FARM-04",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E5",
+    "promotionBeyondStageAllowed": false,
+    "reason": "D357 추가 승인. 기존 Farm E5 상한 유지, 첫 수용량·권한·중단 판단 지원부터. 실제 완료/저장/표현 승격 없음."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "NotApplicable",
+    "notApplicableReason": "첫 정책 계산 지원에만 해당. 실제 집하점/후퇴/무기고 표현은 기존 및 추가 Accepted 연구 결속 후 별도.",
+    "playerReadableMoment": "이번에는 순수 계산만 검증",
+    "requiredHCapabilities": [],
+    "visualKeys": [],
+    "primaryAssetCandidateRefs": [],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [],
+    "placementIntent": "이번 없음",
+    "interactionAnchorIntent": "이번 없음",
+    "candidateRevisionOrFingerprint": "0D7F68CABCC68206AA78621EB2B700C4E70D5B9868F27DAD97332BCEAB9308A8",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "실제 보관처/일정/안전경로/NPC 장착·이동 표현 연결"
+    ]
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "최종 Farm 독립 반복플레이 목표 유지, 이번 제외"
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "이번 제외"
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "부분수확·지정보관·Session/Save/실제 NPC 동작 검증, 곡선미정 분리"
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "Session Actor·용량·위임권한 실제상태/LocalRemote 결속"
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "순수 정책과 기존 Preview 재사용 거부/무변경 시험. 실제 Confirm/부분수확 원자성은 후속"
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "완료단위 수용량 보존·지정밭1회·권한 밖 변경 중단 규칙"
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "기존 Farm Preview와 완료단위/지정보관/사전권한 범위 연결"
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation농사수확위임Contracts.cs"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation농사수확위임.cs"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "InProgress",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation농사수확위임Tests.cs",
+            "test:Simulation농사수확위임Tests:54/54"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "첫 계산 지원은 비시각. FB01 집하/이동/위험대응 표현은 Required 연구·Logic 준비 후 별도 결속."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "첫 계산 지원은 비시각. FB01 집하/이동/위험대응 표현은 Required 연구·Logic 준비 후 별도 결속."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "첫 계산 지원은 비시각. FB01 집하/이동/위험대응 표현은 Required 연구·Logic 준비 후 별도 결속."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "첫 계산 지원은 비시각. FB01 집하/이동/위험대응 표현은 Required 연구·Logic 준비 후 별도 결속."
+        },
+        {
+          "code": "E3",
+          "disposition": "Blocked",
+          "summary": "첫 계산 지원은 비시각. FB01 집하/이동/위험대응 표현은 Required 연구·Logic 준비 후 별도 결속."
+        },
+        {
+          "code": "E2",
+          "disposition": "Blocked",
+          "summary": "첫 계산 지원은 비시각. FB01 집하/이동/위험대응 표현은 Required 연구·Logic 준비 후 별도 결속."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "첫 계산 지원은 비시각. FB01 집하/이동/위험대응 표현은 Required 연구·Logic 준비 후 별도 결속."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "NotStarted",
+    "candidateRevision": "farm-life-delegation.fb01-addendum.r1",
+    "evidenceRefs": [],
+    "openFeedbackRefs": [
+      "부모 LogicE3/P1 사본이며 FB01 전체 기능 증거가 아니다. 순수 정책 54개 시험, 실제 부분수확·운반 Confirm/Session 연결 미완료."
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:farm-crop-cycle.v1|WI-FARM-04",
+    "profileRevision": "farm-fb01-harvest-delegation-support.r1",
+    "logicStatusCode": "Pending",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E3",
+    "evidenceRefs": [],
+    "blockerCodes": [
+      "PartialHarvestCommandAtomicityNotImplemented",
+      "DelegationSessionStorageBindingPending"
+    ]
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md",
+    "designRevision": "farm-life-delegation.fb01-addendum.r1",
+    "designHashSha256": "0D7F68CABCC68206AA78621EB2B700C4E70D5B9868F27DAD97332BCEAB9308A8",
+    "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md"
+  },
+  "requiredStudies": [],
+  "parentWorkOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+  "supportImplementation": {
+    "statusCode": "Partial",
+    "reportedLoopStageIsInherited": true,
+    "ruleImplementationStatusCode": "Implemented",
+    "earliestUnverifiedEvidenceStage": "E3",
+    "focusedTestsPassed": 54,
+    "reportRef": "docs/Reports/농사수확위임-FB01-첫정책구현-2026-08-30.md",
+    "scope": "기존 WI-FARM-04 Preview 결과에 수용량/지정1회위임 경계를 적용하는 순수 정책. 실제 수확량/Lot/재고/명령을 변경하지 않는다.",
+    "excludedFromFirstBatch": [
+      "지연손실/밟힘 피해 수치",
+      "실제 구매/외상",
+      "훈련 NPC 장착/전투",
+      "Session/Save/Scene/부분수확 Confirm"
+    ]
+  },
+  "e5Execution": {
+    "statusCode": "E5Pending",
+    "dispatchRef": "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md",
+    "runtimeEvidenceRefs": [],
+    "sceneEvidenceRefs": [],
+    "gameViewEvidenceRefs": []
+  }
+}

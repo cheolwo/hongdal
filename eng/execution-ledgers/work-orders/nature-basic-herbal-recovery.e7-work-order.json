@@ -278,6 +278,16 @@
       ]
     }
   ],
+  "additionalApprovals": [
+    {
+      "designDocumentRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
+      "designRevision": "nature-herbal-tea.hb01-addendum.r1",
+      "designHashSha256": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6",
+      "statusCode": "Approved",
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-herbal-hb01-contents.e7-work-order.json",
+      "boundary": "D356 명시 범위만 추가 승인. 기존 지식 r5/hash 및 현재 E4 유지. 첫 내용물 지원 계산이며 전체 채집/달임/섭취 완료 아님."
+    }
+  ],
   "e5Execution": {
     "statusCode": "E5Pending",
     "dispatchRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md",

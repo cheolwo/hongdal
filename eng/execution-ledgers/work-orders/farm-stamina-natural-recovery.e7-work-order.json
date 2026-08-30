@@ -1,0 +1,265 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-FARM-STAMINA-NATURAL-RECOVERY",
+  "title": "Farm 행동 체력 자연 회복 — D-319 독립 논리 작업",
+  "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+  "activeWorldInteractionId": "WI-FARM-01",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E5",
+    "promotionBeyondStageAllowed": false,
+    "reason": "D-319 자연 회복만 Logic E5까지. 휴식·열원·마나·포션·성장·새 UI/Scene 제외. 표현 자동 승격 금지."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "NotApplicable",
+    "notApplicableReason": "권위 자연 회복 지원 규칙이며 새 시각/공간/입력은 승인 밖. 기존 Farm 공간 연구·표현 상한은 부모 명세에서 유지.",
+    "playerReadableMoment": "기존 Farm 상태 재조회에서 행동 체력을 읽고 다음 작업을 선택.",
+    "requiredHCapabilities": [],
+    "visualKeys": [],
+    "primaryAssetCandidateRefs": [],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [],
+    "placementIntent": "새 배치 없음",
+    "interactionAnchorIntent": "새 Anchor 없음",
+    "candidateRevisionOrFingerprint": "ABA23E2CA9A0B48181D830539445C8EBA78CC2FB0E30255A9694ED2A3E5294BD",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "기존 Farm 표현은 부모 명세에서 검증"
+    ]
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "최종 Farm 폐루프 방향 보존. 이번 새 UI/Scene·입력·Game View 제외."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "이번 승인 제외. 체감 난이도/피드백은 후속."
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "같은 Session 비용15 유지, 새 밭 두 주기·Lot 보존·재조회·공동 v30 Save/Replay 검증."
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "실제 신뢰된 시간/활동 연결과 같은 Core LocalProcess/RemoteHost 동등성. 모르는 활동은 차단."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "무변경 판독·정산 중복/과거 구간 거부·분할 잔여·경과0·경계 자동시험."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "걷기/대기만 회복, 노동/질주/전투 중단, 겹친 금지 상태·지연0·상한100 결정 규칙."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "동일 Actor·정수 권위 밀리초·활동 허용/금지·범위·소수 잔여 계약."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 표현 유지. 새 UI·Scene·배치·애니메이션은 D-319 범위 밖."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 표현 유지. 새 UI·Scene·배치·애니메이션은 D-319 범위 밖."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 표현 유지. 새 UI·Scene·배치·애니메이션은 D-319 범위 밖."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 표현 유지. 새 UI·Scene·배치·애니메이션은 D-319 범위 밖."
+        },
+        {
+          "code": "E3",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 표현 유지. 새 UI·Scene·배치·애니메이션은 D-319 범위 밖."
+        },
+        {
+          "code": "E2",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 표현 유지. 새 UI·Scene·배치·애니메이션은 D-319 범위 밖."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "기존 Farm 표현 유지. 새 UI·Scene·배치·애니메이션은 D-319 범위 밖."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/플레이어행동체력자연회복.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "NotStarted",
+    "candidateRevision": "player-stamina-natural-recovery.design.r1",
+    "evidenceRefs": [],
+    "openFeedbackRefs": [
+      "권위 시간·동일 Actor 활동 연결 및 Session/Save 미검증"
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:farm-crop-cycle.v1|WI-FARM-01",
+    "profileRevision": "farm-crop-cycle.engine-interaction.r1",
+    "logicStatusCode": "Pending",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E1",
+    "evidenceRefs": [],
+    "blockerCodes": [
+      "AuthorityTimeActorActivityBindingNotVerified"
+    ]
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/플레이어행동체력자연회복.md",
+    "designRevision": "player-stamina-natural-recovery.design.r1",
+    "designHashSha256": "ABA23E2CA9A0B48181D830539445C8EBA78CC2FB0E30255A9694ED2A3E5294BD",
+    "approvalEvidenceRef": "docs/AI/DECISIONS.md#d-319-행동-체력-자연-회복을-독립된-첫-실행-범위로-승인한다"
+  },
+  "requiredStudies": [],
+  "e5Execution": {
+    "statusCode": "E5Pending",
+    "dispatchRef": "docs/Architecture/PlayableLoops/플레이어행동체력자연회복.md",
+    "saveVersionReservation": {
+      "baseline": "simulation-save.v29",
+      "reserved": "simulation-save.v30",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "sharedBy": [
+        "WI-ACTOR-03",
+        "WI-COMMUNITY-VISITOR-STAY",
+        "WI-FARM-01"
+      ],
+      "preserveLegacyReadAndHash": true,
+      "implementationStatusCode": "ReservedNotImplemented"
+    },
+    "runtimeEvidenceRefs": [],
+    "sceneEvidenceRefs": [],
+    "gameViewEvidenceRefs": []
+  },
+  "supportsWorldInteractionIds": [
+    "WI-FARM-01",
+    "WI-FARM-02",
+    "WI-FARM-03",
+    "WI-FARM-04"
+  ],
+  "parentWorkOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+  "supportImplementation": {
+    "statusCode": "Partial",
+    "reportedLoopStageIsInherited": true,
+    "ruleImplementationStatusCode": "Implemented",
+    "focusedTestsPassed": 42,
+    "focusedTestsRef": "artifacts/local/validation/stamina-natural-recovery-20260830/natural-recovery-core.trx",
+    "sessionIntegrationStatusCode": "NotImplemented",
+    "saveReplayStatusCode": "NotImplemented",
+    "localRemoteStatusCode": "NotVerified",
+    "earliestUnverifiedEvidenceStage": "E3",
+    "reason": "currentEvidenceStage E3는 기존 Farm 폐루프의 원장 사본이며 자연 회복 E3 완료가 아니다. 순수 규칙 시험만 통과했고 Confirm/행위 원자성·실제 시간/활동 연결은 남아 있다."
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-HERBAL-HB01-CONTENTS",
+  "title": "HB01 용기 내용물 공통 계산 지원 — 첫 독립 규칙 시험",
+  "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+  "activeWorldInteractionId": "WI-ACTOR-03",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E5",
+    "promotionBeyondStageAllowed": false,
+    "reason": "D356 추가 승인. 첫 지원 계산 묶음 E3 시험부터, 실제 WI 발현/Session/Save/표현 별도."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "NotApplicable",
+    "notApplicableReason": "첫 공통 계산 지원 묶음에만 해당. HB01 전체 표현은 Required 연구/준비 Accepted 후 별도 결속.",
+    "playerReadableMoment": "이번에는 순수 계산만 검증",
+    "requiredHCapabilities": [],
+    "visualKeys": [],
+    "primaryAssetCandidateRefs": [],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [],
+    "placementIntent": "이번 없음",
+    "interactionAnchorIntent": "이번 없음",
+    "candidateRevisionOrFingerprint": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "HB01 전체 용기/열원/섭취 공간 및 음용 중단 표현 연구 결속 필요"
+    ]
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "최종 약초 반복 플레이 목표 유지, 이번 제외"
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "이번 제외"
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "현재 Save 판본 및 실제 용기/열원/섭취 발현. 기존 연구 재사용/부족 연구 결속 후 진행"
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "같은 Session/Actor/권위 시간과 Local/Remote 동일 Core"
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "거부·무변경·경계·불변 사본 집중시험. Command/행위 원자성은 후속 연결"
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "동종 전송 총량/계보 보존과 정수 반올림, 부분 음용 계산"
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "물 보관 능력·최대/현재 mL·처방/효과판본·온도·제조출처 계약"
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation용기내용물Contracts.cs"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation용기내용물.cs"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "InProgress",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation용기내용물Tests.cs",
+            "test:Simulation용기내용물Tests:44/44"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+        },
+        {
+          "code": "E3",
+          "disposition": "Blocked",
+          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+        },
+        {
+          "code": "E2",
+          "disposition": "Blocked",
+          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E4",
+    "status": "NotStarted",
+    "candidateRevision": "nature-herbal-tea.hb01-addendum.r1",
+    "evidenceRefs": [],
+    "openFeedbackRefs": [
+      "E4는 부모 폐루프 사본이며 HB01 신규 기능 증거가 아니다. 지원 계산부터 구현."
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-basic-herbal-recovery.v1|WI-ACTOR-03",
+    "profileRevision": "nature-herbal-hb01-support.r1",
+    "logicStatusCode": "Pending",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E3",
+    "evidenceRefs": [],
+    "blockerCodes": [
+      "CommandActionAtomicityNotImplemented",
+      "SessionSaveBindingPending"
+    ]
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
+    "designRevision": "nature-herbal-tea.hb01-addendum.r1",
+    "designHashSha256": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6",
+    "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md"
+  },
+  "requiredStudies": [],
+  "parentWorkOrderRef": "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json",
+  "supportImplementation": {
+    "statusCode": "Partial",
+    "reportedLoopStageIsInherited": true,
+    "scope": "용기 내용물 순수 계산 지원. WI-ACTOR-03은 부모 작업 연결 표시이며 지식습득을 전송/섭취 명령으로 전용하지 않는다.",
+    "futureConsumers": [
+      "WI-ACTOR-CONSUME",
+      "WI-CRAFT-BREW"
+    ],
+    "excludedFromFirstBatch": [
+      "새 실행 WI/명령 등록",
+      "Application 원자적 Confirm/행위 기록",
+      "가열/연료/권위 시간",
+      "Session/Save/RemoteHost/Scene"
+    ],
+    "earliestUnverifiedEvidenceStage": "E3",
+    "ruleImplementationStatusCode": "Implemented",
+    "focusedTestsPassed": 44,
+    "focusedTestsRef": "artifacts/local/validation/hb01-contents/hb01-contents-final.trx",
+    "reportRef": "docs/Reports/약초내용물-HB01-첫규칙구현-2026-08-30.md",
+    "remaining": "Application Confirm/멱등/경합/행위기록 및 음용/가열/시간·Session/Save는 미구현. 순수 계산을 전체 WI E3로 승격하지 않는다."
+  },
+  "e5Execution": {
+    "statusCode": "E5Pending",
+    "dispatchRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
+    "runtimeEvidenceRefs": [],
+    "sceneEvidenceRefs": [],
+    "gameViewEvidenceRefs": []
+  }
+}

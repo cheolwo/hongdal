@@ -1,6 +1,6 @@
 {
   "schemaVersion": "codex-playable-loop-goals.v4",
-  "revision": "codex-playable-loop-goals.r41",
+  "revision": "codex-playable-loop-goals.r60",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "worldInteractionDeliveryPriorityPath": "eng/execution-ledgers/world-interaction-delivery-priorities.json",
   "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
@@ -34,16 +34,46 @@
     "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
     "goalWorkInProgressLimit": null,
     "worldInteractionWorkInProgressLimit": null,
-    "allowedMaturityTrackCodes": ["Logic", "Presentation"],
+    "allowedMaturityTrackCodes": [
+      "Logic",
+      "Presentation"
+    ],
     "defaultPlayerTargetEvidenceStage": "E7",
     "e9AllowedAsGoalTarget": false,
-    "areaContinuityOrderCodes": ["Nature", "Farm", "Hub", "Town", "City"],
-    "goalReplacementTriggerCodes": ["PlayerPromiseChanged", "IndependentPlayableLoopSelected"],
-    "allowedPipelineGateStatusCodes": ["Pending", "Passed", "Blocked", "Stale"],
-    "allowedActivePlanningStatusCodes": ["Approved", "LegacyActiveMigration"]
+    "areaContinuityOrderCodes": [
+      "Nature",
+      "Farm",
+      "Hub",
+      "Town",
+      "City"
+    ],
+    "goalReplacementTriggerCodes": [
+      "PlayerPromiseChanged",
+      "IndependentPlayableLoopSelected"
+    ],
+    "allowedPipelineGateStatusCodes": [
+      "Pending",
+      "Passed",
+      "Blocked",
+      "Stale"
+    ],
+    "allowedActivePlanningStatusCodes": [
+      "Approved",
+      "LegacyActiveMigration"
+    ]
   },
-  "allowedGoalStateCodes": ["Active", "Queued", "WaitingForDecision", "Blocked", "Completed", "Deferred"],
-  "allowedCompletionRoleCodes": ["Core", "Extension"],
+  "allowedGoalStateCodes": [
+    "Active",
+    "Queued",
+    "WaitingForDecision",
+    "Blocked",
+    "Completed",
+    "Deferred"
+  ],
+  "allowedCompletionRoleCodes": [
+    "Core",
+    "Extension"
+  ],
   "activeGoal": {
     "loopStableId": "playable-loop:nature-night-day2.v1",
     "targetEvidenceStage": "E7",
@@ -72,6 +102,251 @@
     }
   },
   "workItems": [
+    {
+      "workItemId": "work:farm-crop-cycle:landscape-binding-guard",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-01",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Simulation.Application/Simulation경관배치소비검증Service.cs",
+        "Ssalddel.Simulation.Tests/Simulation경관배치소비검증Tests.cs",
+        "docs/Reports/Farm경관-LS01-배치소비경계-개발검토-2026-08-30.md"
+      ],
+      "sharedContractKeys": ["landscape-placement-binding-validation"],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
+          "sha256": "ABF57E4907FAC5A152EA08CFC5AAEAF24C172C0731809B0B6AAF7785131731EC"
+        },
+        {
+          "path": "docs/Architecture/PlayableLoops/Farm경관-LS01-공간배치연구.md",
+          "sha256": "90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "designRevision": "farm-crop-cycle.design.r1",
+        "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+        "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      }
+    },
+    {
+      "workItemId": "work:farm-crop-cycle:landscape-ls01-study",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-01",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "docs/Architecture/PlayableLoops/Farm경관-LS01-공간배치연구.md",
+        "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md"
+      ],
+      "sharedContractKeys": ["farm-landscape-ls01-study"],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
+          "sha256": "ABF57E4907FAC5A152EA08CFC5AAEAF24C172C0731809B0B6AAF7785131731EC"
+        },
+        {
+          "path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "designRevision": "farm-crop-cycle.design.r1",
+        "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+        "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      }
+    },
+    {
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionId": "WI-NATURE-06",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+          "sha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
+      "workOrderSha256": "774CCA01E9C4725B013B7CFE75092ED520FFEF120DB94C44FE46D6A350BF92B1",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+        "designRevision": "nature-woodcutting-animation.design.r1",
+        "designHashSha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642",
+        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md"
+      },
+      "workItemId": "work:nature-shelter:woodcutting-animation-integration",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "writePaths": [
+        "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
+        "docs/Reports/Nature벌목동작-D359-개발통합-2026-08-30.md"
+      ],
+      "sharedContractKeys": [
+        "nature-woodcutting-common-bone-writer"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionId": "WI-NATURE-06",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+          "sha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
+      "workOrderSha256": "774CCA01E9C4725B013B7CFE75092ED520FFEF120DB94C44FE46D6A350BF92B1",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+        "designRevision": "nature-woodcutting-animation.design.r1",
+        "designHashSha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642",
+        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md"
+      },
+      "workItemId": "work:nature-shelter:woodcutting-animation-production",
+      "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+      "writePaths": [
+        "docs/Architecture/PlayableLoops/Nature벌목동작-애니메이션적용연구.md",
+        "docs/Reports/Nature벌목동작-D359-제작인계-2026-08-30.md"
+      ],
+      "sharedContractKeys": [
+        "nature-woodcutting-art-source"
+      ]
+    },
+    {
+      "workItemId": "work:farm-crop-cycle:fb01-harvest-delegation",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-04",
+      "trackCode": "Logic",
+      "targetEvidenceStageCode": "E3",
+      "statusCode": "Active",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation농사수확위임Contracts.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation농사수확위임Contracts.cs.meta",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation농사수확위임.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation농사수확위임.cs.meta",
+        "Ssalddel.Simulation.Tests/Simulation농사수확위임Tests.cs",
+        "docs/Reports/농사수확위임-FB01-첫정책구현-2026-08-30.md"
+      ],
+      "sharedContractKeys": [
+        "farm-fb01-harvest-delegation-policy"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md",
+          "sha256": "0D7F68CABCC68206AA78621EB2B700C4E70D5B9868F27DAD97332BCEAB9308A8"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-fb01-harvest-delegation.e7-work-order.json",
+      "workOrderSha256": "438C600EAFCE605762414772B8DECE8B0BD4F927745EEEDD8A1455BCE10949D6",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md",
+        "designRevision": "farm-life-delegation.fb01-addendum.r1",
+        "designHashSha256": "0D7F68CABCC68206AA78621EB2B700C4E70D5B9868F27DAD97332BCEAB9308A8",
+        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Farm생활위임-FB01개발승인보완.md"
+      }
+    },
+    {
+      "workItemId": "work:nature-basic-herbal-recovery:hb01-contents",
+      "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionId": "WI-ACTOR-03",
+      "trackCode": "Logic",
+      "targetEvidenceStageCode": "E3",
+      "statusCode": "Active",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation용기내용물Contracts.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation용기내용물Contracts.cs.meta",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation용기내용물.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation용기내용물.cs.meta",
+        "Ssalddel.Simulation.Tests/Simulation용기내용물Tests.cs",
+        "docs/Reports/약초내용물-HB01-첫규칙구현-2026-08-30.md"
+      ],
+      "sharedContractKeys": [
+        "herbal-hb01-content-calculation"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
+          "sha256": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-herbal-hb01-contents.e7-work-order.json",
+      "workOrderSha256": "B159468E01B0814BDA88C2CAA5A66B69EA3296B35508AC2B56FEB8EDA2B3D639",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
+        "designRevision": "nature-herbal-tea.hb01-addendum.r1",
+        "designHashSha256": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6",
+        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md"
+      }
+    },
+    {
+      "workItemId": "work:nature-camp-visitor-stay:local-npc-dialogue",
+      "loopStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "worldInteractionId": "WI-COMMUNITY-VISITOR-STAY",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E3",
+      "statusCode": "ReadyForIntegration",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "eng/execution-ledgers/work-orders/local-npc-dialogue-foundation.e7-work-order.json",
+        "docs/Reports/로컬Npc대화지원-D337-구현-2026-08-30.md"
+      ],
+      "sharedContractKeys": [
+        "local-npc-dialogue-foundation",
+        "unity-packages-local-npc-dialogue"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/로컬Npc대화지원기반.md",
+          "sha256": "D50F932811D0FEC144F8B06DEF0D3038078591DD3717A871CD4BFF3A31F0B6C4"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/local-npc-dialogue-foundation.e7-work-order.json",
+      "workOrderSha256": "B89F46842ECAE456479BF6BB01FACA2025420436072EF874F65C3C0CD1059920",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/로컬Npc대화지원기반.md",
+        "designRevision": "local-npc-dialogue-foundation.design.r1",
+        "designHashSha256": "D50F932811D0FEC144F8B06DEF0D3038078591DD3717A871CD4BFF3A31F0B6C4",
+        "approvalEvidenceRef": "docs/AI/DECISIONS.md#d-337"
+      }
+    },
     {
       "workItemId": "work:nature-resource-regeneration:logic",
       "loopStableId": "playable-loop:nature-night-day2.v1",
@@ -122,7 +397,6 @@
         "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerKnowledge.cs",
         "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerKnowledgeSession.cs",
         "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayerKnowledgeService.cs",
-        "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs",
         "Ssalddel.Simulation.Tests/SimulationPlayerKnowledgeTests.cs"
       ],
       "sharedContractKeys": [
@@ -140,7 +414,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json",
-      "workOrderSha256": "658A23F691EEEAAB492084F45B53D781687DBC0BCD9270FC063B52C7E8762FAE",
+      "workOrderSha256": "9B974AFE21BB8F5983B9F8A036187738A288B5E3B81451D50192F389F34A6F6F",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
@@ -163,7 +437,15 @@
         "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationCommunityVisitorStay.cs",
         "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationCommunityVisitorStaySession.cs",
         "Ssalddel.Simulation.Application/RuntimeCore/SimulationCommunityVisitorStayService.cs",
-        "Ssalddel.Simulation.Tests/SimulationCommunityVisitorStayTests.cs"
+        "Ssalddel.Simulation.Tests/SimulationCommunityVisitorStayTests.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/Simulation방문자체류Runtime.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/Simulation방문자체류Runtime.cs.meta",
+        "Ssalddel.Simulation.Server/SimulationServerServiceCollectionExtensions.cs",
+        "Ssalddel.Simulation.Server/Controllers/Simulation방문자체류Controller.cs",
+        "Ssalddel.Simulation.Tests/Simulation방문자체류RuntimeTests.cs",
+        "docs/Reports/방문자체류-Runtime연결-2026-08-30.md"
       ],
       "sharedContractKeys": [
         "nature-camp-visitor-stay-session"
@@ -180,7 +462,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-camp-visitor-stay.e7-work-order.json",
-      "workOrderSha256": "CF658307DC4B222BC9367AF70C577FA151AE489D1DFF41452A5DBFA72743B636",
+      "workOrderSha256": "0EC55B54AFD3C53E552FDB0A074B3280BBE56DDF87733EAFD16635BEC5CB9BD9",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md",
@@ -203,10 +485,10 @@
         "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSurvivalService.cs",
         "Ssalddel.Simulation.Tests/SimulationWorldInteractionFarmSupplyTests.cs",
         "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationActionManifestationSaveReplay.cs",
-        "Ssalddel.Simulation.Application/RuntimeCore/SimulationRuntime.cs",
         "Ssalddel.Simulation.Application/RuntimeCore/세계상호작용E단계Modules.cs",
         "Ssalddel.Simulation.Tests/WorldInteractionDownwardModuleSkeletonTests.cs",
         "Ssalddel.Simulation.Tests/SimulationFarmH2PlacementAdapterTests.cs",
+        "Ssalddel.Simulation.Application/SimulationFarmH2PlacementAdapter.cs",
         "Ssalddel.Simulation.Tests/Ssalddel.Simulation.Tests.csproj",
         "Ssalddel.Simulation.Tests/Fixtures/FarmH2/01-flat.plan.json",
         "Ssalddel.Simulation.Tests/Fixtures/FarmH2/02-noise.plan.json",
@@ -226,10 +508,92 @@
         {
           "path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
           "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0"
+        },
+        {
+          "path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5"
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
-      "workOrderSha256": "EA8E4158B2DC4D32860C900A28048BDBF8F9868216D72AE42D80172E236120D1",
+      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "designRevision": "farm-crop-cycle.design.r1",
+        "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+        "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      }
+    },
+    {
+      "workItemId": "work:farm-crop-cycle:stamina-natural-recovery",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-01",
+      "trackCode": "Logic",
+      "targetEvidenceStageCode": "E5",
+      "statusCode": "Active",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation행동체력자연회복Contracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation행동체력자연회복.cs",
+        "Ssalddel.Simulation.Tests/Simulation행동체력자연회복Tests.cs"
+      ],
+      "sharedContractKeys": [
+        "simulation-stamina-natural-recovery"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/플레이어행동체력자연회복.md",
+          "sha256": "ABA23E2CA9A0B48181D830539445C8EBA78CC2FB0E30255A9694ED2A3E5294BD"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-stamina-natural-recovery.e7-work-order.json",
+      "workOrderSha256": "C3F7A6DC357977C6D5E577591E011A4FA1C3B5C732476DE9BA836545EE2A17B1",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/플레이어행동체력자연회복.md",
+        "designRevision": "player-stamina-natural-recovery.design.r1",
+        "designHashSha256": "ABA23E2CA9A0B48181D830539445C8EBA78CC2FB0E30255A9694ED2A3E5294BD",
+        "approvalEvidenceRef": "docs/AI/DECISIONS.md#d-319-행동-체력-자연-회복을-독립된-첫-실행-범위로-승인한다"
+      }
+    },
+    {
+      "workItemId": "work:farm-crop-cycle:spatial-expansion-r2",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-01",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmH2부지확장Contracts.cs",
+        "Ssalddel.Simulation.Application/SimulationFarmH2부지확장Service.cs",
+        "Ssalddel.Simulation.Tests/SimulationFarmH2부지확장Tests.cs",
+        "Ssalddel.Simulation.Tests/Fixtures/FarmH2ExpandedR2",
+        "docs/Reports/FarmH2-부지확장-r2-인계-2026-08-30.md"
+      ],
+      "sharedContractKeys": [
+        "farm-h2-spatial-expansion-r2"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+          "sha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC"
+        },
+        {
+          "path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
+          "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0"
+        },
+        {
+          "path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
@@ -247,9 +611,9 @@
       "completionRoleCode": "Core",
       "targetEvidenceStage": "E7",
       "targetClosureStateCode": "PlayClosed",
-      "goalStateCode": "Completed",
+      "goalStateCode": "Active",
       "activationPrerequisiteLoopStableIds": [],
-      "nextWorldInteractionId": "WI-ACTOR-02"
+      "nextWorldInteractionId": "WI-NATURE-06"
     },
     {
       "queueOrder": 2,

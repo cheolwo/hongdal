@@ -1,7 +1,10 @@
 {
   "schemaVersion": "playable-loop-engine-interaction-validation.v2",
-  "revision": "playable-loop-engine-interaction-validation.r20",
-  "evidenceTrackCodes": ["Logic", "Presentation"],
+  "revision": "playable-loop-engine-interaction-validation.r21",
+  "evidenceTrackCodes": [
+    "Logic",
+    "Presentation"
+  ],
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "principles": {
     "engineInteractionIsIntegratedGateNotThirdMaturityTrack": true,
@@ -14,19 +17,79 @@
     "actualPlayModeEvidenceRemainsSeparate": true,
     "localProcessAndRemoteHostShareTheSameProfile": true
   },
-  "allowedStatusCodes": ["Executed", "Reused", "NotApplicable", "Blocked"],
+  "allowedStatusCodes": [
+    "Executed",
+    "Reused",
+    "NotApplicable",
+    "Blocked"
+  ],
   "components": [
-    { "componentCode": "WI.ExecutionPipeline", "componentKindCode": "Orchestration", "componentRevision": "playable-loop-engine-trace.r3", "mayMutateAuthority": false },
-    { "componentCode": "Simulation.AuthorityCore", "componentKindCode": "Authority", "componentRevision": "simulation-core.current", "mayMutateAuthority": true },
-    { "componentCode": "Simulation.ActionJournal", "componentKindCode": "Authority", "componentRevision": "simulation-action-manifestation.v1", "mayMutateAuthority": true },
-    { "componentCode": "Simulation.PlayerDomainProgression", "componentKindCode": "Authority", "componentRevision": "player-domain-progress.r1", "mayMutateAuthority": true },
-    { "componentCode": "Simulation.PlayerMeditationProgression", "componentKindCode": "Authority", "componentRevision": "meditation-progress.r2", "mayMutateAuthority": true },
-    { "componentCode": "LH.Surface", "componentKindCode": "Presentation", "componentRevision": "lh-streaming.r1", "mayMutateAuthority": false },
-    { "componentCode": "Sky.Presentation", "componentKindCode": "Presentation", "componentRevision": "sky-engine.r2", "mayMutateAuthority": false },
-    { "componentCode": "Placement.Exterior", "componentKindCode": "Presentation", "componentRevision": "exterior-placement.r1", "mayMutateAuthority": false },
-    { "componentCode": "Placement.Interior", "componentKindCode": "Presentation", "componentRevision": "nature-cabin-presentation.r1", "mayMutateAuthority": false },
-    { "componentCode": "Lighting.Directional", "componentKindCode": "Presentation", "componentRevision": "directional-lighting.natural.r1", "mayMutateAuthority": false },
-    { "componentCode": "World.Presentation", "componentKindCode": "Presentation", "componentRevision": "world-presentation.r1", "mayMutateAuthority": false }
+    {
+      "componentCode": "WI.ExecutionPipeline",
+      "componentKindCode": "Orchestration",
+      "componentRevision": "playable-loop-engine-trace.r3",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Simulation.AuthorityCore",
+      "componentKindCode": "Authority",
+      "componentRevision": "simulation-core.current",
+      "mayMutateAuthority": true
+    },
+    {
+      "componentCode": "Simulation.ActionJournal",
+      "componentKindCode": "Authority",
+      "componentRevision": "simulation-action-manifestation.v1",
+      "mayMutateAuthority": true
+    },
+    {
+      "componentCode": "Simulation.PlayerDomainProgression",
+      "componentKindCode": "Authority",
+      "componentRevision": "player-domain-progress.r1",
+      "mayMutateAuthority": true
+    },
+    {
+      "componentCode": "Simulation.PlayerMeditationProgression",
+      "componentKindCode": "Authority",
+      "componentRevision": "meditation-progress.r2",
+      "mayMutateAuthority": true
+    },
+    {
+      "componentCode": "LH.Surface",
+      "componentKindCode": "Presentation",
+      "componentRevision": "lh-streaming.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Sky.Presentation",
+      "componentKindCode": "Presentation",
+      "componentRevision": "sky-engine.r2",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Placement.Exterior",
+      "componentKindCode": "Presentation",
+      "componentRevision": "exterior-placement.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Placement.Interior",
+      "componentKindCode": "Presentation",
+      "componentRevision": "nature-cabin-presentation.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "Lighting.Directional",
+      "componentKindCode": "Presentation",
+      "componentRevision": "directional-lighting.natural.r1",
+      "mayMutateAuthority": false
+    },
+    {
+      "componentCode": "World.Presentation",
+      "componentKindCode": "Presentation",
+      "componentRevision": "world-presentation.r1",
+      "mayMutateAuthority": false
+    }
   ],
   "profileDerivation": {
     "requiredLoopLevelCode": "PlayableUnit",
@@ -34,21 +97,130 @@
     "expectedPlayableUnitCount": 20,
     "expectedLoopWiPairCount": 66,
     "baseRequirements": [
-      { "order": 10, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Preview", "trackCode": "Logic", "reopenStage": "E4", "allowsReused": false, "allowsNotApplicable": false },
-      { "order": 20, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Confirm", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": false, "allowsNotApplicable": false },
-      { "order": 25, "componentCode": "WI.ExecutionPipeline", "phaseCode": "FocusEvidenceCollect", "trackCode": "Logic", "reopenStage": "E4", "allowsReused": true, "allowsNotApplicable": true },
-      { "order": 30, "componentCode": "Simulation.AuthorityCore", "phaseCode": "AuthorityCommit", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": false },
-      { "order": 40, "componentCode": "Simulation.ActionJournal", "phaseCode": "ActionRecordAppend", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": false },
-      { "order": 50, "componentCode": "Simulation.PlayerDomainProgression", "phaseCode": "PlayerProgressionApply", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": true },
-      { "order": 55, "componentCode": "Simulation.PlayerMeditationProgression", "phaseCode": "MeditationProgressionApply", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": true },
-      { "order": 60, "componentCode": "WI.ExecutionPipeline", "phaseCode": "ReturnProjection", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": true, "allowsNotApplicable": false }
+      {
+        "order": 10,
+        "componentCode": "WI.ExecutionPipeline",
+        "phaseCode": "Preview",
+        "trackCode": "Logic",
+        "reopenStage": "E4",
+        "allowsReused": false,
+        "allowsNotApplicable": false
+      },
+      {
+        "order": 20,
+        "componentCode": "WI.ExecutionPipeline",
+        "phaseCode": "Confirm",
+        "trackCode": "Logic",
+        "reopenStage": "E5",
+        "allowsReused": false,
+        "allowsNotApplicable": false
+      },
+      {
+        "order": 25,
+        "componentCode": "WI.ExecutionPipeline",
+        "phaseCode": "FocusEvidenceCollect",
+        "trackCode": "Logic",
+        "reopenStage": "E4",
+        "allowsReused": true,
+        "allowsNotApplicable": true
+      },
+      {
+        "order": 30,
+        "componentCode": "Simulation.AuthorityCore",
+        "phaseCode": "AuthorityCommit",
+        "trackCode": "Logic",
+        "reopenStage": "E5",
+        "allowsReused": true,
+        "allowsNotApplicable": false
+      },
+      {
+        "order": 40,
+        "componentCode": "Simulation.ActionJournal",
+        "phaseCode": "ActionRecordAppend",
+        "trackCode": "Logic",
+        "reopenStage": "E5",
+        "allowsReused": true,
+        "allowsNotApplicable": false
+      },
+      {
+        "order": 50,
+        "componentCode": "Simulation.PlayerDomainProgression",
+        "phaseCode": "PlayerProgressionApply",
+        "trackCode": "Logic",
+        "reopenStage": "E5",
+        "allowsReused": true,
+        "allowsNotApplicable": true
+      },
+      {
+        "order": 55,
+        "componentCode": "Simulation.PlayerMeditationProgression",
+        "phaseCode": "MeditationProgressionApply",
+        "trackCode": "Logic",
+        "reopenStage": "E5",
+        "allowsReused": true,
+        "allowsNotApplicable": true
+      },
+      {
+        "order": 60,
+        "componentCode": "WI.ExecutionPipeline",
+        "phaseCode": "ReturnProjection",
+        "trackCode": "Logic",
+        "reopenStage": "E5",
+        "allowsReused": true,
+        "allowsNotApplicable": false
+      }
     ],
     "areaDefaults": {
-      "nature": { "changeSemanticCodes": ["ActorStateChanged", "ExteriorPlacementChanged"], "presentationConsumerCodes": ["Placement.Exterior", "World.Presentation"] },
-      "farm": { "changeSemanticCodes": ["InventoryChanged", "ExteriorPlacementChanged"], "presentationConsumerCodes": ["Placement.Exterior", "World.Presentation"] },
-      "hub": { "changeSemanticCodes": ["InventoryChanged", "InteriorFixtureChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] },
-      "town": { "changeSemanticCodes": ["ActorStateChanged", "InteriorFixtureChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] },
-      "city": { "changeSemanticCodes": ["ActorStateChanged", "ExteriorPlacementChanged"], "presentationConsumerCodes": ["Placement.Exterior", "World.Presentation"] }
+      "nature": {
+        "changeSemanticCodes": [
+          "ActorStateChanged",
+          "ExteriorPlacementChanged"
+        ],
+        "presentationConsumerCodes": [
+          "Placement.Exterior",
+          "World.Presentation"
+        ]
+      },
+      "farm": {
+        "changeSemanticCodes": [
+          "InventoryChanged",
+          "ExteriorPlacementChanged"
+        ],
+        "presentationConsumerCodes": [
+          "Placement.Exterior",
+          "World.Presentation"
+        ]
+      },
+      "hub": {
+        "changeSemanticCodes": [
+          "InventoryChanged",
+          "InteriorFixtureChanged"
+        ],
+        "presentationConsumerCodes": [
+          "Placement.Interior",
+          "World.Presentation"
+        ]
+      },
+      "town": {
+        "changeSemanticCodes": [
+          "ActorStateChanged",
+          "InteriorFixtureChanged"
+        ],
+        "presentationConsumerCodes": [
+          "Placement.Interior",
+          "World.Presentation"
+        ]
+      },
+      "city": {
+        "changeSemanticCodes": [
+          "ActorStateChanged",
+          "ExteriorPlacementChanged"
+        ],
+        "presentationConsumerCodes": [
+          "Placement.Exterior",
+          "World.Presentation"
+        ]
+      }
     },
     "presentationPhaseByComponent": {
       "LH.Surface": "SurfacePreparation",
@@ -270,6 +442,18 @@
         "LH.Surface",
         "Placement.Exterior",
         "World.Presentation"
+      ],
+      "requiredStudyBindings": [
+        {
+          "studyStableId": "study:farm-crop-cycle:spatial-placement.r2",
+          "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "statusCode": "Accepted",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+          "domains": [
+            "공간",
+            "배치"
+          ]
+        }
       ]
     },
     {
@@ -285,6 +469,18 @@
         "LH.Surface",
         "Placement.Exterior",
         "World.Presentation"
+      ],
+      "requiredStudyBindings": [
+        {
+          "studyStableId": "study:farm-crop-cycle:spatial-placement.r2",
+          "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "statusCode": "Accepted",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+          "domains": [
+            "공간",
+            "배치"
+          ]
+        }
       ]
     },
     {
@@ -300,6 +496,18 @@
         "LH.Surface",
         "Placement.Exterior",
         "World.Presentation"
+      ],
+      "requiredStudyBindings": [
+        {
+          "studyStableId": "study:farm-crop-cycle:spatial-placement.r2",
+          "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "statusCode": "Accepted",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+          "domains": [
+            "공간",
+            "배치"
+          ]
+        }
       ]
     },
     {
@@ -315,6 +523,18 @@
         "LH.Surface",
         "Placement.Exterior",
         "World.Presentation"
+      ],
+      "requiredStudyBindings": [
+        {
+          "studyStableId": "study:farm-crop-cycle:spatial-placement.r2",
+          "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "statusCode": "Accepted",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+          "domains": [
+            "공간",
+            "배치"
+          ]
+        }
       ]
     }
   ]

@@ -14,6 +14,16 @@
     "nextReopenCondition": "현재 nature-night-day2 Goal 완료 뒤 같은 PlayableUnit의 승인 기획 판본으로 활성화하고 Unity 실제 입력·표현 궤적을 연다."
   },
   "changeImpactReviewRef": "docs/Architecture/벌목집중과명상숙련체계.md",
+  "additionalApprovals": [
+    {
+      "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+      "designRevision": "nature-woodcutting-animation.design.r1",
+      "designHashSha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642",
+      "statusCode": "Approved",
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
+      "boundary": "D359 동작 제작만 추가. 과거 집중 명세의 stage/증거는 이력 보존, 현행 루프/새 변경 검증은 전용 명세로 분리. 다른 Goal 종료 대기는 이번 독립 작업에 적용하지 않는다."
+    }
+  ],
   "trackPlans": {
     "logic": {
       "trackCode": "Logic",

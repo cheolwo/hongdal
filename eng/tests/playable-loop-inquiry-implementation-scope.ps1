@@ -419,6 +419,13 @@ if ($queueSection -match '(?i)question(priority|order)|Q-001.*priority') { throw
 if ($generated.Contains('ActiveWorldInteractionWipOwnedBy') -or $generated.Contains('ParkedByActiveWip')) { throw 'GlobalWipBlockerMustNotRemain' }
 if ($queueSection.Contains('WorldInteractionRegistrationRequired')) { throw 'ResolvedRegistrationBlockerMustNotRemain' }
 $farmInteractionRow = @($queueRows | Where-Object { $_ -match '^\| `WI-FARM-01` ' })
-if ($farmInteractionRow.Count -ne 1 -or $farmInteractionRow[0] -notmatch '`RegisteredWithoutCSharpEvidenceBinding`' -or $farmInteractionRow[0] -notmatch 'CSharpEvidenceResponsibilityBindingRequired') { throw 'GeneratedRegisteredWorldInteractionMissingCSharpBindingGuardInvalid' }
+# Farm E2 결속은 필수지만 자연회복 등의 E1/E3 근거가 추가될 수 있다.
+# 코드 근거 목록을 현재 WI 성숙도 또는 E2 하나로 고정하지 않는다.
+if ($farmInteractionRow.Count -ne 1 -or $farmInteractionRow[0] -notmatch '`Bound`<br>`(?:E[1-7],)*E2(?:,E[1-7])*` / [1-9][0-9]* files' -or $farmInteractionRow[0] -match 'CSharpEvidenceResponsibilityBindingRequired') { throw 'GeneratedFarmWorldInteractionCSharpBindingInvalid' }
+# 결속된 Farm을 미결속으로 가정하지 않고, 미결속 행 전체의 차단을 검증한다.
+if ($unboundCount -eq 0) { throw 'UnboundWorldInteractionGuardFixtureRequired' }
+foreach ($unboundRow in @($queueRows | Where-Object { $_ -match '`RegisteredWithoutCSharpEvidenceBinding`' })) {
+    if ($unboundRow -notmatch 'CSharpEvidenceResponsibilityBindingRequired' -or $unboundRow -match '`ApprovedWorkItemExecutable`') { throw 'GeneratedRegisteredWorldInteractionMissingCSharpBindingGuardInvalid' }
+}
 
 Write-Output 'PlayableLoopInquiryImplementationScopeTestsPassed:Questions=339;Q001=Partial;Q002=Partial;Q003=Partial;Q004=Partial;Q005=Partial;Q006=Partial;Q007=Partial;Q008=Partial;Q009=Partial;Q010=Partial;Q011=Partial;Q012=Partial;Q013=Partial;Q014=Partial;Q015=Partial;Q016=Partial;Q017=Partial;Q018=Partial;Q019=Partial;Q020=Partial;Q021=Partial;Q022=Partial;Q023=Partial;Q024=Partial;Q025=PartialParked;SourceRecovery=3;FarmPattern=43;Q338=Implemented'

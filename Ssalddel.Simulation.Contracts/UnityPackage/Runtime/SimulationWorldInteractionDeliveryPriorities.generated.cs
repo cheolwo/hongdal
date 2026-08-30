@@ -42,7 +42,7 @@ namespace Ssalddel.Simulation.Contracts
         public const int WorkInProgressLimit = 1;
         public static int? MaximumConcurrentWorkItems => null;
         public const string ConcurrencyModeCode = "DependencyAndOwnership";
-        public static IReadOnlyList<string> ActiveWorldInteractionIds { get; } = Array.AsReadOnly(new string[] { "WI-ACTOR-03", "WI-COMMUNITY-VISITOR-STAY", "WI-FARM-01", "WI-WORLD-RESOURCE-REGENERATE" });
+        public static IReadOnlyList<string> ActiveWorldInteractionIds { get; } = Array.AsReadOnly(new string[] { "WI-ACTOR-03", "WI-COMMUNITY-VISITOR-STAY", "WI-FARM-01", "WI-FARM-04", "WI-NATURE-06", "WI-WORLD-RESOURCE-REGENERATE" });
         public static bool IsActiveWorldInteraction(string worldInteractionId)
         {
             foreach (var id in ActiveWorldInteractionIds)
@@ -54,7 +54,7 @@ namespace Ssalddel.Simulation.Contracts
             new SimulationWI실행우선순위Definition("WI-ACTOR-01", "D1", 1, "Core", "Queued", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-ACTOR-02", "D1", 2, "Core", "Queued", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-05", "D1", 3, "Core", "E7Closed", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1", "playable-loop:nature-tactical-self-navigation.v1" }),
-            new SimulationWI실행우선순위Definition("WI-NATURE-06", "D1", 4, "Core", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
+            new SimulationWI실행우선순위Definition("WI-NATURE-06", "D1", 4, "Core", "Active", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-07", "D1", 5, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-08", "D1", 6, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-12", "D1", 7, "Core", "Queued", "NotApplicable", "Construction", new[] { "playable-loop:nature-shelter-foundation.v1" }),
@@ -78,7 +78,7 @@ namespace Ssalddel.Simulation.Contracts
             new SimulationWI실행우선순위Definition("WI-FARM-01", "D2", 1, "Core", "Active", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-02", "D2", 2, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-03", "D2", 3, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
-            new SimulationWI실행우선순위Definition("WI-FARM-04", "D2", 4, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
+            new SimulationWI실행우선순위Definition("WI-FARM-04", "D2", 4, "Core", "Active", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-05", "D2", 5, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-pack-store-return.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-06", "D2", 6, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-pack-store-return.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-DEFENSE-MOBILIZE", "D2", 7, "Core", "Queued", "NotApplicable", "Farm", new[] { "playable-loop:farm-barracks-defense.v1" }),

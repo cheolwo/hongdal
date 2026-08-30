@@ -5,7 +5,7 @@
 - 실행 우선순위 개정: `world-interaction-delivery-priorities.r40`
 - 전체 WI: `105`
 - 진행 방식: 의존성·담당 소유권 기반 병렬 개발 / 고정 작업 수 제한 없음
-- 실행 중 WI: `WI-ACTOR-03, WI-COMMUNITY-VISITOR-STAY, WI-FARM-01, WI-WORLD-RESOURCE-REGENERATE` / 원본: `eng/execution-ledgers/codex-playable-loop-goals.json`
+- 실행 중 WI: `WI-ACTOR-03, WI-COMMUNITY-VISITOR-STAY, WI-FARM-01, WI-FARM-04, WI-NATURE-06, WI-WORLD-RESOURCE-REGENERATE` / 원본: `eng/execution-ledgers/codex-playable-loop-goals.json`
 - 대표 표시 WI: `WI-WORLD-RESOURCE-REGENERATE` / `E1` → `E7` (전체 실행 목록이 아님)
 - Synty H1 설계 재고: `84`
 - E7은 최신 PlayMode·Game View·Hosted 동등성 증거가 있을 때만 승격한다.
@@ -32,7 +32,7 @@
 | 1 | 물품 획득<br>`WI-ACTOR-01` | Queued | Core | E3 | E5 | E6 | Conditional | NotApplicable | Shared | playable-loop:nature-shelter-foundation.v1 |
 | 2 | 장착 상태 변경<br>`WI-ACTOR-02` | Queued | Core | E3 | E5 | E6 | Conditional | NotApplicable | Shared | playable-loop:nature-shelter-foundation.v1 |
 | 3 | 벌목 도끼 획득<br>`WI-NATURE-05` | E7Closed | Core | E3 | E7 | Complete | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1<br>playable-loop:nature-tactical-self-navigation.v1 |
-| 4 | 나무 벌목 작업 시작<br>`WI-NATURE-06` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
+| 4 | 나무 벌목 작업 시작<br>`WI-NATURE-06` | Active | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Nature | playable-loop:nature-shelter-foundation.v1 |
 | 5 | 오두막을 지을 터 선정<br>`WI-NATURE-07` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
 | 6 | 오두막 건설 작업 시작<br>`WI-NATURE-08` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
 | 7 | 진행 중 작업 취소<br>`WI-NATURE-12` | Queued | Core | E3 | E4 | E5 | NotApplicable | EstablishedH1 | Construction | playable-loop:nature-shelter-foundation.v1 |
@@ -64,7 +64,7 @@
 | 1 | 경작지 밭갈이<br>`WI-FARM-01` | Active | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
 | 2 | 경작지 씨앗 파종<br>`WI-FARM-02` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
 | 3 | 농작물 생육 관리<br>`WI-FARM-03` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
-| 4 | 익은 농작물 수확<br>`WI-FARM-04` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
+| 4 | 익은 농작물 수확<br>`WI-FARM-04` | Active | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
 | 5 | 수확물 집하장 모으기<br>`WI-FARM-05` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-pack-store-return.v1 |
 | 6 | 출하 물량 포장<br>`WI-FARM-06` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-pack-store-return.v1 |
 | 7 | 방위 분대 소집<br>`WI-FARM-DEFENSE-MOBILIZE` | Queued | Core | E4 | E4 | E5 | NotApplicable | CandidateLineage | Farm | playable-loop:farm-barracks-defense.v1 |

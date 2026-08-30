@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-playable-loop-catalog.v6",
-"revision": "playable-loops.r36",
+  "revision": "playable-loops.r38",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -26,8 +26,16 @@
   "dualMaturityPolicy": {
     "rolloutCode": "AllPlayableUnits",
     "requiredForLoopLevelCode": "PlayableUnit",
-    "allowedTrackCodes": ["Logic", "Presentation"],
-    "allowedTrackStatusCodes": ["Waiting", "InProgress", "Blocked", "Validated"],
+    "allowedTrackCodes": [
+      "Logic",
+      "Presentation"
+    ],
+    "allowedTrackStatusCodes": [
+      "Waiting",
+      "InProgress",
+      "Blocked",
+      "Validated"
+    ],
     "allowedFeedbackReasonCodes": [
       "ContractMissing",
       "ImplementationMissing",
@@ -49,15 +57,46 @@
     "topicDesignTemplateRef": "docs/ProjectOverview/templates/PlayableLoop주제기획서템플릿.md",
     "topicPlanningRequiredForPlayableUnits": true,
     "topicMapsToExactlyOnePlayableUnit": true,
-    "allowedPlanningStatusCodes": ["NotStarted", "Draft", "ReadyForReview", "Approved", "LegacyActiveMigration"],
+    "allowedPlanningStatusCodes": [
+      "NotStarted",
+      "Draft",
+      "ReadyForReview",
+      "Approved",
+      "LegacyActiveMigration"
+    ],
     "legacyActiveMigrationLoopStableId": "playable-loop:nature-night-day2.v1",
     "existingCatalogMigrationStatusCode": "ActiveAndNext"
   },
-  "allowedLoopKinds": ["IndependentArea", "WorldIntegration", "CrossAreaIntegration"],
-  "allowedLoopLevelCodes": ["PlayableUnit", "AreaAggregate", "WorldAggregate"],
-  "allowedCompletionTierCodes": ["Core", "Extension", "Aggregate"],
-  "allowedClosureStateCodes": ["Open", "CoreClosed", "ExtendedClosed", "PlayClosed", "WorldClosed"],
-  "allowedStatusCodes": ["Planned", "Defined", "InProgress", "Blocked", "Deferred", "Validated"],
+  "allowedLoopKinds": [
+    "IndependentArea",
+    "WorldIntegration",
+    "CrossAreaIntegration"
+  ],
+  "allowedLoopLevelCodes": [
+    "PlayableUnit",
+    "AreaAggregate",
+    "WorldAggregate"
+  ],
+  "allowedCompletionTierCodes": [
+    "Core",
+    "Extension",
+    "Aggregate"
+  ],
+  "allowedClosureStateCodes": [
+    "Open",
+    "CoreClosed",
+    "ExtendedClosed",
+    "PlayClosed",
+    "WorldClosed"
+  ],
+  "allowedStatusCodes": [
+    "Planned",
+    "Defined",
+    "InProgress",
+    "Blocked",
+    "Deferred",
+    "Validated"
+  ],
   "items": [
     {
       "priority": 1,
@@ -227,12 +266,16 @@
       "loopLevelCode": "PlayableUnit",
       "planningGate": {
         "topicStableId": "topic:nature-shelter-foundation.v1",
-        "designDocumentRef": "",
-        "designRevision": "",
-        "designHashSha256": "",
-        "statusCode": "NotStarted",
-        "approvalEvidenceRef": ""
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature도끼벌목오두막기초.md",
+        "designRevision": "nature-shelter-foundation.design.r1",
+        "designHashSha256": "27FA2C4E1945A9BF68E38D517BF28F1D2482FE098A7379662CDDCEFA81BB7407",
+        "statusCode": "Approved",
+        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/Nature도끼벌목오두막기초.md"
       },
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/Nature도끼벌목오두막기초.md",
+        "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md"
+      ],
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
@@ -322,7 +365,8 @@
         "evidence:nature-shelter-explicit-equipment-e7-20260827"
       ],
       "workOrderRefs": [
-        "eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"
+        "eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json",
+        "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json"
       ],
       "legacyWorkOrderRefs": [
         "eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json",
@@ -1660,13 +1704,23 @@
       "blockers": [
         "E5 Session/Save/실제 World 결속 검증 미완료"
       ],
-      "nextAction": "E5 승인 범위: Session·Save·같은 Core·실제 자산 발현을 검증한다. 현재 E는 보존한다.",
+      "nextAction": "D-320 연구 r2 추가 승인으로 Barn native 실측 수용 후보·통로 검증을 공간 담당에 분담한다. 개발은 Session/Save/자연 회복 연결을 병행하고 실제 Scene/화면은 후보 검토 후 검증한다.",
       "requiredStudies": [
         {
           "studyStableId": "study:farm-crop-cycle:spatial-placement.r1",
           "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
           "statusCode": "Accepted",
           "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0"
+        },
+        {
+          "studyStableId": "study:farm-crop-cycle:spatial-placement.r2",
+          "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "statusCode": "Accepted",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+          "domains": [
+            "공간",
+            "배치"
+          ]
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",

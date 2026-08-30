@@ -80,7 +80,13 @@ $aggregate.activeGoal.loopStableId = "playable-loop:nature-survival-homestead.v1
 Require-Rejected "aggregate-as-goal" $aggregate "GoalSubjectIsNotPlayableUnit"
 
 $secondActive = Read-Ledger
-$secondActive.items[8].goalStateCode = "Active"
+$unownedGoal = @($secondActive.items | Where-Object {
+    $loopId = $_.loopStableId
+    $_.goalStateCode -eq 'Queued' -and
+        @($secondActive.workItems | Where-Object loopStableId -eq $loopId).Count -eq 0
+}) | Select-Object -First 1
+if ($null -eq $unownedGoal) { throw 'UnownedQueuedGoalFixtureRequired' }
+$unownedGoal.goalStateCode = "Active"
 Require-Rejected "active-goal-without-work-item" $secondActive "ActiveGoalWorkItemsMismatch"
 
 $e9Target = Read-Ledger
@@ -149,9 +155,15 @@ function Require-Accepted([string] $Name, [object] $Ledger) {
     & $manager -Mode Write -InputPath (Relative $path) -OutputPath (Relative (Join-Path $artifactDirectory "$Name.md")) | Out-Null
 }
 $parallelFixture = Read-Ledger
-$nonfocus = $parallelFixture.workItems[0] | ConvertTo-Json -Depth 40 | ConvertFrom-Json
+# 표시 순서가 아니라 대표 Goal의 실제 작업/소속 WI에서 합성 사례를 고른다.
+$sourceWork = @($parallelFixture.workItems | Where-Object loopStableId -eq $parallelFixture.activeGoal.loopStableId)[0]
+$fixtureLoops = Get-Content (Join-Path $repositoryRoot $parallelFixture.playableLoopCatalogPath) -Raw -Encoding UTF8 | ConvertFrom-Json
+$sourceLoop = @($fixtureLoops.items | Where-Object loopStableId -eq $sourceWork.loopStableId)[0]
+$alternativeWi = @($sourceLoop.worldInteractionIds | Where-Object { $_ -ne $sourceWork.worldInteractionId })[0]
+if (-not $alternativeWi) { throw 'ParallelGoalFixtureRequiresSecondRegisteredWi' }
+$nonfocus = $sourceWork | ConvertTo-Json -Depth 40 | ConvertFrom-Json
 $nonfocus.workItemId = 'test:nonfocus'
-$nonfocus.worldInteractionId = 'WI-ACTOR-PLAN-SET'
+$nonfocus.worldInteractionId = $alternativeWi
 $nonfocus.writePaths = @('synthetic-fixture/nonfocus')
 $nonfocus.sharedContractKeys = @()
 $nonfocusOrder = Get-Content (Join-Path $repositoryRoot $nonfocus.workOrderRef) -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -163,10 +175,10 @@ $nonfocus.workOrderRef = Relative $nonfocusOrderPath
 $nonfocus.workOrderSha256 = (Get-FileHash $nonfocusOrderPath).Hash
 $parallelFixture.workItems += $nonfocus
 Require-Accepted 'same-goal-two-active-wis' $parallelFixture
-$parallelFixture.workItems[0].statusCode = 'Blocked'
-$parallelFixture.workItems[0].workOrderSha256 = '0' * 64
+$sourceWork.statusCode = 'Blocked'
+$sourceWork.workOrderSha256 = '0' * 64
 Require-Accepted 'blocked-stale-representative-with-independent-work' $parallelFixture
-$parallelFixture.workItems[1].statusCode = 'Blocked'
+foreach ($workItem in $parallelFixture.workItems) { $workItem.statusCode = 'Blocked' }
 Require-Accepted 'all-work-blocked-without-global-failure' $parallelFixture
 
 # 복수 Goal도 같은 관리자 전체 경로로 검증한다. 합성 승인/명세는 artifacts에만 둔다.
@@ -199,6 +211,12 @@ $legacy.schemaVersion = 'codex-playable-loop-goals.v3'
 $legacy.PSObject.Properties.Remove('workItems')
 $legacy.policy.goalWorkInProgressLimit = 1
 $legacy.policy.worldInteractionWorkInProgressLimit = 1
+# v3 입력은 단일 대표 작업만 활성인 당시 형태로 만든다.
+foreach ($item in $legacy.items) {
+    if ($item.goalStateCode -eq 'Active' -and $item.loopStableId -ne $legacy.activeGoal.loopStableId) {
+        $item.goalStateCode = 'Queued'
+    }
+}
 Require-Accepted 'legacy-v3-read' $legacy
 
 Write-Output "CodexPlayableLoopGoalTestsPassed:Positive=8;Negative=8;Goals=$expectedGoalCount"

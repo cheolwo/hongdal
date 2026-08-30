@@ -1,0 +1,250 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-LOCAL-NPC-DIALOGUE-FOUNDATION",
+  "title": "로컬 NPC 대화 비권위 지원 — 고정 패키지·격리 연결·Fixture 시험",
+  "playableUnitStableId": "playable-loop:nature-camp-visitor-stay.v1",
+  "activeWorldInteractionId": "WI-COMMUNITY-VISITOR-STAY",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "D337 설치·연결부·자동시험만. 기존 방문자 E4 사본 유지, 새 E 승격/Scene/모델 추론 제외."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "NotApplicable",
+    "notApplicableReason": "대사 지원 코드만, Scene·UI·H·자산 변경 없음.",
+    "playerReadableMoment": "기본 대사 대체 DTO만 준비",
+    "requiredHCapabilities": [],
+    "visualKeys": [],
+    "primaryAssetCandidateRefs": [],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [],
+    "placementIntent": "없음",
+    "interactionAnchorIntent": "없음",
+    "candidateRevisionOrFingerprint": "D50F932811D0FEC144F8B06DEF0D3038078591DD3717A871CD4BFF3A31F0B6C4",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "실제 NPC 소비 제외"
+    ]
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "disabled/modelmissing/noevidence/error/cancel/late·격리·상한·원격 거부 시험"
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "읽기 전용 근거·로컬 검색·LLM 연결·fallback 분리"
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "선택 지원·NPC/Player/Session/Revision 허용 사본·권위 불변 계약"
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "기존 방문자 증거 유지, 지원 기능의 Runtime/Scene/품질 승격 제외."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "disabled/modelmissing/noevidence/error/cancel/late·격리·상한·원격 거부 시험"
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "읽기 전용 근거·로컬 검색·LLM 연결·fallback 분리"
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "선택 지원·NPC/Player/Session/Revision 허용 사본·권위 불변 계약"
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E4",
+    "status": "NotStarted",
+    "candidateRevision": "local-npc-dialogue-foundation.design.r1",
+    "evidenceRefs": [],
+    "openFeedbackRefs": [
+      "모델 미설치·실제 추론/Scene 미검증"
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-camp-visitor-stay.v1|WI-COMMUNITY-VISITOR-STAY",
+    "profileRevision": "nature-camp-visitor-stay.engine-interaction.r3",
+    "logicStatusCode": "Pending",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E1",
+    "evidenceRefs": [],
+    "blockerCodes": [
+      "ModelMissingInferenceNotVerified"
+    ]
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/로컬Npc대화지원기반.md",
+    "designRevision": "local-npc-dialogue-foundation.design.r1",
+    "designHashSha256": "D50F932811D0FEC144F8B06DEF0D3038078591DD3717A871CD4BFF3A31F0B6C4",
+    "approvalEvidenceRef": "docs/AI/DECISIONS.md#d-337"
+  },
+  "requiredStudies": [],
+  "parentWorkOrderRef": "eng/execution-ledgers/work-orders/nature-camp-visitor-stay.e7-work-order.json",
+  "supportImplementation": {
+    "statusCode": "Partial",
+    "reportRef": "docs/Reports/로컬Npc대화지원-D337-구현-2026-08-30.md",
+    "codeStatusCode": "ImplementedIsolatedAdapters",
+    "fixtureTests": { "corePassed": 32, "vendorPassed": 9, "failed": 0, "skipped": 0, "runtime": "net10.0", "coreCompatibility": "netstandard2.1 / CSharp9", "unityEditModePassed": 41, "unityEditModeFailed": 0 },
+    "packageStatusCode": "UpmInstalledPinnedCommit",
+    "backendStatusCode": "InstalledVendorProgressOne",
+    "editorStatusCode": "CompiledLoadedEditModePassed",
+    "modelStatusCode": "NotDownloadedInferenceNotVerified",
+    "recoveryStatusCode": "BackupPreservedCanonicalNotOverwritten",
+    "reportedLoopStageIsInherited": true,
+    "reason": "E4는 기존 방문자 원장 사본. 지원 기능 E3/실제 추론 성공을 의미하지 않음.",
+    "externalWriteOwnership": {
+      "repositoryRoot": "C:/Users/user/ssalddel",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "writePaths": [
+        "Packages/manifest.json",
+        "Packages/packages-lock.json",
+        "Assets/Ssalddel/LocalNpcDialogue",
+        "Assets/Ssalddel/LocalNpcDialogue.meta"
+      ],
+      "preserveExistingLockDependency": "com.ssalddel.interior.domain -> com.ssalddel.simulation.contracts:0.1.0"
+    }
+  }
+}

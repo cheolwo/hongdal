@@ -97,6 +97,7 @@ Simulation·Unity
 │  ├─ 029 contract.dark-age-mindfulness-effect-scope-candidate · Contract · Definition
 │  ├─ 029 domain.party-resonance-recovery-candidate · Domain · Query
 │  ├─ 030 adapter.lh-separated-cell-content · Application · Projection
+│  ├─ 030 application.landscape-placement-binding-guard · Application · Projection
 │  ├─ 030 application.nature-world-asset-placement-state · Application · Projection
 │  ├─ 030 application.separated-world-asset-placement · Application · Projection
 │  ├─ 030 contract.dark-age-mindfulness-effect-strength-candidate · Contract · Definition
@@ -612,6 +613,11 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: LH는 배치 규칙을 소유하지 않고 이미 계산된 계획의 준비·활성·해제만 담당한다.
+- **030 application.landscape-placement-binding-guard** — [Simulation경관배치소비검증Service](../../../Ssalddel.Simulation.Application/Simulation경관배치소비검증Service.cs) · 기준 배치를 보존하며 경관 장식의 공통 소비 입력을 검사한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 입력·권위 상태·WorldRevision·배치 계획을 변경하지 않는 순수 사전검사다.
 - **030 application.nature-world-asset-placement-state** — [SimulationNature세계자산배치Service](../../../Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs) · Nature 권위 상태를 지도·공간 변화 뒤 실외·실내 계획으로 분리하고 호환 상태 사본으로 조립한다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `SimulationState → None`

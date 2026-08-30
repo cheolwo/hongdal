@@ -306,6 +306,14 @@
   ],
   "e5Execution": {
     "statusCode": "E5Pending",
+    "runtimePortIntegration": {
+      "statusCode": "Partial",
+      "reportRef": "docs/Reports/방문자체류-Runtime연결-2026-08-30.md",
+      "automatedTestRef": "artifacts/local/validation/visitor-runtime-d286/visitor-runtime.trx",
+      "scope": "LocalSimulationRuntime/HTTP Query Preview Confirm share existing visitor service; independent fixture ledger only",
+      "pending": ["ActualSessionAndActorAuthorization", "SessionWorldRevisionAtomicity", "SaveReplay", "SceneAndGameView"],
+      "promotionEligible": false
+    },
     "dispatchRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md",
     "saveVersionReservation": {
       "baseline": "simulation-save.v29",

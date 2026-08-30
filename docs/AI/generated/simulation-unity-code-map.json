@@ -1738,6 +1738,23 @@
         },
         {
           "flowOrder": 30,
+          "stepKey": "application.landscape-placement-binding-guard",
+          "dependsOnStepKeys": [],
+          "executionStage": "Projection",
+          "layer": "Application",
+          "componentType": "Ssalddel.Simulation.Application.Simulation\uACBD\uAD00\uBC30\uCE58\uC18C\uBE44\uAC80\uC99DService",
+          "assembly": "Ssalddel.Simulation.Application",
+          "sourcePath": "Ssalddel.Simulation.Application/Simulation\uACBD\uAD00\uBC30\uCE58\uC18C\uBE44\uAC80\uC99DService.cs",
+          "responsibility": "\uAE30\uC900 \uBC30\uCE58\uB97C \uBCF4\uC874\uD558\uBA70 \uACBD\uAD00 \uC7A5\uC2DD\uC758 \uACF5\uD1B5 \uC18C\uBE44 \uC785\uB825\uC744 \uAC80\uC0AC\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "DerivedWorld"
+          ],
+          "writesTo": [],
+          "boundary": "\uC785\uB825\u00B7\uAD8C\uC704 \uC0C1\uD0DC\u00B7WorldRevision\u00B7\uBC30\uCE58 \uACC4\uD68D\uC744 \uBCC0\uACBD\uD558\uC9C0 \uC54A\uB294 \uC21C\uC218 \uC0AC\uC804\uAC80\uC0AC\uB2E4."
+        },
+        {
+          "flowOrder": 30,
           "stepKey": "application.nature-world-asset-placement-state",
           "dependsOnStepKeys": [
             "application.world-asset-placement",
@@ -2753,7 +2770,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Application",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 104\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationActorEquipmentRuntime, ISimulationBattleInstanceStore, ISimulationBattleRuntime, ISimulationBattlefieldDerivationService, ISimulationFarmChoiceRuntime, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 106\uAC1C: DisabledSimulationWorldAreaSetGraphStore, DisabledSimulationWorldLandscapeCompositionStore, DisabledSimulationWorld\uC0C1\uD638\uC791\uC6A9GraphReadinessStore, ISimulationActorEquipmentRuntime, ISimulationBattleInstanceStore, ISimulationBattleRuntime, ISimulationBattlefieldDerivationService, ISimulationFarmChoiceRuntime, ..."
     },
     {
       "severity": "Warning",
@@ -2774,7 +2791,7 @@
       "code": "CODEMAP100",
       "featureKey": "simulation-unity",
       "stepKey": "Ssalddel.Simulation.Server",
-      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 25\uAC1C: DisabledSimulationFarmRealityEvidenceStore, SimulationActorEquipmentController, SimulationActualE5SessionsController, SimulationAreaSetImmersionController, SimulationCollectibleCardRewardsController, SimulationFarmConstructionPlacementController, SimulationIntegratedWorldController, SimulationNatureSurvivalController, ..."
+      "message": "\uAE30\uC900 \uAE30\uB2A5 \uBC16\uC758 \uD0D0\uC0C9 \uD6C4\uBCF4 26\uAC1C: DisabledSimulationFarmRealityEvidenceStore, SimulationActorEquipmentController, SimulationActualE5SessionsController, SimulationAreaSetImmersionController, SimulationCollectibleCardRewardsController, SimulationFarmConstructionPlacementController, SimulationIntegratedWorldController, SimulationNatureSurvivalController, ..."
     },
     {
       "severity": "Warning",
