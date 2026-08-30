@@ -1,0 +1,290 @@
+{
+  "SchemaVersion": "farm-h2-candidate.v1",
+  "PatternStableId": "candidate-pattern:farm-riverside-practical-h2",
+  "Input": {
+    "InstanceStableId": "fixture:farm-h2:03-terrace",
+    "Seed": "farm-terrace-313",
+    "PatternRevision": "farm-riverside-h2.trial.r1",
+    "SourceWorldRevision": 0,
+    "SourceContext": "ExplicitSyntheticFixture;NoAuthorityWI;Q297-Q339",
+    "Terrain": {
+      "StableId": "terrain:03-terrace",
+      "Revision": "terrain-fixture.r1",
+      "Mode": "Terrace",
+      "BaseHeight": 0.5,
+      "Amplitude": 0,
+      "SlopeX": 0,
+      "StepHeight": 0.08,
+      "Patches": []
+    },
+    "Policy": {
+      "MaximumSlope": 5,
+      "MaximumHeightSpread": 0.15,
+      "GroundClearance": 0.03,
+      "BottomTolerance": 0.015,
+      "MinimumSpacing": 0.55,
+      "RouteWidth": 3,
+      "RouteSampleStep": 0.5,
+      "MaximumRouteSlope": 12,
+      "MaximumRouteStep": 0.12
+    },
+    "Obstacles": []
+  },
+  "InputHash": "022a4c6dabb775f6367bfdcb0eb73dec5ce59e64c8d2e04f0e7b29ccfd81152c",
+  "SurfaceHash": "c5adb833b903f863b6a6cb494186cc4be1d04b73054a93cd534398ee0e9a41e5",
+  "Placements": [
+    {
+      "StableId": "fixture:farm-h2:03-terrace/barn",
+      "H1StableId": "fixture:farm-h2:03-terrace/h1:BarnWorkYard",
+      "Role": "BarnWorkYard",
+      "VisualKey": "candidate:farm.red-barn",
+      "AssetFamilyId": "synty:polygon-farm:buildings:barn",
+      "Bounds": {
+        "MinX": -16,
+        "MinZ": -17,
+        "MaxX": -4,
+        "MaxZ": -7,
+        "Valid": true
+      },
+      "Bottom": 0.53,
+      "Yaw": 0,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/field",
+      "H1StableId": "fixture:farm-h2:03-terrace/h1:ProductionPlot",
+      "Role": "ProductionPlot",
+      "VisualKey": "candidate:farm.crop-plot",
+      "AssetFamilyId": "synty:polygon-farm:environment:dirt-rows",
+      "Bounds": {
+        "MinX": 9,
+        "MinZ": 3,
+        "MaxX": 24,
+        "MaxZ": 24,
+        "Valid": true
+      },
+      "Bottom": 0.61,
+      "Yaw": 0,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/well",
+      "H1StableId": "fixture:farm-h2:03-terrace/h1:WaterAccess",
+      "Role": "WaterAccess",
+      "VisualKey": "candidate:farm.water-access",
+      "AssetFamilyId": "synty:polygon-farm:props:well",
+      "Bounds": {
+        "MinX": -12,
+        "MinZ": 10,
+        "MaxX": -8,
+        "MaxZ": 14,
+        "Valid": true
+      },
+      "Bottom": 0.61,
+      "Yaw": 0,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/decor:0",
+      "H1StableId": "fixture:farm-h2:03-terrace/h1:NaturalAccent",
+      "Role": "NaturalAccent",
+      "VisualKey": "candidate:farm.grass-accent",
+      "AssetFamilyId": "synty:polygon-farm:generic:grass",
+      "Bounds": {
+        "MinX": -17.46461432822156,
+        "MinZ": 18.703906309605557,
+        "MaxX": -16.46461432822156,
+        "MaxZ": 19.703906309605557,
+        "Valid": true
+      },
+      "Bottom": 0.61,
+      "Yaw": 344.2948043030442,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/decor:1",
+      "H1StableId": "fixture:farm-h2:03-terrace/h1:NaturalAccent",
+      "Role": "NaturalAccent",
+      "VisualKey": "candidate:farm.grass-accent",
+      "AssetFamilyId": "synty:polygon-farm:generic:grass",
+      "Bounds": {
+        "MinX": 4.675371938658735,
+        "MinZ": 1.5952468146791787,
+        "MaxX": 5.675371938658735,
+        "MaxZ": 2.5952468146791787,
+        "Valid": true
+      },
+      "Bottom": 0.61,
+      "Yaw": 354.42984664682996,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    }
+  ],
+  "Anchors": [
+    {
+      "StableId": "fixture:farm-h2:03-terrace/entry",
+      "Role": "ExternalEntry",
+      "Position": {
+        "X": 0,
+        "Z": -40
+      },
+      "OwnerStableId": "",
+      "Facing": "South"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/yard",
+      "Role": "BarnWorkYard",
+      "Position": {
+        "X": 0,
+        "Z": -12
+      },
+      "OwnerStableId": "",
+      "Facing": ""
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/work-path",
+      "Role": "InternalWorkPath",
+      "Position": {
+        "X": 0,
+        "Z": 12
+      },
+      "OwnerStableId": "",
+      "Facing": ""
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/exit",
+      "Role": "ExternalExit",
+      "Position": {
+        "X": 0,
+        "Z": 40
+      },
+      "OwnerStableId": "",
+      "Facing": "North"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/barn-door",
+      "Role": "H1Entrance",
+      "Position": {
+        "X": -4,
+        "Z": -12
+      },
+      "OwnerStableId": "fixture:farm-h2:03-terrace/barn",
+      "Facing": "East"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/field-access",
+      "Role": "H1Entrance",
+      "Position": {
+        "X": 9,
+        "Z": 12
+      },
+      "OwnerStableId": "fixture:farm-h2:03-terrace/field",
+      "Facing": "West"
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/well-access",
+      "Role": "H1Entrance",
+      "Position": {
+        "X": -8,
+        "Z": 12
+      },
+      "OwnerStableId": "fixture:farm-h2:03-terrace/well",
+      "Facing": "East"
+    }
+  ],
+  "Routes": [
+    {
+      "StableId": "fixture:farm-h2:03-terrace/entry-\u003Eyard",
+      "From": "fixture:farm-h2:03-terrace/entry",
+      "To": "fixture:farm-h2:03-terrace/yard",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/yard-\u003Ework-path",
+      "From": "fixture:farm-h2:03-terrace/yard",
+      "To": "fixture:farm-h2:03-terrace/work-path",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/work-path-\u003Eexit",
+      "From": "fixture:farm-h2:03-terrace/work-path",
+      "To": "fixture:farm-h2:03-terrace/exit",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/yard-\u003Ebarn-door",
+      "From": "fixture:farm-h2:03-terrace/yard",
+      "To": "fixture:farm-h2:03-terrace/barn-door",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/work-path-\u003Efield-access",
+      "From": "fixture:farm-h2:03-terrace/work-path",
+      "To": "fixture:farm-h2:03-terrace/field-access",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/work-path-\u003Ewell-access",
+      "From": "fixture:farm-h2:03-terrace/work-path",
+      "To": "fixture:farm-h2:03-terrace/well-access",
+      "Width": 3
+    }
+  ],
+  "PreservedAreas": [
+    {
+      "StableId": "fixture:farm-h2:03-terrace/river",
+      "Role": "MainRiver",
+      "Bounds": {
+        "MinX": -40,
+        "MinZ": -40,
+        "MaxX": -28,
+        "MaxZ": 40,
+        "Valid": true
+      }
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/river-buffer",
+      "Role": "NaturalBuffer",
+      "Bounds": {
+        "MinX": -28,
+        "MinZ": -40,
+        "MaxX": -24,
+        "MaxZ": 40,
+        "Valid": true
+      }
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/east-buffer",
+      "Role": "NaturalBuffer",
+      "Bounds": {
+        "MinX": 30,
+        "MinZ": -40,
+        "MaxX": 40,
+        "MaxZ": 40,
+        "Valid": true
+      }
+    },
+    {
+      "StableId": "fixture:farm-h2:03-terrace/yard-reservation",
+      "Role": "WorkYard",
+      "Bounds": {
+        "MinX": -3,
+        "MinZ": -16,
+        "MaxX": 3,
+        "MaxZ": -8,
+        "Valid": true
+      }
+    }
+  ],
+  "Issues": [],
+  "ResultHash": "370d3df9e4d800a460111a51a4e828ff88fa60e3d4f9f6386855deba7dd0cd9c",
+  "Status": "UnapprovedCandidate",
+  "PresentationOnly": true,
+  "NumericalPolicyIsTrial": true,
+  "ActualPrefabVerified": false,
+  "ActualTraversalVerified": false
+}

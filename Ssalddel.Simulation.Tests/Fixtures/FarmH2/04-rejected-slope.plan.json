@@ -1,0 +1,367 @@
+{
+  "SchemaVersion": "farm-h2-candidate.v1",
+  "PatternStableId": "candidate-pattern:farm-riverside-practical-h2",
+  "Input": {
+    "InstanceStableId": "fixture:farm-h2:04-rejected-slope",
+    "Seed": "farm-steep-317",
+    "PatternRevision": "farm-riverside-h2.trial.r1",
+    "SourceWorldRevision": 0,
+    "SourceContext": "ExplicitSyntheticFixture;NoAuthorityWI;Q297-Q339",
+    "Terrain": {
+      "StableId": "terrain:04-rejected-slope",
+      "Revision": "terrain-fixture.r1",
+      "Mode": "Slope",
+      "BaseHeight": 0,
+      "Amplitude": 0,
+      "SlopeX": 0.4,
+      "StepHeight": 0,
+      "Patches": []
+    },
+    "Policy": {
+      "MaximumSlope": 5,
+      "MaximumHeightSpread": 0.15,
+      "GroundClearance": 0.03,
+      "BottomTolerance": 0.015,
+      "MinimumSpacing": 0.55,
+      "RouteWidth": 3,
+      "RouteSampleStep": 0.5,
+      "MaximumRouteSlope": 12,
+      "MaximumRouteStep": 0.12
+    },
+    "Obstacles": []
+  },
+  "InputHash": "c73537943c23a0f2c84e24df37c93a80f77dae20ad447549dea81d0432c3cd2e",
+  "SurfaceHash": "70b380a59331abbe409d0f6f7851c746842bb01864e26ee6b2081d1d7cd9ba1d",
+  "Placements": [
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/barn",
+      "H1StableId": "fixture:farm-h2:04-rejected-slope/h1:BarnWorkYard",
+      "Role": "BarnWorkYard",
+      "VisualKey": "candidate:farm.red-barn",
+      "AssetFamilyId": "synty:polygon-farm:buildings:barn",
+      "Bounds": {
+        "MinX": -16,
+        "MinZ": -17,
+        "MaxX": -4,
+        "MaxZ": -7,
+        "Valid": true
+      },
+      "Bottom": -1.57,
+      "Yaw": 0,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/field",
+      "H1StableId": "fixture:farm-h2:04-rejected-slope/h1:ProductionPlot",
+      "Role": "ProductionPlot",
+      "VisualKey": "candidate:farm.crop-plot",
+      "AssetFamilyId": "synty:polygon-farm:environment:dirt-rows",
+      "Bounds": {
+        "MinX": 10,
+        "MinZ": 3,
+        "MaxX": 23,
+        "MaxZ": 24,
+        "Valid": true
+      },
+      "Bottom": 9.23,
+      "Yaw": 0,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/well",
+      "H1StableId": "fixture:farm-h2:04-rejected-slope/h1:WaterAccess",
+      "Role": "WaterAccess",
+      "VisualKey": "candidate:farm.water-access",
+      "AssetFamilyId": "synty:polygon-farm:props:well",
+      "Bounds": {
+        "MinX": -12,
+        "MinZ": 10,
+        "MaxX": -8,
+        "MaxZ": 14,
+        "Valid": true
+      },
+      "Bottom": -3.1700000000000004,
+      "Yaw": 0,
+      "Blocking": true,
+      "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+    }
+  ],
+  "Anchors": [
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/entry",
+      "Role": "ExternalEntry",
+      "Position": {
+        "X": 0,
+        "Z": -40
+      },
+      "OwnerStableId": "",
+      "Facing": "South"
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/yard",
+      "Role": "BarnWorkYard",
+      "Position": {
+        "X": 0,
+        "Z": -12
+      },
+      "OwnerStableId": "",
+      "Facing": ""
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/work-path",
+      "Role": "InternalWorkPath",
+      "Position": {
+        "X": 0,
+        "Z": 12
+      },
+      "OwnerStableId": "",
+      "Facing": ""
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/exit",
+      "Role": "ExternalExit",
+      "Position": {
+        "X": 0,
+        "Z": 40
+      },
+      "OwnerStableId": "",
+      "Facing": "North"
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/barn-door",
+      "Role": "H1Entrance",
+      "Position": {
+        "X": -4,
+        "Z": -12
+      },
+      "OwnerStableId": "fixture:farm-h2:04-rejected-slope/barn",
+      "Facing": "East"
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/field-access",
+      "Role": "H1Entrance",
+      "Position": {
+        "X": 10,
+        "Z": 12
+      },
+      "OwnerStableId": "fixture:farm-h2:04-rejected-slope/field",
+      "Facing": "West"
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/well-access",
+      "Role": "H1Entrance",
+      "Position": {
+        "X": -8,
+        "Z": 12
+      },
+      "OwnerStableId": "fixture:farm-h2:04-rejected-slope/well",
+      "Facing": "East"
+    }
+  ],
+  "Routes": [
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/entry-\u003Eyard",
+      "From": "fixture:farm-h2:04-rejected-slope/entry",
+      "To": "fixture:farm-h2:04-rejected-slope/yard",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/yard-\u003Ework-path",
+      "From": "fixture:farm-h2:04-rejected-slope/yard",
+      "To": "fixture:farm-h2:04-rejected-slope/work-path",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/work-path-\u003Eexit",
+      "From": "fixture:farm-h2:04-rejected-slope/work-path",
+      "To": "fixture:farm-h2:04-rejected-slope/exit",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/yard-\u003Ebarn-door",
+      "From": "fixture:farm-h2:04-rejected-slope/yard",
+      "To": "fixture:farm-h2:04-rejected-slope/barn-door",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/work-path-\u003Efield-access",
+      "From": "fixture:farm-h2:04-rejected-slope/work-path",
+      "To": "fixture:farm-h2:04-rejected-slope/field-access",
+      "Width": 3
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/work-path-\u003Ewell-access",
+      "From": "fixture:farm-h2:04-rejected-slope/work-path",
+      "To": "fixture:farm-h2:04-rejected-slope/well-access",
+      "Width": 3
+    }
+  ],
+  "PreservedAreas": [
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/river",
+      "Role": "MainRiver",
+      "Bounds": {
+        "MinX": -40,
+        "MinZ": -40,
+        "MaxX": -28,
+        "MaxZ": 40,
+        "Valid": true
+      }
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/river-buffer",
+      "Role": "NaturalBuffer",
+      "Bounds": {
+        "MinX": -28,
+        "MinZ": -40,
+        "MaxX": -24,
+        "MaxZ": 40,
+        "Valid": true
+      }
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/east-buffer",
+      "Role": "NaturalBuffer",
+      "Bounds": {
+        "MinX": 30,
+        "MinZ": -40,
+        "MaxX": 40,
+        "MaxZ": 40,
+        "Valid": true
+      }
+    },
+    {
+      "StableId": "fixture:farm-h2:04-rejected-slope/yard-reservation",
+      "Role": "WorkYard",
+      "Bounds": {
+        "MinX": -3,
+        "MinZ": -16,
+        "MaxX": 3,
+        "MaxZ": -8,
+        "Valid": true
+      }
+    }
+  ],
+  "Issues": [
+    {
+      "Code": "DecorationCandidateExhausted",
+      "Target": "fixture:farm-h2:04-rejected-slope"
+    },
+    {
+      "Code": "H1EntranceMissing",
+      "Target": "fixture:farm-h2:04-rejected-slope/barn"
+    },
+    {
+      "Code": "H1EntranceMissing",
+      "Target": "fixture:farm-h2:04-rejected-slope/field"
+    },
+    {
+      "Code": "H1EntranceMissing",
+      "Target": "fixture:farm-h2:04-rejected-slope/well"
+    },
+    {
+      "Code": "HeightSpreadExceeded",
+      "Target": "fixture:farm-h2:04-rejected-slope/barn"
+    },
+    {
+      "Code": "HeightSpreadExceeded",
+      "Target": "fixture:farm-h2:04-rejected-slope/field"
+    },
+    {
+      "Code": "HeightSpreadExceeded",
+      "Target": "fixture:farm-h2:04-rejected-slope/well"
+    },
+    {
+      "Code": "RouteDisconnected",
+      "Target": "fixture:farm-h2:04-rejected-slope/barn-door"
+    },
+    {
+      "Code": "RouteDisconnected",
+      "Target": "fixture:farm-h2:04-rejected-slope/exit"
+    },
+    {
+      "Code": "RouteDisconnected",
+      "Target": "fixture:farm-h2:04-rejected-slope/field-access"
+    },
+    {
+      "Code": "RouteDisconnected",
+      "Target": "fixture:farm-h2:04-rejected-slope/well-access"
+    },
+    {
+      "Code": "RouteDisconnected",
+      "Target": "fixture:farm-h2:04-rejected-slope/work-path"
+    },
+    {
+      "Code": "RouteDisconnected",
+      "Target": "fixture:farm-h2:04-rejected-slope/yard"
+    },
+    {
+      "Code": "RouteSlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/entry-\u003Eyard"
+    },
+    {
+      "Code": "RouteSlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/work-path-\u003Eexit"
+    },
+    {
+      "Code": "RouteSlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/work-path-\u003Efield-access"
+    },
+    {
+      "Code": "RouteSlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/work-path-\u003Ewell-access"
+    },
+    {
+      "Code": "RouteSlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/yard-\u003Ebarn-door"
+    },
+    {
+      "Code": "RouteSlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/yard-\u003Ework-path"
+    },
+    {
+      "Code": "RouteStepExceeded",
+      "Target": "fixture:farm-h2:04-rejected-slope/work-path-\u003Efield-access"
+    },
+    {
+      "Code": "RouteStepExceeded",
+      "Target": "fixture:farm-h2:04-rejected-slope/work-path-\u003Ewell-access"
+    },
+    {
+      "Code": "RouteStepExceeded",
+      "Target": "fixture:farm-h2:04-rejected-slope/yard-\u003Ebarn-door"
+    },
+    {
+      "Code": "SkeletonContinuityBroken",
+      "Target": "fixture:farm-h2:04-rejected-slope/exit"
+    },
+    {
+      "Code": "SkeletonContinuityBroken",
+      "Target": "fixture:farm-h2:04-rejected-slope/work-path"
+    },
+    {
+      "Code": "SkeletonContinuityBroken",
+      "Target": "fixture:farm-h2:04-rejected-slope/yard"
+    },
+    {
+      "Code": "SlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/barn"
+    },
+    {
+      "Code": "SlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/field"
+    },
+    {
+      "Code": "SlopeTooSteep",
+      "Target": "fixture:farm-h2:04-rejected-slope/well"
+    }
+  ],
+  "ResultHash": "c161aa86c33e7ade19229f206cf6143a4a72f96c8bba1640140bb30d3ded0e70",
+  "Status": "UnapprovedCandidate",
+  "PresentationOnly": true,
+  "NumericalPolicyIsTrial": true,
+  "ActualPrefabVerified": false,
+  "ActualTraversalVerified": false
+}
