@@ -31,6 +31,8 @@
 
 ## 진행 중 문답 정밀화
 
+- [HB-01 약초차 개발 승인 보완](Nature약초차-HB01개발승인보완.md) — Q368~377 전체 승인, 기존 지식 습득 r5 보존 및 내용물·가열·섭취 추가 범위.
+- [문답 기반 보편 WI 계층 정리](문답기반보편WI계층정리.md) — 기존 105개 WI·18개 군·5개 특화 관계와 문답의 공통 행위 후보를 구분한 검토 자료. 실행 승인이 아니다.
 - [Q-001~268 전체 문답 정리 상태판](PlanningSessions/문답정리상태판.md)
 - [문답 기록 routing과 주제별 색인](PlanningSessions/README.md)
 - [Nature 거점·수면·날씨·방어](PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md)
