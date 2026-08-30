@@ -37,7 +37,10 @@ namespace Ssalddel.Simulation.Application
             if (candidateHash != request.ExpectedCandidateHashSha256 || candidateHash != S(root, "ResultHash"))
                 throw Error("CandidateHashMismatch");
             var input = root.GetProperty("Input");
-            if (S(input, "PatternRevision") != "farm-riverside-h2.trial.r1"
+            var 후보판본 = S(input, "PatternRevision");
+            // D-320의 추가 후보 형식만 허용한다. 원본 hash·외곽·통행 검사는 그대로 수행한다.
+            if ((후보판본 != "farm-riverside-h2.trial.r1"
+                    && 후보판본 != "farm-riverside-h2.measured-expansion.r2")
                 || string.IsNullOrWhiteSpace(S(input, "Seed")) || string.IsNullOrWhiteSpace(S(input, "InstanceStableId"))
                 || OriginalHash(input) != S(root, "InputHash")) throw Error("CandidateInputHashMismatch");
             var sourceSurface = JsonSerializer.SerializeToElement(new { Terrain = input.GetProperty("Terrain"), Seed = S(input, "Seed") });

@@ -1,0 +1,2448 @@
+{
+  "sourceSha256": "99F8B557D4DC8C2E6044D7D7D688B043CBF502F86C5370418F44D6EE09BE9CC8",
+  "records": [
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Barn_01.prefab",
+      "prefabSha256": "727ed17b903b0d7bbd1f25a2d7636f377637b77c606fc2ef0a70696b76813c59",
+      "metaSha256": "a0af0c55af03190724c7d8ca4153f271d6fe3bb25adcc2a5c0815a4d1b406d10",
+      "dependencyFingerprintSha256": "43e124930635ba7aa213268e278a243f1800c240af554b3b500f9174d0ae5ed6",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Buildings/SM_Bld_Barn_01.prefab",
+        "AssetFingerprintSha256": "43e124930635ba7aa213268e278a243f1800c240af554b3b500f9174d0ae5ed6",
+        "MeasurementHashSha256": "",
+        "CenterX": 0.000002384185791015625,
+        "CenterY": 4.552682399749756,
+        "CenterZ": -9.5367431640625e-7,
+        "SizeX": 13.494843482971191,
+        "SizeY": 9.105387687683105,
+        "SizeZ": 14.15782356262207,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": true
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0.00000238418579,
+            4.5526824,
+            -9.536743e-7
+          ],
+          "size": [
+            13.4948435,
+            9.105388,
+            14.1578236
+          ],
+          "min": [
+            -6.74741936,
+            -0.0000114440918,
+            -7.07891273
+          ],
+          "max": [
+            6.747424,
+            9.105376,
+            7.078911
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Bld_Barn_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0.00000238418579,
+                4.5526824,
+                -0.0000011920929
+              ],
+              "size": [
+                13.4948435,
+                9.105388,
+                14.1578236
+              ],
+              "min": [
+                -6.74741936,
+                -0.0000114440918,
+                -7.07891273
+              ],
+              "max": [
+                6.747424,
+                9.105376,
+                7.078911
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0.00000238418579,
+                4.5526824,
+                -9.536743e-7
+              ],
+              "size": [
+                13.4948435,
+                9.105388,
+                14.1578236
+              ],
+              "min": [
+                -6.74741936,
+                -0.0000114440918,
+                -7.07891273
+              ],
+              "max": [
+                6.747424,
+                9.105376,
+                7.078911
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                3.427267e-7,
+                1.75814033,
+                -5.364418e-7
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89420891
+              ],
+              "min": [
+                -0.101241112,
+                0,
+                -0.947105
+              ],
+              "max": [
+                0.1012418,
+                3.51628065,
+                0.9471039
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                5.830969,
+                1.75812876,
+                0.949129939
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89420891
+              ],
+              "min": [
+                5.72972775,
+                -0.0000115633011,
+                0.002025485
+              ],
+              "max": [
+                5.93221,
+                3.51626921,
+                1.89623439
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_02",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                3.427267e-7,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -0.101241112,
+                0,
+                -0.9471055
+              ],
+              "max": [
+                0.1012418,
+                3.51628065,
+                0.94710815
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                5.830969,
+                1.75812876,
+                -0.9450815
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                5.72972775,
+                -0.0000115633011,
+                -1.89218831
+              ],
+              "max": [
+                5.93221,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_03",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                -5.364418e-7
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89420891
+              ],
+              "min": [
+                -0.101241469,
+                0,
+                -0.947105
+              ],
+              "max": [
+                0.10124144,
+                3.51628065,
+                0.9471039
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                -5.82665157,
+                1.75812876,
+                0.949129939
+              ],
+              "size": [
+                0.202483177,
+                3.51628065,
+                1.89420891
+              ],
+              "min": [
+                -5.927893,
+                -0.0000115633011,
+                0.002025485
+              ],
+              "max": [
+                -5.72541,
+                3.51626921,
+                1.89623439
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_04",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -0.101241469,
+                0,
+                -0.9471055
+              ],
+              "max": [
+                0.10124144,
+                3.51628065,
+                0.94710815
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                -5.82665157,
+                1.75812876,
+                -0.9450815
+              ],
+              "size": [
+                0.202483177,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -5.927893,
+                -0.0000115633011,
+                -1.89218831
+              ],
+              "max": [
+                -5.72541,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Shutter_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -0.0602096,
+                0,
+                -0.6957766
+              ],
+              "size": [
+                0.187060535,
+                2.01756454,
+                1.433505
+              ],
+              "min": [
+                -0.15373987,
+                -1.00878227,
+                -1.41252911
+              ],
+              "max": [
+                0.03332067,
+                1.00878227,
+                0.0209759474
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                5.675889,
+                5.179363,
+                0.0103811622
+              ],
+              "size": [
+                0.18706131,
+                2.01756477,
+                1.433505
+              ],
+              "min": [
+                5.58235836,
+                4.17058039,
+                -0.706371367
+              ],
+              "max": [
+                5.76941967,
+                6.188145,
+                0.7271337
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Shutter_02",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0.0611933321,
+                0,
+                0.6957749
+              ],
+              "size": [
+                0.187061161,
+                2.01756454,
+                1.433505
+              ],
+              "min": [
+                -0.03233725,
+                -1.00878227,
+                -0.0209776163
+              ],
+              "max": [
+                0.154723912,
+                1.00878227,
+                1.41252744
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                -5.697389,
+                5.179363,
+                0.0103811026
+              ],
+              "size": [
+                0.18706131,
+                2.01756477,
+                1.433505
+              ],
+              "min": [
+                -5.79092,
+                4.17058039,
+                -0.7063714
+              ],
+              "max": [
+                -5.60385847,
+                6.188145,
+                0.727133632
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": [
+          {
+            "path": "SM_Bld_Barn_01",
+            "type": "MeshCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                0.000002861023,
+                4.55788755,
+                -0.00812912
+              ],
+              "size": [
+                13.4948444,
+                9.115798,
+                14.1394224
+              ],
+              "min": [
+                -6.74741936,
+                -0.0000114440918,
+                -7.07784033
+              ],
+              "max": [
+                6.747425,
+                9.115787,
+                7.061582
+              ]
+            },
+            "geometry": {
+              "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/SM_Bld_Barn_01_Collision.fbx",
+              "meshName": "SM_Bld_Barn_01_Collision",
+              "convex": false,
+              "bounds": {
+                "center": [
+                  0.00000309944153,
+                  4.55788755,
+                  -0.00812912
+                ],
+                "size": [
+                  13.4948444,
+                  9.115798,
+                  14.1394224
+                ],
+                "min": [
+                  -6.74741936,
+                  -0.0000114440918,
+                  -7.07784033
+                ],
+                "max": [
+                  6.747425,
+                  9.115787,
+                  7.061582
+                ]
+              }
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_01",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                5.830969,
+                1.75812888,
+                0.949129939
+              ],
+              "size": [
+                0.202483177,
+                3.51628065,
+                1.89420891
+              ],
+              "min": [
+                5.72972727,
+                -0.0000114440918,
+                0.002025485
+              ],
+              "max": [
+                5.93221045,
+                3.51626921,
+                1.89623439
+              ]
+            },
+            "geometry": {
+              "center": [
+                3.427267e-7,
+                1.75814033,
+                -5.364418e-7
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89420891
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_02",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                5.830969,
+                1.75812888,
+                -0.9450815
+              ],
+              "size": [
+                0.202483177,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                5.72972727,
+                -0.0000114440918,
+                -1.89218831
+              ],
+              "max": [
+                5.93221045,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "geometry": {
+              "center": [
+                3.427267e-7,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89421368
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_03",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -5.82665157,
+                1.75812888,
+                0.949129939
+              ],
+              "size": [
+                0.202483177,
+                3.51628065,
+                1.89420891
+              ],
+              "min": [
+                -5.927893,
+                -0.0000114440918,
+                0.002025485
+              ],
+              "max": [
+                -5.72541,
+                3.51626921,
+                1.89623439
+              ]
+            },
+            "geometry": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                -5.364418e-7
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89420891
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Door_04",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -5.82665157,
+                1.75812888,
+                -0.9450815
+              ],
+              "size": [
+                0.202483177,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -5.927893,
+                -0.0000114440918,
+                -1.89218831
+              ],
+              "max": [
+                -5.72541,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "geometry": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.202482909,
+                3.51628065,
+                1.89421368
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Shutter_01",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                5.67588854,
+                5.179363,
+                0.0103811622
+              ],
+              "size": [
+                0.187060356,
+                2.01756477,
+                1.433505
+              ],
+              "min": [
+                5.58235836,
+                4.17058039,
+                -0.706371367
+              ],
+              "max": [
+                5.76941872,
+                6.188145,
+                0.7271337
+              ]
+            },
+            "geometry": {
+              "center": [
+                -0.0602096,
+                0,
+                -0.6957766
+              ],
+              "size": [
+                0.187060535,
+                2.01756454,
+                1.433505
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_01/SM_Bld_Barn_01_Shutter_02",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -5.697389,
+                5.179363,
+                0.0103811026
+              ],
+              "size": [
+                0.18706131,
+                2.01756477,
+                1.433505
+              ],
+              "min": [
+                -5.79092,
+                4.17058039,
+                -0.7063714
+              ],
+              "max": [
+                -5.60385847,
+                6.188145,
+                0.727133632
+              ]
+            },
+            "geometry": {
+              "center": [
+                0.0611933321,
+                0,
+                0.6957749
+              ],
+              "size": [
+                0.187061161,
+                2.01756454,
+                1.433505
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Barn_02.prefab",
+      "prefabSha256": "f8e58cd74e67d91714af4aa4c90029609d646bb7dee1b0fa75ed7d78949dcb1a",
+      "metaSha256": "286c77f593d6ab80559184296d7653740db8b147ea616678a2e077ab21d1ebf6",
+      "dependencyFingerprintSha256": "b75924cf67357599af7e44d41f36a9a59445da972e9b41a4b16df94e9bdb32f5",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Buildings/SM_Bld_Barn_02.prefab",
+        "AssetFingerprintSha256": "b75924cf67357599af7e44d41f36a9a59445da972e9b41a4b16df94e9bdb32f5",
+        "MeasurementHashSha256": "",
+        "CenterX": 0,
+        "CenterY": 4.552682399749756,
+        "CenterZ": 0,
+        "SizeX": 13.494843482971191,
+        "SizeY": 9.105387687683105,
+        "SizeZ": 7.435111999511719,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": true
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0,
+            4.5526824,
+            0
+          ],
+          "size": [
+            13.4948435,
+            9.105388,
+            7.435112
+          ],
+          "min": [
+            -6.74742174,
+            -0.0000114440918,
+            -3.717556
+          ],
+          "max": [
+            6.74742174,
+            9.105376,
+            3.717556
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Bld_Barn_02",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0,
+                4.5526824,
+                0
+              ],
+              "size": [
+                13.4948435,
+                9.105388,
+                7.435112
+              ],
+              "min": [
+                -6.74742174,
+                -0.0000114440918,
+                -3.717556
+              ],
+              "max": [
+                6.74742174,
+                9.105376,
+                3.717556
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0,
+                4.5526824,
+                0
+              ],
+              "size": [
+                13.4948435,
+                9.105388,
+                7.435112
+              ],
+              "min": [
+                -6.74742174,
+                -0.0000114440918,
+                -3.717556
+              ],
+              "max": [
+                6.74742174,
+                9.105376,
+                3.717556
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                6.854534e-7
+              ],
+              "size": [
+                0.202482283,
+                3.51628065,
+                1.89421129
+              ],
+              "min": [
+                -0.101241156,
+                0,
+                -0.947104931
+              ],
+              "max": [
+                0.101241127,
+                3.51628065,
+                0.947106361
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                5.83096838,
+                1.75812876,
+                0.9491312
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421129
+              ],
+              "min": [
+                5.72972727,
+                -0.0000115633011,
+                0.00202554464
+              ],
+              "max": [
+                5.93220949,
+                3.51626921,
+                1.8962369
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_02",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.202482283,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -0.101241156,
+                0,
+                -0.9471055
+              ],
+              "max": [
+                0.101241127,
+                3.51628065,
+                0.94710815
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                5.83096838,
+                1.75812876,
+                -0.9450815
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                5.72972727,
+                -0.0000115633011,
+                -1.89218831
+              ],
+              "max": [
+                5.93220949,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_03",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                2.30968e-7,
+                1.75814033,
+                6.854534e-7
+              ],
+              "size": [
+                0.2024823,
+                3.51628065,
+                1.89421129
+              ],
+              "min": [
+                -0.101240918,
+                0,
+                -0.947104931
+              ],
+              "max": [
+                0.10124138,
+                3.51628065,
+                0.947106361
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                -5.82665157,
+                1.75812876,
+                0.9491312
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421129
+              ],
+              "min": [
+                -5.92789268,
+                -0.0000115633011,
+                0.00202554464
+              ],
+              "max": [
+                -5.72541046,
+                3.51626921,
+                1.8962369
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_04",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                2.30968e-7,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.2024823,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -0.101240918,
+                0,
+                -0.9471055
+              ],
+              "max": [
+                0.10124138,
+                3.51628065,
+                0.94710815
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                -5.82665157,
+                1.75812876,
+                -0.9450815
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -5.92789268,
+                -0.0000115633011,
+                -1.89218831
+              ],
+              "max": [
+                -5.72541046,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Shutter_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -0.0602096543,
+                0,
+                -0.6957754
+              ],
+              "size": [
+                0.18706055,
+                2.01756454,
+                1.43350267
+              ],
+              "min": [
+                -0.153739929,
+                -1.00878227,
+                -1.41252673
+              ],
+              "max": [
+                0.03332062,
+                1.00878227,
+                0.0209759474
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                5.675888,
+                5.179363,
+                0.0103823543
+              ],
+              "size": [
+                0.187060356,
+                2.01756477,
+                1.43350267
+              ],
+              "min": [
+                5.582358,
+                4.17058039,
+                -0.706369
+              ],
+              "max": [
+                5.76941824,
+                6.188145,
+                0.7271337
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Shutter_02",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0.0611935854,
+                0,
+                0.695776165
+              ],
+              "size": [
+                0.187060535,
+                2.01756454,
+                1.43350255
+              ],
+              "min": [
+                -0.0323366821,
+                -1.00878227,
+                -0.0209751129
+              ],
+              "max": [
+                0.154723853,
+                1.00878227,
+                1.41252744
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                -5.6973896,
+                5.179363,
+                0.0103824139
+              ],
+              "size": [
+                0.187060356,
+                2.01756477,
+                1.43350255
+              ],
+              "min": [
+                -5.79092,
+                4.17058039,
+                -0.706368864
+              ],
+              "max": [
+                -5.60385942,
+                6.188145,
+                0.7271337
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": [
+          {
+            "path": "SM_Bld_Barn_02",
+            "type": "MeshCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                0.000002861023,
+                4.5619483,
+                -0.00812912
+              ],
+              "size": [
+                13.4948444,
+                9.10767651,
+                7.44969845
+              ],
+              "min": [
+                -6.74741936,
+                0.008110046,
+                -3.73297834
+              ],
+              "max": [
+                6.747425,
+                9.115787,
+                3.71672
+              ]
+            },
+            "geometry": {
+              "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/SM_Bld_Barn_02_Collision.fbx",
+              "meshName": "SM_Bld_Barn_02_Collision",
+              "convex": false,
+              "bounds": {
+                "center": [
+                  0.00000309944153,
+                  4.5619483,
+                  -0.008129239
+                ],
+                "size": [
+                  13.4948444,
+                  9.10767651,
+                  7.44969845
+                ],
+                "min": [
+                  -6.74741936,
+                  0.008110046,
+                  -3.73297834
+                ],
+                "max": [
+                  6.747425,
+                  9.115787,
+                  3.71672
+                ]
+              }
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_01",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                5.83096838,
+                1.75812888,
+                0.949131131
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421129
+              ],
+              "min": [
+                5.72972727,
+                -0.0000114440918,
+                0.002025485
+              ],
+              "max": [
+                5.93220949,
+                3.51626921,
+                1.89623678
+              ]
+            },
+            "geometry": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                6.854534e-7
+              ],
+              "size": [
+                0.202482283,
+                3.51628065,
+                1.89421129
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_02",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                5.83096838,
+                1.75812888,
+                -0.9450815
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                5.72972727,
+                -0.0000114440918,
+                -1.89218831
+              ],
+              "max": [
+                5.93220949,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "geometry": {
+              "center": [
+                -1.86264515e-8,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.202482283,
+                3.51628065,
+                1.89421368
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_03",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -5.826652,
+                1.75812888,
+                0.949131131
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421129
+              ],
+              "min": [
+                -5.927893,
+                -0.0000114440918,
+                0.002025485
+              ],
+              "max": [
+                -5.725411,
+                3.51626921,
+                1.89623678
+              ]
+            },
+            "geometry": {
+              "center": [
+                2.30968e-7,
+                1.75814033,
+                6.854534e-7
+              ],
+              "size": [
+                0.2024823,
+                3.51628065,
+                1.89421129
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Door_04",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -5.826652,
+                1.75812888,
+                -0.9450815
+              ],
+              "size": [
+                0.202482224,
+                3.51628065,
+                1.89421368
+              ],
+              "min": [
+                -5.927893,
+                -0.0000114440918,
+                -1.89218831
+              ],
+              "max": [
+                -5.725411,
+                3.51626921,
+                0.00202536583
+              ]
+            },
+            "geometry": {
+              "center": [
+                2.30968e-7,
+                1.75814033,
+                0.00000134110451
+              ],
+              "size": [
+                0.2024823,
+                3.51628065,
+                1.89421368
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Shutter_01",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                5.675888,
+                5.179363,
+                0.0103823543
+              ],
+              "size": [
+                0.187060356,
+                2.01756477,
+                1.43350267
+              ],
+              "min": [
+                5.582358,
+                4.17058039,
+                -0.706369
+              ],
+              "max": [
+                5.76941824,
+                6.188145,
+                0.7271337
+              ]
+            },
+            "geometry": {
+              "center": [
+                -0.0602096543,
+                0,
+                -0.6957754
+              ],
+              "size": [
+                0.18706055,
+                2.01756454,
+                1.43350267
+              ]
+            }
+          },
+          {
+            "path": "SM_Bld_Barn_02/SM_Bld_Barn_02_Shutter_02",
+            "type": "BoxCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -5.6973896,
+                5.179363,
+                0.0103824139
+              ],
+              "size": [
+                0.187060356,
+                2.01756477,
+                1.43350255
+              ],
+              "min": [
+                -5.79092,
+                4.17058039,
+                -0.706368864
+              ],
+              "max": [
+                -5.60385942,
+                6.188145,
+                0.7271337
+              ]
+            },
+            "geometry": {
+              "center": [
+                0.0611935854,
+                0,
+                0.695776165
+              ],
+              "size": [
+                0.187060535,
+                2.01756454,
+                1.43350255
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_Rows_01.prefab",
+      "prefabSha256": "1c9876de7fe7b6f3800617ecb0b23c2206152d4af1b7c6065193e7774356e15a",
+      "metaSha256": "8a15007ed17215972969bb5160f8bf65ed27f8e6ce3eb035de011040e57d7f30",
+      "dependencyFingerprintSha256": "f37d1fa4ee5ed756145d21f8b4507b548ed0d4ccf7629fb0ae112d919f874668",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Environments/SM_Env_Dirt_Rows_01.prefab",
+        "AssetFingerprintSha256": "f37d1fa4ee5ed756145d21f8b4507b548ed0d4ccf7629fb0ae112d919f874668",
+        "MeasurementHashSha256": "",
+        "CenterX": -2.495269775390625,
+        "CenterY": 0.09919672459363937,
+        "CenterZ": 2.509810447692871,
+        "SizeX": 4.990549087524414,
+        "SizeY": 0.19839344918727875,
+        "SizeZ": 5.068393707275391,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": true
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            -2.49526978,
+            0.0991967246,
+            2.50981045
+          ],
+          "size": [
+            4.990549,
+            0.198393449,
+            5.06839371
+          ],
+          "min": [
+            -4.99054432,
+            0,
+            -0.0243864059
+          ],
+          "max": [
+            0.00000476837158,
+            0.198393449,
+            5.0440073
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Env_Dirt_Rows_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -2.49526978,
+                0.0991967246,
+                2.50981045
+              ],
+              "size": [
+                4.990549,
+                0.198393449,
+                5.06839371
+              ],
+              "min": [
+                -4.99054432,
+                0,
+                -0.0243864059
+              ],
+              "max": [
+                0.00000476837158,
+                0.198393449,
+                5.0440073
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                -2.49526978,
+                0.0991967246,
+                2.50981045
+              ],
+              "size": [
+                4.990549,
+                0.198393449,
+                5.06839371
+              ],
+              "min": [
+                -4.99054432,
+                0,
+                -0.0243864059
+              ],
+              "max": [
+                0.00000476837158,
+                0.198393449,
+                5.0440073
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": [
+          {
+            "path": "SM_Env_Dirt_Rows_01",
+            "type": "MeshCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -2.49526978,
+                0.0991967246,
+                2.50981045
+              ],
+              "size": [
+                4.990549,
+                0.198393449,
+                5.06839371
+              ],
+              "min": [
+                -4.99054432,
+                0,
+                -0.0243864059
+              ],
+              "max": [
+                0.00000476837158,
+                0.198393449,
+                5.0440073
+              ]
+            },
+            "geometry": {
+              "meshPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Dirt_Rows_01.fbx",
+              "meshName": "SM_Env_Dirt_Rows_01",
+              "convex": false,
+              "bounds": {
+                "center": [
+                  -2.49526978,
+                  0.0991967246,
+                  2.50981045
+                ],
+                "size": [
+                  4.990549,
+                  0.198393449,
+                  5.06839371
+                ],
+                "min": [
+                  -4.99054432,
+                  0,
+                  -0.0243864059
+                ],
+                "max": [
+                  0.00000476837158,
+                  0.198393449,
+                  5.0440073
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_S.prefab",
+      "prefabSha256": "2d5093e764f6f66c08ec2c862ecdf250745b66694ce5278622083e3c9fd12912",
+      "metaSha256": "ee7cdcb2404c218f97697c60b6e1299a307dde102b9f52c1e54c1ebfe917bd70",
+      "dependencyFingerprintSha256": "46ec931e3485e60a91cffefa2b014bc7a3b4d5f77f5dfb7ed519242e7b4929f9",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Plants/SM_Prop_Plant_Potato_01_S.prefab",
+        "AssetFingerprintSha256": "46ec931e3485e60a91cffefa2b014bc7a3b4d5f77f5dfb7ed519242e7b4929f9",
+        "MeasurementHashSha256": "",
+        "CenterX": 0,
+        "CenterY": 0.12342609465122223,
+        "CenterZ": 0,
+        "SizeX": 0.18684935569763184,
+        "SizeY": 0.3714474141597748,
+        "SizeZ": 0.26202392578125,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": false
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0,
+            0.123426095,
+            0
+          ],
+          "size": [
+            0.186849356,
+            0.3714474,
+            0.262023926
+          ],
+          "min": [
+            -0.09342468,
+            -0.0622976124,
+            -0.131011963
+          ],
+          "max": [
+            0.09342468,
+            0.3091498,
+            0.131011963
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Prop_Plant_Potato_01_S",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0,
+                0.123426095,
+                0
+              ],
+              "size": [
+                0.186849356,
+                0.3714474,
+                0.262023926
+              ],
+              "min": [
+                -0.09342468,
+                -0.0622976124,
+                -0.131011963
+              ],
+              "max": [
+                0.09342468,
+                0.3091498,
+                0.131011963
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0,
+                0.123426095,
+                0
+              ],
+              "size": [
+                0.186849356,
+                0.3714474,
+                0.262023926
+              ],
+              "min": [
+                -0.09342468,
+                -0.0622976124,
+                -0.131011963
+              ],
+              "max": [
+                0.09342468,
+                0.3091498,
+                0.131011963
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "Assets/Synty/PolygonFarm/Materials/Misc/Leaf_01.mat"
+            ]
+          }
+        ],
+        "colliders": []
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_L.prefab",
+      "prefabSha256": "fc01f89a96545d8fba023fcae7be54f4eae5330306a46519d52d6f3c945ff627",
+      "metaSha256": "d960a73f1fb4eb2a5a55a3f8045c65b7ff0a889771aabeca8ca1085cdbb98703",
+      "dependencyFingerprintSha256": "376104d5cef4c47d1e51bc0224ec338e1a744c0abcd02bb67ebefc7959b95e1e",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Plants/SM_Prop_Plant_Potato_01_L.prefab",
+        "AssetFingerprintSha256": "376104d5cef4c47d1e51bc0224ec338e1a744c0abcd02bb67ebefc7959b95e1e",
+        "MeasurementHashSha256": "",
+        "CenterX": 0.02407941222190857,
+        "CenterY": 0.4739534258842468,
+        "CenterZ": -0.0062496960163116455,
+        "SizeX": 1.1754415035247803,
+        "SizeY": 1.0050066709518433,
+        "SizeZ": 1.1260955333709717,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": false
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0.0240794122,
+            0.473953426,
+            -0.006249696
+          ],
+          "size": [
+            1.1754415,
+            1.00500667,
+            1.12609553
+          ],
+          "min": [
+            -0.5636413,
+            -0.02854991,
+            -0.569297433
+          ],
+          "max": [
+            0.6118002,
+            0.976456761,
+            0.5567981
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Prop_Plant_Potato_01_L",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0.0240794122,
+                0.473953426,
+                -0.006249696
+              ],
+              "size": [
+                1.1754415,
+                1.00500667,
+                1.12609553
+              ],
+              "min": [
+                -0.5636413,
+                -0.02854991,
+                -0.569297433
+              ],
+              "max": [
+                0.6118002,
+                0.976456761,
+                0.5567981
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0.024079442,
+                0.473953426,
+                -0.006249666
+              ],
+              "size": [
+                1.1754415,
+                1.00500667,
+                1.12609553
+              ],
+              "min": [
+                -0.5636413,
+                -0.02854991,
+                -0.569297433
+              ],
+              "max": [
+                0.6118002,
+                0.976456761,
+                0.5567981
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/Misc/Leaf_01.mat",
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": []
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Box_Potato_01.prefab",
+      "prefabSha256": "a128993cf0644a5988a537a0196dc69dcd36619538fc499e01ed7f5a3377c583",
+      "metaSha256": "374ed7092770d129bfc362baa94068f24ce76eadc5ee3b6aee29a0498306011b",
+      "dependencyFingerprintSha256": "69862f79e92b76085b7b46e48b10508baae7ab191325b254af0638f15cfedc44",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Plants/SM_Prop_Box_Potato_01.prefab",
+        "AssetFingerprintSha256": "69862f79e92b76085b7b46e48b10508baae7ab191325b254af0638f15cfedc44",
+        "MeasurementHashSha256": "",
+        "CenterX": 0,
+        "CenterY": 0.19256702065467834,
+        "CenterZ": 1.4901161193847656e-7,
+        "SizeX": 0.7557360529899597,
+        "SizeY": 0.3851340413093567,
+        "SizeZ": 0.452614426612854,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": true
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0,
+            0.192567021,
+            1.49011612e-7
+          ],
+          "size": [
+            0.755736053,
+            0.385134041,
+            0.452614427
+          ],
+          "min": [
+            -0.377868026,
+            0,
+            -0.226307064
+          ],
+          "max": [
+            0.377868026,
+            0.385134041,
+            0.226307362
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Prop_Box_Potato_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0,
+                0.192567021,
+                1.49011612e-7
+              ],
+              "size": [
+                0.755736053,
+                0.385134041,
+                0.452614427
+              ],
+              "min": [
+                -0.377868026,
+                0,
+                -0.226307064
+              ],
+              "max": [
+                0.377868026,
+                0.385134041,
+                0.226307362
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0,
+                0.192567021,
+                1.49011612e-7
+              ],
+              "size": [
+                0.755736053,
+                0.385134041,
+                0.452614427
+              ],
+              "min": [
+                -0.377868026,
+                0,
+                -0.226307064
+              ],
+              "max": [
+                0.377868026,
+                0.385134041,
+                0.226307362
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": [
+          {
+            "path": "SM_Prop_Box_Potato_01",
+            "type": "MeshCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -0.00204589963,
+                0.19178836,
+                0.00054576993
+              ],
+              "size": [
+                0.740373254,
+                0.383576721,
+                0.451523185
+              ],
+              "min": [
+                -0.372232527,
+                0,
+                -0.225215822
+              ],
+              "max": [
+                0.368140727,
+                0.383576721,
+                0.226307362
+              ]
+            },
+            "geometry": {
+              "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Box_Potato_01_Convex.asset",
+              "meshName": "SM_Prop_Box_Potato_01_Convex",
+              "convex": true,
+              "bounds": {
+                "center": [
+                  -0.00204588473,
+                  0.19178836,
+                  0.0005457625
+                ],
+                "size": [
+                  0.740373254,
+                  0.383576721,
+                  0.451523185
+                ],
+                "min": [
+                  -0.3722325,
+                  0,
+                  -0.225215822
+                ],
+                "max": [
+                  0.368140757,
+                  0.383576721,
+                  0.226307362
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Well_01.prefab",
+      "prefabSha256": "faa41d302f4ee21b20bd1a01e596cfe4345a80d08176793f36bd802f53b59b4d",
+      "metaSha256": "4b63c1ee1c6df12a0b61adf77d929955eff62673adf6382aa68e8f2d9d32a17d",
+      "dependencyFingerprintSha256": "858f4d786ee9776a8f3284a6b8cfa40e019ae6fbf1f3b0047dda6c2245eb1777",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Props/SM_Prop_Well_01.prefab",
+        "AssetFingerprintSha256": "858f4d786ee9776a8f3284a6b8cfa40e019ae6fbf1f3b0047dda6c2245eb1777",
+        "MeasurementHashSha256": "",
+        "CenterX": 0.10235893726348877,
+        "CenterY": 0.5720458030700684,
+        "CenterZ": 0,
+        "SizeX": 1.601893424987793,
+        "SizeY": 1.6754071712493896,
+        "SizeZ": 1.4147334098815918,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": true
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0.102358937,
+            0.5720458,
+            0
+          ],
+          "size": [
+            1.60189342,
+            1.67540717,
+            1.41473341
+          ],
+          "min": [
+            -0.6985878,
+            -0.265657783,
+            -0.7073667
+          ],
+          "max": [
+            0.90330565,
+            1.40974939,
+            0.7073667
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Prop_Well_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0,
+                0.5720458,
+                0
+              ],
+              "size": [
+                1.39717555,
+                1.67540717,
+                1.41473341
+              ],
+              "min": [
+                -0.6985878,
+                -0.265657783,
+                -0.7073667
+              ],
+              "max": [
+                0.6985878,
+                1.40974939,
+                0.7073667
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0,
+                0.5720458,
+                0
+              ],
+              "size": [
+                1.39717555,
+                1.67540717,
+                1.41473341
+              ],
+              "min": [
+                -0.6985878,
+                -0.265657783,
+                -0.7073667
+              ],
+              "max": [
+                0.6985878,
+                1.40974939,
+                0.7073667
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          },
+          {
+            "path": "SM_Prop_Well_01/SM_Prop_Well_Handle_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                -0.5155438,
+                -0.0915609151,
+                -3.7252903e-8
+              ],
+              "size": [
+                1.43391466,
+                0.3238189,
+                0.117964588
+              ],
+              "min": [
+                -1.23250115,
+                -0.253470361,
+                -0.05898233
+              ],
+              "max": [
+                0.201413512,
+                0.07034853,
+                0.0589822568
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0.186348259,
+                0.9596906,
+                -3.7252903e-8
+              ],
+              "size": [
+                1.43391466,
+                0.323818922,
+                0.117964588
+              ],
+              "min": [
+                -0.5306091,
+                0.7977811,
+                -0.05898233
+              ],
+              "max": [
+                0.9033056,
+                1.1216,
+                0.0589822568
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": [
+          {
+            "path": "SM_Prop_Well_01",
+            "type": "MeshCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -0.0106010437,
+                0.5900359,
+                0.01072228
+              ],
+              "size": [
+                1.2564553,
+                1.66602063,
+                1.40935493
+              ],
+              "min": [
+                -0.6388287,
+                -0.2429744,
+                -0.6939552
+              ],
+              "max": [
+                0.6176266,
+                1.42304623,
+                0.715399742
+              ]
+            },
+            "geometry": {
+              "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Well_01_Convex.asset",
+              "meshName": "SM_Prop_Well_01_Convex",
+              "convex": true,
+              "bounds": {
+                "center": [
+                  -0.0106010437,
+                  0.5900359,
+                  0.01072225
+                ],
+                "size": [
+                  1.2564553,
+                  1.66602063,
+                  1.40935493
+                ],
+                "min": [
+                  -0.6388287,
+                  -0.2429744,
+                  -0.6939552
+                ],
+                "max": [
+                  0.6176266,
+                  1.42304623,
+                  0.715399742
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Barrel_01.prefab",
+      "prefabSha256": "92998ee3fd7bbcf41945c6cfc40a799880aad6cb0905012dd23df25dd1e3ec63",
+      "metaSha256": "7c57029c76aa0f4c247cda391cbd52987ea547653e08b3a9bf6c543c26ef7ba1",
+      "dependencyFingerprintSha256": "ffaa13e46dd85fe049c8b58c629a5f1cfa62fbbe8f53c851af6f0b8812a8c60f",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Props/SM_Prop_Barrel_01.prefab",
+        "AssetFingerprintSha256": "ffaa13e46dd85fe049c8b58c629a5f1cfa62fbbe8f53c851af6f0b8812a8c60f",
+        "MeasurementHashSha256": "",
+        "CenterX": 0,
+        "CenterY": 0.5798423290252686,
+        "CenterZ": 0,
+        "SizeX": 0.907943606376648,
+        "SizeY": 1.159684419631958,
+        "SizeZ": 0.907943606376648,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": true
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0,
+            0.5798423,
+            0
+          ],
+          "size": [
+            0.9079436,
+            1.15968442,
+            0.9079436
+          ],
+          "min": [
+            -0.4539718,
+            1.1920929e-7,
+            -0.4539718
+          ],
+          "max": [
+            0.4539718,
+            1.15968454,
+            0.4539718
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Prop_Barrel_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0,
+                0.5798423,
+                0
+              ],
+              "size": [
+                0.9079436,
+                1.15968442,
+                0.9079436
+              ],
+              "min": [
+                -0.4539718,
+                1.1920929e-7,
+                -0.4539718
+              ],
+              "max": [
+                0.4539718,
+                1.15968454,
+                0.4539718
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0,
+                0.5798423,
+                0
+              ],
+              "size": [
+                0.9079436,
+                1.15968442,
+                0.9079436
+              ],
+              "min": [
+                -0.4539718,
+                1.1920929e-7,
+                -0.4539718
+              ],
+              "max": [
+                0.4539718,
+                1.15968454,
+                0.4539718
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": [
+          {
+            "path": "SM_Prop_Barrel_01",
+            "type": "MeshCollider",
+            "enabled": true,
+            "isTrigger": false,
+            "active": true,
+            "wrapperAabb": {
+              "center": [
+                -0.0284697413,
+                0.5798423,
+                -0.00219234824
+              ],
+              "size": [
+                0.8209412,
+                1.1284101,
+                0.8744269
+              ],
+              "min": [
+                -0.438940346,
+                0.0156372786,
+                -0.4394058
+              ],
+              "max": [
+                0.382000864,
+                1.14404738,
+                0.4350211
+              ]
+            },
+            "geometry": {
+              "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Barrel_01_Convex.asset",
+              "meshName": "SM_Prop_Barrel_01_Convex",
+              "convex": true,
+              "bounds": {
+                "center": [
+                  -0.0284697413,
+                  0.5798423,
+                  -0.00219234824
+                ],
+                "size": [
+                  0.820941269,
+                  1.1284101,
+                  0.874426842
+                ],
+                "min": [
+                  -0.438940376,
+                  0.0156372786,
+                  -0.439405769
+                ],
+                "max": [
+                  0.3820009,
+                  1.14404738,
+                  0.435021073
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_01.prefab",
+      "prefabSha256": "0ecb6b41ec80385848efafa882f990745ffa15dfb56e928a8760e49b3c86d080",
+      "metaSha256": "074f5cf607cc5f6a030df33c705d7d0a301e5d7bbeaf35ac0ab3a3f3b7f1f7dc",
+      "dependencyFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+      "adapterMeasurementUnsealed": {
+        "Revision": "farm-h2-prefab-measurement.r1",
+        "EvidenceKindCode": "MeasuredWrapper",
+        "EvidenceRef": "artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json#Generic/SM_Generic_Grass_Patch_01.prefab",
+        "AssetFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+        "MeasurementHashSha256": "",
+        "CenterX": 0.042979106307029724,
+        "CenterY": 0.19356714189052582,
+        "CenterZ": 0.012798011302947998,
+        "SizeX": 0.28702616691589355,
+        "SizeY": 0.6202439069747925,
+        "SizeZ": 0.30916765332221985,
+        "UniformScale": 1,
+        "ActiveRenderer": true,
+        "ActiveCollider": false
+      },
+      "localMeasurement": {
+        "visibleBounds": {
+          "center": [
+            0.0429791063,
+            0.193567142,
+            0.0127980113
+          ],
+          "size": [
+            0.287026167,
+            0.6202439,
+            0.309167653
+          ],
+          "min": [
+            -0.100533977,
+            -0.116554812,
+            -0.141785815
+          ],
+          "max": [
+            0.18649219,
+            0.5036891,
+            0.167381838
+          ]
+        },
+        "renderers": [
+          {
+            "path": "SM_Generic_Grass_Patch_01",
+            "type": "MeshRenderer",
+            "enabled": true,
+            "active": true,
+            "localRendererBounds": {
+              "center": [
+                0.0429791063,
+                0.193567142,
+                0.0127980113
+              ],
+              "size": [
+                0.287026167,
+                0.6202439,
+                0.309167653
+              ],
+              "min": [
+                -0.100533977,
+                -0.116554812,
+                -0.141785815
+              ],
+              "max": [
+                0.18649219,
+                0.5036891,
+                0.167381838
+              ]
+            },
+            "wrapperBounds": {
+              "center": [
+                0.0429791063,
+                0.193567142,
+                0.0127980113
+              ],
+              "size": [
+                0.287026167,
+                0.6202439,
+                0.309167653
+              ],
+              "min": [
+                -0.100533977,
+                -0.116554812,
+                -0.141785815
+              ],
+              "max": [
+                0.18649219,
+                0.5036891,
+                0.167381838
+              ]
+            },
+            "materials": [
+              "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat"
+            ]
+          }
+        ],
+        "colliders": []
+      }
+    }
+  ]
+}

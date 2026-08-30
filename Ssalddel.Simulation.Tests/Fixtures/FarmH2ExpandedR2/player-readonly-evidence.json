@@ -1,0 +1,17 @@
+{
+  "utc": "2026-08-30T03:27:01.5288472Z",
+  "scene": "Assets/Ssalddel/Scenes/SimulationWorldShell.unity",
+  "sceneDirty": true,
+  "rootCount": 2,
+  "previewCount": 1,
+  "selection": [],
+  "playerPath": "SimulationWorldShell/WorldMapRoot/OfficialRegionProjectionRoot/SpatialPipeline_EPSG5186_TileAreaSet/L10_플레이어경관탐색_PresentationOnly/LegalWorldFarmPlayer",
+  "colliderJson": "{\"CharacterController\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"3\",\"m_Height\":1.7799999713897706,\"m_Radius\":0.3400000035762787,\"m_SlopeLimit\":42.0,\"m_StepOffset\":0.2800000011920929,\"m_SkinWidth\":0.07999999821186066,\"m_MinMoveDistance\":0.0010000000474974514,\"m_Center\":{\"x\":0.0,\"y\":0.8899999856948853,\"z\":0.0}}}",
+  "movementJson": "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.플레이어경관Controller\",\"profile\":{\"ProfileStableId\":\"player-profile:sim:pyeongchang:world-explorer.v2\",\"WalkSpeed\":3.5999999046325685,\"RunMultiplier\":1.7000000476837159,\"CapsuleHeight\":1.7799999713897706,\"CapsuleRadius\":0.3400000035762787,\"CameraDistance\":15.5,\"CameraHeight\":1.100000023841858,\"CameraFieldOfView\":52.0,\"TacticalYaw\":36.0,\"TacticalPitch\":52.0,\"TacticalMinimumDistance\":9.0,\"TacticalMaximumDistance\":23.0,\"TacticalPanSpeed\":10.0,\"TacticalZoomSpeed\":1.2000000476837159,\"FirstPersonEyeHeight\":1.6799999475479127,\"FirstPersonFieldOfView\":64.0,\"ClickMoveStopDistance\":0.18000000715255738,\"InitialPitch\":2.0,\"LookSensitivity\":0.09000000357627869,\"MinimumX\":-30.5,\"MaximumX\":30.5,\"MinimumZ\":-22.5,\"MaximumZ\":22.5,\"PresentationOnly\":true},\"firstPersonPivot\":{\"instanceID\":0},\"firstPersonCamera\":{\"instanceID\":0},\"thirdPersonPivot\":{\"instanceID\":0},\"thirdPersonCamera\":{\"instanceID\":0},\"visualRoot\":{\"instanceID\":0},\"animationAdapter\":{\"instanceID\":0},\"selectionHighlight\":{\"instanceID\":0},\"destinationMarker\":{\"instanceID\":0},\"movementGate\":{\"instanceID\":0},\"farmManagement\":{\"instanceID\":0},\"combat\":{\"instanceID\":0},\"viewTransitionDuration\":0.8999999761581421,\"viewTransitionArcHeight\":1.7999999523162842,\"presentationOnly\":true,\"guidanceVisible\":false}}",
+  "lossyScale": [
+    1,
+    1,
+    1
+  ],
+  "observation": "ReadOnlyOpenDirtyEditor;NotMovementOrGameViewProof"
+}

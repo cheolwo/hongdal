@@ -223,6 +223,63 @@ public sealed class SimulationFarmH2PlacementAdapterTests
         Assert.Contains(code, Assert.Throws<ArgumentException>(() => Convert(r)).Message);
     }
 
+    [Theory]
+    [InlineData("farm-riverside-h2.trial.r1", true)]
+    [InlineData("farm-riverside-h2.measured-expansion.r2", true)]
+    [InlineData("farm-riverside-h2.measured-expansion.r3", false)]
+    [InlineData("farm-riverside-h2.measured-expansion.r2 ", false)]
+    [InlineData("FARM-RIVERSIDE-H2.MEASURED-EXPANSION.R2", false)]
+    [InlineData("", false)]
+    public void 동결후보는_정확한기존판본과승인확장판본만소비한다(string 판본, bool 허용)
+    {
+        // 형식 호환용 합성 입력이며 실제 확대 부지나 Player 통행 증거가 아니다.
+        var 요청 = Request(0);
+        후보판본변경후봉인(요청, 판본);
+        if (!허용)
+        {
+            Assert.Contains("CandidateInputHashMismatch", Assert.Throws<ArgumentException>(() => Convert(요청)).Message);
+            return;
+        }
+        var 결과 = Convert(요청);
+        Assert.Equal(판본, 결과.CandidatePatternRevision);
+        Assert.Equal(요청.ExpectedCandidateHashSha256, 결과.CandidateHashSha256);
+        Assert.Equal(결과.ConversionOutputHashSha256, Convert(요청).ConversionOutputHashSha256);
+        Assert.False(결과.ActualTraversalVerified);
+    }
+
+    [Theory]
+    [InlineData("farm-riverside-h2.trial.r1")]
+    [InlineData("farm-riverside-h2.measured-expansion.r2")]
+    public void 확장판본도_외곽초과와입력hash손상을허용하지않는다(string 판본)
+    {
+        var 요청 = Request(0);
+        후보판본변경후봉인(요청, 판본);
+        요청.Bindings[0].Measurement.SizeX = 500;
+        SealMeasurements(요청);
+        Assert.Contains("MeasuredEnvelopeExceedsCandidate", Assert.Throws<ArgumentException>(() => Convert(요청)).Message);
+
+        var 손상 = Request(0);
+        var 원문 = JsonNode.Parse(손상.CandidateJson)!;
+        원문["Input"]!["PatternRevision"] = 판본;
+        원문["InputHash"] = Hash("corrupt");
+        원문["ResultHash"] = "";
+        손상.ExpectedCandidateHashSha256 = Hash(JsonSerializer.Serialize(원문));
+        원문["ResultHash"] = 손상.ExpectedCandidateHashSha256;
+        손상.CandidateJson = JsonSerializer.Serialize(원문);
+        Assert.Contains("CandidateInputHashMismatch", Assert.Throws<ArgumentException>(() => Convert(손상)).Message);
+    }
+
+    private static void 후보판본변경후봉인(SimulationFarmH2PlacementRequest 요청, string 판본)
+    {
+        var 원문 = JsonNode.Parse(요청.CandidateJson)!;
+        원문["Input"]!["PatternRevision"] = 판본;
+        원문["InputHash"] = Hash(JsonSerializer.Serialize(원문["Input"]));
+        원문["ResultHash"] = "";
+        요청.ExpectedCandidateHashSha256 = Hash(JsonSerializer.Serialize(원문));
+        원문["ResultHash"] = 요청.ExpectedCandidateHashSha256;
+        요청.CandidateJson = JsonSerializer.Serialize(원문);
+    }
+
     private static SimulationFarmH2PlacementRequest Request(int fixture)
     {
         // 인계 후보의 정규형 hash를 보존한 LF Fixture다. 개인 worktree나 생성기에 의존하지 않는다.

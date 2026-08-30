@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <None Update="Fixtures/FarmH2/*.plan.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures/FarmH2ExpandedR2/**/*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
