@@ -1,7 +1,607 @@
 using System;
+using Ssalddel.Contracts.Common.Metadata;
 
 namespace Ssalddel.Simulation.Contracts
 {
+    public static class SimulationNatureSleepProtectionSpatialLayerCandidateCodes
+    {
+        public const string SchemaVersion =
+            "nature-sleep-protection-spatial-layer-candidate.v1";
+        public const string PlanningCandidate = "PlanningCandidate";
+        public const string Ready = "Ready";
+        public const string Gap = "Gap";
+        public const string SleepSurfaceLayer = "SleepSurfaceLayer";
+        public const string ShelterInteriorLayer = "ShelterInteriorLayer";
+        public const string HeatInfluenceLayer = "HeatInfluenceLayer";
+        public const string PhysicalPerimeterLayer =
+            "PhysicalPerimeterLayer";
+        public const string HigherThreatBoundaryLayer =
+            "HigherThreatBoundaryLayer";
+        public const string SpatialPolicyRevisionRequired =
+            "SpatialPolicyRevisionRequired";
+        public const string WeatherProfileCandidateRequired =
+            "WeatherProfileCandidateRequired";
+        public const string RequiredLayerMissing = "RequiredLayerMissing";
+        public const string LayerStableIdRequired = "LayerStableIdRequired";
+        public const string PlacementStableIdRequired =
+            "PlacementStableIdRequired";
+        public const string GeometryRevisionRequired =
+            "GeometryRevisionRequired";
+        public const string BoundaryGraphRevisionRequired =
+            "BoundaryGraphRevisionRequired";
+        public const string LayerStableIdDuplicated =
+            "LayerStableIdDuplicated";
+        public const string RangeAndShapeUnresolved =
+            "RangeAndShapeUnresolved";
+        public const string DoorOpeningPolicyUnresolved =
+            "DoorOpeningPolicyUnresolved";
+        public const string CompleteBoundaryGraphRuleUnresolved =
+            "CompleteBoundaryGraphRuleUnresolved";
+
+        public static string[] RequiredLayerRoleCodes() => new[]
+        {
+            SleepSurfaceLayer,
+            ShelterInteriorLayer,
+            HeatInfluenceLayer,
+            PhysicalPerimeterLayer,
+            HigherThreatBoundaryLayer,
+        };
+    }
+
+    public sealed class SimulationNatureSleepProtectionSpatialLayerDefinition
+    {
+        public string LayerStableId { get; set; } = string.Empty;
+        public string LayerRoleCode { get; set; } = string.Empty;
+        public string PlacementStableId { get; set; } = string.Empty;
+        public string GeometryRevision { get; set; } = string.Empty;
+        public string BoundaryGraphRevision { get; set; } = string.Empty;
+    }
+
+    public sealed class SimulationNatureSleepProtectionSpatialLayerCandidateRequest
+    {
+        public SimulationNatureWeatherProfileFreezeCandidateSnapshot
+            WeatherProfileCandidate { get; set; } =
+                new SimulationNatureWeatherProfileFreezeCandidateSnapshot();
+        public string SpatialPolicyRevision { get; set; } = string.Empty;
+        public SimulationNatureSleepProtectionSpatialLayerDefinition[] Layers
+            { get; set; } =
+                Array.Empty<SimulationNatureSleepProtectionSpatialLayerDefinition>();
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "침상·오두막 실내·열원 영향권·울타리 물리 경계·마법진 상위 위협 경계를 중첩 가능한 수면 보호 공간층으로 전달한다.",
+        StepKey = "contract.nature-sleep-protection-spatial-layer-candidate",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 16,
+        Boundary = "공간층 역할과 배치·형상·Graph 근거 요구만 정의하며 실제 범위·좌표·충돌·보호 결과를 확정하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q025 Nature 수면 보호를 다섯 중첩 공간층과 배치·형상·경계 Graph 근거로 분리한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-14" },
+        Boundary = "기획 후보이며 실제 H 배치·Collider·Bounds·Graph·Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureSleepProtectionSpatialLayerCandidateSnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureSleepProtectionSpatialLayerCandidateCodes
+                .SchemaVersion;
+        public string DecisionStatusCode { get; set; } =
+            SimulationNatureSleepProtectionSpatialLayerCandidateCodes
+                .PlanningCandidate;
+        public string ReadinessCode { get; set; } =
+            SimulationNatureSleepProtectionSpatialLayerCandidateCodes.Gap;
+        public string SpatialPolicyRevision { get; set; } = string.Empty;
+        public SimulationNatureSleepProtectionSpatialLayerDefinition[] Layers
+            { get; set; } =
+                Array.Empty<SimulationNatureSleepProtectionSpatialLayerDefinition>();
+        public string[] MissingRequirementCodes { get; set; } =
+            Array.Empty<string>();
+        public string[] MissingLayerRoleCodes { get; set; } =
+            Array.Empty<string>();
+        public bool SupportsOverlappingLayers { get; set; } = true;
+        public bool UsesPlacementAndGeometryEvidence { get; set; } = true;
+        public bool UsesBoundaryGraphEvidence { get; set; } = true;
+        public bool AppliesSpatialProtection { get; set; }
+        public bool ChangesWorldState { get; set; }
+        public string[] UnresolvedDecisionCodes { get; set; } = new[]
+        {
+            SimulationNatureSleepProtectionSpatialLayerCandidateCodes
+                .RangeAndShapeUnresolved,
+            SimulationNatureSleepProtectionSpatialLayerCandidateCodes
+                .DoorOpeningPolicyUnresolved,
+            SimulationNatureSleepProtectionSpatialLayerCandidateCodes
+                .CompleteBoundaryGraphRuleUnresolved,
+        };
+    }
+
+    public static class SimulationNatureWeatherProfileFreezeCandidateCodes
+    {
+        public const string SchemaVersion =
+            "nature-weather-profile-freeze-candidate.v1";
+        public const string PlanningCandidate = "PlanningCandidate";
+        public const string Ready = "Ready";
+        public const string Gap = "Gap";
+        public const string NewWorldBoundary = "NewWorldBoundary";
+        public const string GameDayStartBoundary = "GameDayStartBoundary";
+        public const string PublicObservationSource =
+            "PublicObservationSource";
+        public const string GameClimateFixtureSource =
+            "GameClimateFixtureSource";
+        public const string RiskySleepOutcomeCandidateRequired =
+            "RiskySleepOutcomeCandidateRequired";
+        public const string FreezeBoundaryRequired =
+            "FreezeBoundaryRequired";
+        public const string SourceTypeRequired = "SourceTypeRequired";
+        public const string SourceSnapshotHashRequired =
+            "SourceSnapshotHashRequired";
+        public const string ObservationQualityApprovalRequired =
+            "ObservationQualityApprovalRequired";
+        public const string GeneralizationRuleRevisionRequired =
+            "GeneralizationRuleRevisionRequired";
+        public const string WeatherProfileCodeRequired =
+            "WeatherProfileCodeRequired";
+        public const string SaveReplayBindingRequired =
+            "SaveReplayBindingRequired";
+        public const string UnavailableFallbackProfileUnresolved =
+            "UnavailableFallbackProfileUnresolved";
+    }
+
+    public sealed class SimulationNatureWeatherProfileFreezeCandidateRequest
+    {
+        public SimulationNatureRiskySleepOutcomeCandidateSnapshot
+            RiskySleepOutcomeCandidate { get; set; } =
+                new SimulationNatureRiskySleepOutcomeCandidateSnapshot();
+        public string FreezeBoundaryCode { get; set; } = string.Empty;
+        public string GameDayStableId { get; set; } = string.Empty;
+        public string SourceTypeCode { get; set; } = string.Empty;
+        public string SourceSnapshotHashSha256 { get; set; } = string.Empty;
+        public bool ObservationQualityApproved { get; set; }
+        public string GeneralizationRuleRevision { get; set; } = string.Empty;
+        public string WeatherProfileCode { get; set; } = string.Empty;
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "품질 승인 관측을 새 세계·하루 시작 경계에서 일반화된 날씨 Profile과 출처 hash·규칙 판본으로 봉인하는 후보를 전달한다.",
+        StepKey = "contract.nature-weather-profile-freeze-candidate",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SharedPublicData,
+        FlowOrder = 15,
+        Boundary = "외부 API 응답을 플레이 중 직접 반영하지 않으며 실제 수집·품질 승인·Save 판본·Sky 표현을 수행하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q024 기상 관측을 새 세계·하루 경계의 날씨 Profile과 출처 계보로 동결하는 계약을 정의한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-14" },
+        Boundary = "기획 후보이며 실제 Provider 호출·Save/Replay·Sky·Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureWeatherProfileFreezeCandidateSnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureWeatherProfileFreezeCandidateCodes.SchemaVersion;
+        public string DecisionStatusCode { get; set; } =
+            SimulationNatureWeatherProfileFreezeCandidateCodes
+                .PlanningCandidate;
+        public string ReadinessCode { get; set; } =
+            SimulationNatureWeatherProfileFreezeCandidateCodes.Gap;
+        public string FreezeBoundaryCode { get; set; } = string.Empty;
+        public string GameDayStableId { get; set; } = string.Empty;
+        public string SourceTypeCode { get; set; } = string.Empty;
+        public string SourceSnapshotHashSha256 { get; set; } = string.Empty;
+        public string GeneralizationRuleRevision { get; set; } = string.Empty;
+        public string WeatherProfileCode { get; set; } = string.Empty;
+        public string[] MissingRequirementCodes { get; set; } =
+            Array.Empty<string>();
+        public bool FrozenForGameDay { get; set; }
+        public bool AllowsMidDayExternalMutation { get; set; }
+        public bool RequiresSourceLineageInSave { get; set; } = true;
+        public bool AppliesWeatherProfile { get; set; }
+        public bool ChangesWorldState { get; set; }
+        public string[] UnresolvedDecisionCodes { get; set; } = new[]
+        {
+            SimulationNatureWeatherProfileFreezeCandidateCodes
+                .SaveReplayBindingRequired,
+            SimulationNatureWeatherProfileFreezeCandidateCodes
+                .UnavailableFallbackProfileUnresolved,
+        };
+    }
+
+    public static class SimulationNatureRiskySleepOutcomeCandidateCodes
+    {
+        public const string SchemaVersion =
+            "nature-risky-sleep-outcome-candidate.v1";
+        public const string PlanningCandidate = "PlanningCandidate";
+        public const string Ready = "Ready";
+        public const string Gap = "Gap";
+        public const string AnimalApproach = "AnimalApproach";
+        public const string MonsterApproach = "MonsterApproach";
+        public const string ColdExposure = "ColdExposure";
+        public const string PrecipitationExposure =
+            "PrecipitationExposure";
+        public const string FatigueWakeOutcome = "FatigueWakeOutcome";
+        public const string TemperatureWakeOutcome =
+            "TemperatureWakeOutcome";
+        public const string DiseaseRiskWakeOutcome =
+            "DiseaseRiskWakeOutcome";
+        public const string CombatOrRetreatChoice =
+            "CombatOrRetreatChoice";
+        public const string SleepSafetyCandidateRequired =
+            "SleepSafetyCandidateRequired";
+        public const string WeatherInputRevisionRequired =
+            "WeatherInputRevisionRequired";
+        public const string WeatherProfileBindingOwnedByQ024 =
+            "WeatherProfileBindingOwnedByQ024";
+        public const string MultipleThreatPriorityUnresolved =
+            "MultipleThreatPriorityUnresolved";
+        public const string WakeOutcomeNumericRulesUnresolved =
+            "WakeOutcomeNumericRulesUnresolved";
+
+        public static string[] OrderedThreatApproachCodes() => new[]
+        {
+            AnimalApproach,
+            MonsterApproach,
+        };
+    }
+
+    public sealed class SimulationNatureRiskySleepOutcomeCandidateRequest
+    {
+        public SimulationNatureSleepSafetyCandidateSnapshot SleepSafetyCandidate
+            { get; set; } = new SimulationNatureSleepSafetyCandidateSnapshot();
+        public bool AnimalApproachDetected { get; set; }
+        public bool MonsterApproachDetected { get; set; }
+        public bool ColdExposureDetected { get; set; }
+        public bool PrecipitationExposureDetected { get; set; }
+        public bool DiseaseRiskAccumulated { get; set; }
+        public string WeatherInputRevision { get; set; } = string.Empty;
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "위험 수면 중 동물·몬스터 접근은 강제 각성과 전투·후퇴 선택으로, 추위·강수·질병 위험은 기상 결과로 분리해 전달한다.",
+        StepKey = "contract.nature-risky-sleep-outcome-candidate",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 14,
+        Boundary = "중단·누적 결과 종류만 정의하며 실제 전투 생성·피로·체온·질병 변경이나 기상청 자료 동결을 확정하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q023 위험 수면의 위협 접근 중단과 날씨·질병 기상 결과 후보를 분리한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-14", "WI-NATURE-11" },
+        Boundary = "기획 후보이며 실제 수면 중단·전투/후퇴·신체 상태·Save/Replay·Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureRiskySleepOutcomeCandidateSnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureRiskySleepOutcomeCandidateCodes.SchemaVersion;
+        public string DecisionStatusCode { get; set; } =
+            SimulationNatureRiskySleepOutcomeCandidateCodes.PlanningCandidate;
+        public string ReadinessCode { get; set; } =
+            SimulationNatureRiskySleepOutcomeCandidateCodes.Gap;
+        public string WeatherInputRevision { get; set; } = string.Empty;
+        public string[] MissingRequirementCodes { get; set; } =
+            Array.Empty<string>();
+        public string[] ThreatApproachCodes { get; set; } =
+            Array.Empty<string>();
+        public string[] AccumulatedWakeOutcomeCodes { get; set; } =
+            Array.Empty<string>();
+        public bool InterruptsSleepForThreatApproach { get; set; }
+        public bool ReturnsCombatOrRetreatChoice { get; set; }
+        public bool DefersEnvironmentalOutcomeUntilWake { get; set; }
+        public bool AppliesSleepInterruption { get; set; }
+        public bool AppliesWakeOutcome { get; set; }
+        public bool ChangesWorldState { get; set; }
+        public string[] UnresolvedDecisionCodes { get; set; } = new[]
+        {
+            SimulationNatureRiskySleepOutcomeCandidateCodes
+                .WeatherProfileBindingOwnedByQ024,
+            SimulationNatureRiskySleepOutcomeCandidateCodes
+                .MultipleThreatPriorityUnresolved,
+            SimulationNatureRiskySleepOutcomeCandidateCodes
+                .WakeOutcomeNumericRulesUnresolved,
+        };
+    }
+
+    public static class SimulationNatureExpertThreatCandidateCodes
+    {
+        public const string SchemaVersion =
+            "simulation-nature-expert-threat-candidate.v1";
+        public const string PlanningCandidate = "PlanningCandidate";
+        public const string SpawnFrequency = "SpawnFrequency";
+        public const string GroupSize = "GroupSize";
+        public const string IndividualAbility = "IndividualAbility";
+        public const string FocusRequirement = "FocusRequirement";
+        public const string Ready = "Ready";
+        public const string Gap = "Gap";
+        public const string FocusInsufficiencyOutcomeUnresolved =
+            "FocusInsufficiencyOutcomeUnresolved";
+        public const string ThreatRewardScalingUnresolved =
+            "ThreatRewardScalingUnresolved";
+        public const string ProgressionCouplingUnresolved =
+            "ProgressionCouplingUnresolved";
+
+        public static string[] RequiredIntensityDimensionCodes()
+            => new[] { SpawnFrequency, GroupSize, IndividualAbility };
+
+        public static string[] UnresolvedDecisionCodes()
+            => new[]
+            {
+                FocusInsufficiencyOutcomeUnresolved,
+                ThreatRewardScalingUnresolved,
+                ProgressionCouplingUnresolved,
+            };
+    }
+
+    public sealed class SimulationNatureThreatIntensityDimensionRevision
+    {
+        public string DimensionCode { get; set; } = string.Empty;
+        public string RuleRevision { get; set; } = string.Empty;
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "숙련자 위협의 빈도·무리 규모·개별 능력 강화와 기존 집중 체계 결속 후보를 전달한다.",
+        StepKey = "contract.nature-expert-threat-candidate",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 13,
+        Boundary = "강화 차원과 기존 집중 Profile 결속을 기술하며 수치·보상·집중 부족 결과를 확정하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q005 숙련자 위협 강화 세 축과 명상·집중 체계 재사용 후보 계약을 정의한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-11", "WI-NATURE-14" },
+        Boundary = "기획 후보이며 실제 Spawn·전투 보정·집중 소비·Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureExpertThreatCandidateSnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureExpertThreatCandidateCodes.SchemaVersion;
+        public string DecisionStatusCode { get; set; } =
+            SimulationNatureExpertThreatCandidateCodes.PlanningCandidate;
+        public string ReadinessCode { get; set; } =
+            SimulationNatureExpertThreatCandidateCodes.Gap;
+        public SimulationNatureThreatIntensityDimensionRevision[]
+            IntensityDimensionRevisions { get; set; }
+            = Array.Empty<SimulationNatureThreatIntensityDimensionRevision>();
+        public string[] MissingRequirementCodes { get; set; }
+            = SimulationNatureExpertThreatCandidateCodes
+                .RequiredIntensityDimensionCodes();
+        public string FocusProfileCatalogRevision { get; set; } =
+            Simulation집중판정Codes.FocusProfileCatalogRevision;
+        public string FocusRequirementRevision { get; set; } = string.Empty;
+        public bool ReusesExistingMeditationSystem { get; set; } = true;
+        public bool ChangesBaseWorldInteractionOutcome { get; set; }
+        public string[] UnresolvedDecisionCodes { get; set; }
+            = SimulationNatureExpertThreatCandidateCodes
+                .UnresolvedDecisionCodes();
+    }
+
+    public static class SimulationNatureDifficultyBoundaryCodes
+    {
+        public const string SchemaVersion =
+            "simulation-nature-difficulty-boundary.v1";
+        public const string StandardWarningInformation =
+            "StandardWarningInformation";
+        public const string ReducedWarningInformation =
+            "ReducedWarningInformation";
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "Nature 난이도의 공통 수면 판정식과 별도 위협 출몰 Profile 경계를 전달한다.",
+        StepKey = "contract.nature-difficulty-boundary",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 12,
+        Boundary = "난이도는 같은 주변 상태의 수면 안전 공식을 바꾸지 않고 출몰 입력과 경고 정보량만 선택한다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q004 공통 수면 판정식과 모드별 Spawn Profile·경고 정보 경계를 정의한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-14" },
+        Boundary = "Profile 선택 계약이며 실제 출몰 빈도·Save/Replay·Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureDifficultyBoundarySnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureDifficultyBoundaryCodes.SchemaVersion;
+        public string DifficultyCode { get; set; } =
+            SimulationNatureRiskySleepWarningCodes.Normal;
+        public string SleepSafetyFormulaRevision { get; set; } = string.Empty;
+        public bool UsesSharedSleepSafetyFormula { get; set; } = true;
+        public string SelectedSpawnProfileRevision { get; set; } =
+            string.Empty;
+        public bool IncreasedThreatExposure { get; set; }
+        public string WarningInformationLevelCode { get; set; } =
+            SimulationNatureDifficultyBoundaryCodes
+                .StandardWarningInformation;
+        public bool ChangesCurrentSafetyForSameInputs { get; set; }
+    }
+
+    public static class SimulationNatureRiskySleepWarningCodes
+    {
+        public const string SchemaVersion =
+            "simulation-nature-risky-sleep-warning.v1";
+        public const string Beginner = "Beginner";
+        public const string Normal = "Normal";
+        public const string Expert = "Expert";
+        public const string UseModeDefault = "UseModeDefault";
+        public const string AlwaysShow = "AlwaysShow";
+        public const string NeverShow = "NeverShow";
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "위험 수면 허용과 경고 표시의 난이도·사용자 설정 경계를 전달한다.",
+        StepKey = "contract.nature-risky-sleep-warning",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 11,
+        Boundary = "경고 가시성은 정보 표현이며 수면 안전 판정이나 실제 위험도를 변경하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q003 위험 수면 허용과 모드별 경고 기본값·사용자 설정 계약을 정의한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-14" },
+        Boundary = "계약 정의이며 실제 Preview UI·수면 결과·Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureRiskySleepWarningSnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureRiskySleepWarningCodes.SchemaVersion;
+        public string DifficultyCode { get; set; } =
+            SimulationNatureRiskySleepWarningCodes.Normal;
+        public string PreferenceCode { get; set; } =
+            SimulationNatureRiskySleepWarningCodes.UseModeDefault;
+        public bool RiskDetected { get; set; }
+        public string[] WarningReasonCodes { get; set; } =
+            Array.Empty<string>();
+        public bool WarningVisible { get; set; }
+        public bool SleepSelectionAllowed { get; set; } = true;
+        public bool ChangesAuthoritySafetyJudgement { get; set; }
+    }
+
+    public static class SimulationNatureSleepSafetyCandidateCodes
+    {
+        public const string SchemaVersion =
+            "simulation-nature-sleep-safety-candidate.v1";
+        public const string PlanningCandidate = "PlanningCandidate";
+        public const string Temperate = "Temperate";
+        public const string AnimalThreat = "AnimalThreat";
+        public const string MonsterThreat = "MonsterThreat";
+        public const string Cabin = "Cabin";
+        public const string Fire = "Fire";
+        public const string Fence = "Fence";
+        public const string MagicCircle = "MagicCircle";
+        public const string Ready = "Ready";
+        public const string Gap = "Gap";
+        public const string DiseaseIncrementBoundsRequired =
+            "DiseaseIncrementBoundsRequired";
+        public const string SleepPermissionPolicyUnresolved =
+            "SleepPermissionPolicyUnresolved";
+        public const string FireFuelCostUnresolved =
+            "FireFuelCostUnresolved";
+        public const string DiseaseOnsetRecoveryUnresolved =
+            "DiseaseOnsetRecoveryUnresolved";
+
+        public static string[] UnresolvedDecisionCodes()
+            => new[]
+            {
+                SleepPermissionPolicyUnresolved,
+                FireFuelCostUnresolved,
+                DiseaseOnsetRecoveryUnresolved,
+            };
+    }
+
+    public sealed class SimulationNatureSleepProtectionRequirement
+    {
+        public string RequirementStableId { get; set; } = string.Empty;
+        public string[] AlternativeProtectionCodes { get; set; }
+            = Array.Empty<string>();
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "Nature 수면 안전 단계의 기획 후보와 구현 공백을 전달한다.",
+        StepKey = "contract.nature-sleep-safety-candidate",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 10,
+        Boundary = "Q002의 합성 후보를 확정 규칙과 구분하며 수면 허용·연료·질병 결과를 결정하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q002 오두막·불·울타리·마법진의 단계적 수면 안전 후보 계약을 정의한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-14" },
+        Boundary = "기획 후보 계약이며 실제 수면 판정·상태 변경·Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureSleepSafetyCandidateSnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureSleepSafetyCandidateCodes.SchemaVersion;
+        public string DecisionStatusCode { get; set; } =
+            SimulationNatureSleepSafetyCandidateCodes.PlanningCandidate;
+        public string SituationCode { get; set; } = string.Empty;
+        public string ReadinessCode { get; set; } =
+            SimulationNatureSleepSafetyCandidateCodes.Gap;
+        public SimulationNatureSleepProtectionRequirement[]
+            ProtectionRequirements { get; set; }
+            = Array.Empty<SimulationNatureSleepProtectionRequirement>();
+        public string[] AvailableProtectionCodes { get; set; }
+            = Array.Empty<string>();
+        public string[] MissingRequirementStableIds { get; set; }
+            = Array.Empty<string>();
+        public bool DiseaseIncrementBoundsDefined { get; set; }
+        public int DiseaseRiskIncrementMinimum { get; set; }
+        public int DiseaseRiskIncrementMaximum { get; set; }
+        public string[] UnresolvedDecisionCodes { get; set; }
+            = SimulationNatureSleepSafetyCandidateCodes
+                .UnresolvedDecisionCodes();
+    }
+
+    public static class SimulationNatureShelterPurposeCodes
+    {
+        public const string SchemaVersion =
+            "simulation-nature-shelter-purpose.v1";
+        public const string SafeSleep = "SafeSleep";
+        public const string TemperatureStability = "TemperatureStability";
+        public const string FatigueRecovery = "FatigueRecovery";
+        public const string DiseaseRiskReduction = "DiseaseRiskReduction";
+        public const string Storage = "Storage";
+        public const string Ready = "Ready";
+        public const string Gap = "Gap";
+
+        public static string[] CoreBenefitCodes()
+            => new[]
+            {
+                TemperatureStability,
+                FatigueRecovery,
+                DiseaseRiskReduction,
+            };
+
+        public static string[] SecondaryBenefitCodes()
+            => new[] { Storage };
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "Nature 오두막의 1차 목적과 핵심·보조 효용의 구현 준비 상태를 전달한다.",
+        StepKey = "contract.nature-shelter-purpose",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 9,
+        Boundary = "안전한 수면을 1차 목적으로 고정하며 보관 용량을 체온·피로·질병 규칙의 대체 증거로 사용하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q001 오두막의 안전한 수면 목적과 핵심·보조 효용 계약을 정의한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        WorldInteractionIds = new[] { "WI-NATURE-14" },
+        Boundary = "계약 정의는 체온·피로·질병 수치 적용이나 실제 수면 Runtime 증거가 아니다.")]
+    public sealed class SimulationNatureShelterPurposeReadinessSnapshot
+    {
+        public string SchemaVersion { get; set; } =
+            SimulationNatureShelterPurposeCodes.SchemaVersion;
+        public string PrimaryPurposeCode { get; set; } =
+            SimulationNatureShelterPurposeCodes.SafeSleep;
+        public bool CabinOperational { get; set; }
+        public bool LegacyRecoverySignalAvailable { get; set; }
+        public string CoreBenefitReadinessCode { get; set; } =
+            SimulationNatureShelterPurposeCodes.Gap;
+        public string[] RequiredCoreBenefitCodes { get; set; }
+            = SimulationNatureShelterPurposeCodes.CoreBenefitCodes();
+        public string[] ImplementedCoreBenefitCodes { get; set; }
+            = Array.Empty<string>();
+        public string[] MissingCoreBenefitCodes { get; set; }
+            = SimulationNatureShelterPurposeCodes.CoreBenefitCodes();
+        public string[] SecondaryBenefitCodes { get; set; }
+            = SimulationNatureShelterPurposeCodes.SecondaryBenefitCodes();
+    }
+
     public static class SimulationNatureSurvivalCodes
     {
         public const string ProfileRevisionR1 = "nature-survival.realtime.r1";

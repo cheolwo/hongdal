@@ -10,6 +10,18 @@ namespace Ssalddel.Simulation.Contracts
         public const string 분야Profile = "simulation-player-domain-profile.v2";
         public const string 분야학습효과선 = "simulation-domain-learning-effect-line.v1";
         public const string 분야진척기여 = "simulation-domain-progress-contribution.v1";
+        public const string 성장낌새Projection =
+            "simulation-player-growth-hint-projection.v1";
+    }
+
+    public static class Simulation성장낌새ProjectionCodes
+    {
+        public const string ProjectionRevision = "player-growth-hint.r1";
+        public const string Allowed = "Allowed";
+        public const string PolicyRevisionRequired =
+            "PolicyRevisionRequired";
+        public const string NoAuthorizedDomain = "NoAuthorizedDomain";
+        public const string TargetProfileMismatch = "TargetProfileMismatch";
     }
 
     public static class Simulation플레이어분야Codes
@@ -263,5 +275,59 @@ namespace Ssalddel.Simulation.Contracts
             = Array.Empty<Simulation분야진척Snapshot>();
         public string[] 전체자료접근Codes { get; set; } = Array.Empty<string>();
         public string[] 선택형기회후보Codes { get; set; } = Array.Empty<string>();
+    }
+
+    public sealed class Simulation성장낌새ProjectionRequest
+    {
+        public string ObserverPlayerStableId { get; set; } = string.Empty;
+        public string TargetPlayerStableId { get; set; } = string.Empty;
+        public string AuthorizationPolicyRevision { get; set; } = string.Empty;
+        public string[] AuthorizedDomainCodes { get; set; } =
+            Array.Empty<string>();
+        public int MaximumHintCount { get; set; } = 3;
+    }
+
+    public sealed class Simulation성장낌새HintSnapshot
+    {
+        public int Rank { get; set; }
+        public string DomainStableId { get; set; } = string.Empty;
+        public string DomainNameKo { get; set; } = string.Empty;
+        public string DominantProgressKindCode { get; set; } = string.Empty;
+        public string QualitativeStageCode { get; set; } = string.Empty;
+    }
+
+    [SsalddelCodeMetadata(
+        SsalddelCodeFeatureKeys.SimulationWorldDerivation,
+        SsalddelCodeLayer.Contract,
+        "다른 플레이어의 승인된 성장 분야를 정확한 수치가 아닌 정성적 낌새로 전달한다.",
+        StepKey = "contract.player-growth-hint-projection",
+        ExecutionStage = SsalddelCodeExecutionStage.Definition,
+        ReadsFrom = SsalddelCodeDataScope.SimulationState,
+        FlowOrder = 17,
+        Boundary = "승인된 분야와 정성 단계만 전달하며 기여 기록·정확한 수치·해금·인벤토리를 노출하지 않는다.")]
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E1,
+        "Q009 온라인 관찰의 분야별 성장 낌새와 공개 정책 경계 계약을 정의한다.",
+        SubmoduleKey = SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약,
+        Boundary = "Projection 계약이며 온라인 인증·실제 UI·Runtime 증거가 아니다.")]
+    public sealed class Simulation성장낌새ProjectionSnapshot
+    {
+        public string SchemaCode { get; set; } =
+            Simulation플레이어분야SchemaCodes.성장낌새Projection;
+        public string ProjectionRevision { get; set; } =
+            Simulation성장낌새ProjectionCodes.ProjectionRevision;
+        public string ObserverPlayerStableId { get; set; } = string.Empty;
+        public string TargetPlayerStableId { get; set; } = string.Empty;
+        public string SourceProfileRevision { get; set; } = string.Empty;
+        public string AuthorizationPolicyRevision { get; set; } = string.Empty;
+        public bool Allowed { get; set; }
+        public string ReasonCode { get; set; } = string.Empty;
+        public Simulation성장낌새HintSnapshot[] Hints { get; set; } =
+            Array.Empty<Simulation성장낌새HintSnapshot>();
+        public bool ContainsExactProgressValues { get; set; }
+        public bool ContainsContributionRecords { get; set; }
+        public bool ContainsUnlockCodes { get; set; }
+        public bool ContainsInventory { get; set; }
+        public bool ChangesWorldState { get; set; }
     }
 }
