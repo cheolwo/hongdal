@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.Linq;
 using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Contracts;
@@ -28,40 +27,37 @@ namespace Ssalddel.Simulation.Application
     public sealed class Simulation분리세계자산배치Coordinator
     {
         private readonly ISimulation세계자산배치Engine compatibilityEngine;
+        private readonly ISimulation세계자산배치Plan분리Service partitionService;
 
         public Simulation분리세계자산배치Coordinator()
-            : this(new Simulation결정적세계자산배치Engine())
+            : this(new Simulation결정적세계자산배치Engine(),
+                new Simulation결정적세계자산배치Plan분리Service())
         {
         }
 
         public Simulation분리세계자산배치Coordinator(
             ISimulation세계자산배치Engine worldAssetPlacementEngine)
-            => compatibilityEngine = worldAssetPlacementEngine
+            : this(worldAssetPlacementEngine,
+                new Simulation결정적세계자산배치Plan분리Service())
+        {
+        }
+
+        public Simulation분리세계자산배치Coordinator(
+            ISimulation세계자산배치Engine worldAssetPlacementEngine,
+            ISimulation세계자산배치Plan분리Service planPartitionService)
+        {
+            compatibilityEngine = worldAssetPlacementEngine
                 ?? throw new ArgumentNullException(nameof(worldAssetPlacementEngine));
+            partitionService = planPartitionService
+                ?? throw new ArgumentNullException(nameof(planPartitionService));
+        }
 
         public Simulation분리세계자산배치Result Compose(
             Simulation세계자산배치Request request)
         {
             var compatibilityPlan = compatibilityEngine.Compose(request);
-            return new Simulation분리세계자산배치Result
-            {
-                CompatibilityPlan = compatibilityPlan,
-                ExteriorPlan = Simulation세계자산배치PlanPartitioner
-                    .Exterior(compatibilityPlan),
-                InteriorPlan = Simulation세계자산배치PlanPartitioner
-                    .Interior(compatibilityPlan),
-            };
+            return partitionService.Partition(compatibilityPlan);
         }
-    }
-
-    public sealed class Simulation분리세계자산배치Result
-    {
-        public Simulation세계자산배치Plan CompatibilityPlan { get; set; }
-            = new Simulation세계자산배치Plan();
-        public Simulation실외자산배치Plan ExteriorPlan { get; set; }
-            = new Simulation실외자산배치Plan();
-        public Simulation실내자산배치Plan InteriorPlan { get; set; }
-            = new Simulation실내자산배치Plan();
     }
 
     public sealed class Simulation결정적실외자산배치Engine
@@ -188,88 +184,4 @@ namespace Ssalddel.Simulation.Application
         }
     }
 
-    internal static class Simulation세계자산배치PlanPartitioner
-    {
-        public static Simulation실외자산배치Plan Exterior(
-            Simulation세계자산배치Plan source)
-        {
-            var placements = source.Placements
-                .Where(value => value.PlacementKindCode !=
-                                Simulation세계자산배치Codes.InteriorOverlay)
-                .OrderBy(value => value.PlacementStableId, StringComparer.Ordinal)
-                .ToArray();
-            var result = new Simulation실외자산배치Plan
-            {
-                CellStableId = source.CellStableId,
-                SourceWorldRevision = source.SourceWorldRevision,
-                SourceCombinedPlanHashSha256 =
-                    source.AssetPlacementPlanHashSha256,
-                Placements = placements,
-            };
-            result.ExteriorPlacementPlanHashSha256 =
-                Simulation세계자산CanonicalHash.Hash(string.Join("|", new[]
-                {
-                    result.CellStableId,
-                    result.SourceWorldRevision.ToString(CultureInfo.InvariantCulture),
-                    result.SourceCombinedPlanHashSha256,
-                    string.Join(",", placements.Select(PlacementCanonical)),
-                }));
-            return result;
-        }
-
-        public static Simulation실내자산배치Plan Interior(
-            Simulation세계자산배치Plan source)
-        {
-            var overlays = source.Placements
-                .Where(value => value.PlacementKindCode ==
-                                Simulation세계자산배치Codes.InteriorOverlay)
-                .OrderBy(value => value.PlacementStableId, StringComparer.Ordinal)
-                .ToArray();
-            var result = new Simulation실내자산배치Plan
-            {
-                CellStableId = source.CellStableId,
-                SourceWorldRevision = source.SourceWorldRevision,
-                SourceCombinedPlanHashSha256 =
-                    source.AssetPlacementPlanHashSha256,
-                InteriorPlanHandles = source.InteriorPlanHandles
-                    .OrderBy(value => value.BuildingPlacementStableId,
-                        StringComparer.Ordinal).ToArray(),
-                InteriorPlanBodies = source.InteriorPlanBodies
-                    .OrderBy(value => value.BuildingPlacementStableId,
-                        StringComparer.Ordinal).ToArray(),
-                OverlayPlacements = overlays,
-            };
-            result.InteriorPlacementPlanHashSha256 =
-                Simulation세계자산CanonicalHash.Hash(string.Join("|", new[]
-                {
-                    result.CellStableId,
-                    result.SourceWorldRevision.ToString(CultureInfo.InvariantCulture),
-                    result.SourceCombinedPlanHashSha256,
-                    string.Join(",", result.InteriorPlanHandles.Select(value =>
-                        value.BuildingPlacementStableId + ":"
-                        + value.InteriorPlacementPlanHashSha256)),
-                    string.Join(",", result.InteriorPlanBodies.Select(value =>
-                        value.BuildingPlacementStableId + ":" + value.BodyHashSha256)),
-                    string.Join(",", overlays.Select(PlacementCanonical)),
-                }));
-            return result;
-        }
-
-        private static string PlacementCanonical(
-            Simulation세계자산PlacementSnapshot value)
-            => string.Join(":", new[]
-            {
-                value.PlacementStableId,
-                value.ParentPlacementStableId,
-                value.OwnerCellStableId,
-                value.PlacementKindCode,
-                value.CompositionKey,
-                value.StateCode,
-                value.LocalXMeters.ToString("R", CultureInfo.InvariantCulture),
-                value.LocalYMeters.ToString("R", CultureInfo.InvariantCulture),
-                value.LocalZMeters.ToString("R", CultureInfo.InvariantCulture),
-                value.RotationDegrees.ToString("R", CultureInfo.InvariantCulture),
-                value.UniformScale.ToString("R", CultureInfo.InvariantCulture),
-            });
-    }
 }

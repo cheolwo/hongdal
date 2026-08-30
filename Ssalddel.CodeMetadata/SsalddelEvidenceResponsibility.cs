@@ -141,6 +141,7 @@ public static class SsalddelEvidenceSubmoduleKeys
 
     public const string E2세션실행 = "E2.SessionExecution";
     public const string E2세계상호작용실행 = "E2.WorldInteractionExecution";
+    public const string E2공간실행 = "E2.SpatialExecution";
     public const string E2로컬권위Adapter = "E2.LocalAuthorityAdapter";
     public const string E2원격HostAdapter = "E2.RemoteHostAdapter";
     public const string E2Unity권위Client = "E2.UnityAuthorityClient";
@@ -193,6 +194,11 @@ public static class SsalddelEvidenceSubmoduleDefinitionCatalog
                 SsalddelEvidenceStage.E2, "세계 상호작용 실행",
                 "E2세계상호작용실행Module",
                 "Farm·Nature WI Preview·Confirm 실행 포트를 제공한다."),
+            new SsalddelEvidenceSubmoduleDefinition(
+                SsalddelEvidenceSubmoduleKeys.E2공간실행,
+                SsalddelEvidenceStage.E2, "공간 실행",
+                "E2공간실행Module",
+                "H·LH·배치 계획의 준비·활성·캐시·해제 실행 경계를 제공한다."),
             new SsalddelEvidenceSubmoduleDefinition(
                 SsalddelEvidenceSubmoduleKeys.E2로컬권위Adapter,
                 SsalddelEvidenceStage.E2, "로컬 권위 Adapter",

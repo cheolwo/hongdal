@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "com.ssalddel.code-metadata": "0.1.0",
-    "com.ssalddel.interior.contracts": "0.1.0"
+    "com.ssalddel.interior.contracts": "0.1.0",
+    "com.ssalddel.simulation.contracts": "0.1.0"
   },
   "samples": [
     {

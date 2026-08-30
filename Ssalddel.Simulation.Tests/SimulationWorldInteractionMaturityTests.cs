@@ -16,17 +16,33 @@ public sealed class SimulationWorldInteractionMaturityTests
     private readonly SimulationWorldInteractionMaturityService service = new();
 
     [Fact]
-    public void E1_E2_E3은_각각다섯개_사람용하위Module을가진다()
+    public void E1_E2_E3은_공간실행을포함한_하위Module의책임을보존한다()
     {
         var definitions = SsalddelEvidenceSubmoduleDefinitionCatalog.All;
 
-        Assert.Equal(15, definitions.Count);
-        Assert.Equal(5, definitions.Count(value =>
-            value.EvidenceStage == SsalddelEvidenceStage.E1));
-        Assert.Equal(5, definitions.Count(value =>
-            value.EvidenceStage == SsalddelEvidenceStage.E2));
-        Assert.Equal(5, definitions.Count(value =>
-            value.EvidenceStage == SsalddelEvidenceStage.E3));
+        // 개수만 갱신하지 않고 Q338에서 추가한 공간 실행을 포함해 각 책임을 고정한다.
+        var 기대책임 = new[]
+        {
+            (SsalddelEvidenceSubmoduleKeys.E1세션권위계약, SsalddelEvidenceStage.E1),
+            (SsalddelEvidenceSubmoduleKeys.E1세계상호작용계약, SsalddelEvidenceStage.E1),
+            (SsalddelEvidenceSubmoduleKeys.E1공간계약, SsalddelEvidenceStage.E1),
+            (SsalddelEvidenceSubmoduleKeys.E1저장재생계약, SsalddelEvidenceStage.E1),
+            (SsalddelEvidenceSubmoduleKeys.E1전투위협계약, SsalddelEvidenceStage.E1),
+            (SsalddelEvidenceSubmoduleKeys.E2세션실행, SsalddelEvidenceStage.E2),
+            (SsalddelEvidenceSubmoduleKeys.E2세계상호작용실행, SsalddelEvidenceStage.E2),
+            (SsalddelEvidenceSubmoduleKeys.E2공간실행, SsalddelEvidenceStage.E2),
+            (SsalddelEvidenceSubmoduleKeys.E2로컬권위Adapter, SsalddelEvidenceStage.E2),
+            (SsalddelEvidenceSubmoduleKeys.E2원격HostAdapter, SsalddelEvidenceStage.E2),
+            (SsalddelEvidenceSubmoduleKeys.E2Unity권위Client, SsalddelEvidenceStage.E2),
+            (SsalddelEvidenceSubmoduleKeys.E3계약회귀, SsalddelEvidenceStage.E3),
+            (SsalddelEvidenceSubmoduleKeys.E3결정성검증, SsalddelEvidenceStage.E3),
+            (SsalddelEvidenceSubmoduleKeys.E3저장재생검증, SsalddelEvidenceStage.E3),
+            (SsalddelEvidenceSubmoduleKeys.E3로컬원격동등성, SsalddelEvidenceStage.E3),
+            (SsalddelEvidenceSubmoduleKeys.E3Unity소비자회귀, SsalddelEvidenceStage.E3),
+        };
+        Assert.Equal(기대책임.OrderBy(value => value.Item1, StringComparer.Ordinal),
+            definitions.Select(value => (value.SubmoduleKey, value.EvidenceStage))
+                .OrderBy(value => value.SubmoduleKey, StringComparer.Ordinal));
         Assert.Equal(definitions.Count, definitions.Select(value =>
             value.SubmoduleKey).Distinct(StringComparer.Ordinal).Count());
         Assert.Contains(definitions, value => value.TechnicalName ==
@@ -52,6 +68,14 @@ public sealed class SimulationWorldInteractionMaturityTests
                 value.ComponentMethod is null);
         Assert.Equal(SsalddelEvidenceSubmoduleKeys.E2로컬권위Adapter,
             localRuntime.SubmoduleKey);
+        var 공간실행책임 = Assert.Single(
+            SsalddelEvidenceResponsibilityReader.Read(
+                typeof(SimulationLhAssetPlanLifecycleService)),
+            value => value.Role == SsalddelEvidenceResponsibilityRole.Primary
+                && value.ComponentMethod is null);
+        Assert.Equal(SsalddelEvidenceStage.E2, 공간실행책임.EvidenceStage);
+        Assert.Equal(SsalddelEvidenceSubmoduleKeys.E2공간실행,
+            공간실행책임.SubmoduleKey);
     }
 
     [Fact]
@@ -265,14 +289,14 @@ public sealed class SimulationWorldInteractionMaturityTests
     }
 
     [Fact]
-    public void WI_66개는_발생원과별개로_원천과조작정책을_분류한다()
+    public void WI_105개는_발생원과별개로_원천과조작정책을_분류한다()
     {
         using var document = JsonDocument.Parse(File.ReadAllText(
             SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog));
         var items = document.RootElement.GetProperty("items")
             .EnumerateArray().ToArray();
 
-        Assert.Equal(66, items.Length);
+        Assert.Equal(105, items.Length);
         Assert.All(items, item =>
         {
             Assert.Contains(item.GetProperty("originCode").GetString(),
@@ -283,25 +307,31 @@ public sealed class SimulationWorldInteractionMaturityTests
         Assert.All(items.Where(item =>
             (item.GetProperty("groupCode").GetString()
                 is "HUB" or "MARKET" or "ORDER" or "LOG" or "CITY")
-            && item.GetProperty("kind").GetString() == "Command"), item =>
+            && item.GetProperty("kind").GetString() == "Command"
+            && item.GetProperty("originCode").GetString() != "SimulationNative"), item =>
             Assert.Equal(SimulationWorldInteractionControlPolicyCodes.NpcRoutine,
                 item.GetProperty("controlPolicyCode").GetString()));
-        Assert.All(items.Where(item => item.GetProperty("groupCode").GetString()
-            == "FARM"), item => Assert.Equal(
+        Assert.All(items.Where(item => item.GetProperty("id").GetString()
+            is "WI-FARM-01" or "WI-FARM-02" or "WI-FARM-03" or "WI-FARM-04" or "WI-FARM-05" or "WI-FARM-06"), item => Assert.Equal(
                 SimulationWorldInteractionControlPolicyCodes.PlayerOrNpc,
                 item.GetProperty("controlPolicyCode").GetString()));
+        foreach (var id in new[] { "WI-HUB-DEMAND-ALLOCATE", "WI-TOWN-STOCK-REPLENISH", "WI-FARM-FIELD-BOUNDARY-CONFIRM" })
+        {
+            var 항목 = Assert.Single(items, 값 => 값.GetProperty("id").GetString() == id);
+            Assert.Equal("PlayerDirect", 항목.GetProperty("controlPolicyCode").GetString());
+        }
     }
 
     [Fact]
-    public void WI_66개는_절차단계대신_한국어기능명과단일책임을노출한다()
+    public void WI_105개는_절차단계대신_한국어기능명과단일책임을노출한다()
     {
         using var document = JsonDocument.Parse(File.ReadAllText(
             SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog));
         var root = document.RootElement;
         var items = root.GetProperty("items").EnumerateArray().ToArray();
 
-        Assert.Equal(66, Simulation세계상호작용이름Catalog.All.Count);
-        Assert.Equal(66, items.Length);
+        Assert.Equal(105, Simulation세계상호작용이름Catalog.All.Count);
+        Assert.Equal(105, items.Length);
         foreach (var item in items)
         {
             var id = item.GetProperty("id").GetString()!;
