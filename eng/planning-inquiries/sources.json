@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "planning-inquiry-sources.v1",
+  "scopeRef": "eng/execution-ledgers/playable-loop-inquiry-implementation-scope.json",
+  "depthIndexRef": "docs/Architecture/PlayableLoops/PlanningSessions/Q001-Q198주제깊이색인.md",
+  "extraSources": [
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
+      "role": "TopicSource",
+      "topicCode": "landscape-composition"
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md",
+      "role": "HistoricalArchive",
+      "topicCode": "legacy-archive"
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/플레이어행동체력회복과성장.md",
+      "role": "TopicSource",
+      "topicCode": "actor-stamina-mana"
+    }
+  ],
+  "supplements": [
+    {
+      "selector": "387-396",
+      "topicCode": "landscape-composition",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "378-380,383-384",
+      "topicCode": "farm-building-spatial-placement",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "381-382,386",
+      "topicCode": "solo-work-delegation",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/솔로업무위임/solo-work-delegation.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "385",
+      "topicCode": "region-five-elements-monster",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "340-346",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "Unclassified"
+    },
+    {
+      "selector": "347",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "348",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "349",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "350",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "351",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "352",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "353",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "354",
+      "topicCode": "community-membership-visitor",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "355",
+      "topicCode": "community-membership-visitor",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "356",
+      "topicCode": "community-membership-visitor",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "357",
+      "topicCode": "community-membership-visitor",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "358",
+      "topicCode": "community-membership-visitor",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "359",
+      "topicCode": "community-membership-visitor",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "360",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "361",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "362",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "363",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "364",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "365",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "366",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "367",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "368",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "369-370,372-377",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "371",
+      "topicCode": "herbal-recipe-crafting",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    }
+  ]
+}
