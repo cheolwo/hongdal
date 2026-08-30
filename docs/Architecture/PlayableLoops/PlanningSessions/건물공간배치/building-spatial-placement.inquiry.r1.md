@@ -7,8 +7,8 @@
 - 대상 PlayableLoop: `대표 영역 폐루프 선택 전`
 - 기록 revision: `cross-area-building-spatial-placement.inquiry.r1`
 - 상태: `Open`
-- 현재 질문 ID: `Q-130`
-- 마지막 확인 질문 ID: `Q-130`
+- 현재 질문 ID: `Q-339`
+- 마지막 확인 질문 ID: `Q-339`
 - 반영 대상 기획 revision: `cross-area-building-spatial-placement.design.r1`
 
 ## 현재 한 문장
@@ -75,6 +75,12 @@
 | `Q-128` | 중단·지원 | 어려운 농지를 혼자 개간하면 어떤 대가와 지원이 생기는가? | 진척은 보존하되 시간·피로·도구 내구도·부상 위험이 증가한다. 시스템이 문맥 알림을 주고, 관계와 안전한 길이 성립한 NPC는 실제 방문해 도움을 제안할 수 있다. | `Answered` | Progress Checkpoint, Burden, Route Visit, Assistance |
 | `Q-129` | 도움 권한 | 방문 NPC는 어떤 도움을 자동으로 수행할 수 있는가? | 잡초 제거·정리·소량 운반·확정 작업 보조는 기본 자동 허용하되 끌 수 있다. 자원 소비·수확·지형 변경·건설·철거는 명시적 승인이나 사전 위임이 필요하다. | `Answered` | Permission Policy, Auto Help, Confirm, ActionRecord |
 | `Q-130` | 호혜·보수 | 방문 NPC의 가벼운 도움에 어떻게 보답하는가? | 가벼운 도움은 호혜 기여로 기록해 식사·선물·맞도움 등으로 보답하고, 전문 기술·장시간·위험·장비 노동은 시작 전에 보수와 조건을 합의한다. | `Answered` | Reciprocity Ledger, Contribution, Compensation Preview |
+| `Q-136` | Farm 개간·표현 순환 | 플레이어가 밭을 개간할 때 작업 진행을 3인칭 화면에서 어떻게 보여주는가? | 도구가 지면에 닿는 작업 애니메이션과 권위 checkpoint에 맞춰 경계 안의 개간된 흙 영역을 점진적으로 넓힌다. 완료 때 전체를 한 번에 교체하지 않으며 간결한 진행 정보만 보조한다. | `Answered` | ToolContact, Task checkpoint, Terrain/Decal, 개간 구획 상태, Presentation E4~E5 |
+| `Q-143` | Farm 관수 시설·Synty·H 조립 | 첫 관수 시설을 어떤 공간과 자산 조합으로 표현하는가? | 빗물 저수통·수동 급수 지점·짧은 호스 또는 수로를 첫 단계로 삼는다. 보유 Synty의 Barrel·WaterTank·Well·Sprinkler Hose·Hose Reel·Pipe·Gutter를 H1~H3으로 조합하되 정확한 손펌프 Prefab은 미확인이라 별도 fallback을 둔다. | `Answered` | Farm 관수 H1~H3, Synty 후보, 수원·토양수분, 배치 엔진, Presentation E4~E5 |
+| `Q-144` | Farm 물 획득·Sky 연계 | 초기 저수통의 물을 어떤 원인으로 채우는가? | 승인된 권위 강수 상태에 따라 WorldTick에서 자동 축적하고, 부족할 때 플레이어가 우물에서 직접 길어 수동 보충한다. 비가 없거나 공공 관측이 결측이어도 Farm 진행을 막지 않는다. | `Answered` | SkyInputProfile, 강수 Effect, WaterStorage, 우물 WI, 물 운반 Task, Save/Replay |
+| `Q-146` | Farm 관수 거리·비용 | 농장과 수원지가 멀어질 때 관수 비용은 어떻게 달라지는가? | 수원과 급수 대상 사이의 유효 경로가 길수록 배관·호스·수로 재료, 시공 노동, 수동 운반 대가, 펌프·중간 저수조 요구, 유지비와 손실 위험이 증가한다. 가까운 수원 선택과 장거리 기반시설 투자를 플레이어의 선택으로 둔다. | `Answered` | WaterServiceRoute, 거리·고저차, 건설 Preview, Pump, 중간 저수조, 유지비·손실 |
+| `Q-147` | Farm 관수 경로·비용 계산 | 수원 거리 비용을 어떤 공간 측정으로 계산하는가? | 수원과 밭의 직선거리가 아니라 실제 설치 가능한 경로 길이·고저차·지형 및 구조물 횡단을 계산한다. 배치 엔진은 후보 경로와 근거를 만들고 Simulation이 선택·승인된 경로의 비용을 확정한다. | `Answered` | Route Geometry, Elevation Profile, Crossing Cost, Placement Candidate, Simulation Cost Snapshot |
+| `Q-155` | Farm 관수 경로·3인칭 Preview | 실제 경로와 비용 원인을 플레이어에게 어떻게 보여주는가? | 지면 위 반투명 후보 경로를 표시하고 비용이 커지는 구간을 구분하며 Pump·중간 저수조 필요 지점을 보여 준다. 정확한 재료·노동·운영 비용은 연결된 선택 카드에서 확인한다. | `Answered` | World Overlay, Route Segment, Cost Marker, Facility Ghost, Cost Card, 접근성 |
 
 상태는 `Asked | Answered | Synthesized | Confirmed | Deferred | Superseded` 중 하나를 사용한다.
 
@@ -149,6 +155,12 @@
 | `BUILD-PLACEMENT-065` | 관계와 안전한 길이 성립한 NPC는 농장을 방문하고, 가벼운 도움은 기본 자동 허용하되 플레이어가 끌 수 있다. | 세계 안의 관계와 이동이 자연스러운 도움으로 이어지게 하면서 공간 소유자의 통제권을 유지한다. | NPC 방문·작업 참여 | Route Visit, Assistance Permission, ActionRecord |
 | `BUILD-PLACEMENT-066` | 자원 소비·수확·지형 변경·건설·철거는 명시적 승인 또는 사전 위임을 요구한다. | 자동 도움의 편의가 플레이어의 계획·소유 상태·되돌리기 어려운 세계 변화로 번지는 것을 막는다. | 작업 권한·Confirm | Permission Policy, Preview/Confirm, Delegation |
 | `BUILD-PLACEMENT-067` | 가벼운 도움은 호혜 기여 원장에 남기고 전문·장시간·위험·장비 노동은 시작 전에 보수와 조건을 합의한다. | 이웃 도움의 생활감과 노동 가치·공정한 보상을 함께 보존한다. | 관계·기여·보수 | Reciprocity Ledger, Contribution Record, Compensation Preview |
+| `BUILD-PLACEMENT-068` | Farm 개간은 도구 접촉 checkpoint마다 권위 진척과 개간된 흙 영역의 확장을 같은 순서로 표현한다. | 플레이어의 노동과 세계 변화가 직접 이어져 보이고 중단·재개 시 완료 구획을 정확히 읽게 해야 한다. | Farm 개간 표현 | ToolContact, Parcel Segment, Terrain/Decal Reconcile, Progress Feedback |
+| `BUILD-PLACEMENT-069` | 첫 Farm 관수는 빗물 저수통·수동 급수 지점·짧은 호스/수로의 조립으로 시작하고 물탱크·급수탑·스프링클러로 성장한다. | 초반 직접 노동과 후속 자동화가 같은 물 공급 계보에서 이어지면서 보유 Synty 자산을 기능별로 재사용해야 한다. | Farm 관수 성장 | WaterSourceAnchor, StorageCapacity, ManualTransfer, DistributionRoute, Irrigation Effect |
+| `BUILD-PLACEMENT-070` | 초기 저수량은 권위 강수의 자동 축적과 우물 수동 보충을 함께 사용한다. | 날씨가 공간과 생산에 실제 영향을 주면서도 무강수·결측 때문에 첫 농사가 교착되지 않아야 한다. | Farm 물 획득 | SkyInputProfile, RainCaptureEffect, WellTransferTask, WaterStorageLedger |
+| `BUILD-PLACEMENT-071` | 수원과 Farm 급수 대상 사이의 유효 경로가 멀고 험할수록 관수 건설·운반·운영 비용을 높인다. | 농지 위치와 물 기반시설 투자가 실제 선택과 대가를 만들고 가까운 수원의 공간적 가치를 보존해야 한다. | Farm 관수 입지·성장 | WaterServiceRoute, RouteCostSnapshot, PumpHead, IntermediateStorage, Maintenance |
+| `BUILD-PLACEMENT-072` | 관수 비용은 실제 설치 후보 경로의 길이·고저차·횡단 조건으로 계산하고 직선거리나 자의적 등급만으로 확정하지 않는다. | 같은 거리라도 지형과 경로에 따라 다른 건설·운영 부담을 설명하고 플레이어가 대안을 비교할 수 있어야 한다. | Farm 관수 경로 Preview | Route Geometry, Elevation Profile, Crossing Segment, Candidate Hash, Cost Snapshot |
+| `BUILD-PLACEMENT-073` | 관수 후보 경로는 3인칭 지면 Overlay와 구간별 비용·설비 표식으로 보여 주고 정확한 값은 연결 카드에서 설명한다. | 플레이어가 공간 안에서 비싼 원인을 직접 읽으면서도 색과 장식만으로 비용을 추측하지 않게 해야 한다. | Farm 관수 경로 표현 | Route Overlay, Segment Cost Class, Pump/Tank Ghost, Detail Card, Accessibility |
 
 ### NPC 방문자와 멀티플레이 사람 방문자 경계
 
@@ -582,6 +594,80 @@ H3 Nature 탐사·연결로 성장 폐루프
 - 호혜 기여 기록은 즉시 화폐 채무와 동일하지 않지만, 장기간 도움만 받고 되돌려주지 않으면 관계·다음 참여 의향에 영향을 줄 수 있다. 구체 수치와 감쇠는 아직 확정하지 않는다.
 - Solo NPC와 Hosted Multiplayer 참여자는 같은 `작업 기여 기록`의 기본 구조를 재사용할 수 있지만, NPC 관계 원장과 실제 플레이어 간 권한·보상 합의는 별도 정책으로 유지한다.
 
+## Q-136 개간 애니메이션과 지면 변화
+
+- 플레이어가 개간 입력을 유지하면 삽·괭이 등 현재 도구의 작업 애니메이션이 반복되고, 도구가 지면에 닿는 checkpoint에서만 한 단위의 개간 진척을 권위 상태로 확정한다.
+- Unity는 같은 상태 사본을 읽어 자유형 밭 경계 안의 완료 구획부터 흙·이랑 Terrain 또는 Decal을 점진적으로 확장한다. 애니메이션이나 Decal이 Simulation Revision을 직접 변경하지 않는다.
+- 작업 중단 시 마지막으로 확정된 구획까지만 개간된 모습이 남고, 미확정 동작 구간은 되돌린다. 저장·재진입에서도 같은 완료 구획을 복원한다.
+- HUD는 전체 진행을 간결하게 보조하지만, 주된 피드백은 Actor의 도구 동작과 실제 지면 변화다.
+- Presentation E5 전에는 도구별 손·지면 접촉점, Animation Event 오차 허용, Terrain/Decal 경계 연결, 카메라 가림과 Game View 판독성을 검증해야 한다.
+
+## Q-143 첫 관수 시설과 Synty H1~H3 조립
+
+### 보유 자산 조사
+
+- 저수 주 후보: `Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Barrel_01.prefab` (`guid: 98b3be7212af6224fab301a49a9f28e3`).
+- 저수 대체 후보: `PolygonConstruction`의 `SM_Prop_Barrel_Water_01`, `SM_Bld_WaterTank_01~03`, `SM_Prop_Watertank_01`.
+- 수원 주 후보: `Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Well_01.prefab` (`guid: 67762d8bd3734a7438c2df391d2709de`).
+- 호스 주 후보: `Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Sprinkler_Hose_01.prefab` (`guid: d27dcac185b4fcb48b212da5c3a71683`).
+- 호스 대체 후보: `Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_HoseReel_01.prefab` (`guid: 634a52dd3611dbb4eb4015e379e8f198`).
+- 연결 후보: `PolygonGeneric` Pipe Straight·Corner·T·Valve, `PolygonCity` Pipe Part, Town Gutter·DrainPipe, Terrain/Decal 기반 짧은 얕은 수로.
+- 후속 성장 후보: `Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_WaterTower_01.prefab` (`guid: 0f09218de0063234fa95d7fe64da775b`), Farm Trailer Tank와 기존 관수 스프링클러 표현.
+- 조사 한계: 파일명 기준으로 정확한 수동 손펌프 Prefab은 확인되지 않았다. 우물·Valve·Pipe의 조립 또는 의미가 분명한 Primitive fallback을 먼저 사용하고 실제 크기·Mesh·Animation 적합성은 E5 전에 검증한다.
+
+### H 조립
+
+- H1 `빗물저장점`: Barrel 또는 소형 WaterTank, 유입 Gutter/Drain, 물 용량 상태와 점검 `InteractionAnchor`.
+- H1 `수동급수점`: Well 또는 저장점에 연결된 Pump fallback, Actor 작업 위치, 물 옮기기 Preview·Confirm Anchor.
+- H1 `밭급수구간`: 짧은 Hose·Pipe·얕은 수로와 관수 가능 범위. Renderer 길이나 물 FX 개수로 실제 물의 양을 계산하지 않는다.
+- H2 `초기관수작업장`: 빗물저장점 + 수동급수점 + 하나 이상의 밭급수구간을 작업 동선과 NavMesh로 묶는다.
+- H3 `Farm용수망`: 여러 H2, 수원 Anchor, 물탱크·급수탑·스프링클러 성장 시설을 연결하며 공급 용량·범위·우선순위는 Simulation 상태가 소유한다.
+
+### E4→E5 경계
+
+- 현재 자산 존재와 조립 의도는 Presentation E4 준비 자료다.
+- E5에서는 실제 Prefab Bounds·Collider·지형 접촉, Actor 펌프 동작 위치, 호스/수로 연결부, 강수 상태별 물 표현, 저장·재진입 시 StableId 복원을 검증해야 한다.
+- Synty 팩 출처는 게임 영역 권위가 아니므로 Town·Construction·Generic 후보를 Farm H 의미에 맞게 승인해 재사용할 수 있다.
+
+## Q-144 강수 축적과 우물 수동 보충
+
+- 강수 입력: Sky Engine 문맥에서 품질 검사·고정된 `SkyInputProfile` 또는 명시적인 결정적 게임 기후 Profile을 Simulation이 읽는다.
+- 자동 축적: WorldTick에서 강수량, 지붕·집수 면적, 저수통 남은 용량과 손실 규칙을 계산해 `WaterStorageLedger`를 변경한다.
+- 수동 보충: 플레이어가 우물과 용기·저수통 접근을 Preview하고 Confirm한 뒤 물 긷기·운반·붓기 Task를 수행한다.
+- 선택과 대가: 비는 노동을 줄이지만 저장 용량을 넘긴 물은 손실될 수 있고, 우물 보충은 시간·피로·용기 용량의 대가를 가진다.
+- 결측 경계: 공공 관측 실패는 오래된 날씨를 조용히 재사용하지 않고 결정적 게임 기후 Profile로 표시한다. 어느 경우든 우물 수동 보충은 유지한다.
+- 표현 경계: 빗물 FX·저수통 수면·양동이 Animation은 권위 수량을 표현하며 Renderer나 물 높이로 실제 수량을 역산하지 않는다.
+- 저장 경계: 고정 날씨 source hash, 저수량, 수동 Transfer와 마지막 WorldTick을 저장·재생하되 강수 FX frame은 저장하지 않는다.
+
+## Q-146 수원 거리와 관수 시설 비용
+
+- 비용 기준은 수원과 밭의 단순 직선거리만 저장하지 않고 승인된 `WaterServiceRoute`를 기준으로 계산한다.
+- 건설 비용 후보: 호스·배관·수로 길이, 연결부, 고저차에 필요한 Pump 단계, 지형 장애물 횡단, 중간 저수조와 작업 지점 수.
+- 운영 비용 후보: 수동 운반 시간·피로, Pump 에너지·정비, 개방 수로의 손실, 파손·누수 점검 노동.
+- Preview는 가까운 수원 사용, 장거리 직접 연결, 중간 저수조 설치 같은 대안을 같은 단위로 비교하고 재료·노동·운영 부담을 분리해 보여 준다.
+- 장거리라고 농사를 자동 금지하지 않는다. 플레이어는 작은 면적을 수동 운반으로 시작하거나, 가까운 후보지를 선택하거나, 기반시설에 투자해 같은 땅을 사용할 수 있다.
+- H 결속: H1 급수구간이 경로 단위를, H2 초기관수작업장이 한 밭의 공급을, H3 Farm용수망이 여러 수원·저수조·Pump와 우선순위를 관리한다.
+- 권위 경계: 배치 엔진은 경로와 자산 후보를 만들고 Simulation이 승인된 경로의 비용·용량·손실·공급 결과를 확정한다.
+
+## Q-147 실제 경로 기반 비용 계산
+
+- 배치 엔진은 수원 Anchor에서 저수·Pump·밭 급수 Anchor까지 연결 가능한 복수의 `WaterServiceRouteCandidate`를 만든다.
+- 각 후보는 실제 경로 길이, 구간별 고저차, 총 양정, 경사, 암석·도로·건물·하천 횡단, 연결부와 중간 설비 위치를 포함한다.
+- Preview는 후보별 재료 길이, Pump 단계, 시공 노동, 예상 손실, 유지 접근성과 차단 이유를 같은 단위로 비교한다.
+- 플레이어가 후보를 선택해 Confirm하면 후보 revision·hash와 ExpectedRevision을 검증하고 그때 비용과 배치 예약을 확정한다.
+- 지형이나 건물이 변경되어 후보 경로가 무효화되면 조용히 다른 경로로 바꾸지 않고 Preview를 다시 요구한다.
+- 직선거리는 빠른 탐색·대략적 안내에만 사용할 수 있고 최종 비용이나 건설 가능 판정의 권위 근거가 아니다.
+
+## Q-155 관수 경로 3인칭 Preview
+
+- 후보 경로는 현재 지형 위에 반투명 선·띠로 투영하고, 확정된 시설이나 일반 탐색 중에는 기본적으로 숨긴다.
+- 구간 표현은 `일반`, `고비용`, `차단`처럼 제한된 상태로 구분하고 색상 외에 선 모양·아이콘·텍스트를 함께 사용한다.
+- 고저차가 Pump 한계를 넘는 지점에는 Pump Ghost를, 장거리·압력·용량 때문에 분할이 필요한 지점에는 중간 저수조 Ghost를 표시한다.
+- 도로·암석·건물·하천 횡단은 해당 구간 표식과 차단 또는 추가 공사 이유를 제공한다.
+- 연결 카드는 후보 revision·hash, 전체 길이, 재료·노동·Pump·운영 부담과 다른 후보 대비 차이를 정확한 값으로 보여 준다.
+- 플레이어가 후보를 바꾸거나 경로를 조정하면 Preview를 다시 계산하고 Confirm 전에는 지형·재료·시설 예약을 변경하지 않는다.
+- E5 전에는 Terrain 투영 오차, 경사면 Z-fighting, 먼 거리 판독, Pump/Tank Prefab Bounds, 색각·고대비 대체와 Game View를 검증한다.
+
 ## 합성·종료 점검
 
 - 플레이어 약속과 반복 이유: 후보
@@ -595,3 +681,71 @@ H3 Nature 탐사·연결로 성장 폐루프
 - 모든 미정의 귀속: 기록됨
 - 사용자 핵심 해석 확인: Q-077 반영
 - `sourcePlanningDocumentRefs` 반영: 미실시
+
+## Q-297~Q-339 Farm 경관·H 패턴 재고·LH 조립
+
+이 구간은 Farm 경관을 하나의 고정 배치로 선택하지 않고, 지형과 세계 상태에 맞는 승인 패턴 재고로 발전시키는 기준이다. 현재는 문답 기획 기록이며 실제 패턴 시험 월드·Prefab 결속·`SimulationWorldShell` 배치·Game View 증거가 없으므로 E5를 선언하지 않는다.
+
+| 질문 | 확인된 결정 | 반영 점검 |
+| --- | --- | --- |
+| Q-297 | 자연 지형 속에서도 Farm 목적지와 이동 흐름이 읽히는 여러 경관 패턴을 보유한다. | 기획 기록, 구현 미착수 |
+| Q-298 | 경사·수원·평지 분포를 분석해 호환 가능한 경관 형태를 추천한다. | 기획 기록, 규칙 미구현 |
+| Q-299 | 실제 지형 위에서 호환 청사진 2~3개를 Preview하고 플레이어가 선택한다. | 기획 기록, Preview 미구현 |
+| Q-300 | 수로 Farm을 본거지로 유지하며 주변 평지에 소형 생산 거점을 연결한다. | 기획 기록, H3 결속 미구현 |
+| Q-301 | 첫 기준은 넓은 주 하천 하나를 Farm 경관축으로 사용한다. | 기획 기록, 수계 Fixture 미동결 |
+| Q-302 | 이동 가능한 완만한 단차와 계단식 평지를 허용한다. | 기획 기록, 지형 Profile 미동결 |
+| Q-303 | 자연 여백과 생산 시설이 균형을 이루는 중간 밀도를 사용한다. | 기획 기록, 밀도 Profile 미동결 |
+| Q-304 | 실용적인 도로 패턴을 재고로 보유하고 지형 문맥에 따라 선택한다. | 기획 기록, 패턴 미구현 |
+| Q-305 | 건물은 지형·업무 관계에 따라 자연스럽게 분산하고 짧은 작업로로 연결한다. | 기획 기록, 배치 미구현 |
+| Q-306 | 붉은 Barn을 지역 랜드마크 후보로 사용하고 다른 표식은 보조한다. | 기획 기록, Prefab 미동결 |
+| Q-307 | 별도 시험 월드에서 패턴을 반복 생성하고 승인된 것만 실제 세계에 사용한다. | 기획 기록, 시험 월드 미구현 |
+| Q-308 | 자동 배치 검사와 실제 이동·Game View 사람 검토를 모두 통과해야 승인한다. | 기획 기록, 검증 미실행 |
+| Q-309 | 고정 골격을 유지하면서 허용 범위 안에서 자산·밀도·방향을 변형한다. | 기획 기록, 변형 계약 미구현 |
+| Q-310 | 첫 시험 단위는 여러 H1을 묶는 H2 Farm 블록이다. | 기획 기록, H2 Fixture 미구현 |
+| Q-311 | H2 시안→H1 수정→H2 재조립→H3 시험을 왕복한다. | 기획 기록, 관리 흐름 미결속 |
+| Q-312 | 패턴마다 Seed·지형이 다른 3~5개 변형을 시험한다. | 기획 기록, 시험 미실행 |
+| Q-313 | 첫 H2는 강변 실용 Farm 블록으로 한다. | 기획 기록, 후보 미제작 |
+| Q-314 | 고정 골격은 외부 진입→붉은 Barn 작업마당→내부 작업로→외부 출구다. | 기획 기록, H1 Anchor 미구현 |
+| Q-315 | 진입·핵심 흐름은 유지하고 필지·간격·소품 밀도만 지형에 적응한다. | 기획 기록, 적응 규칙 미구현 |
+| Q-316 | 회전→간격→필지 변형→승인 Prefab 교체 순으로 적응한다. | 기획 기록, 연산 미구현 |
+| Q-317 | 부적합 지형은 억지로 평탄화하지 않고 후보를 거부한 뒤 다른 패턴을 찾는다. | 기획 기록, 거부 시험 미구현 |
+| Q-318 | 지형 적합도·인근 반복 억제·현재 세계 상태를 함께 점수화한다. | 기획 기록, 점수 Profile 미동결 |
+| Q-319 | 상공 배치·낮 이동·밤 이동을 모두 검토한다. | 기획 기록, Runtime 미검증 |
+| Q-320 | 모든 표본이 필수 검사를 통과하고 최소 3개가 시각 승인을 받아야 한다. | 기획 기록, 승인 증거 없음 |
+| Q-321 | 개선 시 새 Revision·Hash를 만들고 기존 Save는 생성 당시 판본을 유지한다. | 기획 기록, 저장 계약 미구현 |
+| Q-322 | H3의 패턴 수와 간격은 지형 수용력·영역 목적·최소 거리로 결정한다. | 기획 기록, H3 생성 미구현 |
+| Q-323 | 역할·방향이 호환되는 도로·수로 연결부만 결속하고 나머지는 자연 완충지대로 둔다. | 기획 기록, Connector 미구현 |
+| Q-324 | 최초 공간 성립 때 패턴 판본·Hash를 고정하고 발견한 뒤 지도에 공개한다. | 기획 기록, Save·발견 미구현 |
+| Q-325 | H2 사이에는 하천·숲·초지·바위 같은 자연 완충지대를 보존한다. | 기획 기록, 배치 미구현 |
+| Q-326 | H3 구역마다 대표 경관 표식 하나를 두고 나머지는 시각 비중을 낮춘다. | 기획 기록, 표현 미구현 |
+| Q-327 | 초기에는 자연 중심 저밀도로 시작하고 변화에 따라 승인 패턴을 추가한다. | 기획 기록, 성장 규칙 미구현 |
+| Q-328 | 완충지대는 이동·채집·탐사·작은 발견을 제공하되 건축 밀도는 낮게 유지한다. | 기획 기록, WI 결속 미구현 |
+| Q-329 | 세계 상태가 필요성을 만들고 엔진이 청사진을 제안하며 플레이어가 Confirm한다. | 기획 기록, 권위 계약 미구현 |
+| Q-330 | Preview에서 예약 영역·통행·지형을 검사하고 부적합하면 대안 위치를 제시한다. | 기획 기록, Preview 미구현 |
+| Q-331 | H3가 H2 패턴 인스턴스를 포함하고 H2가 실제 H1 작업공간 배치를 소유한다. | 기획 기록, 상태 구조 미구현 |
+| Q-332 | 원인 WI·선택·세계 상태·PatternRevision·Seed·결과 Hash를 함께 기록한다. | 기획 기록, 행위·계보 미구현 |
+| Q-333 | 후보는 시험 공간, 승인 판본은 실제 세계, 폐기 판본은 기존 Save 읽기 호환에 사용한다. | 기획 기록, 수명주기 미구현 |
+| Q-334 | 패턴은 `VisualKey`·`AssetFamilyId`를 참조하고 Unity가 실제 Prefab을 해석한다. | 기획 기록, Resolver 미결속 |
+| Q-335 | 자산이 없으면 승인 대체 표현을 사용하고 검토 필요 상태를 남긴다. | 기획 기록, fallback 미구현 |
+| Q-336 | E5 전에 크기·Collider·Renderer·진입 방향·지지면·통행·fingerprint를 검증한다. | 기획 기록, 자산 검증 미실행 |
+| Q-337 | 시험 공간에서 실제 Prefab·Renderer·Collider·WI Anchor를 검증한 뒤 canonical Scene에 배치한다. | 기획 기록, E5 증거 없음 |
+| Q-338 | 배치 엔진은 동결 계획을 만들고 LH는 Prepare·Activate·Cache·Release만 수행한다. | 기획 기록, 경계 미검증 |
+| Q-339 | 실제 입력으로 입구→주요 H1→출구를 이동하고 카메라·충돌·낮/밤 시야를 확인한다. | 기획 기록, Play Mode·Game View 미검증 |
+
+### 패턴 수명주기와 권위 경계
+
+```text
+IdeaInventory
+→ 시험 월드 반복 생성
+→ 자동 통행·충돌 검사
+→ 낮·밤 실제 이동과 Game View 검토
+→ CandidateForReview
+→ 사람 승인
+→ ApprovedReference
+→ 결정적 H3 조립
+```
+
+- 패턴은 의미·관계·허용 변형을 소유하고 Synty Prefab 경로를 직접 소유하지 않는다.
+- LH는 이미 생성된 공간 계획의 준비·활성·캐시·해제만 담당하며 활성화 때 재설계하지 않는다.
+- 기본 LH 생성은 지형을 조용히 평탄화하지 않는다. 플레이어의 개간·평탄화는 별도 WI와 Delta다.
+- 질문 확인과 기획 이미지는 E 증거가 아니다. 실제 E5는 동결 후보의 Prefab·World 배치·Renderer·Collider·WI 상태 발현이 필요하다.
