@@ -6,12 +6,12 @@
 
 ## 기본 관계
 
-`주제 1개 → PlayableLoop 1개 → Codex Goal 1개 → 활성 WI 1개`를 기본 단위로 사용한다.
+`주제 1개 → PlayableLoop 1개 → Codex Goal 1개 → 승인된 WI·하위 작업 목록`을 기본 단위로 사용한다. 이 소유 관계는 프로젝트 전체나 스레드별 동시 작업 수 제한이 아니다.
 
 - 주제 기획서는 플레이어 상황, 욕구, 선택, 대가, 성공·실패, 회복·귀환, 다음 선택을 설명한다.
 - PlayableLoop는 논리·표현 E와 증거, 차단, 재개 단계를 기록한다.
 - Goal은 한 시점에 하나의 PlayableUnit만 소유한다.
-- WI는 Goal 안에서 한 번에 하나만 활성화한다.
+- 독립적인 WI와 같은 WI의 비중첩 하위 작업은 Goal 안에서 병렬로 진행할 수 있다. 작업별 승인·기준선·의존성·변경 소유권은 [Goal 운영 체계](CodexPlayableLoopGoal운영체계.md)를 따른다.
 - AreaAggregate와 WorldAggregate는 주제 기획 관문의 대상이 아니며 자식 결과에서 파생한다.
 
 ## 기획 스레드와 개발 스레드
@@ -32,10 +32,11 @@
 
 - `Approved` 기획서와 현재 활성 Goal의 E7 작업 명세를 구현 입력으로 사용한다.
 - 현재 WI에 `Required`로 연결된 전문 연구가 모두 `Accepted`인지 확인하고, 그 기준선과 기획서 재결속 결과를 함께 구현한다.
-- Goal WIP 1, WI WIP 1을 유지하고 현재 WI의 가장 이른 미완료 의존성부터 처리한다.
+- 전역·스레드별 WIP 고정 상한 없이 실제 선행 의존성이 준비된 승인 작업을 진행한다. 다른 WI가 활성이라는 사실만으로 차단하지 않으며 같은 파일·공유 계약의 쓰기 소유권은 먼저 조율한다.
 - 기획서에 없는 플레이어 약속·핵심 선택·비용·실패·회복 규칙을 임의로 추가하지 않는다.
 - 구현에서 기획 충돌이나 미정 사항을 발견하면 `openFeedbackItems`와 재개 E를 남기고 기획 스레드로 돌려보낸다.
 - 코드·시험·Play Mode·Game View 결과는 기획서가 아니라 원장과 `EvidencePackage`에 기록한다.
+- 분야별 스레드는 담당 범위의 구현·시험·인계를 수행하고 `개발` 스레드가 최종 통합을 소유한다. 독립 시험과 호환 결과의 묶음 통합은 허용하며 한 작업의 차단으로 무관한 작업을 멈추지 않는다.
 
 두 스레드는 대화 내용을 직접 인계 자료로 사용하지 않는다. 기획 대화는 문답 정밀화 기록과 기획서로 합성한 뒤에만 인계한다. 저장소의 승인 기획서, 연결된 문답·전문 연구, Goal 원장, 작업 명세와 생성 상태판이 유일한 공용 인계면이다.
 
@@ -46,7 +47,7 @@
 `PlanningThreadGoal`은 저장소의 `Codex PlayableLoop Goal`과 다르다.
 
 - `PlanningThreadGoal`: 여러 문답 회차와 구현 인계를 계속 관리하는 대화 운영 목표
-- `Codex PlayableLoop Goal`: 개발 스레드가 한 번에 소유하는 PlayableUnit 하나, WI WIP 1
+- `Codex PlayableLoop Goal`: 각각 PlayableUnit 하나를 소유하며 승인된 WI·하위 작업을 추적하는 구현 목표
 
 기획 스레드는 질문을 계속할 수 있지만 이미 개발 스레드에 보낸 기획 revision의 플레이어 약속·WI 책임·권위·H·저장 의미를 조용히 바꾸지 않는다. 새 답변이 전달 범위를 바꾸면 다음 revision으로 기록하고, 진행 중 구현에는 `FeedbackRequired` 또는 재승인 인계로 알려야 한다.
 
@@ -55,8 +56,8 @@
 1. 개발할 범위가 Unity 게임 완성 구성요소 대장에서 `확정후보` 이상이며 핵심 미정이 없다.
 2. 문답이 기획서에 합성되고 `designRevision`·hash·승인 근거가 `Approved`다.
 3. 모든 `Required` 전문 연구가 `Accepted`이고 승인 기획서에 재결속됐다.
-4. 첫 활성 WI와 E7 작업 명세, 엔진·표현 파이프라인, Save/Replay·Local/Remote·Game View 완료 조건이 준비됐다.
-5. 현재 개발 스레드의 Goal WIP·WI WIP와 충돌하지 않는다. 충돌하면 명령하지 않고 대기열에 둔다.
+4. 인계할 WI·하위 작업과 E7 작업 명세, 엔진·표현 파이프라인, Save/Replay·Local/Remote·Game View 완료 조건이 준비됐다.
+5. 담당·기준 revision/hash·수정 경로·공유 계약·선행 의존성이 명시되고 변경 소유권이 조율됐다. 실제 선행 미완료나 조율되지 않은 충돌만 해당 작업을 대기시키며 다른 작업의 활성 여부나 개수만으로 막지 않는다.
 
 조건이 부족하면 기획 스레드가 구현 가능하다고 추정해 대화 요약만 보내지 않는다. 문답은 계속 진행하되 인계 상태를 `NotReady`로 유지한다.
 
@@ -122,7 +123,7 @@ PlayableUnit의 `planningGate`는 다음 값을 가진다.
 2. 필수 절을 채운 `designDocumentRef`
 3. 승인된 `designRevision`, `designHashSha256`, `approvalEvidenceRef`
 4. 단일 플레이어 약속과 반복 폐루프
-5. 활성화할 첫 WI와 WI별 단일 책임·허용 발생원
+5. 활성화할 WI·하위 작업과 WI별 단일 책임·허용 발생원
 6. 성공·실패·취소·회복·귀환 상태
 7. Logic·Presentation E7→E1 영향 검토 범위
 8. 필요한 H Capability와 엔진·파이프라인 인계
@@ -130,16 +131,18 @@ PlayableUnit의 `planningGate`는 다음 값을 가진다.
 10. 연구에서 확정한 치수·시간·거리·밀도·접촉점·자산 fallback과 재검증 조건
 11. Save/Replay, LocalProcess/RemoteHost, 외부 자료 경계
 12. 실제 입력·Play Mode·Game View를 포함한 E7 완료 조건
+13. 작업별 담당·기준 revision/hash·수정 경로·공유 계약·선행 작업·통합 담당 및 승인 상한
 
 실제 스레드 인계 메시지는 위 묶음을 다시 서술하는 긴 자유문이 아니라 다음 참조를 가진 짧은 실행 지시로 작성한다.
 
 ```text
-dispatchStableId
-PlayableLoop / topic / Goal / 활성 WI
+dispatchStableId / 작업 ID / 담당 스레드
+PlayableLoop / topic / Goal / WI / 하위 작업·궤적
 designDocumentRef + revision + SHA-256
 Accepted 전문 연구 참조
 E7 workOrderRef
 이번 구현 범위와 제외 범위
+기준 revision·hash / 수정 경로 / 공유 계약 / 선행 작업 / 통합 담당
 Unity 완성 구성요소 대상 행
 필수 검증과 완료 증거
 기획 충돌 발견 시 되돌릴 feedback 위치와 가장 이른 재개 E
@@ -152,29 +155,32 @@ Unity 완성 구성요소 대상 행
   -> 기획 합성·연구 승인
   -> dispatch 준비 검사
   -> 개발 스레드에 실행 지시
-  -> 코드·시험·Unity Runtime 작업
-  -> 완료 증거 또는 FeedbackRequired
-  -> 기획 스레드가 결과 읽기
+  -> 개발의 규칙 구현 + 전문 담당의 공간·배치·애니메이션 병렬 작업
+  -> 전문 담당이 개발에 산출물·검증·차단 인계
+  -> 개발이 결합·회귀 검증 후 통합 결과 또는 FeedbackRequired 정리
+  -> 기획 스레드가 통합 상태판과 원문 증거 읽기
   -> 다음 질문·revision·재인계
 ```
 
 - 개발 스레드는 인계를 받으면 현재 Goal 상태와 승인 hash를 다시 검증하고 일치할 때만 구현한다.
+- 전문 분담·변경 소유권·반환 양식은 [Goal 운영 체계의 전문 담당과 기획 환류](CodexPlayableLoopGoal운영체계.md#전문-담당과-기획-환류)를 따른다. 개발은 규칙 구현과 통합을 겸임하며 [개발 통합 상태판](../AI/개발통합상태판.md)을 기획 반환의 입구로 유지한다. 전문 담당의 개별 완료 보고를 곧바로 최종 통합 결과로 사용하지 않는다.
 - 기획 스레드는 구현이 진행되는 동안 비중첩 구성요소의 문답을 계속할 수 있다.
 - 같은 WI·같은 기획 절을 바꾸는 문답은 개발 결과가 돌아오거나 구현이 명시적으로 중단될 때까지 다음 revision 후보로만 보존한다.
 - 개발 완료 보고는 코드 변경, 자동시험, 저장 Scene, Play Mode, Game View, Console, Build 증거를 구분한다.
 - 구현 중 발견한 설계 충돌은 개발 스레드가 임의로 해결하지 않고 `openFeedbackItems`, 관련 구성요소, 가장 이른 재개 E와 함께 돌려보낸다.
 - 기획 스레드는 개발 완료를 대화만으로 승인하지 않고 원장·상태판·EvidencePackage와 실제 변경을 읽은 뒤 다음 인계 여부를 결정한다.
+- 독립 결과는 준비된 묶음부터 통합하고, 기획 결정이 필요한 차단은 개발이 먼저 확인해 반환한다. 전체 담당 완료나 기획 응답을 기다리는 동안 무관한 승인 작업까지 중단하지 않는다.
 
 개발 스레드는 시작할 때 다음 순서를 지킨다.
 
-1. `docs/AI/generated/codex-playable-loop-goals.md`에서 활성 Goal과 WI를 읽는다.
+1. `docs/AI/generated/codex-playable-loop-goals.md`와 원장의 전체 작업 목록에서 담당 Goal·WI·하위 작업과 다른 담당의 소유 범위를 읽는다. 과거 대표 활성 값만으로 실행 범위를 판단하지 않는다.
 2. `playable-loops.json`의 `planningGate`가 `Approved`인지 확인한다.
 3. `manage-playable-loop-topic-planning.ps1 -Mode Validate`로 문서 hash와 필수 절을 검사한다.
 4. 승인 기획서와 `sourcePlanningDocumentRefs` 중 현재 WI에 필요한 근거를 읽는다.
 5. 현재 WI에 `Required`로 연결된 전문 연구가 모두 `Accepted`인지 확인하고 기준선·revision·무효화 조건을 읽는다.
 6. Goal의 `workOrderRef`와 엔진·표현 파이프라인 프로필을 읽는다.
 7. 기획 범위·전문 연구와 현재 코드가 다르면 코드를 먼저 늘리지 않고 차이를 원장에 기록한다.
-8. 현재 WI 하나만 구현하고 Logic·Presentation 증거를 분리해 갱신한다.
+8. 승인된 소유 범위에서 독립 작업을 구현·검증하고 Logic·Presentation 증거를 분리해 인계한다. 같은 WI의 결과는 하나의 WI 증거 기록으로 결속하며 대기 작업 자동 활성화나 E 상한 우회는 하지 않는다.
 
 승인 기획서는 구현 방법을 모든 줄까지 고정하지 않는다. 내부 클래스 분리, 시험 보조 코드, 성능 최적화처럼 플레이어 약속과 권위 경계를 바꾸지 않는 기술 선택은 개발 스레드가 결정할 수 있다. 반대로 플레이어 선택·대가·보상·실패·회복·귀환, WI 책임, H 필수 능력, 저장 의미, Local/Remote 권위 또는 `Accepted` 연구의 측정 기준이 달라지면 연구와 기획 revision 재승인이 필요하다.
 

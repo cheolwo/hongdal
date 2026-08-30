@@ -4,12 +4,14 @@ param(
     [string] $Mode = "Check",
     [string] $InputPath = "eng/execution-ledgers/world-interaction-delivery-priorities.json",
     [string] $OutputPath = "docs/AI/generated/world-interaction-delivery-priorities.md",
-    [string] $ContractOutputPath = "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldInteractionDeliveryPriorities.generated.cs"
+    [string] $ContractOutputPath = "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldInteractionDeliveryPriorities.generated.cs",
+    [string] $GoalLedgerPath = "eng/execution-ledgers/codex-playable-loop-goals.json"
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot "../common/deterministic-text-output.ps1")
+. (Join-Path $PSScriptRoot "../common/parallel-development-work.ps1")
 
 function Require([bool] $Condition, [string] $Code) {
     if (-not $Condition) { throw "WorldInteractionDeliveryPriorityInvalid:$Code" }
@@ -22,8 +24,16 @@ function Escape-CSharp([string] $Value) {
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $resolvedInput = (Resolve-Path (Join-Path $repositoryRoot $InputPath)).Path
 $ledger = Get-Content -LiteralPath $resolvedInput -Raw -Encoding UTF8 | ConvertFrom-Json
+$goals = Get-Content -LiteralPath (Join-Path $repositoryRoot $GoalLedgerPath) -Raw -Encoding UTF8 | ConvertFrom-Json
+$workItems = @(Get-ParallelDevelopmentWorkItems -Ledger $goals)
+$activeIds = @($workItems | Where-Object { [string] $_.statusCode -in @("Active", "ReadyForIntegration") } |
+    ForEach-Object { [string] $_.worldInteractionId } | Sort-Object -Unique)
 $catalog = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.worldInteractionCatalogPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 $loops = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.playableLoopCatalogPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
+$workReadiness = @(Test-ParallelDevelopmentWorkItems -Ledger $goals -Loops $loops -RepositoryRoot $repositoryRoot)
+foreach ($readiness in @($workReadiness | Where-Object { $_.statusCode -in @("Active", "ReadyForIntegration") })) {
+    Require ([bool] $readiness.canExecute) "ExecutingWorkItemNotApproved:$($readiness.workItemId):$(@($readiness.blockerCodes) -join ',')"
+}
 $wiEh = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.wiEhStatusPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 $synty = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.syntyCatalogPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 
@@ -34,13 +44,16 @@ Require ([bool] $ledger.principles.playableLoopOwnsPlayClosedPromotion) "Playabl
 Require ([bool] $ledger.principles.e7RequiresCurrentRuntimeEvidence) "E7EvidencePrincipleMissing"
 Require ([bool] $ledger.principles.syntyExpressionDoesNotPromoteEvidence) "SyntyBoundaryMissing"
 Require ([bool] $ledger.principles.independentAreasPrecedeIntegrationRoutes) "IndependentAreaPrincipleMissing"
-Require ([string] $ledger.deliveryModeCode -eq "SingleWorldInteractionVertical") "DeliveryModeInvalid"
-Require ([int] $ledger.workInProgressLimit -eq 1) "WorkInProgressLimitMustBeOne"
+Require ([string] $ledger.deliveryModeCode -in @("SingleWorldInteractionVertical", "DependencyAndOwnership")) "DeliveryModeInvalid"
+if ([string] $ledger.deliveryModeCode -eq "DependencyAndOwnership") {
+    Require ($null -eq $ledger.workInProgressLimit) "FixedWorkInProgressLimitNotSupported"
+    Require ([string] $ledger.concurrencyModeCode -eq "DependencyAndOwnership") "ConcurrencyModeInvalid"
+}
 Require ([string] $ledger.defaultIndividualTargetEvidenceStage -eq "E7") "DefaultTargetMustBeE7"
 $worldInteractionCount = @($catalog.items).Count
 Require ($worldInteractionCount -gt 0) "WorldInteractionCountInvalid"
 Require (@($ledger.items).Count -eq $worldInteractionCount) "DeliveryItemCountMismatch"
-Require (@($ledger.waves).Count -eq 6) "DeliveryWaveCountMustBe6"
+Require (@($ledger.waves).Count -eq 7) "DeliveryWaveCountMustBe7"
 
 $catalogById = @{}
 foreach ($item in @($catalog.items)) { $catalogById[[string] $item.id] = $item }
@@ -70,7 +83,7 @@ foreach ($item in @($ledger.items)) {
         $loop = $loopById[[string] $loopRef]
         Require (@($loop.worldInteractionIds) -contains $id) "PlayableLoopDoesNotContainWorldInteraction:${id}:$loopRef"
     }
-    if ([string] $item.completionRoleCode -ne "DeferredIntegration") {
+    if ([string] $item.completionRoleCode -notin @("DeferredIntegration", "DeferredRegistration")) {
         Require (@($item.playableLoopRefs).Count -gt 0) "ActiveItemPlayableLoopMissing:$id"
     }
     $assigned[$id] = $item
@@ -79,6 +92,11 @@ foreach ($item in @($ledger.items)) {
 $missing = @($catalog.items | Where-Object { -not $assigned.ContainsKey([string] $_.id) })
 $missingIds = @($missing | ForEach-Object { [string] $_.id })
 Require ($missing.Count -eq 0) "WorldInteractionCoverageMissing:$($missingIds -join ',')"
+foreach ($id in $activeIds) {
+    Require ($assigned.ContainsKey($id)) "ExecutingWorldInteractionUnknown:$id"
+    Require ([string] $assigned[$id].completionRoleCode -notin @("DeferredIntegration", "DeferredRegistration")) `
+        "ExecutingWorldInteractionDeferred:$id"
+}
 $activeId = [string] $ledger.activeWork.worldInteractionId
 Require ($assigned.ContainsKey($activeId)) "ActiveWorldInteractionUnknown:$activeId"
 $activeWorkState = [string] $ledger.activeWork.workStateCode
@@ -86,12 +104,17 @@ Require ($activeWorkState -in @("Active", "E7Closed")) "ActiveWorkStateInvalid"
 Require ([string] $ledger.activeWork.currentEvidenceStage -eq
     [string] $catalogById[$activeId].integration.currentStage) "ActiveEvidenceStageDrift:$activeId"
 Require ([string] $ledger.activeWork.targetEvidenceStage -eq "E7") "ActiveTargetMustBeE7"
-Require ([string] $assigned[$activeId].deliveryWaveCode -eq "D1" -and
-    [string] $assigned[$activeId].completionRoleCode -ne "DeferredIntegration") `
-    "ActiveWorldInteractionMustBeNatureDeliveryWork"
+Require ([string] $assigned[$activeId].completionRoleCode -notin @("DeferredIntegration", "DeferredRegistration")) `
+    "ActiveWorldInteractionMustBeIndependentDeliveryWork"
 $stageReviews = @($ledger.activeWork.stageReviews)
-Require ($stageReviews.Count -eq 4) "ActiveStageReviewCountInvalid"
-Require ((@($stageReviews.stageCode) -join ",") -eq "E4,E5,E6,E7") `
+$allStages = @("E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7")
+$currentStageIndex = [Array]::IndexOf($allStages,
+    [string] $ledger.activeWork.currentEvidenceStage)
+Require ($currentStageIndex -ge 1 -and $currentStageIndex -le 7) `
+    "ActiveEvidenceStageInvalid"
+$expectedReviewStageCodes = @($allStages[$currentStageIndex..7])
+Require ($stageReviews.Count -eq $expectedReviewStageCodes.Count) "ActiveStageReviewCountInvalid"
+Require ((@($stageReviews.stageCode) -join ",") -eq ($expectedReviewStageCodes -join ",")) `
     "ActiveStageReviewOrderInvalid"
 foreach ($review in $stageReviews) {
     Require (@($ledger.allowedStageReviewResultCodes) -contains
@@ -104,25 +127,16 @@ foreach ($review in $stageReviews) {
 $passedStageCodes = @($stageReviews | Where-Object resultCode -eq "Passed" |
     ForEach-Object stageCode)
 if ($activeWorkState -eq "Active") {
-    $currentStageIndex = [Array]::IndexOf(@("E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"),
-        [string] $ledger.activeWork.currentEvidenceStage)
-    Require ($currentStageIndex -ge 1 -and $currentStageIndex -lt 7) `
+    Require ($currentStageIndex -lt 7) `
         "ActiveEvidenceStageInvalid"
-    $expectedPassedStageCodes = if ($currentStageIndex -lt 4) {
-        @()
-    }
-    else {
-        @($stageReviews | Where-Object {
-                [Array]::IndexOf(@("E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"),
-                    [string] $_.stageCode) -lt $currentStageIndex
-            } | ForEach-Object stageCode)
-    }
-    Require (($passedStageCodes -join ",") -eq ($expectedPassedStageCodes -join ",")) `
-        "ActivePassedStageSequenceInvalid"
-    $firstOpenReviewIndex = $passedStageCodes.Count
-    for ($index = $firstOpenReviewIndex + 1; $index -lt $stageReviews.Count; $index++) {
-        Require ([string] $stageReviews[$index].resultCode -eq "Pending") `
-            "ActiveLaterStageMustRemainPending:$($stageReviews[$index].stageCode)"
+    $seenOpen = $false
+    foreach ($review in $stageReviews) {
+        if ([string] $review.resultCode -eq "Passed") {
+            Require (-not $seenOpen) "ActivePassedStageSequenceInvalid"
+        }
+        else {
+            $seenOpen = $true
+        }
     }
     Require ([string] ($stageReviews | Where-Object stageCode -eq "E7").resultCode `
         -ne "Passed") "ActiveE7MustRemainOpen"
@@ -133,9 +147,11 @@ else {
     Require (($passedStageCodes -join ",") -eq "E4,E5,E6,E7") `
         "ClosedPassedStageSequenceInvalid"
 }
-Require ([string] $stageReviews[2].refinement.realityGroundingCode -eq "NotApplied") `
+$e6Review = @($stageReviews | Where-Object stageCode -eq "E6") | Select-Object -First 1
+Require ($null -ne $e6Review) "ActiveE6ReviewMissing"
+Require ([string] $e6Review.refinement.realityGroundingCode -eq "NotApplied") `
     "ActiveE6RealityBoundaryMissing"
-Require ([string] $stageReviews[2].refinement.authorityCode -eq "SimulationCore") `
+Require ([string] $e6Review.refinement.authorityCode -eq "SimulationCore") `
     "ActiveE6AuthorityInvalid"
 
 $requiredNpcE8 = @($ledger.npcE8Policy.requiredCodes)
@@ -184,12 +200,13 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- 실행 우선순위 개정: ``$($ledger.revision)``")
 [void] $builder.AppendLine("- 전체 WI: ``$(@($ledger.items).Count)``")
-[void] $builder.AppendLine("- 진행 방식: ``$($ledger.deliveryModeCode)`` / 작업 중 한도 ``$($ledger.workInProgressLimit)``")
-[void] $builder.AppendLine("- 현재 활성 WI: ``$activeId`` / ``$($ledger.activeWork.currentEvidenceStage)`` → ``$($ledger.activeWork.targetEvidenceStage)``")
+[void] $builder.AppendLine("- 진행 방식: 의존성·담당 소유권 기반 병렬 개발 / 고정 작업 수 제한 없음")
+[void] $builder.AppendLine("- 실행 중 WI: ``$($activeIds -join ', ')`` / 원본: ``$GoalLedgerPath``")
+[void] $builder.AppendLine("- 대표 표시 WI: ``$activeId`` / ``$($ledger.activeWork.currentEvidenceStage)`` → ``$($ledger.activeWork.targetEvidenceStage)`` (전체 실행 목록이 아님)")
 [void] $builder.AppendLine("- Synty H1 설계 재고: ``$($synty.counts.h1Total)``")
 [void] $builder.AppendLine("- E7은 최신 PlayMode·Game View·Hosted 동등성 증거가 있을 때만 승격한다.")
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("## 현재 단일 WI 증거 관문")
+[void] $builder.AppendLine("## 대표 표시 WI 증거 관문")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("| E 단계 | 판정 | 정제·검증 요약 |")
 [void] $builder.AppendLine("| --- | --- | --- |")
@@ -212,9 +229,9 @@ foreach ($wave in @($ledger.waves | Sort-Object order)) {
         $wi = $catalogById[[string] $priority.worldInteractionId]
         $status = $statusById[[string] $priority.worldInteractionId]
         $loopsText = if (@($priority.playableLoopRefs).Count -eq 0) { "후속 정의" } else { @($priority.playableLoopRefs) -join "<br>" }
-        $workState = if ([string] $priority.worldInteractionId -eq $activeId) { $activeWorkState }
+        $workState = if ($activeIds -contains [string] $priority.worldInteractionId) { "Active" }
             elseif ([string] $wi.integration.currentStage -eq "E7") { "E7Closed" }
-            elseif ([string] $priority.completionRoleCode -eq "DeferredIntegration") { "Deferred" }
+            elseif ([string] $priority.completionRoleCode -in @("DeferredIntegration", "DeferredRegistration")) { "Deferred" }
             else { "Queued" }
         $npcE8 = if ($requiredNpcE8 -contains [string] $priority.worldInteractionId) { "Required" }
             elseif ($conditionalNpcE8 -contains [string] $priority.worldInteractionId) { "Conditional" }
@@ -263,11 +280,23 @@ $contract = [Text.StringBuilder]::new()
 [void] $contract.AppendLine("    {")
 [void] $contract.AppendLine(('        public const string Revision = "{0}";' -f
         (Escape-CSharp ([string] $ledger.revision))))
+[void] $contract.AppendLine('        [Obsolete("대표 표시 호환 값입니다. 실행 판단은 ActiveWorldInteractionIds를 사용하세요.")]')
 [void] $contract.AppendLine(('        public const string ActiveWorldInteractionId = "{0}";' -f
         (Escape-CSharp $activeId)))
 [void] $contract.AppendLine(('        public const string ActiveEvidenceStage = "{0}";' -f
         (Escape-CSharp ([string] $ledger.activeWork.currentEvidenceStage))))
+[void] $contract.AppendLine('        [Obsolete("구형 호환 값이며 실행 제한이 아닙니다. MaximumConcurrentWorkItems를 사용하세요.")]')
 [void] $contract.AppendLine("        public const int WorkInProgressLimit = 1;")
+[void] $contract.AppendLine("        public static int? MaximumConcurrentWorkItems => null;")
+[void] $contract.AppendLine('        public const string ConcurrencyModeCode = "DependencyAndOwnership";')
+$activeIdArgs = @($activeIds | ForEach-Object { '"{0}"' -f (Escape-CSharp $_) }) -join ", "
+[void] $contract.AppendLine(('        public static IReadOnlyList<string> ActiveWorldInteractionIds {{ get; }} = Array.AsReadOnly(new string[] {{ {0} }});' -f $activeIdArgs))
+[void] $contract.AppendLine("        public static bool IsActiveWorldInteraction(string worldInteractionId)")
+[void] $contract.AppendLine("        {")
+[void] $contract.AppendLine("            foreach (var id in ActiveWorldInteractionIds)")
+[void] $contract.AppendLine("                if (string.Equals(id, worldInteractionId, StringComparison.Ordinal)) return true;")
+[void] $contract.AppendLine("            return false;")
+[void] $contract.AppendLine("        }")
 [void] $contract.AppendLine("        private static readonly SimulationWI실행우선순위Definition[] 항목들 =")
 [void] $contract.AppendLine("        {")
 foreach ($priority in @($ledger.items | Sort-Object { [int] $waveByCode[[string] $_.deliveryWaveCode].order }, orderInWave)) {
@@ -281,9 +310,9 @@ foreach ($priority in @($ledger.items | Sort-Object { [int] $waveByCode[[string]
     else {
         "new[] { $loopArgs }"
     }
-    $workState = if ([string] $priority.worldInteractionId -eq $activeId) { $activeWorkState }
+    $workState = if ($activeIds -contains [string] $priority.worldInteractionId) { "Active" }
         elseif ([string] $wi.integration.currentStage -eq "E7") { "E7Closed" }
-        elseif ([string] $priority.completionRoleCode -eq "DeferredIntegration") { "Deferred" }
+        elseif ([string] $priority.completionRoleCode -in @("DeferredIntegration", "DeferredRegistration")) { "Deferred" }
         else { "Queued" }
     $npcE8 = if ($requiredNpcE8 -contains [string] $priority.worldInteractionId) { "Required" }
         elseif ($conditionalNpcE8 -contains [string] $priority.worldInteractionId) { "Conditional" }
@@ -326,4 +355,4 @@ else {
     Require ((ConvertTo-DeterministicText ([IO.File]::ReadAllText($resolvedContractOutput))) -ceq $contractContent) "GeneratedContractMismatch"
 }
 
-Write-Output "WorldInteractionDeliveryPrioritiesValid:$worldInteractionCount;Waves=6;Revision=$($ledger.revision)"
+Write-Output "WorldInteractionDeliveryPrioritiesValid:$worldInteractionCount;Waves=$(@($ledger.waves).Count);Revision=$($ledger.revision)"

@@ -44,25 +44,76 @@ Simulation·Unity
 │  ├─ 040 domain.save-package · Domain · Persistence
 │  └─ 050 infrastructure.save-store · Infrastructure · Persistence
 ├─ 공공데이터-파생 World [simulation-world-derivation]
+│  ├─ 009 contract.nature-shelter-purpose · Contract · Definition
+│  ├─ 010 contract.nature-sleep-safety-candidate · Contract · Definition
 │  ├─ 010 domain.derived-world-ledger · Domain · Definition
+│  ├─ 011 contract.nature-risky-sleep-warning · Contract · Definition
+│  ├─ 012 contract.nature-difficulty-boundary · Contract · Definition
+│  ├─ 013 contract.nature-expert-threat-candidate · Contract · Definition
+│  ├─ 014 contract.meditation-focus-access-candidate · Contract · Definition
+│  ├─ 014 contract.nature-risky-sleep-outcome-candidate · Contract · Definition
+│  ├─ 015 contract.meditation-combat-progression-candidate · Contract · Definition
+│  ├─ 015 contract.nature-weather-profile-freeze-candidate · Contract · Definition
+│  ├─ 016 contract.deep-observation-progression-candidate · Contract · Definition
 │  ├─ 016 contract.landscape-composition-tile · Contract · Definition
+│  ├─ 016 contract.nature-sleep-protection-spatial-layer-candidate · Contract · Definition
 │  ├─ 016 contract.world-map-composition · Contract · Definition
 │  ├─ 017 contract.environment-spawn-decision · Contract · Projection
 │  ├─ 017 contract.landscape-graph · Contract · Definition
+│  ├─ 017 contract.player-growth-hint-projection · Contract · Definition
 │  ├─ 018 contract.interior-layout-plan · Contract · Definition
+│  ├─ 018 contract.party-proximity-resonance-candidate · Contract · Definition
 │  ├─ 019 contract.marketplace-grounded-interior-item · Contract · Definition
+│  ├─ 019 contract.party-resonance-recovery-candidate · Contract · Definition
 │  ├─ 019 contract.world-asset-placement · Contract · Projection
 │  ├─ 019 domain.interior-layout-generate · Domain · Projection
+│  ├─ 019 domain.nature-shelter-purpose-readiness · Domain · Query
 │  ├─ 020 application.pyeongchang-derivation · Application · Projection
+│  ├─ 020 contract.party-resonance-afterglow-candidate · Contract · Definition
 │  ├─ 020 domain.marketplace-grounded-item-effect-derive · Domain · Projection
+│  ├─ 020 domain.nature-sleep-safety-candidate-readiness · Domain · Query
+│  ├─ 021 contract.party-resonance-stacking-candidate · Contract · Definition
+│  ├─ 021 domain.nature-risky-sleep-outcome-candidate · Domain · Query
+│  ├─ 021 domain.nature-risky-sleep-warning-policy · Domain · Query
+│  ├─ 022 contract.gwangbok-resonance-entry-cap-candidate · Contract · Definition
+│  ├─ 022 domain.nature-difficulty-boundary · Domain · Query
+│  ├─ 022 domain.nature-weather-profile-freeze-candidate · Domain · Query
+│  ├─ 023 contract.gwangbok-self-recovery-action-candidate · Contract · Definition
+│  ├─ 023 domain.nature-expert-threat-candidate-readiness · Domain · Query
+│  ├─ 023 domain.nature-sleep-protection-spatial-layer-candidate · Domain · Query
+│  ├─ 024 contract.gwangbok-resonance-maintenance-candidate · Contract · Definition
+│  ├─ 024 domain.meditation-focus-access-candidate-readiness · Domain · Query
+│  ├─ 025 contract.personal-recovery-decay-candidate · Contract · Definition
+│  ├─ 025 domain.meditation-combat-progression-candidate-readiness · Domain · Query
+│  ├─ 026 contract.personal-recovery-offline-time-candidate · Contract · Definition
+│  ├─ 026 domain.deep-observation-progression-candidate-readiness · Domain · Query
+│  ├─ 027 contract.personal-recovery-threat-offset-candidate · Contract · Definition
 │  ├─ 027 domain.environment-spawn-decision · Domain · Projection
+│  ├─ 027 domain.player-growth-hint-projection · Domain · Query
 │  ├─ 028 application.world-map-composition · Application · Projection
+│  ├─ 028 contract.dark-age-mindfulness-access-candidate · Contract · Definition
+│  ├─ 028 domain.party-proximity-resonance-candidate · Domain · Query
 │  ├─ 029 application.world-asset-placement · Application · Projection
+│  ├─ 029 contract.dark-age-mindfulness-effect-scope-candidate · Contract · Definition
+│  ├─ 029 domain.party-resonance-recovery-candidate · Domain · Query
 │  ├─ 030 adapter.lh-separated-cell-content · Application · Projection
 │  ├─ 030 application.nature-world-asset-placement-state · Application · Projection
 │  ├─ 030 application.separated-world-asset-placement · Application · Projection
+│  ├─ 030 contract.dark-age-mindfulness-effect-strength-candidate · Contract · Definition
+│  ├─ 030 domain.party-resonance-afterglow-candidate · Domain · Query
 │  ├─ 030 infrastructure.derived-world-store · Infrastructure · Persistence
 │  ├─ 031 application.nature-world-cell-assembly · Application · Projection
+│  ├─ 031 application.world-asset-plan-partition · Application · Projection
+│  ├─ 031 domain.party-resonance-stacking-candidate · Domain · Query
+│  ├─ 032 domain.gwangbok-resonance-entry-cap-candidate · Domain · Query
+│  ├─ 033 domain.gwangbok-self-recovery-action-candidate · Domain · Query
+│  ├─ 034 domain.gwangbok-resonance-maintenance-candidate · Domain · Query
+│  ├─ 035 domain.personal-recovery-decay-candidate · Domain · Query
+│  ├─ 036 domain.personal-recovery-offline-time-candidate · Domain · Query
+│  ├─ 037 domain.personal-recovery-threat-offset-candidate · Domain · Query
+│  ├─ 038 domain.dark-age-mindfulness-access-candidate · Domain · Query
+│  ├─ 039 domain.dark-age-mindfulness-effect-scope-candidate · Domain · Query
+│  ├─ 040 domain.dark-age-mindfulness-effect-strength-candidate · Domain · Query
 │  ├─ 041 unity.marketplace-grounded-item-detail · ViewModel · Presentation
 │  ├─ 042 domain.landscape-graph-assembler · Domain · Projection
 │  └─ 044 application.landscape-graph-job · Application · Projection
@@ -73,6 +124,7 @@ Simulation·Unity
 ├─ L2 타일 Streaming [simulation-world-streaming]
 │  ├─ 010 contract.stream-recipe · Contract · Definition
 │  ├─ 011 contract.lh-world-profile · Contract · Definition
+│  ├─ 012 contract.lh-asset-plan-lifecycle · Contract · Definition
 │  ├─ 020 api.world-stream · Api · Query
 │  ├─ 025 api.world-region-summary · Api · Query
 │  ├─ 028 contract.world-layout-definition · Contract · Definition
@@ -82,7 +134,10 @@ Simulation·Unity
 │  ├─ 031 application.lh-world-preview · Application · Preview
 │  ├─ 032 api.lh-world-preview · Api · Preview
 │  ├─ 033 application.lh-interior-plan-handle · Application · Projection
-│  └─ 040 unity.interior-plan-presentation · ViewModel · Presentation
+│  ├─ 034 application.lh-asset-plan-lifecycle · Application · Projection
+│  ├─ 035 application.lh-asset-plan-window-reconcile · Application · Projection
+│  ├─ 040 unity.interior-plan-presentation · ViewModel · Presentation
+│  └─ 041 unity.lh-asset-plan-presentation-reconcile · ClientAdapter · Presentation
 ├─ Farm 감자 3원천 현실근거 [simulation-farm-reality-evidence]
 │  ├─ 010 contract.farm-reality-evidence · Contract · Definition
 │  ├─ 020 api.farm-reality-evidence · Api · Persistence
@@ -292,16 +347,71 @@ Simulation·Unity
 
 ## 공공데이터-파생 World (`simulation-world-derivation`)
 
+- **009 contract.nature-shelter-purpose** — [SimulationNatureShelterPurposeReadinessSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · Nature 오두막의 1차 목적과 핵심·보조 효용의 구현 준비 상태를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 안전한 수면을 1차 목적으로 고정하며 보관 용량을 체온·피로·질병 규칙의 대체 증거로 사용하지 않는다.
+- **010 contract.nature-sleep-safety-candidate** — [SimulationNatureSleepSafetyCandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · Nature 수면 안전 단계의 기획 후보와 구현 공백을 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: Q002의 합성 후보를 확정 규칙과 구분하며 수면 허용·연료·질병 결과를 결정하지 않는다.
 - **010 domain.derived-world-ledger** — [SimulationWorld파생원장](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldDerivation.cs) · 공간 원본 계보·파생 node·관계·배치 계획을 불변 실행 단위로 정의한다.
   - 계층/단계: `Domain / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: 관측·파생·통계배분·시나리오·장식 근거를 분리하며 추정 위치를 실제 사실로 승격하지 않는다.
+- **011 contract.nature-risky-sleep-warning** — [SimulationNatureRiskySleepWarningSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · 위험 수면 허용과 경고 표시의 난이도·사용자 설정 경계를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 경고 가시성은 정보 표현이며 수면 안전 판정이나 실제 위험도를 변경하지 않는다.
+- **012 contract.nature-difficulty-boundary** — [SimulationNatureDifficultyBoundarySnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · Nature 난이도의 공통 수면 판정식과 별도 위협 출몰 Profile 경계를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 난이도는 같은 주변 상태의 수면 안전 공식을 바꾸지 않고 출몰 입력과 경고 정보량만 선택한다.
+- **013 contract.nature-expert-threat-candidate** — [SimulationNatureExpertThreatCandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · 숙련자 위협의 빈도·무리 규모·개별 능력 강화와 기존 집중 체계 결속 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 강화 차원과 기존 집중 Profile 결속을 기술하며 수치·보상·집중 부족 결과를 확정하지 않는다.
+- **014 contract.meditation-focus-access-candidate** — [Simulation명상집중접근CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs) · 명상 숙련에 따른 일상 행동·기본 공격의 집중 접근 확대 후보와 기존 집중 판정 경계를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 숙련 접근 후보를 정의하지만 기본 공격 피해·크리티컬·순간 집중 역할을 임의로 확정하지 않는다.
+- **014 contract.nature-risky-sleep-outcome-candidate** — [SimulationNatureRiskySleepOutcomeCandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · 위험 수면 중 동물·몬스터 접근은 강제 각성과 전투·후퇴 선택으로, 추위·강수·질병 위험은 기상 결과로 분리해 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 중단·누적 결과 종류만 정의하며 실제 전투 생성·피로·체온·질병 변경이나 기상청 자료 동결을 확정하지 않는다.
+- **015 contract.meditation-combat-progression-candidate** — [Simulation명상전투성장CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs) · 명상 숙련의 크리티컬 확률·기본 피해 안정화·심층 관찰 인계 성장 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 성장 순서를 정의하지만 승인 전 기본 공격 피해·크리티컬 결과·관찰 정보를 변경하지 않는다.
+- **015 contract.nature-weather-profile-freeze-candidate** — [SimulationNatureWeatherProfileFreezeCandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · 품질 승인 관측을 새 세계·하루 시작 경계에서 일반화된 날씨 Profile과 출처 hash·규칙 판본으로 봉인하는 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SharedPublicData → None`
+  - 부수효과: `None`
+  - 경계: 외부 API 응답을 플레이 중 직접 반영하지 않으며 실제 수집·품질 승인·Save 판본·Sky 표현을 수행하지 않는다.
+- **016 contract.deep-observation-progression-candidate** — [Simulation심층관찰CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs) · 명상 성장에 따른 환경·전투·사회 성장 낌새의 단계적 관찰 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 관찰 계층을 정의하지만 권한 없는 원본 행동 기록·인벤토리·정확한 성장 수치를 노출하지 않는다.
 - **016 contract.landscape-composition-tile** — [SimulationWorldLandscapeCompositionTileResponse](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldLandscapeCompositionContracts.cs) · 공간 근거로 조립된 경관 Graph와 의미 기반 Composition 배치를 Unity에 전달한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Prefab 경로·GUID·상품명은 노출하지 않으며, 응답은 표현 계획이지 운영 사실이나 실제 시설 존재의 확정이 아니다.
+- **016 contract.nature-sleep-protection-spatial-layer-candidate** — [SimulationNatureSleepProtectionSpatialLayerCandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs) · 침상·오두막 실내·열원 영향권·울타리 물리 경계·마법진 상위 위협 경계를 중첩 가능한 수면 보호 공간층으로 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 공간층 역할과 배치·형상·Graph 근거 요구만 정의하며 실제 범위·좌표·충돌·보호 결과를 확정하지 않는다.
 - **016 contract.world-map-composition** — [ISimulation지도구성Engine](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs) · 지면·셀·H·연결구를 자산 선택 없는 지도구성 계획으로 만든다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `DerivedWorld → None`
@@ -317,16 +427,31 @@ Simulation·Unity
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Graph는 표현용 공간 구조이며 Unity의 로드 상태나 운영 업무 상태를 확정하지 않는다.
+- **017 contract.player-growth-hint-projection** — [Simulation성장낌새ProjectionSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayerDomainProficiencyContracts.cs) · 다른 플레이어의 승인된 성장 분야를 정확한 수치가 아닌 정성적 낌새로 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 승인된 분야와 정성 단계만 전달하며 기여 기록·정확한 수치·해금·인벤토리를 노출하지 않는다.
 - **018 contract.interior-layout-plan** — [I실내공간조립Engine](../../../Ssalddel.Interior.Contracts/UnityPackage/Runtime/InteriorLayoutContracts.cs) · H 의미와 건물 문맥을 결정적 InteriorPlacementPlan으로 만드는 엔진 계약이다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 새 H 단계, Simulation 상태, Prefab 경로, 재고·가격·소유권을 만들지 않는다.
+- **018 contract.party-proximity-resonance-candidate** — [Simulation파티근접공명CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs) · 같은 파티의 승인된 명상 숙련자가 가까이 있을 때 역할 배정 없는 수동 공명 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 공명 발생 조건만 정의하며 역할을 제안·수락·배정하거나 회복·위협·행위 능력치를 변경하지 않는다.
 - **019 contract.marketplace-grounded-interior-item** — [I상품특성효과DerivationEngine](../../../Ssalddel.Interior.Contracts/UnityPackage/Runtime/상품근거ItemContracts.cs) · 승인 상품 Reference를 게임용 특성·효과 정의와 범주형 VisualKey로 결속하는 계약이다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 효과 정의만 만들며 WI Confirm·WorldTick·재고·소유권·운영 상품 성능을 확정하지 않는다.
+- **019 contract.party-resonance-recovery-candidate** — [Simulation파티공명회복CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 파티 근접 공명의 첫 결과를 분야별 직접 버프가 아닌 대상 플레이어의 개인 회복 축 후보로 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 회복 축 선택만 정의하며 크기·지속·중첩·기간 진입이나 전투·제작·채집 능력치를 변경하지 않는다.
 - **019 contract.world-asset-placement** — [ISimulation세계자산배치Engine](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationWorldAssetPlacementContracts.cs) · 지도와 권위 변화에서 환경·건물·실내 자산 배치 계획을 만든다.
   - 계층/단계: `Contract / Projection`
   - 읽기/쓰기: `DerivedWorld → None`
@@ -337,31 +462,151 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 같은 입력은 같은 hash를 만들며 WorldTick·재고·가격·소유권을 변경하지 않는다.
+- **019 domain.nature-shelter-purpose-readiness** — [SimulationNatureShelterPurposeReadinessEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureShelterPurposeReadinessEvaluator.cs) · 현재 Nature 오두막 상태가 안전한 수면의 핵심 효용을 실제로 구현했는지 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 기존 RecoveryAvailable을 체온·피로·질병의 개별 구현으로 간주하지 않고 확인된 효용만 Ready로 판정한다.
 - **020 application.pyeongchang-derivation** — [평창군공간파생Pipeline](../../../Ssalddel.Simulation.Persistence/PyeongchangWorldDerivationPipeline.cs) · 평창군 공공데이터를 읽어 대표 건물·공간 관계·Unity 타일 계획을 결정적으로 조립한다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `SharedPublicData → DerivedWorld`
   - 부수효과: `PersistentRead | PersistentWrite`
   - 경계: 공유 공공데이터는 읽기 전용이며 건물 도형이나 DEM이 없으면 임의 좌표를 생성하지 않는다.
+- **020 contract.party-resonance-afterglow-candidate** — [Simulation파티공명잔향CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 근접 파티 공명이 끝난 뒤 회복 효과가 즉시 사라지지 않고 권위 시간 기반 잔향으로 감쇠하는 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 잔향의 시간 책임만 정의하며 지속시간·감쇠 계수·중첩·Save 상태나 Unity deltaTime 계산을 확정하지 않는다.
 - **020 domain.marketplace-grounded-item-effect-derive** — [상품특성효과DerivationEngine](../../../Ssalddel.Interior.Domain/UnityPackage/Runtime/상품특성효과DerivationEngine.cs) · 승인된 상품 특성을 revision 고정 규칙으로 게임용 효과 정의에 결정적으로 변환한다.
   - 계층/단계: `Domain / Projection`
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 상품명 문자열이나 실시간 Marketplace 상태로 효과를 임의 생성하지 않고 Simulation 상태를 변경하지 않는다.
+- **020 domain.nature-sleep-safety-candidate-readiness** — [SimulationNatureSleepSafetyCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSleepSafetyCandidateEvaluator.cs) · 주변 상황별 수면 안전 기획 후보의 보호 수단과 질병 증분 범위 준비도를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 후보 준비도만 읽으며 위험 수면 허용·차단, 불 연료 소비, 질병 발병·회복을 실행하지 않는다.
+- **021 contract.party-resonance-stacking-candidate** — [Simulation파티공명중첩CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 여러 파티 공명을 강도와 고유 식별자로 결정적 정렬하고 최강 기여는 온전히, 후속 기여는 순위 감쇠 대상으로 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 중첩 순서와 정책 종류만 정의하며 감쇠 계수·최대 인원·광복기 진입 상한이나 NatureMind 상태를 확정하지 않는다.
+- **021 domain.nature-risky-sleep-outcome-candidate** — [SimulationNatureRiskySleepOutcomeCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureRiskySleepOutcomeCandidateEvaluator.cs) · 수면 안전 후보와 위협·날씨 노출을 읽어 강제 각성 인계와 기상 누적 결과를 결정적 후보로 분리한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 결과 후보만 판정하며 수면 Task·전투·피로·체온·질병·WorldRevision을 변경하지 않는다.
+- **021 domain.nature-risky-sleep-warning-policy** — [SimulationNatureRiskySleepWarningPolicyResolver](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureRiskySleepWarningPolicyResolver.cs) · 위험 수면의 모드 기본값과 사용자 설정으로 경고 가시성을 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 경고 표시만 판정하고 수면 선택을 차단하거나 Simulation 위험·회복 수치를 바꾸지 않는다.
+- **022 contract.gwangbok-resonance-entry-cap-candidate** — [Simulation광복기공명상한CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 파티 공명은 광복기 진입 직전까지만 돕고 대상 플레이어 자신의 회복 기여가 마지막 문턱을 넘게 하는 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 공명 단독 진입 금지와 자기 행위 필요만 정의하며 인정 WI·정확한 여유 폭·기간 전이를 확정하지 않는다.
+- **022 domain.nature-difficulty-boundary** — [SimulationNatureDifficultyBoundaryResolver](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureDifficultyBoundaryResolver.cs) · Nature 난이도에서 공통 수면 판정식과 별도 위협 출몰 Profile을 선택한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: Profile revision을 선택할 뿐 출몰을 생성하거나 수면 안전 결과·WorldRevision을 변경하지 않는다.
+- **022 domain.nature-weather-profile-freeze-candidate** — [SimulationNatureWeatherProfileFreezeCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureWeatherProfileFreezeCandidateEvaluator.cs) · 위험 수면 날씨 입력과 승인 관측 계보를 읽어 하루 날씨 Profile 동결 준비도를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SharedPublicData → None`
+  - 부수효과: `None`
+  - 경계: 동결 후보 준비도만 판정하며 외부 호출·날씨 상태·Save·Sky 표현을 변경하지 않는다.
+- **023 contract.gwangbok-self-recovery-action-candidate** — [Simulation광복기자기회복행위CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs) · 명상(정신 차림) 또는 집중 성공으로 실제 개인 회복 기여를 남긴 WI만 광복기 마지막 자기 행위 후보로 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: ActionRecord·회복 변화·집중 성공 자격만 정의하며 완전한 수면은 제외하고 실제 기간 전이를 적용하지 않는다.
+- **023 domain.nature-expert-threat-candidate-readiness** — [SimulationNatureExpertThreatCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureExpertThreatCandidateEvaluator.cs) · 숙련자 위협 강화 세 축과 기존 집중 Profile 결속의 구현 준비도를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 준비도만 판정하고 Spawn·전투·보상·집중 자원·WorldRevision을 변경하지 않는다.
+- **023 domain.nature-sleep-protection-spatial-layer-candidate** — [SimulationNatureSleepProtectionSpatialLayerCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSleepProtectionSpatialLayerCandidateEvaluator.cs) · 수면 보호 공간층의 역할·배치·형상·경계 Graph 근거를 읽어 중첩 공간 후보 준비도를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 공간층 근거 준비도만 판정하며 H 정의·배치·Collider·Graph·보호 상태를 변경하지 않는다.
+- **024 contract.gwangbok-resonance-maintenance-candidate** — [Simulation광복기공명유지CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 자기 행위로 진입한 광복기에서 공명·잔향은 감쇠를 늦추지만 영구 유지하지 못하고 주기적 자기 회복 행위를 요구한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 유지 책임만 정의하며 실제 감쇠율·자기 행동 주기·기간 이탈·WorldTick 상태를 확정하지 않는다.
+- **024 domain.meditation-focus-access-candidate-readiness** — [SimulationMeditationFocusAccessCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationMeditationFocusAccessCandidateEvaluator.cs) · 명상 숙련의 집중 접근 확대 후보가 기존 집중 판정과 결속될 준비가 되었는지 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: revision 준비도만 판정하고 숙련·집중·공격 피해·크리티컬·WorldRevision을 변경하지 않는다.
+- **025 contract.personal-recovery-decay-candidate** — [Simulation개인회복감쇠CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 개인 회복 감쇠를 권위 게임 시간 기본 감쇠와 위협·피로·집중 실패 추가 감쇠로 분리해 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 감쇠 원인과 순서만 정의하며 계수·오프라인 시간·Recovery 상태·기간 이탈을 확정하지 않는다.
+- **025 domain.meditation-combat-progression-candidate-readiness** — [SimulationMeditationCombatProgressionCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationMeditationCombatProgressionCandidateEvaluator.cs) · 명상 숙련의 전투 보상 성장 후보가 승인된 전투 Effect에 인계될 준비가 되었는지 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 성장 revision 준비도만 판정하고 현재 전투 피해·크리티컬·관찰·WorldRevision을 변경하지 않는다.
+- **026 contract.personal-recovery-offline-time-candidate** — [Simulation개인회복오프라인시간CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 게임 종료 중 현실 시간에는 개인 회복 감쇠를 멈추고 Save 복원 뒤 권위 게임 시간이 재개될 때만 이어가는 후보를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 벽시계 경과시간을 입력으로 사용하지 않으며 실제 Save 판본·복원·감쇠 적용이나 위협 상쇄를 확정하지 않는다.
+- **026 domain.deep-observation-progression-candidate-readiness** — [SimulationDeepObservationCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDeepObservationCandidateEvaluator.cs) · 환경·전투·사회 성장 낌새의 단계적 관찰 Projection 후보 준비도를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: Projection revision 준비도만 판정하고 권한을 만들거나 비공개 원본·정확한 성장 수치를 노출하지 않는다.
+- **027 contract.personal-recovery-threat-offset-candidate** — [Simulation개인회복위협상쇄CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 개인 회복이 같은 플레이어의 위협을 낮추고 명상·정신 차림 성공과 숙련도가 상쇄·기간 문턱 후보에 기여하는 경계를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 상쇄와 숙련도 문턱 완화 후보만 정의하며 비율·곡선·기간 충돌·실제 Mind Effect를 확정하지 않는다.
 - **027 domain.environment-spawn-decision** — [Simulation결정적환경발생DecisionEngine](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationWorldAssetPlacement.cs) · 변화 Context가 적용된 환경 발생 가중치를 결정적으로 판정한다.
   - 계층/단계: `Domain / Projection`
   - 읽기/쓰기: `SimulationState → None`
   - 부수효과: `None`
   - 경계: 결정은 후보이며 SimulationEntity는 WorldTick Effect가 별도로 확정해야 한다.
+- **027 domain.player-growth-hint-projection** — [SimulationPlayerGrowthHintProjection](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerGrowthHintProjection.cs) · 승인된 플레이어 분야 진척을 정확한 수치 없이 정성적 성장 낌새로 투영한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 기존 분야 Profile을 읽지만 기여 기록·정확한 수치·해금·인벤토리를 결과에 복사하지 않는다.
 - **028 application.world-map-composition** — [SimulationScenario지도구성Engine](../../../Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs) · 기존 LH 시나리오 지식에서 객체 선택 없는 지도구성 계획을 만든다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 환경·건물·실내 자산과 Prefab을 선택하지 않는다.
+- **028 contract.dark-age-mindfulness-access-candidate** — [Simulation암흑기정신차림접근CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 극한 위협에서는 암흑기를 지배 기간으로 유지하면서 극한 명상 숙련자의 제한적 광복기 계열 효과 접근 후보를 별도 상태로 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 단일 PeriodStateCode를 보존하며 허용 효과 범위·강도·유지 비용이나 실제 기간 전이를 확정하지 않는다.
+- **028 domain.party-proximity-resonance-candidate** — [SimulationPartyProximityResonanceCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyProximityResonanceCandidateEvaluator.cs) · 같은 파티·근접·승인된 명상 자격을 읽어 역할 배정 없는 수동 공명 후보를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 입력된 승인 판정과 파티 문맥만 읽으며 명상 Profile·NatureMind·역할·WorldRevision을 변경하지 않는다.
 - **029 application.world-asset-placement** — [Simulation결정적세계자산배치Engine](../../../Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanning.cs) · 지도·공간 변화·결정적 Spawn에서 환경·건물·실내 계획을 조립한다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 권위 Spawn과 건물 상태를 만들지 않고 LH 상세도와 Prefab을 결정하지 않는다.
+- **029 contract.dark-age-mindfulness-effect-scope-candidate** — [Simulation암흑기정신차림EffectScopeCandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 암흑기 안의 제한 접근을 개인 전투 집중·심층 관찰·정밀 제작 효과로 한정하고 세계·공동체 효과를 차단하는 Profile을 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 효과 범주와 소비자 허용 여부만 정의하며 강도·지속·실제 전투·관찰·제작 수치를 적용하지 않는다.
+- **029 domain.party-resonance-recovery-candidate** — [SimulationPartyResonanceRecoveryCandidateResolver](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyResonanceRecoveryCandidateResolver.cs) · Q010의 근접 공명 후보를 개인 Recovery 축 후보로만 해석하고 분야별 직접 버프를 만들지 않는다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 효과 축 후보만 반환하며 NatureMind Effect를 추가하거나 기간·행위 능력치·WorldRevision을 변경하지 않는다.
 - **030 adapter.lh-separated-cell-content** — [SimulationSeparatedLhCellContentSource](../../../Ssalddel.Simulation.Application/SimulationSeparatedLhCellContentSource.cs) · 분리된 지도구성·세계자산배치 결과를 기존 LH 셀 계약으로 변환한다.
   - 계층/단계: `Application / Projection`
   - 읽기/쓰기: `DerivedWorld → None`
@@ -377,6 +622,16 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 기존 v26 계획과 hash를 변경하지 않고 파생 실행 계획만 만든다.
+- **030 contract.dark-age-mindfulness-effect-strength-candidate** — [Simulation암흑기정신차림EffectStrengthCandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 암흑기 정신 차림 효과의 접근은 현재 회복 비중으로, 접근 후 강도는 장기 명상 숙련도로 판정하도록 입력 책임을 분리한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 접근·강도 입력 소유자만 정의하며 정확한 숙련 곡선·효과량·지속·비용이나 실제 Effect를 확정하지 않는다.
+- **030 domain.party-resonance-afterglow-candidate** — [SimulationPartyResonanceAfterglowCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyResonanceAfterglowCandidateEvaluator.cs) · Q011 회복 공명 후보와 판본화된 시간 정책을 읽어 권위 Tick 기반 잔향 준비도를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 잔향 준비도만 판정하며 WorldTick·Save·NatureMind·Unity 프레임 상태를 변경하지 않는다.
 - **030 infrastructure.derived-world-store** — [SimulationWorld파생원장Store](../../../Ssalddel.Simulation.Persistence/SimulationWorldDerivationPersistence.cs) · 파생 World 원장과 입력·출력 hash를 별도 DB에 멱등 저장한다.
   - 계층/단계: `Infrastructure / Persistence`
   - 읽기/쓰기: `DerivedWorld → DerivedWorld`
@@ -387,6 +642,61 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`
   - 부수효과: `None`
   - 경계: 지면·셀은 LH, Prefab 생명주기는 Unity 배치 Runtime이 소유하며 이 엔진은 권위 상태를 변경하지 않는다.
+- **031 application.world-asset-plan-partition** — [Simulation결정적세계자산배치Plan분리Service](../../../Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanPartitioning.cs) · 봉인된 통합 세계자산 배치 계획을 실외·실내 실행 계획으로 결정적으로 분리한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 통합 계획과 WorldRevision을 다시 계산하지 않고 동일한 계획 identity의 실행 입력만 만든다.
+- **031 domain.party-resonance-stacking-candidate** — [SimulationPartyResonanceStackingCandidatePlanner](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyResonanceStackingCandidatePlanner.cs) · 여러 공명 제공자를 강도 내림차순·고유 식별자 오름차순으로 정렬해 최강 전체·후속 감쇠 후보를 계획한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 결정적 순위와 감쇠 필요 여부만 반환하며 최종 합산량·상한·NatureMind·WorldRevision을 변경하지 않는다.
+- **032 domain.gwangbok-resonance-entry-cap-candidate** — [SimulationGwangbokResonanceEntryCapCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationGwangbokResonanceEntryCapCandidateEvaluator.cs) · 공명 중첩 후보와 자기 회복 기여 여부를 읽어 광복기 마지막 문턱의 주도권 후보를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 진입 자격 후보만 판정하며 Recovery 수치·기간 상태·ActionRecord·WorldRevision을 변경하지 않는다.
+- **033 domain.gwangbok-self-recovery-action-candidate** — [SimulationGwangbokSelfRecoveryActionCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationGwangbokSelfRecoveryActionCandidateEvaluator.cs) · 판본화된 WI Profile과 ActionRecord·회복 변화·집중 결과를 읽어 광복기 자기 회복 행위 후보를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 기존 기록을 읽어 자격만 판정하며 회복 Effect·기간·ActionRecord·WorldRevision을 변경하지 않는다.
+- **034 domain.gwangbok-resonance-maintenance-candidate** — [SimulationGwangbokResonanceMaintenanceCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationGwangbokResonanceMaintenanceCandidateEvaluator.cs) · 광복기·자기 진입 행위·공명·잔향을 읽어 유지 보조와 자기 회복 갱신 필요를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 유지 준비도만 판정하며 Recovery·기간·WorldTick·Save 상태를 변경하지 않는다.
+- **035 domain.personal-recovery-decay-candidate** — [SimulationPersonalRecoveryDecayCandidatePlanner](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPersonalRecoveryDecayCandidatePlanner.cs) · 권위 시간과 위협·피로·집중 실패 상태를 읽어 개인 회복 감쇠 원인의 결정적 계산 순서를 계획한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 원인 순서만 계획하며 감쇠 계수·Recovery·기간·WorldTick 상태를 변경하지 않는다.
+- **036 domain.personal-recovery-offline-time-candidate** — [SimulationPersonalRecoveryOfflineTimeCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPersonalRecoveryOfflineTimeCandidateEvaluator.cs) · 개인 회복 감쇠 후보와 Save 기준 Tick을 읽어 오프라인 현실 시간 정지·권위 게임 시간 재개 정책의 준비도를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 오프라인 정책 준비도만 판정하며 벽시계·Recovery·Save·WorldTick 상태를 읽거나 변경하지 않는다.
+- **037 domain.personal-recovery-threat-offset-candidate** — [SimulationPersonalRecoveryThreatOffsetCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPersonalRecoveryThreatOffsetCandidateEvaluator.cs) · 개인 회복·위협·명상 자기 행위·숙련도를 읽어 위협 상쇄와 광복기 문턱 완화 후보를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 후보 자격만 판정하며 상쇄량·기간 문턱·Recovery·Threat·WorldTick 상태를 변경하지 않는다.
+- **038 domain.dark-age-mindfulness-access-candidate** — [SimulationDarkAgeMindfulnessAccessCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDarkAgeMindfulnessAccessCandidateEvaluator.cs) · 개인 기간·회복 비중·위협 비중·명상 숙련도를 읽어 암흑기 우세와 제한적 정신 차림 효과 접근 후보를 판정한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 접근 후보만 판정하며 PeriodStateCode·Effect 권한·Recovery·Threat 상태를 변경하지 않는다.
+- **039 domain.dark-age-mindfulness-effect-scope-candidate** — [SimulationDarkAgeMindfulnessEffectScopeCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDarkAgeMindfulnessEffectScopeCandidateEvaluator.cs) · 암흑기 정신 차림 접근 후보와 판본화된 Effect Profile을 읽어 개인 효과만 허용하고 세계 효과를 거부한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: Profile 허용 여부만 판정하며 Effect·전투·관찰·제작·세계 상태를 변경하지 않는다.
+- **040 domain.dark-age-mindfulness-effect-strength-candidate** — [SimulationDarkAgeMindfulnessEffectStrengthCandidateEvaluator](../../../Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDarkAgeMindfulnessEffectStrengthCandidateEvaluator.cs) · 허용된 개인 정신 차림 효과와 현재 회복·장기 명상 숙련도를 읽어 접근과 강도 입력 책임을 분리한다.
+  - 계층/단계: `Domain / Query`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: 입력 책임과 준비도만 판정하며 효과 강도·Recovery·숙련도·세계 상태를 변경하지 않는다.
 - **041 unity.marketplace-grounded-item-detail** — [상품근거ItemDetailProjection](../../../Ssalddel.Unity/Runtime/Interiors/상품근거ItemDetailProjection.cs) · 상품 근거 Item 정의를 범주형 Synty 표현과 읽기 전용 특성·효과 상세로 투영한다.
   - 계층/단계: `ViewModel / Presentation`
   - 읽기/쓰기: `DerivedWorld → ClientPresentation`
@@ -437,6 +747,11 @@ Simulation·Unity
   - 읽기/쓰기: `None → None`
   - 부수효과: `None`
   - 경계: Profile과 Cell Preview는 Simulation 공간 후보이며 H 권위나 운영 상태를 새로 확정하지 않는다.
+- **012 contract.lh-asset-plan-lifecycle** — [SimulationLhAssetPlanLifecycleSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLhAssetPlanLifecycleContracts.cs) · 동결된 실외·실내 배치 계획의 LH 표현 수명주기 상태를 전달한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `DerivedWorld → None`
+  - 부수효과: `None`
+  - 경계: 수명주기 Revision은 표현 준비 상태이며 Simulation WorldRevision이나 배치 내용을 변경하지 않는다.
 - **020 api.world-stream** — [SimulationWorldStreamingController](../../../Ssalddel.Simulation.Server/Controllers/SimulationWorldStreamingController.cs) · 타일 Recipe·Manifest·Layer·객체 Projection 조회 경계를 제공한다.
   - 계층/단계: `Api / Query`
   - 읽기/쓰기: `SimulationState | DerivedWorld → None`
@@ -482,11 +797,26 @@ Simulation·Unity
   - 읽기/쓰기: `DerivedWorld → None`
   - 부수효과: `None`
   - 경계: LH는 실내를 생성하거나 재배치하지 않고 준비 상세도만 선택한다.
+- **034 application.lh-asset-plan-lifecycle** — [SimulationLhAssetPlanLifecycleService](../../../Ssalddel.Simulation.Application/SimulationLhAssetPlanLifecycleService.cs) · 동결 배치 계획의 LH 준비·활성·캐시·해제 상태만 전이한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → ClientPresentation`
+  - 부수효과: `UiStateMutation`
+  - 경계: 표현 수명주기만 변경하며 배치 계획과 Simulation WorldRevision은 고정한다.
+- **035 application.lh-asset-plan-window-reconcile** — [SimulationLhAssetPlanWindowReconciler](../../../Ssalddel.Simulation.Application/SimulationLhAssetPlanWindowReconciler.cs) · LH Window 역할과 캐시 용량을 동결 배치 계획의 표현 수명주기로 조정한다.
+  - 계층/단계: `Application / Projection`
+  - 읽기/쓰기: `DerivedWorld → ClientPresentation`
+  - 부수효과: `UiStateMutation`
+  - 경계: 셀 활성 우선순위와 수명주기만 결정하며 계획 생성·재배치·Simulation 상태 변경은 수행하지 않는다.
 - **040 unity.interior-plan-presentation** — [InteriorPresentationProjection](../../../Ssalddel.Unity/Runtime/Interiors/InteriorPresentationProjection.cs) · 고정된 실내 계획을 LH Focus 상세도에 맞는 Unity VisualKey와 Reference 카드로 투영한다.
   - 계층/단계: `ViewModel / Presentation`
   - 읽기/쓰기: `DerivedWorld → ClientPresentation`
   - 부수효과: `UiStateMutation`
   - 경계: Pinned hash 불일치는 닫고 Unity는 Plan·상품 승인·Simulation 상태를 변경하지 않는다.
+- **041 unity.lh-asset-plan-presentation-reconcile** — [SimulationLhAssetPlanPresentationReconciler](../../../Ssalddel.Unity/Runtime/WorldProjection/SimulationLhAssetPlanPresentationReconciler.cs) · LH 배치 계획 수명주기 상태를 Unity Prepare·Activate·Cache·Release 표현 명령으로 변환한다.
+  - 계층/단계: `ClientAdapter / Presentation`
+  - 읽기/쓰기: `DerivedWorld → ClientPresentation`
+  - 부수효과: `UiStateMutation`
+  - 경계: Prefab 선택이나 GameObject 생성 없이 표현 명령만 만들며 Simulation 권위 상태를 변경하지 않는다.
 
 ## Farm 감자 3원천 현실근거 (`simulation-farm-reality-evidence`)
 

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-FARM-BARRACKS-DEFENSE-RESOLUTION",
+  "title": "Farm 병영 방위 - 방어 성공 결과 발현 E3",
+  "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+  "activeWorldInteractionId": "WI-FARM-DEFENSE-RESOLVE",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "Q-232 확정 결과를 전투 계산과 분리한 발현 단일 책임 계약·도메인·응용·자동시험까지 먼저 닫는다."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "결과 WI가 승패·피해·보상 수치를 계산하거나 치료·귀환을 함께 변경하면 Logic E1을 다시 연다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 묶음 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "실패·부상·치료·귀환 회복은 후속 WI다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 결과 UI·전리품·Actor 발현은 후속 범위다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "판독 순간·VisualKey·자산 후보는 별도 승인한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "Preview·Confirm·멱등·거부·결정적 hash와 결과 합산을 집중 시험한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "순수 Aggregate와 Application Service를 구현한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "전투 권위가 확정한 성공 결과 묶음만 Farm 상태에 한 번 발현한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseResolution.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseResolutionService.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmDefenseResolutionTests.cs", "test:SimulationFarmDefenseResolutionTests:10/10"] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 묶음 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "결과 피드백과 다음 선택은 후속 범위다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 결과 UI와 전리품 표현은 후속 범위다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "판독 순간·VisualKey·자산 후보는 별도 승인한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "조우별 결과 카드 StableId·정렬·revision과 읽기 전용성을 검증한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "권위 원장에서 읽기 전용 결과 카드를 만든다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어는 방어 뒤 위협·안전·보정·전리품 결과를 읽어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseResolutionContracts.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmDefenseResolutionTests.cs", "test:SimulationFarmDefenseResolutionTests:10/10"] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E3",
+    "status": "Passed",
+    "candidateRevision": "farm-barracks-defense.design.r5",
+    "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "test:SimulationFarmDefenseResolutionTests:10/10"],
+    "openFeedbackRefs": ["E4 판독 순간·VisualKey와 E5 실제 결과 UI·전리품 발현은 별도 승인한다."]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:farm-barracks-defense.v1|WI-FARM-DEFENSE-RESOLVE",
+    "profileRevision": "farm-barracks-defense-resolution.engine-interaction.r1",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E4",
+    "evidenceRefs": ["evidence:farm-barracks-defense-resolution-e3-20260830"],
+    "blockerCodes": ["PromotionBeyondIntegratedE3DeferredByDeliveryCap"]
+  }
+}

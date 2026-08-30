@@ -1,0 +1,239 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-HEAT-SOURCE",
+  "title": "Nature 열원 상태 변경 Logic E3",
+  "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+  "activeWorldInteractionId": "WI-HEAT-SOURCE-STATE-CHANGE",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "사용자 신규 33개 E3 요청. Q032~034/Q053의 열원 상태 변경 단일 플레이어 Core만 Logic E3. Presentation E1/통합 E1."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "열원 변경이 수면·연소·자동 성장 책임을 소유하면 Logic E1 재검토."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "Session·연소·수면·실제 실행은 후속 승인 범위다."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "Session·연소·수면·실제 실행은 후속 승인 범위다."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "Session·연소·수면·실제 실행은 후속 승인 범위다."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "Session·연소·수면·실제 실행은 후속 승인 범위다."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "열원 계약·순수 규칙·멱등·거부·행위 기록을 검증한다."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "열원 계약·순수 규칙·멱등·거부·행위 기록을 검증한다."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "열원 계약·순수 규칙·멱등·거부·행위 기록을 검증한다."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature열원관리E3.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+        },
+        {
+          "code": "E3",
+          "disposition": "Blocked",
+          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+        },
+        {
+          "code": "E2",
+          "disposition": "Blocked",
+          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature열원관리E3.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "Passed",
+    "candidateRevision": "nature-heat-source.design.r1",
+    "evidenceRefs": [
+      "docs/Architecture/PlayableLoops/Nature열원관리E3.md"
+    ],
+    "openFeedbackRefs": [
+      "Presentation E2 이후 미구현",
+      "Logic E4 이상·Save·RemoteHost·연소 Tick·NPC는 별도 승인"
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-night-day2.v1|WI-HEAT-SOURCE-STATE-CHANGE",
+    "profileRevision": "nature-heat-source.engine-interaction.r1",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E2",
+    "evidenceRefs": [
+      "eng/execution-ledgers/work-orders/nature-heat-source.e7-work-order.json"
+    ],
+    "blockerCodes": [
+      "PresentationImplementationDeferred",
+      "LogicBeyondE3NotApproved"
+    ]
+  },
+  "playerProgression": {
+    "statusCode": "NotApplicable",
+    "reason": "문답에 열원 관리의 성장량·집중 조건이 없음. 자동 경험치·명상 성장 발명 금지."
+  },
+  "approvedQuestionScope": [
+    "Q-032",
+    "Q-033",
+    "Q-034",
+    "Q-053"
+  ],
+  "excludedQuestionScope": [
+    "Q-340",
+    "Q-341",
+    "Q-342",
+    "Q-343",
+    "Q-344",
+    "Q-345"
+  ],
+  "implementationEvidence": {
+    "test": "Simulation열원상태Tests",
+    "passed": 23,
+    "failed": 0,
+    "runtimeVerified": false,
+    "playModeVerified": false
+  }
+}

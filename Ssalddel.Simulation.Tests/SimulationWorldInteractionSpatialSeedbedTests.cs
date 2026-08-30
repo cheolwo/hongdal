@@ -15,10 +15,21 @@ public sealed class SimulationWorldInteractionSpatialSeedbedTests
         var first = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
         var second = SimulationWorldInteractionSpatialSeedbedTestFixture.Compile();
 
-        Assert.Equal("simulation-world-interaction-spatial-seedbeds.r8", first.Revision);
-        Assert.Equal("simulation-world-interactions.r31",
+        using var 모판원장 = JsonDocument.Parse(File.ReadAllText(Path.Combine(
+            SimulationWorldInteractionSpatialSeedbedTestFixture.SeedbedRoot, "catalog.json")));
+        using var 행동원장 = JsonDocument.Parse(File.ReadAllText(
+            SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog));
+        using var 경관원장 = JsonDocument.Parse(File.ReadAllText(
+            SimulationWorldInteractionSpatialSeedbedTestFixture.LandscapeGrammar));
+        Assert.False(string.IsNullOrWhiteSpace(first.Revision));
+        Assert.Equal(모판원장.RootElement.GetProperty("revision").GetString(), first.Revision);
+        Assert.Equal(행동원장.RootElement.GetProperty("revision").GetString(),
             first.WorldInteractionCatalogRevision);
-        Assert.Equal("pyeongchang-landscape-grammar.v1",
+        Assert.Equal(모판원장.RootElement.GetProperty("worldInteractionCatalogRevision").GetString(),
+            first.WorldInteractionCatalogRevision);
+        Assert.Equal(경관원장.RootElement.GetProperty("catalogRevision").GetString(),
+            first.LandscapeGrammarRevision);
+        Assert.Equal(모판원장.RootElement.GetProperty("landscapeGrammarRevision").GetString(),
             first.LandscapeGrammarRevision);
         Assert.Equal(8, first.Definitions.Length);
         Assert.Equal(32, first.Definitions.SelectMany(value => value.IncludedWiIds)
@@ -125,6 +136,33 @@ public sealed class SimulationWorldInteractionSpatialSeedbedTests
             error.Message);
     }
 
+    [Theory]
+    [InlineData("worldInteractionCatalogRevision", "WiSpatialSeedbedWorldInteractionRevisionMismatch")]
+    [InlineData("landscapeGrammarRevision", "WiSpatialSeedbedLandscapeGrammarRevisionMismatch")]
+    public void 공간모판은_참조원장과_다른개정을_거부한다(string 속성, string 오류)
+    {
+        using var fixture = MutableSeedbedFixture.Create();
+        fixture.SetCatalogValue(속성, "unmatched-revision.test");
+
+        var error = Assert.Throws<InvalidOperationException>(() => fixture.Compile());
+        Assert.Equal(오류, error.Message);
+    }
+
+    [Fact]
+    public void 공간모판은_현재입력개정을_결과와해시에_반영한다()
+    {
+        using var fixture = MutableSeedbedFixture.Create();
+        var 이전 = fixture.Compile();
+        var 변경개정 = 이전.Revision + ".test";
+        fixture.SetCatalogValue("revision", 변경개정);
+
+        var 변경 = fixture.Compile();
+        Assert.Equal(변경개정, 변경.Revision);
+        Assert.Equal(이전.WorldInteractionCatalogRevision, 변경.WorldInteractionCatalogRevision);
+        Assert.Equal(이전.LandscapeGrammarRevision, 변경.LandscapeGrammarRevision);
+        Assert.NotEqual(이전.CatalogHashSha256, 변경.CatalogHashSha256);
+    }
+
     private sealed class MutableSeedbedFixture : IDisposable
     {
         private readonly string root;
@@ -154,6 +192,15 @@ public sealed class SimulationWorldInteractionSpatialSeedbedTests
                 Path.Combine(root, "catalog.json"),
                 SimulationWorldInteractionSpatialSeedbedTestFixture.WorldInteractionCatalog,
                 SimulationWorldInteractionSpatialSeedbedTestFixture.LandscapeGrammar).Compile();
+
+        public void SetCatalogValue(string 속성, string 값)
+        {
+            var path = Path.Combine(root, "catalog.json");
+            var 원장 = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path))!.AsObject();
+            Assert.True(원장.ContainsKey(속성));
+            원장[속성] = 값;
+            File.WriteAllText(path, 원장.ToJsonString());
+        }
 
         public void Dispose() => Directory.Delete(root, recursive: true);
 

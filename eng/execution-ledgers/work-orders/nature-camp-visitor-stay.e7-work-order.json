@@ -1,0 +1,324 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-CAMP-VISITOR-STAY",
+  "title": "Nature 방문자 임시 체류 E5 승인 실행",
+  "playableUnitStableId": "playable-loop:nature-camp-visitor-stay.v1",
+  "activeWorldInteractionId": "WI-COMMUNITY-VISITOR-STAY",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E5",
+    "promotionBeyondStageAllowed": false,
+    "reason": "D-286 승인 인계 r1. 실제 Session·핵심 Save/Replay·동일 Core·Scene/Game View까지 검증하되 E6/E7은 승격하지 않는다."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
+  },
+  "logicE4ContextBinding": {
+    "triggerSourceCode": "PlayerDriven",
+    "initiatorCode": "HostPlayer",
+    "executorCode": "SimulationCore",
+    "targetCode": "AwaitingCommunityVisitor",
+    "resourceAndReservationCodes": [
+      "GuestCapacity"
+    ],
+    "timeRuleCode": "NoTimeProgressionInThisWorldInteraction",
+    "spatialApplicabilityCode": "Contextual",
+    "spatialCapabilityCodes": [
+      "Spatial.VisitorWaitingAnchor",
+      "Spatial.GuestRestAnchor",
+      "Spatial.VisitorDepartureAnchor"
+    ],
+    "authorityBoundary": "H 기준점과 표현 계획은 방문자 상태·수용 칸·마음 계보·WorldRevision을 변경하지 않는다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "플레이어가 방문자 카드에서 결정 대기·임시 체류·거절, 남은 수용 칸과 선택 가능 여부를 읽는 순간이다.",
+    "requiredHCapabilities": [
+      "Spatial.VisitorWaitingAnchor",
+      "Spatial.GuestRestAnchor",
+      "Spatial.VisitorDepartureAnchor"
+    ],
+    "visualKeys": [
+      "Community.Visitor.Stay.AwaitingDecision",
+      "Community.Visitor.Stay.TemporaryStay",
+      "Community.Visitor.Stay.Rejected"
+    ],
+    "primaryAssetCandidateRefs": [
+      "Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Chr_Male_01.prefab",
+      "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Bench_01.prefab",
+      "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Bed_01.prefab"
+    ],
+    "alternativeAssetCandidateRefs": [
+      "Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Chr_Female_01.prefab",
+      "Assets/Synty/PolygonConstruction/Prefabs/Props/SM_Prop_Shelter_01.prefab",
+      "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_Bed_Single_01.prefab"
+    ],
+    "fallbackPresentationRefs": [
+      "Primitive:CommunityVisitorMarker",
+      "Card:CommunityVisitorStay"
+    ],
+    "placementIntent": "Q-207~Q-209에 따라 결정 대기 방문자는 Nature 안전 경계 안쪽이면서 출입구와 생활 중심부 사이의 완충 위치에 두고, 임시 체류 방문자는 기존 플레이어 침상과 다른 손님 Slot을 사용하며, 거절 상태는 출입구 방향 이탈 기준점만 사용한다.",
+    "interactionAnchorIntent": "상태별 H 기준점은 방문자 카드 조회와 WI-COMMUNITY-VISITOR-STAY Preview 진입만 제공하며 Prefab·Animator는 Confirm과 WorldRevision을 변경하지 않는다.",
+    "candidateRevisionOrFingerprint": "847D2A57CA215CD9B3310B2AD70331CF3A8F2D7586492E1964621E98346C67E0",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "실제 지지면·활성 Bounds·통행·입력·저장 재진입 검증 필요",
+      "Starter 남성 Actor Idle/Walk 재생·취소 복귀 검증 필요"
+    ]
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "실제 입력·Game View는 이번 E5의 좁은 증거로 수집한다. 전체 E7 승격은 별도 관문이다."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "체류 기간·실패 회복·후속 관계 선택은 후속 WI다."
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "같은 Session의 상태·명령·행위 기록을 원자적으로 결속하고 Save/Replay와 Local/Remote를 검증한다."
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "발생원·발의·수행·대상·수용 자원·무시간 진행·공간 적용 여부를 단일 WI 실행 문맥에 결속한다."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "Preview·Confirm·멱등·거부·결정적 hash를 집중 시험한다. Session/Save 변경 영향 회귀를 다시 검증한다."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "순수 Domain Aggregate와 Application Service를 구현한다. Session/Save 변경 영향 회귀를 다시 검증한다."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "대기 방문자의 임시 체류 수용 또는 거절만 한 번에 변경한다. Session/Save 변경 영향 회귀를 다시 검증한다."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationCommunityVisitorStay.cs",
+            "Ssalddel.Simulation.Application/RuntimeCore/SimulationCommunityVisitorStayService.cs"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/SimulationCommunityVisitorStayTests.cs",
+            "test:SimulationCommunityVisitorStayTests:10/10"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E4표현연구.r1.md",
+            "Ssalddel.Unity/Runtime/Cards/Simulation방문자체류PresentationPreparation.cs",
+            "test:Simulation방문자체류PresentationPreparationTests:7/7"
+          ]
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "실제 입력·Game View는 이번 E5의 좁은 증거로 수집한다. 전체 E7 승격은 별도 관문이다."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "응대·대가·회복 피드백 정제는 후속 범위다."
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "Accepted 연구의 실제 H·Prefab·Renderer/Collider·Bounds·입력·저장 재진입·Game View를 검증한다."
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "판독 순간·상태별 H 기준점·VisualKey·주·대체·fallback 자산·AnimationRole과 E5 준비 상태를 동결한다."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "방문자 카드의 StableId·정렬·revision·수용 여력을 결정적으로 검증한다."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "권위 상태에서 읽기 전용 방문자 응대 카드를 만든다."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "플레이어는 방문자 상태·남은 수용 칸·선택 의미를 읽어야 한다."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationCommunityVisitorStayContracts.cs"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/SimulationCommunityVisitorStayTests.cs",
+            "test:SimulationCommunityVisitorStayTests:10/10"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E4표현연구.r1.md",
+            "Ssalddel.Unity/Runtime/Cards/Simulation방문자체류PresentationPreparation.cs",
+            "Ssalddel.Unity.Tests/Simulation방문자체류PresentationPreparationTests.cs",
+            "test:Simulation방문자체류PresentationPreparationTests:7/7"
+          ]
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E4",
+    "status": "Passed",
+    "candidateRevision": "nature-camp-visitor-stay.design.r3",
+    "evidenceRefs": [
+      "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md",
+      "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E4표현연구.r1.md",
+      "test:SimulationCommunityVisitorStayTests:10/10",
+      "test:Simulation방문자체류PresentationPreparationTests:7/7"
+    ],
+    "openFeedbackRefs": [
+      "Session/Save/실제 배치 결과 미검증: E5Pending. 승인 범위 밖 후속 WI는 열지 않는다."
+    ],
+    "previousCandidateRevision": "nature-camp-visitor-stay.design.r2"
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-camp-visitor-stay.v1|WI-COMMUNITY-VISITOR-STAY",
+    "profileRevision": "nature-camp-visitor-stay.engine-interaction.r3",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E5",
+    "evidenceRefs": [
+      "test:SimulationCommunityVisitorStayTests:10/10",
+      "test:Simulation방문자체류PresentationPreparationTests:7/7"
+    ],
+    "blockerCodes": [
+      "SessionSaveAndWorldManifestationPending"
+    ]
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md",
+    "designRevision": "nature-camp-visitor-stay.design.r3",
+    "designHashSha256": "87F6CF282753D70908BEC278441122F5B6DD094713C599F305BB91E504AEC920",
+    "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+  },
+  "requiredStudies": [
+    {
+      "studyStableId": "study:nature-camp-visitor-stay:presentation.r2",
+      "documentRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E5표현연구.r2.md",
+      "statusCode": "Accepted",
+      "sha256": "847D2A57CA215CD9B3310B2AD70331CF3A8F2D7586492E1964621E98346C67E0",
+      "domains": [
+        "공간",
+        "배치",
+        "애니메이션"
+      ]
+    }
+  ],
+  "e5Execution": {
+    "statusCode": "E5Pending",
+    "dispatchRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md",
+    "saveVersionReservation": {
+      "baseline": "simulation-save.v29",
+      "reserved": "simulation-save.v30",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "sharedBy": [
+        "WI-ACTOR-03",
+        "WI-COMMUNITY-VISITOR-STAY"
+      ],
+      "preserveLegacyReadAndHash": true
+    },
+    "runtimeEvidenceRefs": [],
+    "sceneEvidenceRefs": [],
+    "gameViewEvidenceRefs": []
+  }
+}

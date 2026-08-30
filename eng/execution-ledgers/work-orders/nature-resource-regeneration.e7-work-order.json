@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-RESOURCE-REGENERATION",
+  "title": "세계 자원 재생 Logic E3",
+  "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+  "activeWorldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "32개 캠페인: 정책 기반 WorldTick 자동 재성장·생성. 실제 공간·저장·출시 수치 제외."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "실제 공간 후보·생산 정책·기존 WorldTick/Save에 연결하면 E1 재검토."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
+            "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
+            "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
+            "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+        },
+        {
+          "code": "E3",
+          "disposition": "Blocked",
+          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+        },
+        {
+          "code": "E2",
+          "disposition": "Blocked",
+          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "Passed",
+    "candidateRevision": "nature-resource-regeneration.design.r1",
+    "evidenceRefs": [
+      "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md"
+    ],
+    "openFeedbackRefs": [
+      "Presentation E2 이후·실제 공간 정책 미구현",
+      "Logic E4·Save·Runtime·RemoteHost 별도 승인"
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-night-day2.v1|WI-WORLD-RESOURCE-REGENERATE",
+    "profileRevision": "nature-resource-regeneration.engine-interaction.r1",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E2",
+    "evidenceRefs": [
+      "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+    ],
+    "blockerCodes": [
+      "PresentationRevisionRequired",
+      "ProductionSpatialAndGrowthPolicyUndefined",
+      "SharedManagementLedgerHandoffPending"
+    ]
+  },
+  "playerProgression": {
+    "statusCode": "NotApplicable",
+    "reason": "WorldDerivedResourceRegeneration"
+  },
+  "approvedQuestionScope": [
+    "Q-036",
+    "Q-037",
+    "Q-038"
+  ],
+  "excludedQuestionScope": [
+    "Q-340",
+    "Q-341",
+    "Q-342",
+    "Q-343",
+    "Q-344",
+    "Q-345"
+  ],
+  "implementationEvidence": {
+    "test": "Simulation세계자원재생Tests",
+    "passed": 35,
+    "failed": 0,
+    "runtimeVerified": false,
+    "playModeVerified": false,
+    "resultArtifactRef": "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx",
+    "releaseResultArtifactRef": "artifacts/local/remaining-32-wi/resource-regeneration-isolated-release.trx",
+    "executionBoundary": "공유 Simulation.Tests의 자원 재생 집중35/35와 분리 Debug/Release 각각35/35. 전체 회귀·Runtime·화면 증거 아님."
+  }
+}

@@ -4,7 +4,7 @@
   "title": "기준 경관 문법 기반 H1~H4 상향 유도 공간 설계 지식",
   "summary": "52개 의미군·156개 표현 변형에서 검토된 조립법으로 H1~H4 설계 후보와 계보를 제공한다.",
   "previousCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v2.json",
-  "previousCatalogSha256": "075fec259742d68c4eb88bfcef583fb2c5a4462135ffc92e96c2358a1d7440bd",
+  "previousCatalogSha256": "2a78dd185561775f27d11685ba874efd6acb34b10ea681b6a7044a738f9fa66c",
   "grammarCatalogPath": "eng/world-seedbeds/manifests/pyeongchang-landscape-grammar.v1.json",
   "grammarRevision": "pyeongchang-landscape-grammar.v1",
   "grammarCatalogHashSha256": "d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f",
@@ -31,7 +31,7 @@
     },
     {
       "stableId": "h1-stock:farm-hub-corridor",
-      "revision": 2,
+      "revision": 3,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-hub-corridor.v2.json",
       "definitionSha256": "8d7e1d04c5281fded4b40e365e7b231786f38949fe6d1ad19cdeffbf6a051880",
@@ -151,9 +151,9 @@
       "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "bded7dc7d8d2347c99aef14d49874703f29654d86ed6751a363ced8cea28c6c5",
+      "definitionSha256": "ca5db034477d95a328ef4080b41cdc476b54f995d4c1b7c20bb45460151e9563",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "3f7d50caa60e82e355b16a3b3ad931cdaab3a6522c6e14b1179950b013626af1"
+      "documentSha256": "ed519b5e3f0d91cf7abcc2c7e2dad5b67a3535101dec50d78bd90e2c83e19c18"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -175,7 +175,7 @@
     },
     {
       "stableId": "h1-stock:hub-market-transfer",
-      "revision": 2,
+      "revision": 3,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/hub-market-transfer.v2.json",
       "definitionSha256": "05b3d3a890eb01bda53e737d361708fd1aafa90c3b7ac13823c3247060d0d7db",
@@ -319,12 +319,12 @@
     },
     {
       "stableId": "h1-stock:nature-shelter",
-      "revision": 4,
+      "revision": 5,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-shelter.v2.json",
-      "definitionSha256": "275f2b60978bd753251b5eae947240eaf6ae6850858d9889cf1f0550e6e4fd54",
+      "definitionSha256": "e1424ed2cf2a76ba4960c0133e58108cb4ec6fe72d1a4458bd57cb577f4698d3",
       "documentPath": "authored/h1/nature-shelter.v2.md",
-      "documentSha256": "d576a129b4ac2cf20d4c4f1ba414ceceeb257f7c071767a78b9132628516f225"
+      "documentSha256": "3315266076a743600fef1336d2ee232259970455e664d95840a66aef4fd788b9"
     },
     {
       "stableId": "h1-stock:nature-threat-watch",
@@ -1199,9 +1199,9 @@
       "revision": 2,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "bded7dc7d8d2347c99aef14d49874703f29654d86ed6751a363ced8cea28c6c5",
+      "definitionSha256": "ca5db034477d95a328ef4080b41cdc476b54f995d4c1b7c20bb45460151e9563",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "3f7d50caa60e82e355b16a3b3ad931cdaab3a6522c6e14b1179950b013626af1"
+      "documentSha256": "ed519b5e3f0d91cf7abcc2c7e2dad5b67a3535101dec50d78bd90e2c83e19c18"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -1367,12 +1367,12 @@
     },
     {
       "stableId": "h1-stock:nature-shelter",
-      "revision": 4,
+      "revision": 5,
       "cardKindCode": "InteractionSpace",
       "definitionPath": "definitions/h1/nature-shelter.v2.json",
-      "definitionSha256": "275f2b60978bd753251b5eae947240eaf6ae6850858d9889cf1f0550e6e4fd54",
+      "definitionSha256": "e1424ed2cf2a76ba4960c0133e58108cb4ec6fe72d1a4458bd57cb577f4698d3",
       "documentPath": "authored/h1/nature-shelter.v2.md",
-      "documentSha256": "d576a129b4ac2cf20d4c4f1ba414ceceeb257f7c071767a78b9132628516f225"
+      "documentSha256": "3315266076a743600fef1336d2ee232259970455e664d95840a66aef4fd788b9"
     },
     {
       "stableId": "h1-stock:nature-threat-watch",
@@ -3374,5 +3374,5 @@
   "authorityBoundary": "문법과 유도 후보는 세계 가능성을 제안할 뿐 H 정의·E 증거·AreaSet·LandscapeGraph·Simulation 상태를 자동 승인하지 않는다.",
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "eb7be32e180472ef862550a700e230883b17bfec209d6a5c1c58d34451c6d9d4"
+  "contentHashSha256": "0c2b04f7cfe8eca2c2d62b6623d9cd4d848d4baf6b2a096e6f05bfd7336aac73"
 }

@@ -41,7 +41,7 @@ PlayableLoop Draft
 | 건물 | 이 폐루프에 어떤 건물 상태와 구조가 필요한가? | 유형, 규모, 바닥 면적, 출입구, 내부 구역, 건설·손상·복구 상태, 카메라·충돌·이동 경계 |
 | 공간 | 플레이어가 어떤 거리·시간·시야·밀도로 이동하고 되돌아오는가? | 동선, 이동 시간, 시야선, 방향 인지, 경사·평탄화 범위, 카메라 판독 기준 |
 | 배치 | 어떤 권위 상태가 어떤 실내·실외 배치 차이로 보이며 보유 Synty 자산을 H1→H2→H3로 어떻게 조립하는가? | 배치 역할, Synty 실제 Prefab 재고, 직접 사용·조합·부족 판정, H1 기능 공간, H2 관계, H3 반복 맥락, Surface·Slot·Clearance, 상태별 변형, 결정적 Seed·Hash, VisualKey·대체 자산 |
-| 애니메이션 | 행위의 준비·수행·결과·취소가 몸과 도구로 어떻게 읽히는가? | 상태 전이, Clip·Rig 후보, 손·도구 접촉점, Task 시간 동기화, 취소 구간, Audio·FX, fallback |
+| 애니메이션 | 행위의 준비·수행·결과·취소가 몸과 도구로 어떻게 읽히는가? | WI 판독 순간, AnimationRole·ActionCue, 원천 팩과 Clip revision·fingerprint, Rig·Avatar·Retarget, root motion·Controller·Adapter, 손·도구 접촉 Window, Task 시간 동기화, 취소·귀환, Audio·FX, 권위 불변, fallback |
 
 분야 목록은 첫 공통 프로필이다. 다른 전문 연구가 필요하면 같은 계약으로 추가할 수 있지만 새 E 단계나 별도 Goal로 만들지 않는다.
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-evidence-package-catalog.v3",
-  "revision": "ssalddel-evidence-package-catalog.r29",
+  "revision": "ssalddel-evidence-package-catalog.r41",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
@@ -46,6 +46,246 @@
     "External"
   ],
   "packages": [
+    {
+      "evidenceId": "evidence:nature-resource-regeneration-logic-e3-20260830",
+      "title": "세계 자원 재생 Logic E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-night-day2.v1",
+        "WI-WORLD-RESOURCE-REGENERATE"
+      ],
+      "evidenceStageCodes": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "sourceRevision": "nature-resource-regeneration.design.r1/resource-regeneration.r1",
+      "executedAt": "2026-08-30T08:18:19.3131427+09:00",
+      "environment": "Windows; .NET 10; 실제 Contracts/Domain/Application을 참조한 분리 시험 프로젝트",
+      "scope": "공유 Simulation.Tests 집중35/35·개인계획/열원/전달 우선순위 회귀77/77. 분리 Debug/Release 각각35/35, 분리회귀74/74. Unity 소비 빌드 경고·오류0. AppliedWorldTick int 범위 밖 성장 예약도 거부.",
+      "exclusions": [
+        "전체 Fast/Task 회귀·통합 실행",
+        "기존 Session WorldTick 연결·Save/Replay",
+        "실제 공간·생산 주기/밀도·토지 변경",
+        "채집·소비·성장 보상",
+        "RemoteHost·Unity 장면·Play Mode·Game View",
+        "Q340 이후"
+      ],
+      "artifactReferences": [
+        {
+          "locator": "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md",
+          "sha256": "f9a3e2043ba05a31f142615663aa061bf232e39d757aa7efd58d1d53bfd941cf",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json",
+          "sha256": "c5732583e046b90a4fded89f2cab15bc22a4c03d306451159601b6f80c8cefac",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
+          "sha256": "0a3aaff7f3d26d730cdf5708e45e31ae62dc7616596517ce657472a947d1e65b",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation세계자원재생.cs",
+          "sha256": "63b4a9dcab7541b4f38cb04d351bbfa76a57edd41300cbd7d3599e57162306d5",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Simulation.Application/RuntimeCore/Simulation세계자원재생Service.cs",
+          "sha256": "66207378edd16d7cea68f251be5536cd795514415c39e4d494b53e5222c6b9a2",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
+          "sha256": "716205072f412ab482a722be62c650ebcba32a01c1509aaef88927ff2a1ed2f4",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "artifacts/local/remaining-32-wi/resource-tests/ResourceRegeneration.Focused.Tests.csproj",
+          "sha256": "6813597f0c94beb65dc1c114a65443d25e4ae02b5f66176f0c80b0af40e56c1a",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locator": "artifacts/local/remaining-32-wi/resource-regeneration-isolated.trx",
+          "sha256": "eb31f5e427ca996c9e6401868e6081a85a1ac7a8b58853e1698df418fcbc86b0",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locator": "artifacts/local/remaining-32-wi/resource-regeneration-isolated-release.trx",
+          "sha256": "74e548e007bb0e184dbcae608c817c0652760a42d85f4314f0bb660fc16ecd47",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locator": "artifacts/local/remaining-32-wi/resource-regression-isolated.trx",
+          "sha256": "39ab8a6d346dab5d85207e7ed625825fc2bb785a04f91e8622efeb90b075cb62",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locator": "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx",
+          "sha256": "d6df140d4aa4bcd05943f92a2a4e868641b66a10d95095881effb0ae6440193b",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locator": "artifacts/local/remaining-32-wi/resource-regeneration-regression.trx",
+          "sha256": "6b06350cec73a572ca0595ad82502be71fcd0922d224b7e6e5e56cfb5cc9cbe7",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "자원 재생 계약·규칙·서비스·시험 변경",
+        "신뢰된 정책·셀·Tick 입력 의미 변경",
+        "행위 원장 정규형 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-personal-plan-logic-e3-20260830",
+      "title": "개인 계획 설정 Logic E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-night-day2.v1",
+        "WI-ACTOR-PLAN-SET"
+      ],
+      "evidenceStageCodes": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "sourceRevision": "nature-personal-plan.design.r1/personal-plan.r1",
+      "executedAt": "2026-08-30T07:56:27.7792191+09:00",
+      "environment": "Windows; .NET 10; 단일 플레이어·계획 슬롯 독립 Domain/Application Fixture",
+      "scope": "집중시험 16/16. 계획 설정·수정, 최초 안정 자격 중복 방지, 무변경 Preview, 멱등 재전송·경합·권한·본문·개정 거부, 행위 기록 및 정책/상태 사본 격리.",
+      "exclusions": [
+        "실제 회복 수치·진척·보상 적용",
+        "기존 Day2 세션 연결",
+        "Save/Replay·자동 저장",
+        "RemoteHost·Hosted 동등성",
+        "Unity·H·Prefab·Play Mode·Game View",
+        "Q340 이후"
+      ],
+      "artifactReferences": [
+        {
+          "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs",
+          "sha256": "6948e888f6494708c0f671a56d3d578f43c81af04944a406cf763c18dba47d64",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation개인계획.cs",
+          "sha256": "184155aa8dd3e101c9e5a264e0c4b099010bfacd69b827b8f9ac5e0ba9bb33b0",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Simulation.Application/RuntimeCore/Simulation개인계획Service.cs",
+          "sha256": "1246c67e64fe7744d723f7cc7d17cf500116312e2c9cc324bd694d415a99db1f",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs",
+          "sha256": "70be7855e9adab2593625f630174d47fee9c7056bd50977968d4dd947b703139",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "artifacts/local/remaining-32-wi/personal-plan-e3.trx",
+          "sha256": "acc1d1d68e6e5c202d4497d608575d274751e54623428ec9d6e6226f460b6fb6",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "계획 계약·규칙·서비스·시험 변경",
+        "안정 자격 범위 또는 초기 정책 변경",
+        "행위 기록 정규형 변경"
+      ]
+    },
+    {
+      "evidenceId": "evidence:nature-heat-source-logic-e3-20260830",
+      "title": "Nature 열원 상태 변경 Logic E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:nature-night-day2.v1",
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "evidenceStageCodes": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "sourceRevision": "nature-heat-source.design.r1/heat-source-state.r1",
+      "executedAt": "2026-08-30T07:43:26.7240679+09:00",
+      "environment": "Windows; .NET 10; 독립 Domain/Application 실행 수명 Fixture",
+      "scope": "열원 집중 23개 + 기존 방문자·Farm 귀환 회귀 19개, 총42 통과. 점화·연료 추가·소화, 무변경 Preview, 멱등·입력충돌·경합·권한·연료·용량·정수경계·사본격리·결정적 행위 기록.",
+      "exclusions": [
+        "Session runtime 연결",
+        "NPC·다중 열원",
+        "Save/Replay",
+        "RemoteHost API/Hosted 동등성",
+        "Unity·H·Prefab·Play Mode·Game View",
+        "연소 Tick·날씨·수면·성장·Q340 이후"
+      ],
+      "artifactReferences": [
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation열원상태Contracts.cs",
+          "sha256": "e828486b23012ad6eb64c39256472cfd365cf58b1e0f0b960539aeb8b3f85a50",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation열원상태.cs",
+          "sha256": "5ea3ed0d5a92dd57669840a8b47dd863655a67cb853f447f9b65982cb1acee2b",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Application/RuntimeCore/Simulation열원상태Service.cs",
+          "sha256": "84b1caec75e44cbc78a96e11e271c6ca09985fc719984bd717584bb525069110",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "RepositoryPath",
+          "locator": "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs",
+          "sha256": "4d842e526a4ef314f692352104430ee16ae2b4b362139aa0cdd4a353934fb099",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locationKind": "LocalArtifact",
+          "locator": "artifacts/local/heat-source-e3/heat-source-e3-final.trx",
+          "sha256": "0036276ecb78e6cfecfcc1a8cc4acdfcf61f150574cd84b04425bf906bcfeff6",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "열원 계약·규칙·서비스·시험 변경",
+        "신뢰된 연료 정책과 초기 상태 의미 변경",
+        "행위 기록 정규형 변경"
+      ]
+    },
     {
       "evidenceId": "evidence:nature-basic-herbal-recovery-logic-e3-20260828",
       "title": "Nature 기초 약초 회복 지식 습득 Logic E3",
@@ -111,6 +351,29 @@
         { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260828-herbal-knowledge-presentation-e3/herbal-knowledge-presentation-e3-unity-regression.trx", "sha256": "15da3d9d90f9367a2cb4103f306177d2b0118e1025eb5f57eec8d8463c6f3b5e", "retentionCode": "LocalOnly" }
       ],
       "invalidationTriggers": ["플레이어 지식 원장 또는 지식 습득 Preview의 wire 속성 변경", "RecipeKnowledge 카드 상태·정렬·권위 경계 변경", "CardWorkspace 가족 결합 규칙 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-basic-herbal-recovery-presentation-e4-20260829",
+      "title": "Nature 기초 약초 회복 처방 기록 Presentation E4 준비 계약",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-basic-herbal-recovery.v1", "WI-ACTOR-03"],
+      "evidenceStageCodes": ["E4"],
+      "sourceRevision": "nature-basic-herbal-recovery.design.r4/worktree-20260829",
+      "executedAt": "2026-08-29T12:43:22+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Unity 표현 준비 계약 단위시험",
+      "scope": "같은 revision의 Recipe 지식 카드 상태를 물리 처방 기록 후보의 ReadableKnowledgeSource, 의미 기반 VisualKey, 승인 후보 fingerprint, primitive fallback과 Preview 전용 InteractionAnchor에 결정적으로 결속했다. Known·Readable·Blocked 판독 경계, 입력 순서 독립 hash와 표현 전용 권위 불변을 포함한 집중 회귀 12/12, Simulation 전체 973/973, Unity 전체 521/521이 통과했다.",
+      "exclusions": ["실제 Unity checkout과 SimulationWorldShell 배선", "실제 Synty Prefab 로드·H1 좌표·Renderer·Collider", "카드 Confirm과 실제 입력", "Play Mode·Game View", "Save/Replay", "약초 채집·달이기·섭취·약효"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity/Runtime/Cards/Simulation처방기록PresentationPreparation.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity.Tests/Simulation처방기록PresentationPreparationTests.cs", "sha256": "", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260829-recipe-knowledge-presentation-e4/recipe-knowledge-presentation-e4-regression.trx", "sha256": "6e75009228285205391564d6f33b32b8c470f69cbd24cafe7d6c594d1223925b", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260829-125300/Ssalddel.Simulation.Tests.trx", "sha256": "1529090780bc08a0b9f79b1529e6097722ad3bb7b78654ebbaded6ca8836373c", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260829-125300/Ssalddel.Unity.Tests.trx", "sha256": "c1b7adbfc77988051144c7f060bcdbf27d20a02cfd944f375559fb183198368d", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["RecipeKnowledge 카드 상태 또는 KnowledgeSourceStableId 의미 변경", "ReadableKnowledgeSource·VisualKey·fallback·InteractionAnchor 계약 변경", "후보 revision·fingerprint 또는 결정적 Plan hash 규칙 변경"]
     },
     {
       "evidenceId": "evidence:hub-npc-routine-core-20260825",
@@ -1514,6 +1777,174 @@
         { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/artifacts/local/validation/nature-tactical-e8/SimulationWorldShell-nature-tactical-restored-20260828-054925104.png", "sha256": "db19582707df4eaed85d71419a7abc9e083e9679278d54def194d73e0f5b1f3d", "retentionCode": "External" }
       ],
       "invalidationTriggers": ["SimulationWorldShell Nature 탐험 탭·실제 입력·카메라 배선 변경", "도끼 획득 저장·Scene 재진입 복원 변경", "Nature HUD 또는 Synty H1 도끼 배치 변경"]
+    },
+    {
+      "evidenceId": "evidence:farm-barracks-defense-e3-20260829",
+      "title": "Farm 병영 방위 분대 소집 Logic·Presentation E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:farm-barracks-defense.v1", "WI-FARM-DEFENSE-MOBILIZE"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "farm-barracks-defense.design.r1/farm-defense-mobilization.r1",
+      "executedAt": "2026-08-29T23:00:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests",
+      "scope": "분대 소집 Preview 무변경, Confirm의 출동·생산 기여 중단 원자성, 행위 기록, Command 멱등성, revision·분대·위협·중복 거부와 읽기 전용 카드 투영의 결정성을 집중시험 8/8로 검증했다.",
+      "exclusions": ["Save/Replay", "LocalProcess/RemoteHost API 동등성", "H·Synty·Unity Runtime·Play Mode·Game View", "전투 결과·부상·보급·귀환"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationFarmDefenseMobilizationTests.cs", "sha256": "9fc2040e1acd67e26dc59ebb8c4bd0b2a129f7bb814eb4a8e806ebd881fe33c3", "retentionCode": "Tracked" }
+      ],
+      "invalidationTriggers": ["WI-FARM-DEFENSE-MOBILIZE 계약·Aggregate·Application Service 변경", "행위 원장 또는 카드 상태 사본 정규형 변경", "farm-defense-mobilization.r1 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-camp-visitor-stay-e3-20260829",
+      "title": "Nature 야영지 방문자 임시 체류 Logic·Presentation E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-camp-visitor-stay.v1", "WI-COMMUNITY-VISITOR-STAY"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "nature-camp-visitor-stay.design.r1/community-visitor-stay.r1",
+      "executedAt": "2026-08-29T23:45:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests",
+      "scope": "방문자 응대 Preview 무변경, 수용·거절 Confirm의 방문자 상태·수용 칸·마음 계보 원자성, 행위 기록, Command 멱등성, revision·방문자·선택·재결정·수용 한도 거부와 읽기 전용 카드 투영의 결정성을 집중시험 10/10으로 검증했다.",
+      "exclusions": ["Save/Replay", "LocalProcess/RemoteHost API 동등성", "H·Synty·Unity Runtime·Play Mode·Game View", "체류 기간·연장·정식 편입·NPC 이동·마음 점수"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationCommunityVisitorStayTests.cs", "sha256": "0808c653a6bf71446d29e9d2d211eaa0fe6487df62f34be82b0a6f362f033e82", "retentionCode": "Tracked" }
+      ],
+      "invalidationTriggers": ["WI-COMMUNITY-VISITOR-STAY 계약·Aggregate·Application Service 변경", "행위 원장 또는 방문자 카드 상태 사본 정규형 변경", "community-visitor-stay.r1 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-camp-visitor-stay-e4-20260830",
+      "title": "Nature 야영지 방문자 임시 체류 실행 문맥·표현 준비 E4",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-camp-visitor-stay.v1", "WI-COMMUNITY-VISITOR-STAY"],
+      "evidenceStageCodes": ["E4"],
+      "sourceRevision": "nature-camp-visitor-stay.design.r2/nature-camp-visitor-stay.presentation-study.r1",
+      "executedAt": "2026-08-30T00:35:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Unity 표현 준비 계약 단위시험; 보유 Synty 파일 재고",
+      "scope": "PlayerDriven 발생원·HostPlayer 발의·SimulationCore 수행·대기 방문자 대상·수용 칸 자원·무시간 진행과 Contextual 공간 적용을 작업 명세에 결속했다. 같은 revision의 방문자 카드를 상태별 H 기준점·VisualKey·보유 Actor·침상·대기 소품·AnimationRole 후보와 primitive fallback에 결정적으로 결속하고 권위 불변, 입력 순서 독립 hash, 혼합 revision·중복 Binding 거부를 집중시험 7/7로 검증했다.",
+      "exclusions": ["실제 Unity checkout과 SimulationWorldShell 배선", "실제 H 좌표·Prefab 로드·Renderer·Collider·Bounds·Rig·Animator", "방문자 NPC 실제 이동", "Play Mode·Game View", "Save/Replay·RemoteHost", "체류 기간·연장·정식 편입·마음 점수"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity/Runtime/Cards/Simulation방문자체류PresentationPreparation.cs", "sha256": "3ea07c3d84c39e382ad093e3b38402d2f4bf1dde3332e1200d5a79f13a37ee54", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity.Tests/Simulation방문자체류PresentationPreparationTests.cs", "sha256": "8897855b9c3db1876c4c3bd218be21288ed6da1fbe7b6a773d38776bcb184091", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E4표현연구.r1.md", "sha256": "32aa412ebf4caa4d845e1f5814e6e08e5707befddb4b5950140f63ef8ddbb0db", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260830-visitor-presentation-e4/visitor-presentation-e4.trx", "sha256": "b57c271bc5a4cecd0e0c3937593f25db36f6fe2865cb516b0e29ef40b951e65c", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["방문자 카드 상태·H 기준점·VisualKey·fallback 의미 변경", "후보 Prefab·Clip path 또는 fingerprint 변경", "Q-207~Q-209 공간 성장·완충 위치·짧은 마중 원칙 변경", "방문자 표현 계획 정규형 hash 변경"]
+    },
+    {
+      "evidenceId": "evidence:farm-barracks-defense-e4-20260830",
+      "title": "Farm 병영 방위 분대 소집 실행 문맥·표현 준비 E4",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:farm-barracks-defense.v1", "WI-FARM-DEFENSE-MOBILIZE"],
+      "evidenceStageCodes": ["E4"],
+      "sourceRevision": "farm-barracks-defense.design.r2/farm-barracks-defense.presentation-study.r1",
+      "executedAt": "2026-08-30T01:05:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Unity 표현 준비 계약 단위시험; 보유 Synty 파일 재고",
+      "scope": "WorldDerived 발의·NPC 수행의 분대 소집 상태를 같은 revision의 H 기준점·VisualKey·보유 초소·Actor·랙·깃발·AnimationRole 후보와 primitive fallback에 결정적으로 결속하고 권위 불변, 입력 순서 독립 hash, 혼합 revision·중복 Binding 거부를 집중시험 7/7로 검증했다.",
+      "exclusions": ["실제 Unity checkout과 SimulationWorldShell 배선", "실제 H 좌표·Prefab 로드·Renderer·Collider·Bounds·Rig·Animator", "전투·피해·귀환", "Play Mode·Game View", "Save/Replay·RemoteHost"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity/Runtime/Cards/SimulationFarm방위소집PresentationPreparation.cs", "sha256": "1468b537856b4743cc9d18bf41b48fbb680f921832734cb88859173d10932425", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Unity.Tests/SimulationFarm방위소집PresentationPreparationTests.cs", "sha256": "d0a173460ed1cf198266a492e5afd1ca10b1e788cbacc670f00fa53d20ab78bf", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "docs/Architecture/PlayableLoops/Farm병영방위-E4표현연구.r1.md", "sha256": "1019d50971468fd15cae8fbb1da19ae9e395a66eb6031ea04cf31db07d7af4ac", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260830-farm-defense-e4/farm-defense-e4-presentation.trx", "sha256": "b2b2fae64c4ddf1e754460c7cbd071af1889676691dabcf95db41976daaf43fd", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["분대 카드 상태·H 기준점·VisualKey·fallback 의미 변경", "후보 Prefab path 또는 fingerprint 변경", "Q-228·Q-233·Q-234 초소 공간·상태 표현 원칙 변경", "분대 소집 표현 계획 정규형 hash 변경"]
+    },
+    {
+      "evidenceId": "evidence:farm-barracks-squad-assignment-e3-20260830",
+      "title": "Farm 경비 초소 분대 배정 Logic·Presentation E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:farm-barracks-defense.v1", "WI-SQUAD-ASSIGN"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "farm-barracks-defense.design.r3/farm-defense-squad-assignment.r1",
+      "executedAt": "2026-08-30T03:10:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests",
+      "scope": "초소 슬롯 분대 배정 Preview 무변경, Confirm의 1:1 배정·행위 기록·WorldRevision 증가, Command 멱등성과 payload 충돌, revision·초소·슬롯·분대·기배정·점유 거부, 빈 슬롯을 포함한 읽기 전용 카드 투영의 결정성을 집중시험 10/10으로 검증했다.",
+      "exclusions": ["Save/Replay", "LocalProcess/RemoteHost API 동등성", "H·Synty·Unity Runtime·Play Mode·Game View", "분대원 편성·훈련·보급·자동 출동·영웅 직접 조작·배정 해제"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmSquadAssignmentContracts.cs", "sha256": "1ca3661cd07e1b06e40ee444cc5b67cc09bcecaeb4a0087cfade91e89ff15901", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmSquadAssignment.cs", "sha256": "af31fde220b9a323a6c7a70385ae6b888539163e8bb4df83e4ef0a0864a46014", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSquadAssignmentService.cs", "sha256": "dd11b1be8c88fb3ec7b0aaf3aba0239e96adc47d663c6ca02956bcac7ff150d4", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationFarmSquadAssignmentTests.cs", "sha256": "d532e1f76ffd9266248c6e37eb2360d14935690fc9b59528f3dee83b967beb4a", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260830-farm-squad-assignment-e3-final/farm-squad-assignment-e3-final.trx", "sha256": "b939fb751278f68f184022ec618991e1352637bf371294d8703e43867cc10329", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["WI-SQUAD-ASSIGN 계약·Aggregate·Application Service 변경", "행위 원장 또는 초소 슬롯 카드 상태 사본 정규형 변경", "farm-defense-squad-assignment.r1 변경"]
+    },
+    {
+      "evidenceId": "evidence:farm-barracks-squad-supply-e3-20260830",
+      "title": "Farm 경비 분대 식량·장비 내구도 보급 Logic·Presentation E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:farm-barracks-defense.v1", "WI-SQUAD-SUPPLY"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "farm-barracks-defense.design.r4/farm-defense-squad-supply.r1",
+      "executedAt": "2026-08-30T04:00:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests",
+      "scope": "분대 보급 Preview 무변경, Confirm의 식량·장비 내구도 복구 능력 동시 소비와 준비 완료, 행위 기록·WorldRevision, Command 멱등성과 payload 충돌, revision·분대·기보급·자원 부족 거부, 읽기 전용 보급 카드 투영의 결정성을 집중시험 9/9로 검증했다.",
+      "exclusions": ["Save/Replay", "LocalProcess/RemoteHost API 동등성", "H·Synty·Unity Runtime·Play Mode·Game View", "플레이어 입력 보급량·개별 장비 수리·훈련·출동·전투·자동 재보급"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmSquadSupplyContracts.cs", "sha256": "f71f42c1d8c05e9a6e61ea303cf2ae8d375112a1500ae4d4c81f312c572ebd05", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmSquadSupply.cs", "sha256": "c24f28a1d388ee069b983b9878ad76e42ad01f8a4c5b3252dfa2422a89c14721", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSquadSupplyService.cs", "sha256": "9cdf2b79f726c5fcd7947393bfa8e305d663b23abc56d5ebc9a91be22d79cf8d", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationFarmSquadSupplyTests.cs", "sha256": "6fb47e96dbcbe0bb0481f1324a2c3dafc16fad00cc2accb48a3b99f08deb6967", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260830-farm-squad-supply-e3-final/farm-squad-supply-e3-final.trx", "sha256": "233d0b39a444b5ed7ada1ffb0c0ed21b8ad49ffb43785ad9ff20ba3b2ea83f33", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["WI-SQUAD-SUPPLY 계약·Aggregate·Application Service 변경", "행위 원장 또는 분대 보급 카드 상태 사본 정규형 변경", "farm-defense-squad-supply.r1 변경"]
+    },
+    {
+      "evidenceId": "evidence:farm-barracks-defense-resolution-e3-20260830",
+      "title": "Farm 방어 성공 결과 발현 Logic·Presentation E3",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:farm-barracks-defense.v1", "WI-FARM-DEFENSE-RESOLVE"],
+      "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "farm-barracks-defense.design.r5/farm-defense-resolution.r1",
+      "executedAt": "2026-08-30T05:00:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests",
+      "scope": "전투 권위의 확정 결과를 읽는 Preview 무변경, 위협·안전 기간·생산/회복 보정·전리품 원자 발현, 행위 기록·WorldRevision, Command 멱등성과 payload 충돌, revision·조우·실패·기발현 거부, 위협 하한·안전 기간·전리품 합산과 읽기 전용 결과 카드의 결정성을 집중시험 10/10으로 검증했다.",
+      "exclusions": ["전투 승패·피해·보상 수치 계산", "Save/Replay", "LocalProcess/RemoteHost API 동등성", "H·Synty·Unity Runtime·Play Mode·Game View", "부상·치료·초소 귀환·생산 재합류"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseResolutionContracts.cs", "sha256": "771a698735e69af6e1c113f50f5de32d5cb294f9e2a49d463fdece465af3a61c", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseResolution.cs", "sha256": "3130bb7c3387863afc92205737450dd4754e4e109b7059408070bb788565735c", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseResolutionService.cs", "sha256": "ca965245f663e19d5ee94d841c4c5b3eba6a05ec0e3385b79b4c962cc569f8b3", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationFarmDefenseResolutionTests.cs", "sha256": "87787aa7ab28986a8f109ce4c46a8ff929939e5bf79265249c82020470226c3a", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260830-farm-defense-resolution-e3-final/farm-defense-resolution-e3-final.trx", "sha256": "87db025f02b395aafa45e48aaeafd8e344773dc56012bb80ea558c6f1909dacc", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["WI-FARM-DEFENSE-RESOLVE 계약·Aggregate·Application Service 변경", "행위 원장 또는 방어 결과 카드 상태 사본 정규형 변경", "farm-defense-resolution.r1 변경"]
+    },
+    {
+      "evidenceId": "evidence:farm-barracks-defense-return-e3-20260830",
+      "title": "Farm 방위 분대 초소 귀환 인계 Logic·Presentation E3",
+      "evidenceKindCode": "AutomatedTest", "evidenceTrackCode": "Integrated", "resultCode": "Passed", "statusCode": "Current",
+      "subjectRefs": ["playable-loop:farm-barracks-defense.v1", "WI-FARM-DEFENSE-RETURN"], "evidenceStageCodes": ["E1", "E2", "E3"],
+      "sourceRevision": "farm-barracks-defense.design.r6/farm-defense-return.r1", "executedAt": "2026-08-30T05:30:00+09:00", "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests",
+      "scope": "Preview 무변경, 결과 확정 분대의 초소 귀환과 치료·생산 재합류 후보 대기열 인계, 행위 기록·WorldRevision, Command 멱등성과 payload 충돌, revision·미확정·기귀환 거부, 읽기 전용 귀환 카드 결정성을 집중시험 9/9로 검증했다.",
+      "exclusions": ["전리품 재지급", "치료·휴식·생산 재합류 실행", "Save/Replay", "RemoteHost", "H·Unity Runtime·Play Mode·Game View"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseReturnContracts.cs", "sha256": "16b000554772f2133476a749a464652658b99fb68c8df43f0b8472927e52a993", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseReturn.cs", "sha256": "774f1c1d8f577a6a95526fd81a4ed91d8083ee4168700eefd4df3397557b021b", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseReturnService.cs", "sha256": "2808d5810045d2747de5074b1d53db35d0525b3bb5496643b98122e677749f7f", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationFarmDefenseReturnTests.cs", "sha256": "a79b77e01d1e1e563fcb46e0fda2f27592ef4a9b5eeea0e529cf845d8306ea02", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260830-farm-defense-return-e3-final/farm-defense-return-e3-final.trx", "sha256": "27ac9a022a6b589c2126e19c885aacffafac24bfb7cf1d0c9dd51d63cd124106", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["WI-FARM-DEFENSE-RETURN 계약·Aggregate·Application Service 변경", "귀환 카드 또는 후속 대기열 정규형 변경", "farm-defense-return.r1 변경"]
     }
   ]
 }

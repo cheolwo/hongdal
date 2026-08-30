@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-interaction-responsibilities.v1",
-  "revision": "simulation-world-interaction-responsibilities.r5",
+  "revision": "simulation-world-interaction-responsibilities.r13",
   "lastVerifiedDate": "2026-08-27",
   "principles": {
     "oneIntentPerWorldInteraction": true,
@@ -28,15 +28,54 @@
     "ActorResponsibilityMigrationRequired"
   ],
   "primaryOutcomeCodes": {
+    "WI-ACTOR-CONSUME": "ItemConsumed",
+    "WI-ACTOR-PLAN-SET": "PersonalPlanSet",
+    "WI-COMBAT-DIRECT-CONTROL-SET": "ActorDirectControlChanged",
+    "WI-COMBAT-TACTICAL-COMMAND": "SquadTacticalOrderConfirmed",
+    "WI-COMMUNITY-COOPERATION-PROPOSE": "CooperationProposed",
+    "WI-COMMUNITY-ENTRANCE-POLICY-SET": "EntrancePolicySet",
+    "WI-COMMUNITY-HIRE": "NpcEmploymentConfirmed",
+    "WI-COMMUNITY-MEMBERSHIP-CONFIRM": "CommunityMembershipConfirmed",
+    "WI-COMMUNITY-REMOTE-RESPONSE": "RemoteResponseOrderConfirmed",
+    "WI-COMMUNITY-SUPPORT-MISSION-JOIN": "SupportMissionParticipationConfirmed",
+    "WI-CON-BLUEPRINT-PLACE": "ConstructionBlueprintPlaced",
+    "WI-CON-DEMOLISH": "ConstructionDemolished",
+    "WI-CON-MATERIAL-DEPOSIT": "ConstructionMaterialDeposited",
+    "WI-CON-WORK-CONTRIBUTE": "ConstructionWorkContributed",
+    "WI-CRAFT-BREW": "BrewBatchCompleted",
+    "WI-EXPEDITION-DISPATCH": "ExpeditionDispatched",
+    "WI-FARM-FIELD-BOUNDARY-CONFIRM": "FieldBoundaryConfirmed",
+    "WI-FARM-SOIL-AMEND": "SoilAmended",
+    "WI-FARM-WATER-TRANSFER": "IrrigationWaterTransferred",
+    "WI-GUEST-PERMISSION-SET": "GuestPermissionSet",
+    "WI-HEAT-SOURCE-STATE-CHANGE": "HeatSourceStateChanged",
+    "WI-HUB-DEMAND-ALLOCATE": "HubDemandInventoryAllocated",
+    "WI-HUB-SUPPLY-TASK-ACCEPT": "HubSupplyTaskAccepted",
+    "WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM": "BelowReserveSaleConfirmed",
+    "WI-NATURE-HERB-GATHER": "HerbGathered",
+    "WI-NATURE-TRACE-INVESTIGATE": "NatureTraceInvestigated",
+    "WI-SURVIVAL-RATION-POLICY-SET": "RationPolicySet",
+    "WI-TOWN-DELIVERY-INSPECT": "TownDeliveryInspected",
+    "WI-TOWN-DELIVERY-RECEIVE": "TownDeliveryReceived",
+    "WI-TOWN-STOCK-PUTAWAY": "TownStockPutAway",
+    "WI-TOWN-STOCK-REPLENISH": "TownReplenishmentOrderConfirmed",
+    "WI-TOWN-SUPPLY-DISPATCH": "TownSupplyDispatched",
+    "WI-WORLD-RESOURCE-REGENERATE": "ResourceAvailabilityRestored",
     "WI-ACTOR-01": "ItemAcquired",
     "WI-ACTOR-02": "ItemEquipmentChanged",
     "WI-ACTOR-03": "RecipeKnowledgeAdded",
+    "WI-COMMUNITY-VISITOR-STAY": "CommunityVisitorStayDecisionRecorded",
     "WI-FARM-01": "SoilTilled",
     "WI-FARM-02": "CultivationStarted",
     "WI-FARM-03": "CropCareApplied",
     "WI-FARM-04": "HarvestLotCreated",
     "WI-FARM-05": "HarvestLotCollected",
     "WI-FARM-06": "PackageLotCreated",
+    "WI-FARM-DEFENSE-MOBILIZE": "FarmDefenseSquadMobilized",
+    "WI-FARM-DEFENSE-RESOLVE": "FarmDefenseResolved",
+    "WI-FARM-DEFENSE-RETURN": "FarmDefenseSquadReturned",
+    "WI-SQUAD-ASSIGN": "FarmDefenseSquadAssigned",
+    "WI-SQUAD-SUPPLY": "FarmDefenseSquadSupplied",
     "WI-LOG-01": "CargoTransportReserved",
     "WI-LOG-02": "CargoDeparted",
     "WI-LOG-03": "CargoRouteProgressed",
@@ -101,12 +140,24 @@
       "reason": "업무 검토 완료와 운영 숙련 근거 확정은 같은 검토 결과에서 함께 성립해야 한다."
     },
     {
+      "worldInteractionId": "WI-COMMUNITY-VISITOR-STAY",
+      "reason": "방문자 결정·수용 칸·공동체 마음 계보는 하나의 수용 또는 거절 확정에서 함께 성립해야 한다."
+    },
+    {
       "worldInteractionId": "WI-FARM-04",
       "reason": "수확 Lot 생성과 재배 단위 수확 완료는 하나의 수확 원자성 안에서 함께 성립해야 한다."
     },
     {
       "worldInteractionId": "WI-FARM-06",
       "reason": "포장 Lot 생성과 같은 수량의 운송 Cargo 준비는 하나의 포장 결과를 보존하는 원자적 계보다."
+    },
+    {
+      "worldInteractionId": "WI-FARM-DEFENSE-MOBILIZE",
+      "reason": "분대 출동과 배정 작업자의 생산 기여 중단은 같은 방위 소집 확정에서 함께 성립해야 한다."
+    },
+    {
+      "worldInteractionId": "WI-FARM-DEFENSE-RESOLVE",
+      "reason": "전투 권위가 한 결과 묶음으로 확정한 위협 감소·안전 기간·생산/회복 보정·전리품은 같은 방어 성공 발현에서 원자적으로 함께 성립해야 한다."
     },
     {
       "worldInteractionId": "WI-002",
@@ -146,6 +197,11 @@
     }
   ],
   "alternativeOutcomeSets": [
+    {
+      "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+      "outcomeCodes": ["ResourceAvailabilityRestored", "ResourceAvailabilityUnchanged"],
+      "reason": "신뢰된 Tick의 단일 재생 평가 결과다. 변경 노드가 있으면 복원, 없으면 자원 가용성 유지 중 정확히 하나의 행위 결과만 기록한다."
+    },
     {
       "worldInteractionId": "WI-CITY-02",
       "outcomeCodes": ["CityInventoryAllocated", "CityInventoryShortage"],

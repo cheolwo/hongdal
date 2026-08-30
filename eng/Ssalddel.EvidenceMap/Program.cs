@@ -261,19 +261,22 @@ static void ValidateModuleCatalog(ModuleCatalogDocument catalog)
                 $"E 책임 모듈 대장과 C# 투영이 다릅니다: {source.EvidenceStage}");
     }
     var submodules = SsalddelEvidenceSubmoduleDefinitionCatalog.All;
-    if (submodules.Count != 15 || submodules.Select(item => item.SubmoduleKey)
+    if (submodules.Count != 16 || submodules.Select(item => item.SubmoduleKey)
             .Distinct(StringComparer.Ordinal).Count() != submodules.Count)
         throw new InvalidOperationException(
-            "E1~E3 하위 모듈 카탈로그는 중복 없는 15개 정의를 가져야 합니다.");
-    foreach (var stage in new[]
-             {
-                 SsalddelEvidenceStage.E1,
-                 SsalddelEvidenceStage.E2,
-                 SsalddelEvidenceStage.E3,
-             })
-        if (submodules.Count(item => item.EvidenceStage == stage) != 5)
+            "E1~E3 하위 모듈 카탈로그는 중복 없는 16개 정의를 가져야 합니다.");
+    var expectedSubmoduleCountByStage = new Dictionary<
+        SsalddelEvidenceStage, int>
+    {
+        [SsalddelEvidenceStage.E1] = 5,
+        [SsalddelEvidenceStage.E2] = 6,
+        [SsalddelEvidenceStage.E3] = 5,
+    };
+    foreach (var expectedCount in expectedSubmoduleCountByStage)
+        if (submodules.Count(item => item.EvidenceStage ==
+                                     expectedCount.Key) != expectedCount.Value)
             throw new InvalidOperationException(
-                $"{stage} 하위 모듈은 다섯 개여야 합니다.");
+                $"{expectedCount.Key} 하위 모듈은 {expectedCount.Value}개여야 합니다.");
 }
 
 static Dictionary<Type, string?> BuildSourceIndex(

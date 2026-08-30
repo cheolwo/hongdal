@@ -1,0 +1,299 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-FARM-CROP-CYCLE",
+  "title": "Farm 경작 세계 발현 E5 승인 실행",
+  "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+  "activeWorldInteractionId": "WI-FARM-01",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E5",
+    "promotionBeyondStageAllowed": false,
+    "reason": "D-286 승인 인계 r1. 실제 Session·핵심 Save/Replay·동일 Core·Scene/Game View까지 검증하되 E6/E7은 승격하지 않는다."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "밭갈이·파종·관리·수확 결과와 다음 파종을 판독한다.",
+    "requiredHCapabilities": [
+      "CultivationWorkArea",
+      "HarvestWorkArea"
+    ],
+    "visualKeys": [
+      "farm.crop.prepare",
+      "farm.crop.plant",
+      "farm.crop.grow",
+      "farm.crop.harvest"
+    ],
+    "primaryAssetCandidateRefs": [
+      "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_Rows_01.prefab",
+      "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_S.prefab",
+      "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_L.prefab",
+      "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Box_Potato_01.prefab"
+    ],
+    "alternativeAssetCandidateRefs": [
+      "Assets/Synty/PolygonFarm/Prefabs/Buildings/SM_Bld_Barn_02.prefab"
+    ],
+    "fallbackPresentationRefs": [
+      "기존 지면+상태 Outline/UI: Synty 실물 증거 아님"
+    ],
+    "placementIntent": "승인 연구의 강변 H2 동선과 H1 생산 밭을 현행 Cell/H/CompositionKey/pivot으로 변환한다.",
+    "interactionAnchorIntent": "기존 Player의 실제 접근과 Preview/Confirm 연결. 배치 엔진은 권위를 변경하지 않는다.",
+    "candidateRevisionOrFingerprint": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "호환 변환·실제 Bounds·통행·두 주기·저장 재진입 미검증"
+    ]
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 01~04 규칙·예약·행위 기록·두 주기·저장을 검증한다."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "기존 Farm 01~04 규칙·예약·행위 기록·두 주기·저장을 검증한다."
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "기존 Farm 01~04 규칙·예약·행위 기록·두 주기·저장을 검증한다."
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "기존 Farm 01~04 규칙·예약·행위 기록·두 주기·저장을 검증한다."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "기존 Farm 01~04 규칙·예약·행위 기록·두 주기·저장을 검증한다."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "기존 Farm 01~04 규칙·예약·행위 기록·두 주기·저장을 검증한다."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "기존 Farm 01~04 규칙·예약·행위 기록·두 주기·저장을 검증한다."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "eng/execution-ledgers/playable-loops.json"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "eng/execution-ledgers/playable-loops.json"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "Passed",
+          "evidenceRefs": [
+            "eng/execution-ledgers/playable-loops.json"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+        },
+        {
+          "code": "E5",
+          "disposition": "Affected",
+          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+        },
+        {
+          "code": "E4",
+          "disposition": "Affected",
+          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+        },
+        {
+          "code": "E1",
+          "disposition": "Defined",
+          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "eng/execution-ledgers/playable-loops.json"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "NotStarted",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "NotStarted",
+    "candidateRevision": "farm-crop-cycle.design.r1",
+    "evidenceRefs": [
+      "evidence:simulation-task-20260824"
+    ],
+    "openFeedbackRefs": [
+      "Session 두 주기·저장·호환 배치 미검증"
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:farm-crop-cycle.v1|WI-FARM-01",
+    "profileRevision": "farm-crop-cycle.engine-interaction.r1",
+    "logicStatusCode": "Pending",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E4",
+    "evidenceRefs": [],
+    "blockerCodes": [
+      "FarmSessionTwoCycleNotVerified"
+    ]
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+    "designRevision": "farm-crop-cycle.design.r1",
+    "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+    "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+  },
+  "requiredStudies": [
+    {
+      "studyStableId": "study:farm-crop-cycle:spatial-placement.r1",
+      "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
+      "statusCode": "Accepted",
+      "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0",
+      "domains": [
+        "공간",
+        "배치",
+        "애니메이션"
+      ]
+    }
+  ],
+  "e5Execution": {
+    "statusCode": "E5Pending",
+    "dispatchRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md",
+    "saveVersionReservation": {
+      "baseline": "simulation-save.v29",
+      "reserved": "simulation-save.v30",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "sharedBy": [
+        "WI-ACTOR-03",
+        "WI-COMMUNITY-VISITOR-STAY"
+      ],
+      "preserveLegacyReadAndHash": true
+    },
+    "runtimeEvidenceRefs": [],
+    "sceneEvidenceRefs": [],
+    "gameViewEvidenceRefs": [],
+    "technicalVerification": {
+      "statusCode": "Partial",
+      "reportRef": "docs/Reports/Farm경작-E5기술연결-중간검증-2026-08-30.md",
+      "taskEvidenceRef": "artifacts/local/validation/20260830-094221",
+      "focusedEvidenceRef": "artifacts/local/e5-world-manifestation/farm-e5-integrated.trx",
+      "fullTestsPassed": 1227,
+      "focusedTestsPassed": 75,
+      "sceneVerified": false,
+      "newSoilTwoCycleVerified": false,
+      "preTilledTwoCycleVerified": true,
+      "blocker": "StaminaRecoveryRulesAwaitApprovedRevision"
+    }
+  },
+  "wiExecutionSequence": [
+    "WI-FARM-01",
+    "WI-FARM-02",
+    "WI-FARM-03",
+    "WI-FARM-04"
+  ]
+}

@@ -26,21 +26,35 @@ foreach ($name in @(
     "starterIsPrototypeFallbackOnly",
     "playableLoopSelectsModuleBeforeAssetFamily",
     "humanDesignUsesKoreanTaxonomyAndStableCodes",
-    "presentationCannotMutateAuthorityRevision")) {
+    "presentationCannotMutateAuthorityRevision",
+    "animationClipsUseSeparateSourceProfiles",
+    "purchasedPackDoesNotCreateGameplayArea",
+    "newPackStartsAsNeedsReview")) {
     Require ([bool] $catalog.principles.$name) "Principle:$name"
 }
 
 $packs = @($catalog.sourcePacks)
-Require ($packs.Count -eq 7) "PackCount"
+Require ($packs.Count -eq 13) "PackCount"
 Require ((@($packs.expectedPrefabCount | Measure-Object -Sum).Sum) -eq
     [int] $catalog.expectedPrefabCount) "PrefabCountSum"
-Require ([int] $catalog.expectedPrefabCount -eq 2899) "ExpectedPrefabCount"
+Require ([int] $catalog.expectedPrefabCount -eq 4211) "ExpectedPrefabCount"
 Require ([string] ($packs | Where-Object packCode -eq "construction").policyCode -eq
     "SharedConstructionStateLayer") "ConstructionPolicy"
 Require ([string] ($packs | Where-Object packCode -eq "generic").policyCode -eq
     "SharedBase") "GenericPolicy"
 Require ([string] ($packs | Where-Object packCode -eq "starter").policyCode -eq
     "PrototypeFallbackOnly") "StarterPolicy"
+
+$purchasedProfiles = @($catalog.purchasedAssetUsageProfiles)
+Require ($purchasedProfiles.Count -eq 6) "PurchasedProfileCount"
+foreach ($profile in $purchasedProfiles) {
+    $packCode = [string] $profile.packCode
+    Require (@($packs | Where-Object packCode -eq $packCode).Count -eq 1) "PurchasedProfilePack:$packCode"
+    Require (@("Prefab", "AnimationClip") -contains [string] $profile.sourceKindCode) `
+        "PurchasedProfileKind:$packCode"
+    Require (@($profile.requiredHCapabilities).Count -gt 0) "PurchasedProfileH:$packCode"
+    Require (@($profile.playableLoopCandidateCodes).Count -gt 0) "PurchasedProfileLoop:$packCode"
+}
 
 $modules = @($catalog.functionalModules)
 Require ($modules.Count -eq 12) "ModuleCount"
@@ -143,6 +157,7 @@ $lines = @(
     "- revision: ``$($catalog.revision)``",
     "- 현재 원본 Prefab 기준 수량: ``$($catalog.expectedPrefabCount)``",
     "- 원본 팩: ``$($packs.Count)``",
+    "- 신규 구매 활용 프로필: ``$($purchasedProfiles.Count)`` (Prefab과 AnimationClip 분리)",
     "- 기능군: ``$($modules.Count)``",
     "- 사람이 읽는 표현 범위: ``$($scopes.Count)`` (실외 표현 / 실내 표현 / 공통 표현)",
     "- 세부 기능군: ``$subgroupCount``",
@@ -155,6 +170,20 @@ $lines = @(
 )
 foreach ($pack in $packs) {
     $lines += "| $($pack.packCode) | $($pack.expectedPrefabCount) | $($pack.policyCode) |"
+}
+$lines += @(
+    "",
+    "## 신규 구매 자산의 WI·H 활용 후보",
+    "",
+    "> 새 팩은 새 Area가 아니다. 아래 연결은 E4 후보 조사 입력이며 실제 채택과 E5 배치를 승인하지 않는다.",
+    "",
+    "| 원본 팩 | 원천 종류 | H Capability 후보 | PlayableLoop 후보 |",
+    "| --- | --- | --- | --- |"
+)
+foreach ($profile in $purchasedProfiles) {
+    $lines += "| $($profile.packCode) | $($profile.sourceKindCode) | " +
+        "$(@($profile.requiredHCapabilities) -join ', ') | " +
+        "$(@($profile.playableLoopCandidateCodes) -join ', ') |"
 }
 $lines += @(
     "",
@@ -179,7 +208,7 @@ foreach ($scope in $scopes) {
     }
     $lines += ""
 }
-$generated = ($lines -join "`n") + "`n"
+$generated = (($lines -join "`n").TrimEnd()) + "`n"
 $output = Join-Path $root $OutputPath
 if ($Mode -eq "Write") {
     $directory = Split-Path -Parent $output
@@ -192,4 +221,4 @@ if ($Mode -eq "Write") {
     Require ((Get-Content -LiteralPath $output -Raw -Encoding UTF8) -eq $generated) "GeneratedOutputOutOfDate"
 }
 
-Write-Output "SyntyAssetFunctionalModulesValid:Packs=7;Prefabs=2899;Scopes=3;Modules=12;Subgroups=$subgroupCount;AssetKinds=$assetKindCount;Areas=4"
+Write-Output "SyntyAssetFunctionalModulesValid:Packs=13;Prefabs=4211;PurchasedProfiles=6;Scopes=3;Modules=12;Subgroups=$subgroupCount;AssetKinds=$assetKindCount;Areas=4"

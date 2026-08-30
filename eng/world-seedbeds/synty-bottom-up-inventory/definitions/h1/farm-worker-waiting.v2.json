@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
   "stableId": "h1-stock:farm-worker-waiting",
-  "revision": 2,
+  "revision": 3,
   "hierarchyLevelCode": "H1",
   "title": "농가 귀환·작업자 대기 공간",
   "summary": "플레이어와 작업자가 농장에 돌아와 쉬고, 작업을 확인하고, 다음 작업 구역으로 출발하는 생활 거점 공간이다.",
@@ -9,14 +9,17 @@
   "originModeCode": "WorldIntent",
   "approvedDefinitionStableId": null,
   "wiIds": [
-    "WI-WORLD-01"
+    "WI-WORLD-01",
+    "WI-FARM-DEFENSE-MOBILIZE"
   ],
   "anticipatedGameplayCodes": [
     "WorkerBriefing",
     "ShiftHandoff",
     "FarmReturn",
     "FarmRest",
-    "NextTaskSelection"
+    "NextTaskSelection",
+    "FarmDefenseSquadMuster",
+    "FarmDefenseProductionCostRead"
   ],
   "spatialRoleCodes": [
     "FarmWorkerWaitingArea",
@@ -26,7 +29,8 @@
   "capabilityCodes": [
     "Spatial.WorkerAccessible",
     "Spatial.NpcWorkArea",
-    "Spatial.RestArea"
+    "Spatial.RestArea",
+    "Spatial.FarmDefenseMusterAnchor"
   ],
   "capacityConceptCodes": [],
   "predecessorH1Refs": [],
@@ -56,7 +60,8 @@
     "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-worker-waiting"
   ],
   "unresolvedItems": [
-    "휴식은 표현·다음 작업 선택 기능이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다."
+    "휴식과 방위 집결은 표현·다음 작업 선택 후보이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다.",
+    "실제 외곽 초소 좌표·분대 Actor·출동 경로는 Farm 방위 E5 승인 뒤 검증한다."
   ],
   "presentationOnly": true,
   "isOperationalState": false

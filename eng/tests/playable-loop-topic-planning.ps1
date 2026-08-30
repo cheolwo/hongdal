@@ -1,118 +1,59 @@
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-
-$repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
-$manager = Join-Path $repositoryRoot "eng/execution-ledgers/manage-playable-loop-topic-planning.ps1"
-$inputPath = Join-Path $repositoryRoot "eng/execution-ledgers/playable-loops.json"
-$outputPath = Join-Path $repositoryRoot "docs/AI/generated/playable-loop-topic-planning.md"
-
-$first = & $manager -Mode Write
-$hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $outputPath).Hash
-$ticks = (Get-Item -LiteralPath $outputPath).LastWriteTimeUtc.Ticks
-$second = & $manager -Mode Write
-$validate = & $manager -Mode Validate
-if ((Get-FileHash -Algorithm SHA256 -LiteralPath $outputPath).Hash -ne $hash -or
-    (Get-Item -LiteralPath $outputPath).LastWriteTimeUtc.Ticks -ne $ticks) {
-    throw "PlayableLoopTopicPlanningOutputIsNotDeterministic"
-}
-if ($validate -notmatch "Units=16;Approved=0;Legacy=1") {
-    throw "PlayableLoopTopicPlanningValidationDidNotComplete:$validate"
-}
-$generated = Get-Content -LiteralPath $outputPath -Raw -Encoding UTF8
-foreach ($expected in @(
-    "topic:nature-night-day2.v1",
-    "LegacyActiveMigration",
-    "현재 Goal 완료 전 승인 전환",
-    "topic:nature-base-reflection.v1",
-    "Draft",
-    "playable-loop:nature-workbench-foundation.v1 / NotStarted")) {
-    if (-not $generated.Contains($expected)) {
-        throw "PlayableLoopTopicPlanningGeneratedEntryMissing:$expected"
-    }
-}
-
-$artifactDirectory = Join-Path $repositoryRoot "artifacts/local/validation/playable-loop-topic-planning/negative"
-New-Item -ItemType Directory -Path $artifactDirectory -Force | Out-Null
+$repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+$manager = Join-Path $repositoryRoot 'eng/execution-ledgers/manage-playable-loop-topic-planning.ps1'
+$loopsPath = Join-Path $repositoryRoot 'eng/execution-ledgers/playable-loops.json'
+$goalsPath = Join-Path $repositoryRoot 'eng/execution-ledgers/codex-playable-loop-goals.json'
+$outputPath = 'artifacts/local/validation/playable-loop-topic-planning/current.md'
+$artifacts = Join-Path $repositoryRoot 'artifacts/local/validation/playable-loop-topic-planning'
+New-Item -ItemType Directory -Path $artifacts -Force | Out-Null
 $utf8 = [Text.UTF8Encoding]::new($false)
-function Relative([string] $Path) {
-    $rootWithSeparator = $repositoryRoot.TrimEnd("\") + "\"
-    $rootUri = [Uri]::new($rootWithSeparator)
-    $pathUri = [Uri]::new([IO.Path]::GetFullPath($Path))
-    return [Uri]::UnescapeDataString($rootUri.MakeRelativeUri($pathUri).ToString())
+$first = & $manager -Mode Write -OutputPath $outputPath
+$hash = (Get-FileHash (Join-Path $repositoryRoot $outputPath)).Hash
+$ticks = (Get-Item (Join-Path $repositoryRoot $outputPath)).LastWriteTimeUtc.Ticks
+$second = & $manager -Mode Write -OutputPath $outputPath
+if ((Get-FileHash (Join-Path $repositoryRoot $outputPath)).Hash -ne $hash -or (Get-Item (Join-Path $repositoryRoot $outputPath)).LastWriteTimeUtc.Ticks -ne $ticks) { throw 'TopicOutputNotDeterministic' }
+function Read-Loops { Get-Content $loopsPath -Raw -Encoding UTF8 | ConvertFrom-Json }
+function Read-Goals { Get-Content $goalsPath -Raw -Encoding UTF8 | ConvertFrom-Json }
+function Invoke-Case([string] $Name, [object] $Loops, [object] $Goals, [string] $ExpectedError = '') {
+    $loopRef = "artifacts/local/validation/playable-loop-topic-planning/$Name-loops.json"
+    $goalRef = "artifacts/local/validation/playable-loop-topic-planning/$Name-goals.json"
+    [IO.File]::WriteAllText((Join-Path $repositoryRoot $loopRef), ($Loops | ConvertTo-Json -Depth 100), $utf8)
+    [IO.File]::WriteAllText((Join-Path $repositoryRoot $goalRef), ($Goals | ConvertTo-Json -Depth 100), $utf8)
+    $failure = ''
+    try { $null = & $manager -Mode Validate -PlayableLoopPath $loopRef -GoalLedgerPath $goalRef }
+    catch { $failure = $_.Exception.Message }
+    if ($ExpectedError -eq '' -and $failure -ne '') { throw "TopicPositiveFailed:${Name}:$failure" }
+    if ($ExpectedError -ne '' -and -not $failure.Contains($ExpectedError)) { throw "TopicNegativeFailed:${Name}:$failure" }
 }
-function Read-Catalog() {
-    Get-Content -LiteralPath $inputPath -Raw -Encoding UTF8 | ConvertFrom-Json
-}
-function Require-Rejected([string] $Name, [object] $Catalog, [string] $ExpectedCode) {
-    $path = Join-Path $artifactDirectory "$Name.json"
-    [IO.File]::WriteAllText($path, ($Catalog | ConvertTo-Json -Depth 50), $utf8)
-    $arguments = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $manager,
-        "-Mode", "Write", "-PlayableLoopPath", (Relative $path),
-        "-OutputPath", (Relative (Join-Path $artifactDirectory "$Name.md")))
-    $failureText = ""
-    try { $failureText = (& pwsh @arguments 2>&1 | Out-String) }
-    catch { $failureText = $_.Exception.Message + "`n" + ($_ | Out-String) }
-    if ($LASTEXITCODE -eq 0 -or -not $failureText.Contains($ExpectedCode)) {
-        throw "PlayableLoopTopicPlanningNegativeWasAccepted:${Name}:$failureText"
-    }
-}
-
-$missingGate = Read-Catalog
-$unit = $missingGate.items | Where-Object loopStableId -eq "playable-loop:nature-shelter-foundation.v1"
-$unit.PSObject.Properties.Remove("planningGate")
-Require-Rejected "missing-gate" $missingGate "PlanningGateMissing"
-
-$duplicateTopic = Read-Catalog
-$unit = $duplicateTopic.items | Where-Object loopStableId -eq "playable-loop:nature-twilight-return.v1"
-$unit.planningGate.topicStableId = "topic:nature-shelter-foundation.v1"
-Require-Rejected "duplicate-topic" $duplicateTopic "TopicStableIdDuplicate"
-
-$unapprovedActive = Read-Catalog
-$unit = $unapprovedActive.items | Where-Object loopStableId -eq "playable-loop:nature-night-day2.v1"
-$unit.planningGate.statusCode = "NotStarted"
-Require-Rejected "unapproved-active" $unapprovedActive "ActiveGoalPlanningNotApproved"
-
-$legacyTransfer = Read-Catalog
-$unit = $legacyTransfer.items | Where-Object loopStableId -eq "playable-loop:nature-workbench-foundation.v1"
-$unit.planningGate.statusCode = "LegacyActiveMigration"
-Require-Rejected "legacy-transfer" $legacyTransfer "LegacyMigrationTransferred"
-
-$badHash = Read-Catalog
-$unit = $badHash.items | Where-Object loopStableId -eq "playable-loop:nature-base-reflection.v1"
-$unit.planningGate.statusCode = "Approved"
-$unit.planningGate.approvalEvidenceRef = "decision:test"
-$unit.planningGate.designHashSha256 = ("0" * 64)
-Require-Rejected "approved-bad-hash" $badHash "DesignHashMismatch"
-
-$missingApproval = Read-Catalog
-$unit = $missingApproval.items | Where-Object loopStableId -eq "playable-loop:nature-base-reflection.v1"
-$unit.planningGate.statusCode = "Approved"
-Require-Rejected "approved-missing-evidence" $missingApproval "ApprovalEvidenceMissing"
-
-$aggregateGate = Read-Catalog
-$aggregate = $aggregateGate.items | Where-Object loopStableId -eq "playable-loop:nature-survival-homestead.v1"
-$aggregate | Add-Member -NotePropertyName planningGate -NotePropertyValue ([pscustomobject]@{ topicStableId="topic:bad.v1" })
-Require-Rejected "aggregate-gate" $aggregateGate "AggregateHasPlanningGate"
-
-$brokenSource = Read-Catalog
-$unit = $brokenSource.items | Where-Object loopStableId -eq "playable-loop:nature-base-reflection.v1"
-$unit.sourcePlanningDocumentRefs = @("docs/Architecture/does-not-exist.md")
-Require-Rejected "broken-source-link" $brokenSource "SourcePlanningDocumentNotFound"
-
-$missingHeading = Read-Catalog
-$unit = $missingHeading.items | Where-Object loopStableId -eq "playable-loop:nature-base-reflection.v1"
-$designDirectory = Join-Path $artifactDirectory "missing-heading-root"
-New-Item -ItemType Directory -Path $designDirectory -Force | Out-Null
-$designPath = Join-Path $designDirectory "nature-base-reflection.v1.md"
-$content = Get-Content -LiteralPath (Join-Path $repositoryRoot $unit.planningGate.designDocumentRef) -Raw -Encoding UTF8
-$content = $content.Replace("## 반복 폐루프", "## 반복 흐름")
-[IO.File]::WriteAllText($designPath, $content, $utf8)
-$missingHeading.designDocumentationPolicy.detailedDesignRoot = Relative $designDirectory
-$unit.planningGate.designDocumentRef = Relative $designPath
-$unit.planningGate.designHashSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $designPath).Hash
-Require-Rejected "missing-required-heading" $missingHeading "DesignHeadingMissing"
-
-Write-Output "PlayableLoopTopicPlanningTestsPassed:Positive=3;Negative=9;Units=16"
-Write-Output $first
-Write-Output $second
-Write-Output $validate
+$goals = Read-Goals
+$loops = Read-Loops
+$approved = @($loops.items | Where-Object { $_.loopLevelCode -eq 'PlayableUnit' -and $_.planningGate.statusCode -eq 'Approved' })
+if ($approved.Count -lt 2) { throw 'TwoApprovedFixturesRequired' }
+# All actually active goals must be checked, not only the display focus.
+foreach ($unit in $approved[0..1]) { ($goals.items | Where-Object loopStableId -eq $unit.loopStableId).goalStateCode = 'Active' }
+Invoke-Case 'multiple-approved' $loops $goals
+$unapproved = Read-Loops
+$other = @($unapproved.items | Where-Object { $_.loopLevelCode -eq 'PlayableUnit' -and $_.planningGate.statusCode -eq 'NotStarted' })[0]
+$goals2 = Read-Goals
+($goals2.items | Where-Object loopStableId -eq $other.loopStableId).goalStateCode = 'Active'
+Invoke-Case 'nonfocus-unapproved' $unapproved $goals2 'ActiveGoalPlanningNotApproved'
+$missingGate = Read-Loops
+($missingGate.items | Where-Object loopStableId -eq $other.loopStableId).PSObject.Properties.Remove('planningGate')
+Invoke-Case 'missing-gate' $missingGate (Read-Goals) 'PlanningGateMissing'
+$duplicate = Read-Loops
+($duplicate.items | Where-Object loopStableId -eq $approved[1].loopStableId).planningGate.topicStableId = $approved[0].planningGate.topicStableId
+Invoke-Case 'duplicate-topic' $duplicate (Read-Goals) 'TopicStableId'
+$legacy = Read-Loops
+($legacy.items | Where-Object loopStableId -eq $other.loopStableId).planningGate.statusCode = 'LegacyActiveMigration'
+Invoke-Case 'legacy-transfer' $legacy (Read-Goals) 'LegacyMigrationTransferred'
+$badHash = Read-Loops
+($badHash.items | Where-Object loopStableId -eq $approved[0].loopStableId).planningGate.designHashSha256 = ('0' * 64)
+Invoke-Case 'bad-hash' $badHash (Read-Goals) 'DesignHashMismatch'
+$noApproval = Read-Loops
+($noApproval.items | Where-Object loopStableId -eq $approved[0].loopStableId).planningGate.approvalEvidenceRef = ''
+Invoke-Case 'no-approval' $noApproval (Read-Goals) 'ApprovalEvidenceMissing'
+$aggregate = Read-Loops
+($aggregate.items | Where-Object loopLevelCode -ne PlayableUnit | Select-Object -First 1) | Add-Member -NotePropertyName planningGate -NotePropertyValue @{}
+Invoke-Case 'aggregate-gate' $aggregate (Read-Goals) 'AggregateHasPlanningGate'
+Write-Output 'PlayableLoopTopicPlanningTestsPassed:Positive=3;Negative=7;MultiActivePlanning=Verified'

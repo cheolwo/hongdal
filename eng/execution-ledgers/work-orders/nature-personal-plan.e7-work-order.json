@@ -1,0 +1,244 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-PERSONAL-PLAN",
+  "title": "개인 계획 설정 Logic E3",
+  "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+  "activeWorldInteractionId": "WI-ACTOR-PLAN-SET",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "남은32개 순차LogicE3 요청 중 개인계획 설정과 일회성 안정 근거만. 수치보상 제외."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "설정 WI가 실제 보상·진척·수면 책임까지 변경하면 E1 재검토."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs",
+            "artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs",
+            "artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+          ]
+        },
+        {
+          "code": "E3",
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs",
+            "artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+          ]
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+        },
+        {
+          "code": "E3",
+          "disposition": "Blocked",
+          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+        },
+        {
+          "code": "E2",
+          "disposition": "Blocked",
+          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Passed",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature개인계획E3.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "Passed",
+    "candidateRevision": "nature-personal-plan.design.r1",
+    "evidenceRefs": [
+      "docs/Architecture/PlayableLoops/Nature개인계획E3.md"
+    ],
+    "openFeedbackRefs": [
+      "Presentation E2 이후 미구현",
+      "Logic E4 이상·Save·RemoteHost·수치 회복·진척은 별도 승인"
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-night-day2.v1|WI-ACTOR-PLAN-SET",
+    "profileRevision": "nature-personal-plan.engine-interaction.r1",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E2",
+    "evidenceRefs": [
+      "eng/execution-ledgers/work-orders/nature-personal-plan.e7-work-order.json"
+    ],
+    "blockerCodes": [
+      "PresentationRevisionRequired",
+      "NumericRecoveryAndProgressPolicyUndefined"
+    ]
+  },
+  "playerProgression": {
+    "statusCode": "NotApplicable",
+    "reason": "NumericRecoveryAndProgressPolicyUndefined"
+  },
+  "approvedQuestionScope": [
+    "Q-040",
+    "Q-041",
+    "Q-042",
+    "Q-043",
+    "Q-044"
+  ],
+  "excludedQuestionScope": [
+    "Q-340",
+    "Q-341",
+    "Q-342",
+    "Q-343",
+    "Q-344",
+    "Q-345"
+  ],
+  "implementationEvidence": {
+    "test": "Simulation개인계획Tests",
+    "passed": 16,
+    "failed": 0,
+    "runtimeVerified": false,
+    "playModeVerified": false,
+    "resultArtifactRef": "artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+  }
+}

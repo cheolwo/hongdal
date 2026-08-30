@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-FARM-BARRACKS-DEFENSE-RETURN",
+  "title": "Farm 병영 방위 - 초소 귀환 인계 E3",
+  "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+  "activeWorldInteractionId": "WI-FARM-DEFENSE-RETURN",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "deliveryCap": { "currentDispatchTargetStage": "E3", "promotionBeyondStageAllowed": false, "reason": "Q-239를 초소 귀환과 후속 치료·생산 재합류 대기열 인계 단일 책임 E3까지 닫는다." },
+  "iterationState": { "currentPass": "UpwardAssemblyAndValidation", "nextReopenCondition": "귀환 WI가 치료·휴식·생산 재합류 또는 전리품 재지급을 실행하면 Logic E1을 다시 연다." },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic", "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 묶음 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "치료·휴식·생산 재합류와 다음 선택은 후속 WI다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 초소·분대·이동 발현은 후속 범위다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "판독 순간·InteractionAnchor·VisualKey는 별도 승인한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "Preview·Confirm·멱등·거부·후속 대기열과 결정적 hash를 시험한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "순수 Aggregate와 Application Service를 구현한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "결과 확정 분대를 초소로 귀환시키고 치료·생산 재합류 후보를 인계한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseReturn.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseReturnService.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmDefenseReturnTests.cs", "test:SimulationFarmDefenseReturnTests:9/9"] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] }, { "code": "E5", "status": "Blocked", "evidenceRefs": [] }, { "code": "E6", "status": "Blocked", "evidenceRefs": [] }, { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation", "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 묶음 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "귀환·치료·재합류 피드백은 후속 범위다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 초소와 분대 표현은 후속 범위다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "판독 순간·InteractionAnchor·VisualKey는 별도 승인한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "귀환 카드 StableId·정렬·revision과 읽기 전용성을 검증한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "권위 상태에서 읽기 전용 귀환 카드를 만든다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어는 귀환 분대와 후속 치료·생산 재합류 건수를 읽어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseReturnContracts.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmDefenseReturnTests.cs", "test:SimulationFarmDefenseReturnTests:9/9"] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] }, { "code": "E5", "status": "Blocked", "evidenceRefs": [] }, { "code": "E6", "status": "Blocked", "evidenceRefs": [] }, { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": { "currentEvidenceStage": "E3", "status": "Passed", "candidateRevision": "farm-barracks-defense.design.r6", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "test:SimulationFarmDefenseReturnTests:9/9"], "openFeedbackRefs": ["E4 판독 순간·InteractionAnchor·VisualKey와 E5 실제 초소 귀환 표현은 별도 승인한다."] },
+  "pipelineValidation": { "profileKey": "playable-loop:farm-barracks-defense.v1|WI-FARM-DEFENSE-RETURN", "profileRevision": "farm-barracks-defense-return.engine-interaction.r1", "logicStatusCode": "Passed", "presentationStatusCode": "Passed", "integratedStatusCode": "Passed", "earliestReopenEvidenceStageCode": "E4", "evidenceRefs": ["evidence:farm-barracks-defense-return-e3-20260830"], "blockerCodes": ["PromotionBeyondIntegratedE3DeferredByDeliveryCap"] }
+}

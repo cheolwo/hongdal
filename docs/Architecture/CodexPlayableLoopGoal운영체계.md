@@ -2,11 +2,12 @@
 
 ## 목적
 
-짧은 이동·대기 시간에 사용자와 Codex가 개발을 이어가더라도 큰 목적을 잃지 않도록 장기 Goal과 한 번에 수행할 WI를 분리한다. Goal은 플레이어가 경험하는 폐루프 하나만 소유하며 H·E·G·WI 전체 체계를 하나의 작업으로 뭉치지 않는다.
+짧은 이동·대기 시간에 사용자와 Codex가 개발을 이어가더라도 큰 목적을 잃지 않도록 장기 Goal과 실제 구현 작업을 분리한다. 각 Goal은 플레이어가 경험하는 폐루프 하나만 소유하며 H·E·G·WI 전체 체계를 하나의 작업으로 뭉치지 않는다. 독립적인 구현은 병렬 진행하고 실제 의존성과 수정 충돌만 조율한다.
 
 ```text
-Goal = PlayableLoop 하나
-WI = 현재 구현할 단일 행동 책임, WIP 1
+Goal = PlayableUnit 하나
+WI = 단일 행동 책임; 독립적인 WI는 병렬 구현 가능
+WorkItem = 담당·기준선·수정 범위·의존성을 가진 구현 또는 검증 작업
 E = 완료를 입증하는 증거 성숙도
 H = 현재 폐루프가 요구하는 공간 능력
 G = 다음 E로 가기 위한 관리·검토 체계
@@ -17,13 +18,13 @@ EvidencePackage = 시험·저장·Runtime·화면·Hosted 증거 묶음
 
 ## 운영 원장
 
-권위 입력은 [`codex-playable-loop-goals.json`](../../eng/execution-ledgers/codex-playable-loop-goals.json)이다. 검사기는 Goal WIP 1, WI WIP 1, PlayableUnit 전용 Goal, 목표 E7, 대기열 순서와 기존 PlayableLoop·WI 원장 참조를 검증한다. 새 Goal은 [주제 기획 기반 PlayableLoop 개발 체계](주제기획기반PlayableLoop개발체계.md)의 `Approved` 관문을 통과해야 한다. 사람이 읽는 현재 `/goal` 입력과 상태 보고는 [`codex-playable-loop-goals.md`](../AI/generated/codex-playable-loop-goals.md)로 자동 생성한다.
+권위 입력은 [`codex-playable-loop-goals.json`](../../eng/execution-ledgers/codex-playable-loop-goals.json)이다. v4 원장은 복수 활성 Goal과 `workItems`를 관리한다. 검사기는 작업별 소유권·기준선·선행 의존성·기획 승인, PlayableUnit 전용 Goal, 목표 E7과 기존 PlayableLoop·WI 원장 참조를 검증한다. 전역·스레드별 Goal/WI 개수는 표시 정보이지 실패 조건이 아니다. 새 Goal은 [주제 기획 기반 PlayableLoop 개발 체계](주제기획기반PlayableLoop개발체계.md)의 `Approved` 관문을 통과해야 한다. 사람이 읽는 상태 보고는 [`codex-playable-loop-goals.md`](../AI/generated/codex-playable-loop-goals.md)로 자동 생성한다. 과거 단일 `activeGoal` 조회는 대표 표시 작업의 호환값일 뿐 실행 가능 작업의 전체 목록이 아니다.
 
 주제와 PlayableLoop는 1:1이다. 기획서는 재미·플레이어 약속·선택·대가를 소유하고 Goal 원장과 상태판은 현재 WI·E·증거·차단을 소유한다. 과거 활성 Goal을 위한 `LegacyActiveMigration`은 이전 자료를 읽기 위한 한시 상태일 뿐 새 Goal에 양도할 수 없다. 현재 활성 Goal과 기획 승인 상태는 특정 이름을 이 문서에 고정하지 않고 [주제 기획 상태판](../AI/generated/playable-loop-topic-planning.md)과 [Goal 상태판](../AI/generated/codex-playable-loop-goals.md)을 현재 기준으로 사용한다.
 
 활성 Goal은 현재 WI의 파이프라인 프로필 key·revision, Logic·Presentation·통합 관문 상태, 가장 이른 재개 E와 차단 사유도 함께 가진다. 권위 변화의 행위 기록이나 표현 엔진 cursor 소비가 빠지면 Goal을 교체하지 않고 같은 Goal의 해당 E를 다시 연다. Goal은 여전히 E7에서 끝나며 E8~E10 파이프라인 안정·조화·관찰은 별도 캠페인으로 인계한다.
 
-현재 우선순위는 모든 Core를 먼저 닫고 Extension을 뒤에 여는 방식이다.
+기본 우선순위는 Core를 먼저 닫고 Extension을 뒤에 검토하는 방식이다. 다음 순서는 선택 지침이며 앞선 독립 작업이 활성이라는 이유만으로 뒤 작업을 차단하는 전역 실행 잠금이 아니다.
 
 ```text
 Nature Core 6개
@@ -40,19 +41,93 @@ Nature Core 6개
 
 모든 Goal은 `world-layout:sim:pyeongchang:nature-farm-hub-town.v1`의 `WorldAreaAnchor`를 영역 위치 기준으로 사용한다. 폐루프 구현은 현재 AreaSet 내부의 H1·H2·H3를 성숙시키며 H5 중심 좌표를 임의로 다시 잡지 않는다. `Reserved` City 앵커는 City의 위치·특징 의도만 고정하며 City Goal의 E5나 통행 가능성을 선행 증명하지 않는다.
 
-현재 전술 Goal이 끝나면 선행 관계상 `nature-night-day2`를 다시 활성화해 승인 기획과 E7을 닫은 뒤 작업대 Goal로 이동한다. 이후 Nature 현장 왕복, Farm Core, Hub Core, Town Core, City Core 순으로 진행하고 Extension은 모든 Core 뒤에 연다.
+특정 Goal 이름이나 과거 대기 순서를 현행 활성 상태로 고정하지 않는다. 현재 작업 목록에서 명시된 실제 선행 계약과 승인 범위가 준비된 작업만 선택하며, 새로운 병렬 운영 방식만으로 대기 Goal/WI를 자동 활성화하지 않는다.
+
+## 병렬 작업과 통합 소유권
+
+- 같은 Goal의 여러 WI, 같은 WI의 논리·표현·시험 하위 작업도 독립적인 변경 범위이면 병렬로 등록한다. 작업마다 담당 스레드, 기준 revision/hash, 작업 명세, 수정 경로, 공유 계약, 선행 작업, 증거 상한과 통합 상태를 남긴다.
+- 하나가 차단되어도 무관한 작업을 정지시키지 않는다. 기획 미승인, 기준 hash 불일치, 실제 선행 계약 미완료, 조율되지 않은 파일·공유 계약 충돌을 해당 작업의 구체적인 차단으로 기록한다. 다른 WI가 활성이라는 사실은 차단 사유가 아니다.
+- 같은 파일·공유 계약의 쓰기는 변경 소유자를 정해 조율한다. 별도 worktree는 같은 계약에 대한 경쟁 변경을 안전하게 만들어 주지 않는다. 읽기 기준선과 인계 결과 hash를 비교하고 변경된 의존성은 재검증한다.
+- 분야별 담당은 독립 코드·Fixture·검증 결과를 `개발` 스레드에 인계한다. 개발은 Simulation·WI 구현과 최종 통합을 겸임하고 통합 결과·남은 기획 판단을 `기획` 스레드로 반환한다. 호환되는 결과는 묶어 통합하고 독립 시험은 병렬 수행할 수 있다. 공통 원장과 공식 Scene의 실제 쓰기는 소유자가 충돌 없이 반영한다.
+- 같은 WI의 여러 작업이 만든 증거는 동일한 WI·판본의 기록으로 합친다. 작업 개수와 인계 완료는 Evidence 승격이 아니며 승인된 E 상한과 Logic/Presentation 중 낮은 통합 E를 유지한다.
+- 현재 작업·증거와 이전 단일 활성 자료는 보존한다. 기존 기획의 한시적 이전 예외를 새 병렬 작업에 복제하거나, 미승인 WI를 지원 작업으로 바꿔 기획 관문을 우회하지 않는다.
+
+## 전문 담당과 기획 환류
+
+‘하위 스레드’는 앱의 물리적 계층이 아니라 작업 배분·결과 인계 관계다. 기존 스레드를 재사용하고 이름·위치·브랜치를 자동 변경하지 않는다. 현재 담당 ID와 원문 인계는 [개발 통합 상태판](../AI/개발통합상태판.md)에서 찾는다.
+
+| 담당 | 소유하는 작업 | 기본 인계 대상 |
+| --- | --- | --- |
+| 기획 | 문답·플레이어 약속·우선순위·연구 및 기획 변경 승인 | 개발 |
+| 개발 | Simulation·WI 구현, 공통 계약, 전문 작업 배분, 결합·회귀 검증·실행 원장 | 기획 |
+| 월드·공간·배치 | 지형·H·LH·실내외 배치·Synty 공간 조합의 독립 모듈과 시험 | 개발 |
+| 애니메이션 | 행위 표현·Clip/Rig·도구 결속·취소/복귀·Audio/FX 연결 요구와 시험 | 개발 |
+
+UI·저장·네트워크·검증을 처음부터 별도 상설 스레드로 늘리지 않는다. 독립 산출물과 비중첩 쓰기 범위가 생겼을 때 개발이 전문 분리를 제안한다. 기존 스카이 엔진 담당은 필요한 때 재사용하는 후보이며 이 정책으로 자동 재개하지 않는다. 기상 자료의 권위 해석은 Simulation 담당, 하늘 표현은 표현 담당으로 구별한다.
+
+### 배분과 변경 소유권
+
+- 실행 구현은 기존 `workItems`에 승인 기획·명세·대상 WI·담당·변경 경로·의존성·E 상한을 연결한다. 공통 연구·미승인 공간 후보는 [전문 연구 절차](PlayableLoop전문심화연구분기재결속체계.md)와 후보 인계로 관리하며, 작업 목록을 채우려고 실행 WI나 E를 만들어내지 않는다.
+- 개발이 공통 계약을 확인한 뒤 각 담당은 동결된 입력 상태 사본으로 독립 구현한다. 미정 계약은 조사·후보까지만 진행하며 구현 승인을 추정하지 않는다.
+- 같은 `.unity`·Prefab·`.meta`·Animator Controller·공유 계약의 쓰기는 담당을 조율한다. 공식 `SimulationWorldShell` 저장·공통 원장·생성기 반영은 개발이 책임지고, 실제 조작을 다른 담당에게 맡길 때 경로와 기간을 명시한다. 같은 Unity Editor의 Scene/Play Mode 변경·시험도 겹치지 않게 사용한다. 전체 개발 WIP 잠금은 아니다.
+- 서로 다른 작업 트리는 실제 소스·패키지·대상 프레임워크와 hash를 비교한다. 특히 dirty 파일은 HEAD만으로 식별되지 않는다. Hongdal과 별도 Unity 저장소의 경로·기준선·검증을 각각 남기고 한 저장소의 `writePaths`에 `../`로 외부 경로를 넣지 않는다. 외부 저장소 변경 소유는 인계에 명시하고 개발이 함께 대조한다.
+- 기획은 승인 문서를, 전문 담당은 자기 산출물을, 개발은 실행 원장·생성 상태판·통합 상태판을 갱신한다. `CURRENT_WORK.md`는 관련 절의 쓰기 담당을 먼저 알리고 직전 내용을 다시 읽어 반영한다.
+
+### 전문 담당 → 개발 인계
+
+정상 완료의 기본 수신자는 개발이다. 전문 담당끼리 정보를 교환할 수 있지만 공통 계약 변경·최종 통합 판정을 우회하지 않는다. 다음을 하나의 원문 인계로 남긴다.
+
+```text
+작업 ID 또는 연구/후보 ID · 담당 · 대상 WI/폐루프
+승인 범위 · 기준 revision/hash · 저장소/변경 파일 · 산출물 hash
+구현 내용 · 재현 명령 · 통과/실패 결과 · 실행/화면 미검증 범위
+의존 계약 차이 · 남은 결함 · 통합 방법 · 필요한 기획 결정
+```
+
+개발은 승인·hash·소유권을 확인하고 생산자와 소비자 연결 및 회귀를 검사한다. 낡은 기준선이나 결함은 해당 인계에만 돌려보내며 무관한 작업은 계속한다. 원문 보고 수신·문서 반영·시험 성공은 실제 결합이나 `Integrated` 판정의 대체가 아니다.
+
+### 개발 → 기획 반환
+
+호환되는 결과 묶음이 준비될 때마다 통합·검증 후 상태판을 갱신하고 기획에 짧게 반환한다. 모든 전문 담당의 완료를 기다리지 않는다. 플레이어 약속·연구 기준선의 변경이 필요한 차단은 통합 완료 전에도 개발이 근거를 확인해 우선 반환한다. 정기 실행 자동화나 시간 기반 보고를 이 규칙만으로 만들지 않는다.
+
+반환 양식은 다음 다섯 항목이다.
+
+1. **실제 통합 결과:** 플레이어가 새로 할 수 있는 것. 아직 실행 연결이 없으면 없다고 기록한다.
+2. **준비됐지만 미통합:** 받은 산출물과 연결되지 않은 이유·담당.
+3. **검증 범위:** WI/판본별 Logic·Presentation·통합 E, 시험·Runtime·Game View 구별, 원문 증거·통합 승인 기록 참조.
+4. **기획 판단:** 필요한 결정과 대안·영향·가장 이른 재개 E. 구현 결함은 기획 선택으로 떠넘기지 않는다.
+5. **다음 작업:** 기존 승인 안에서 가능한 작업과 재승인 대상을 분리한다.
+
+[개발 통합 상태판](../AI/개발통합상태판.md)은 이 반환의 최신 요약이며 별도 실행 원장이나 E 권위가 아니다. 원문 인계·기존 `workItems`·EvidencePackage·통합 승인 기록을 연결한다. 상태가 달라지면 기준 시각과 참조를 갱신하고, 기획의 응답은 승인 기획의 다음 revision 또는 미정 질문으로 남긴다. 기술 통합 승인은 기획 승인이나 사람의 시각 승인을 대신하지 않는다.
+
+### 분담의 조사 근거
+
+- Unity는 동일 Scene의 서로 다른 객체 수정도 같은 파일에 기록됨을 설명하며 독립 Prefab을 통한 충돌 감소를 권한다. 이 프로젝트는 공식 Scene을 늘리는 대신 전문 산출물을 분리해 통합한다. [Unity Scene·Prefab 협업 지침](https://unity.com/blog/author-scenes-and-prefabs-with-verson-control)
+- Assembly는 의존성·재컴파일 범위를 분리하는 수단이다. 스레드 수에 맞춘 새 Assembly가 아니라 기존 계약을 우선 사용한다. [Unity Assembly 지침](https://docs.unity3d.com/6000.0/Documentation/Manual/assembly-definition-files.html)
+- Git worktree는 HEAD가 독립적이어도 일부 참조와 설정을 공유한다. 별도 작업 트리가 계약 호환이나 최신 기준선을 보증하지 않으므로 실제 입력 hash를 확인한다. [Git worktree 문서](https://git-scm.com/docs/git-worktree)
+
+## 작업 목록 등록과 통합 기록
+
+`workItems`의 각 항목은 `workItemId`, `loopStableId`, `worldInteractionId`, `trackCode`, `targetEvidenceStageCode`, `ownerThreadId`, `worktreePath`, `writePaths`, `sharedContractKeys`, `dependsOnWorkItemIds`, `baselineFiles`, `workOrderRef`·`workOrderSha256`, 승인 당시 `planningGate`를 가진다. 같은 폐루프에서 기획서가 갱신돼도 이전 작업의 승인 판본을 조용히 덮어쓰지 않는다.
+
+- `Active`: 승인된 범위를 구현·검증한다. `ReadyForIntegration`: 동일한 승인·기준 검사를 유지한 채 통합 인계를 기다린다.
+- `Blocked`: 이유를 표시하고 해당 작업만 대기한다. 손상되거나 오래된 명세 때문에 다른 독립 작업까지 멈추지 않는다. 같은 파일 쓰기를 다음 작업에 넘길 때는 선행 작업·통합 기록을 연결한다.
+- `Integrated`: `integrationReceiptRef`·`integrationReceiptSha256`로 고정된 통합 승인 JSON을 연결한다. 기록에는 작업/Goal/WI, `workOrderSha256`, 목표 E, `Accepted` 상태, 원장의 `integrationOwnerThreadId`와 같은 `acceptedByThreadId`, `acceptedAt`, 결과 파일의 경로·hash를 가진 `artifactRefs`를 넣는다. 상태 문자열만 바꿔 후속 의존성을 통과시킬 수 없다. 이 통합 기록은 목표 E 달성이나 PlayableUnit E7 완료를 자동 선언하지 않는다.
+- `writePaths`는 저장소 상대 경로이며 폴더 범위도 허용한다. 대소문자·구분자·상하위 경로를 정규화해 충돌을 검사한다. 공유 계약 키는 읽기가 아니라 변경 소유권을 표시한다.
+
+검사는 `eng/tests/parallel-development-work.ps1` 및 Goal·전달 우선순위·문답 원장 시험을 사용한다. 모든 기존 원장을 같은 담당자가 검증 후 갱신하며 생성 문서와 C#은 생성기로 반영한다. 구형 `activeGoal`·`activeWork`·단일 C# 상수는 대표 표시/읽기 호환용이고 신규 실행 선택은 작업 목록을 사용한다.
 
 ## Goal 생명주기
 
 1. 1:1 주제 기획서의 필수 절·revision·hash·승인 근거를 확인한다.
 2. 기획서의 전문 심화 연구 판정을 확인하고 모든 `Required` 문서가 `Accepted` 상태로 재결속됐는지 확인한 뒤 기획서를 `Approved`로 고정한다.
 3. 현재 `PlayableLoop`의 플레이어 약속과 목표 E를 Goal로 고정한다.
-4. E7→E1 영향 검토에서 가장 낮은 미완료 의존성 WI 하나만 활성화한다.
-5. WI를 필요한 증거 단계까지 올린 뒤 E1→E7 방향으로 다시 검증한다.
+4. E7→E1 영향 검토에서 실제 선행 의존성과 승인 상한을 확인하고, 소유 범위가 조율된 작업들을 등록한다.
+5. 독립적인 WI·하위 작업을 필요한 증거 단계까지 구현하고 결과를 인계해 E1→E7 방향으로 다시 검증한다.
 6. 새 영향이 나오면 같은 Goal과 작업 명세의 하향 검토 또는 잘못된 전문 연구를 다시 연다.
-7. 플레이어 약속이 바뀌거나 독립 폐루프를 선택할 때만 새 주제·PlayableLoop·Goal로 교체한다.
+7. 플레이어 약속이 바뀌거나 독립 폐루프를 선택할 때 새 주제·PlayableLoop·Goal로 분리한다. 독립 Goal의 추가가 진행 중인 다른 Goal의 폐기를 뜻하지 않는다.
 
-Goal은 `activeMaturityTrackCode`로 현재 논리 또는 표현 궤적을 표시한다. 표현 실패가 권위 상태 누락에서 시작됐으면 같은 Goal을 유지한 채 논리 궤적으로 돌아가며, 통합 E는 [논리·시각 이중 순환 기준](플레이폐루프논리시각이중순환체계.md)에 따라 두 궤적 중 낮은 단계다.
+작업별로 현재 논리 또는 표현 궤적을 표시한다. 기존 `activeMaturityTrackCode`는 대표 표시를 위한 호환 조회이며 다른 궤적 작업을 금지하지 않는다. 표현 실패가 권위 상태 누락에서 시작됐으면 같은 Goal의 관련 논리 책임으로 돌아가며, 통합 E는 [논리·시각 이중 순환 기준](플레이폐루프논리시각이중순환체계.md)에 따라 두 궤적 중 낮은 단계다.
 
 E8~E10은 Goal의 다음 수직 목표가 아니다. 각 `PlayableUnit`이 E7을 통과하면 자기 E8 안정성 캠페인으로 인계한다. 같은 영역의 E8 Core 둘 이상이 준비됐을 때만 E9 조화·사람 승인 캠페인을 열고, 승인 후보만 E10 제한 운영으로 보낸다. 상세 기준은 [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](E1-E7수직폐루프와E8-E10수평증거체계.md)를 따른다.
 
@@ -63,15 +138,15 @@ E8~E10은 Goal의 다음 수직 목표가 아니다. 각 `PlayableUnit`이 E7을
 - Scene·Synty 배치·문서·EditMode 성공만으로 E7을 선언하지 않는다.
 - E7 완료 뒤 Goal을 E8로 올리지 않는다. 해당 Goal을 완료하고 `post-e7-evidence-campaigns.json`의 개별 E8 안정성 캠페인을 연다.
 
-## 현재 Goal
+## 현재 작업 조회와 보고
 
-현재 활성 Goal은 `playable-loop:nature-tactical-self-navigation.v1`, 활성 WI는 `WI-NATURE-05`, 활성 궤적은 `Presentation`이다. 승인된 전술 Goal을 E7로 닫기 전 다른 폐루프를 활성화하지 않는다. 이후 재개할 `nature-night-day2`와 다음 `nature-workbench-foundation`도 각각 기획서가 `Approved`가 아니면 활성화할 수 없다. 실제 E·차단·다음 의존성은 생성 상태판을 현재 기준으로 삼는다.
+현재 활성 Goal·작업·WI와 실제 E·차단·다음 의존성은 생성 상태판을 현재 기준으로 삼는다. 담당자는 대표 `activeGoal`만 보고 다른 활성 작업을 놓치지 않도록 전체 작업 목록에서 자신의 소유 범위와 공유 계약을 먼저 확인한다. 다른 작업의 완료를 무조건 기다리지 않으며 승인되지 않은 작업은 병렬 여부와 무관하게 활성화하지 않는다.
 
 진행 보고는 항상 다음 순서를 사용한다.
 
 ```text
-현재 WI / 현재 E단계 / 이번에 추가된 증거 /
-남은 차단 항목 / 다음 최저 미완료 의존성
+작업 ID·담당 / Goal·WI·궤적 / 현재 E단계 / 이번에 추가된 증거 /
+실제 차단·의존성 / 통합 상태·다음 인계
 ```
 
 새 권위 부여, 외부 Provider 호출, 운영 쓰기, 범위가 다른 폐루프 추가 또는 기존 플레이어 약속 변경이 필요하면 구현을 멈추고 사용자 결정을 요청한다.

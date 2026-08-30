@@ -1,0 +1,802 @@
+{
+  "schemaVersion": "wi-logic-e3-campaign.v1",
+  "revision": "remaining-32-wi-logic-e3.r4",
+  "status": "Active",
+  "approvalEvidenceRef": "user:2026-08-30:remaining-32-wi-goal-sequential-logic-e3",
+  "goalScope": "32개 전체의 확정 가능한 Logic E3 구현. 하나의 WI 완료로 캠페인을 종료하지 않는다.",
+  "sourceQuestionRange": {
+    "first": 1,
+    "last": 339
+  },
+  "completedBeforeCampaign": [
+    "WI-HEAT-SOURCE-STATE-CHANGE"
+  ],
+  "executionPolicy": {
+    "wipLimit": null,
+    "concurrencyModeCode": "DependencyAndOwnership",
+    "targetTrack": "Logic",
+    "targetStage": "E3",
+    "presentationCeiling": "E1",
+    "independentSubscopeMayBeDeferred": true,
+    "undefinedGameplayNumbersMustNotBeInvented": true,
+    "fixturePolicyIsNotProductionBalance": true,
+    "orderIsDependencyProposalNotQuestionPriority": true,
+    "skipBlockedSubscopeAndContinueOtherWi": true,
+    "doesNotReplacePlayableUnitGoalLedger": true,
+    "commitPushAuthorized": false
+  },
+  "activeWorldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+  "items": [
+    {
+      "order": 1,
+      "worldInteractionId": "WI-ACTOR-PLAN-SET",
+      "titleKo": "개인 계획 설정",
+      "questionIds": [
+        "Q-040",
+        "Q-041",
+        "Q-042",
+        "Q-043",
+        "Q-044"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md"
+      ],
+      "stateCode": "LogicE3Verified",
+      "logicStage": "E3",
+      "presentationStage": "E1",
+      "integratedStage": "E1",
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-personal-plan.e7-work-order.json",
+      "implementationRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation개인계획.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/Simulation개인계획Service.cs",
+        "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs"
+      ],
+      "testEvidenceRefs": [
+        "artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+      ],
+      "deferredSubscopes": [
+        "Q041 회복 수치·Q042 진척 매핑은 미정. 최초 자격 근거만 기록하며 실제 보상은 적용하지 않음.",
+        "Save·RemoteHost·Unity 표현 미구현"
+      ],
+      "evidencePackageRef": "evidence:nature-personal-plan-logic-e3-20260830"
+    },
+    {
+      "order": 2,
+      "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+      "titleKo": "세계 자원 재생",
+      "questionIds": [
+        "Q-036",
+        "Q-037"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ],
+      "stateCode": "LogicE3Verified",
+      "logicStage": "E3",
+      "presentationStage": "E1",
+      "integratedStage": "E1",
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json",
+      "implementationRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation세계자원재생.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/Simulation세계자원재생Service.cs",
+        "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs"
+      ],
+      "testEvidenceRefs": ["artifacts/local/remaining-32-wi/resource-regeneration-isolated.trx"],
+      "deferredSubscopes": [
+        "실제 공간 적합성·제외 반경·성장 주기·생성 밀도 연구 및 출시 정책",
+        "기존 Session Tick·자원 소진·LandUse 변경·Save·RemoteHost·Unity 연결"
+      ],
+      "evidencePackageRef": "evidence:nature-resource-regeneration-logic-e3-20260830"
+    },
+    {
+      "order": 3,
+      "worldInteractionId": "WI-NATURE-TRACE-INVESTIGATE",
+      "titleKo": "자연 흔적 조사",
+      "questionIds": [
+        "Q-164",
+        "Q-165",
+        "Q-166"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 4,
+      "worldInteractionId": "WI-NATURE-HERB-GATHER",
+      "titleKo": "약초 채집",
+      "questionIds": [
+        "Q-269",
+        "Q-270",
+        "Q-275",
+        "Q-276",
+        "Q-277",
+        "Q-278",
+        "Q-287",
+        "Q-288",
+        "Q-289",
+        "Q-290",
+        "Q-291",
+        "Q-292",
+        "Q-293",
+        "Q-294",
+        "Q-295",
+        "Q-296"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 5,
+      "worldInteractionId": "WI-CRAFT-BREW",
+      "titleKo": "배합물 달이기",
+      "questionIds": [
+        "Q-061",
+        "Q-062",
+        "Q-063",
+        "Q-064",
+        "Q-068",
+        "Q-069",
+        "Q-070",
+        "Q-071",
+        "Q-142",
+        "Q-150",
+        "Q-157",
+        "Q-279",
+        "Q-280",
+        "Q-281",
+        "Q-282",
+        "Q-283",
+        "Q-284",
+        "Q-285",
+        "Q-286",
+        "Q-287",
+        "Q-288",
+        "Q-289",
+        "Q-290",
+        "Q-291",
+        "Q-292",
+        "Q-293",
+        "Q-294",
+        "Q-295",
+        "Q-296"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 6,
+      "worldInteractionId": "WI-ACTOR-CONSUME",
+      "titleKo": "물품 섭취",
+      "questionIds": [
+        "Q-045",
+        "Q-046",
+        "Q-047",
+        "Q-048",
+        "Q-049",
+        "Q-050",
+        "Q-287",
+        "Q-288",
+        "Q-289",
+        "Q-290",
+        "Q-291",
+        "Q-292",
+        "Q-293",
+        "Q-294",
+        "Q-295",
+        "Q-296"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 7,
+      "worldInteractionId": "WI-CON-BLUEPRINT-PLACE",
+      "titleKo": "건설 청사진 배치",
+      "questionIds": [
+        "Q-054",
+        "Q-055",
+        "Q-056"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 8,
+      "worldInteractionId": "WI-CON-MATERIAL-DEPOSIT",
+      "titleKo": "건설 재료 투입",
+      "questionIds": [
+        "Q-054",
+        "Q-055",
+        "Q-056"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 9,
+      "worldInteractionId": "WI-CON-WORK-CONTRIBUTE",
+      "titleKo": "건설 시공 기여",
+      "questionIds": [
+        "Q-054",
+        "Q-055",
+        "Q-056",
+        "Q-058",
+        "Q-059",
+        "Q-060"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 10,
+      "worldInteractionId": "WI-CON-DEMOLISH",
+      "titleKo": "건설물 해체",
+      "questionIds": [
+        "Q-054",
+        "Q-055",
+        "Q-056"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 11,
+      "worldInteractionId": "WI-GUEST-PERMISSION-SET",
+      "titleKo": "손님 활동 권한 설정",
+      "questionIds": [
+        "Q-112",
+        "Q-113",
+        "Q-114",
+        "Q-115",
+        "Q-116",
+        "Q-117",
+        "Q-118"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 12,
+      "worldInteractionId": "WI-COMMUNITY-HIRE",
+      "titleKo": "NPC 고용 확정",
+      "questionIds": [
+        "Q-112",
+        "Q-113",
+        "Q-114",
+        "Q-115",
+        "Q-116",
+        "Q-117",
+        "Q-118"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 13,
+      "worldInteractionId": "WI-EXPEDITION-DISPATCH",
+      "titleKo": "탐사 임무 파견",
+      "questionIds": [
+        "Q-119",
+        "Q-121"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 14,
+      "worldInteractionId": "WI-FARM-FIELD-BOUNDARY-CONFIRM",
+      "titleKo": "밭 경계 확정",
+      "questionIds": [
+        "Q-087",
+        "Q-088",
+        "Q-089",
+        "Q-091",
+        "Q-103",
+        "Q-104",
+        "Q-105",
+        "Q-109",
+        "Q-110"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 15,
+      "worldInteractionId": "WI-FARM-SOIL-AMEND",
+      "titleKo": "토양 개량",
+      "questionIds": [
+        "Q-083",
+        "Q-084",
+        "Q-085",
+        "Q-086",
+        "Q-098"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 16,
+      "worldInteractionId": "WI-FARM-WATER-TRANSFER",
+      "titleKo": "농업 용수 이송",
+      "questionIds": [
+        "Q-099",
+        "Q-100",
+        "Q-101",
+        "Q-102",
+        "Q-143",
+        "Q-144",
+        "Q-146",
+        "Q-147",
+        "Q-155"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 17,
+      "worldInteractionId": "WI-COMBAT-TACTICAL-COMMAND",
+      "titleKo": "분대 전술 명령 확정",
+      "questionIds": [
+        "Q-183",
+        "Q-184",
+        "Q-185",
+        "Q-186",
+        "Q-187",
+        "Q-188",
+        "Q-189",
+        "Q-190"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 18,
+      "worldInteractionId": "WI-COMBAT-DIRECT-CONTROL-SET",
+      "titleKo": "직접 전투 조종 전환",
+      "questionIds": [
+        "Q-183",
+        "Q-184",
+        "Q-185",
+        "Q-186",
+        "Q-187",
+        "Q-188",
+        "Q-189",
+        "Q-190"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 19,
+      "worldInteractionId": "WI-COMMUNITY-SUPPORT-MISSION-JOIN",
+      "titleKo": "공동 지원 임무 참여",
+      "questionIds": [
+        "Q-175",
+        "Q-176",
+        "Q-177",
+        "Q-178",
+        "Q-179"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 20,
+      "worldInteractionId": "WI-COMMUNITY-MEMBERSHIP-CONFIRM",
+      "titleKo": "공동체 정식 편입 확정",
+      "questionIds": [
+        "Q-200",
+        "Q-205",
+        "Q-206"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 21,
+      "worldInteractionId": "WI-COMMUNITY-REMOTE-RESPONSE",
+      "titleKo": "원격 응대 지시 확정",
+      "questionIds": [
+        "Q-210",
+        "Q-211",
+        "Q-212",
+        "Q-213",
+        "Q-214"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 22,
+      "worldInteractionId": "WI-COMMUNITY-ENTRANCE-POLICY-SET",
+      "titleKo": "공동체 출입 정책 설정",
+      "questionIds": [
+        "Q-218",
+        "Q-219"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 23,
+      "worldInteractionId": "WI-COMMUNITY-COOPERATION-PROPOSE",
+      "titleKo": "공동체 협력 제안",
+      "questionIds": [
+        "Q-236",
+        "Q-238"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 24,
+      "worldInteractionId": "WI-TOWN-STOCK-REPLENISH",
+      "titleKo": "Town 재고 보충 주문",
+      "questionIds": [
+        "Q-137",
+        "Q-138",
+        "Q-145",
+        "Q-148"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 25,
+      "worldInteractionId": "WI-TOWN-DELIVERY-RECEIVE",
+      "titleKo": "Town 납품 인수",
+      "questionIds": [
+        "Q-151"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 26,
+      "worldInteractionId": "WI-TOWN-DELIVERY-INSPECT",
+      "titleKo": "Town 납품 검수",
+      "questionIds": [
+        "Q-151"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 27,
+      "worldInteractionId": "WI-TOWN-STOCK-PUTAWAY",
+      "titleKo": "Town 후방 재고 적재",
+      "questionIds": [
+        "Q-151"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 28,
+      "worldInteractionId": "WI-TOWN-SUPPLY-DISPATCH",
+      "titleKo": "Town 공급 운송 출발 확정",
+      "questionIds": [
+        "Q-158"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 29,
+      "worldInteractionId": "WI-HUB-DEMAND-ALLOCATE",
+      "titleKo": "Hub 수요 재고 할당",
+      "questionIds": [
+        "Q-245"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 30,
+      "worldInteractionId": "WI-HUB-SUPPLY-TASK-ACCEPT",
+      "titleKo": "Hub 조달 과제 수락",
+      "questionIds": [
+        "Q-247"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 31,
+      "worldInteractionId": "WI-SURVIVAL-RATION-POLICY-SET",
+      "titleKo": "생존 배급 정책 설정",
+      "questionIds": [
+        "Q-255"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    },
+    {
+      "order": 32,
+      "worldInteractionId": "WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM",
+      "titleKo": "목표 비축 미달 판매 확정",
+      "questionIds": [
+        "Q-260"
+      ],
+      "sourceRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ],
+      "stateCode": "Queued",
+      "logicStage": "E0",
+      "presentationStage": "E0",
+      "integratedStage": "E0",
+      "workOrderRef": "",
+      "implementationRefs": [],
+      "testEvidenceRefs": [],
+      "deferredSubscopes": []
+    }
+  ]
+}

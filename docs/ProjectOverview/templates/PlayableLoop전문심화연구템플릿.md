@@ -77,10 +77,19 @@
 
 ### Animation
 
+- `WorldInteractionId`와 플레이어 판독 순간:
+- `AnimationRole`·`ActionCue`:
 - 준비·수행·결과·취소 상태:
-- Clip·Rig·Retarget 후보:
+- 원천 팩과 주·대체 Clip 후보:
+- Clip revision·GUID·fingerprint:
+- Rig·Avatar·Retarget 호환:
+- root motion 적용·reconcile 정책:
+- 프로젝트 Controller·AnimationAdapter 결속:
 - 손·도구·대상 접촉점:
-- Task 시간·Audio·FX 동기화와 fallback:
+- Task 시간·접촉 Window·Audio·FX 동기화:
+- 취소·피격·시점 전환 뒤 귀환:
+- procedural·정적·UI fallback과 사용 표시:
+- Animation Event가 권위 결과를 만들지 않는 검증:
 
 해당하지 않는 분야 절은 `NotApplicable`과 이유를 적는다.
 

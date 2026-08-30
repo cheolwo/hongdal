@@ -1,6 +1,6 @@
 {
   "schemaVersion": "playable-loop-engine-interaction-validation.v2",
-  "revision": "playable-loop-engine-interaction-validation.r8",
+  "revision": "playable-loop-engine-interaction-validation.r20",
   "evidenceTrackCodes": ["Logic", "Presentation"],
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "principles": {
@@ -31,8 +31,8 @@
   "profileDerivation": {
     "requiredLoopLevelCode": "PlayableUnit",
     "profileRevision": "all-playable-units.pipeline-gate.r2",
-    "expectedPlayableUnitCount": 18,
-    "expectedLoopWiPairCount": 57,
+    "expectedPlayableUnitCount": 20,
+    "expectedLoopWiPairCount": 66,
     "baseRequirements": [
       { "order": 10, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Preview", "trackCode": "Logic", "reopenStage": "E4", "allowsReused": false, "allowsNotApplicable": false },
       { "order": 20, "componentCode": "WI.ExecutionPipeline", "phaseCode": "Confirm", "trackCode": "Logic", "reopenStage": "E5", "allowsReused": false, "allowsNotApplicable": false },
@@ -60,10 +60,262 @@
     }
   },
   "profileOverrides": [
-    { "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1", "worldInteractionId": "WI-ACTOR-03", "displayNameKo": "기초 처방 지식 습득", "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r3", "changeSemanticCodes": ["PlayerProgressChanged"], "presentationConsumerCodes": ["World.Presentation"] },
-    { "loopStableId": "playable-loop:nature-tactical-self-navigation.v1", "worldInteractionId": "WI-NATURE-05", "displayNameKo": "전술 이동 뒤 벌목 도끼 획득", "profileRevision": "nature-tactical-self-navigation.engine-interaction.r1", "changeSemanticCodes": ["ActorStateChanged", "InventoryChanged"], "presentationConsumerCodes": ["Placement.Exterior", "World.Presentation"] },
-    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-13", "displayNameKo": "거점 보관", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["InventoryChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] },
-    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-14", "displayNameKo": "오두막 수면과 새벽 전환", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["ActorStateChanged", "TimeStateChanged", "AtmosphereChanged", "InteriorFixtureChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["LH.Surface", "Sky.Presentation", "Placement.Exterior", "Placement.Interior", "Lighting.Directional", "World.Presentation"] },
-    { "loopStableId": "playable-loop:nature-night-day2.v1", "worldInteractionId": "WI-NATURE-15", "displayNameKo": "다음 확장 계획 선택과 Day2 반환", "profileRevision": "nature-night-day2.engine-interaction.r3", "changeSemanticCodes": ["ActorStateChanged", "PlayerProgressChanged"], "presentationConsumerCodes": ["Placement.Interior", "World.Presentation"] }
+    {
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-ACTOR-PLAN-SET",
+      "displayNameKo": "개인 계획 설정",
+      "profileRevision": "nature-personal-plan.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "PlayerProgressChanged"
+      ],
+      "presentationConsumerCodes": [
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-HEAT-SOURCE-STATE-CHANGE",
+      "displayNameKo": "열원 점화·연료 추가·소화",
+      "profileRevision": "nature-heat-source.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "HeatSourceStateChanged",
+        "InventoryChanged"
+      ],
+      "presentationConsumerCodes": [
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionId": "WI-ACTOR-03",
+      "displayNameKo": "기초 처방 지식 습득",
+      "profileRevision": "nature-basic-herbal-recovery.engine-interaction.r4",
+      "changeSemanticCodes": [
+        "PlayerProgressChanged"
+      ],
+      "presentationConsumerCodes": [
+        "LH.Surface",
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "worldInteractionId": "WI-COMMUNITY-VISITOR-STAY",
+      "displayNameKo": "Nature 야영지 방문자 임시 체류 결정",
+      "profileRevision": "nature-camp-visitor-stay.engine-interaction.r3",
+      "changeSemanticCodes": [
+        "ActorStateChanged"
+      ],
+      "presentationConsumerCodes": [
+        "LH.Surface",
+        "Placement.Exterior",
+        "Placement.Interior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-tactical-self-navigation.v1",
+      "worldInteractionId": "WI-NATURE-05",
+      "displayNameKo": "전술 이동 뒤 벌목 도끼 획득",
+      "profileRevision": "nature-tactical-self-navigation.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "ActorStateChanged",
+        "InventoryChanged"
+      ],
+      "presentationConsumerCodes": [
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-NATURE-13",
+      "displayNameKo": "거점 보관",
+      "profileRevision": "nature-night-day2.engine-interaction.r3",
+      "changeSemanticCodes": [
+        "InventoryChanged",
+        "InteriorFixtureChanged",
+        "PlayerProgressChanged"
+      ],
+      "presentationConsumerCodes": [
+        "Placement.Interior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-NATURE-14",
+      "displayNameKo": "오두막 수면과 새벽 전환",
+      "profileRevision": "nature-night-day2.engine-interaction.r3",
+      "changeSemanticCodes": [
+        "ActorStateChanged",
+        "TimeStateChanged",
+        "AtmosphereChanged",
+        "InteriorFixtureChanged",
+        "PlayerProgressChanged"
+      ],
+      "presentationConsumerCodes": [
+        "LH.Surface",
+        "Sky.Presentation",
+        "Placement.Exterior",
+        "Placement.Interior",
+        "Lighting.Directional",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-NATURE-15",
+      "displayNameKo": "다음 확장 계획 선택과 Day2 반환",
+      "profileRevision": "nature-night-day2.engine-interaction.r3",
+      "changeSemanticCodes": [
+        "ActorStateChanged",
+        "PlayerProgressChanged"
+      ],
+      "presentationConsumerCodes": [
+        "Placement.Interior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionId": "WI-FARM-DEFENSE-MOBILIZE",
+      "displayNameKo": "Farm 방위 분대 소집",
+      "profileRevision": "farm-barracks-defense.engine-interaction.r2",
+      "changeSemanticCodes": [
+        "ActorStateChanged",
+        "PlayerProgressChanged"
+      ],
+      "presentationConsumerCodes": [
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionId": "WI-SQUAD-ASSIGN",
+      "displayNameKo": "Farm 경비 초소 분대 배정",
+      "profileRevision": "farm-barracks-squad-assignment.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "ActorStateChanged"
+      ],
+      "presentationConsumerCodes": [
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionId": "WI-SQUAD-SUPPLY",
+      "displayNameKo": "Farm 경비 분대 식량·장비 보급",
+      "profileRevision": "farm-barracks-squad-supply.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "ActorStateChanged",
+        "InventoryChanged"
+      ],
+      "presentationConsumerCodes": [
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionId": "WI-FARM-DEFENSE-RESOLVE",
+      "displayNameKo": "Farm 방어 성공 결과 발현",
+      "profileRevision": "farm-barracks-defense-resolution.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "ActorStateChanged",
+        "InventoryChanged"
+      ],
+      "presentationConsumerCodes": [
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionId": "WI-FARM-DEFENSE-RETURN",
+      "displayNameKo": "Farm 방위 분대 초소 귀환 인계",
+      "profileRevision": "farm-barracks-defense-return.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "ActorStateChanged"
+      ],
+      "presentationConsumerCodes": [
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+      "displayNameKo": "세계 자원 재생",
+      "profileRevision": "nature-resource-regeneration.engine-interaction.r1",
+      "changeSemanticCodes": [
+        "ResourceAvailabilityChanged"
+      ],
+      "presentationConsumerCodes": [
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-01",
+      "displayNameKo": "Farm 경작 세계 발현 WI-FARM-01",
+      "changeSemanticCodes": [
+        "InventoryChanged",
+        "ExteriorPlacementChanged"
+      ],
+      "profileRevision": "farm-crop-cycle.engine-interaction.r1",
+      "presentationConsumerCodes": [
+        "LH.Surface",
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-02",
+      "displayNameKo": "Farm 경작 세계 발현 WI-FARM-02",
+      "changeSemanticCodes": [
+        "InventoryChanged",
+        "ExteriorPlacementChanged"
+      ],
+      "profileRevision": "farm-crop-cycle.engine-interaction.r1",
+      "presentationConsumerCodes": [
+        "LH.Surface",
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-03",
+      "displayNameKo": "Farm 경작 세계 발현 WI-FARM-03",
+      "changeSemanticCodes": [
+        "InventoryChanged",
+        "ExteriorPlacementChanged"
+      ],
+      "profileRevision": "farm-crop-cycle.engine-interaction.r1",
+      "presentationConsumerCodes": [
+        "LH.Surface",
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-04",
+      "displayNameKo": "Farm 경작 세계 발현 WI-FARM-04",
+      "changeSemanticCodes": [
+        "InventoryChanged",
+        "ExteriorPlacementChanged"
+      ],
+      "profileRevision": "farm-crop-cycle.engine-interaction.r1",
+      "presentationConsumerCodes": [
+        "LH.Surface",
+        "Placement.Exterior",
+        "World.Presentation"
+      ]
+    }
   ]
 }

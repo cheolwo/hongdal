@@ -5,10 +5,9 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $manager = Join-Path $root "eng/execution-ledgers/manage-synty-asset-functional-modules.ps1"
 $result = @(& $manager -Mode Validate)
 if (($result -join "`n") -notlike
-    "*SyntyAssetFunctionalModulesValid:Packs=7;Prefabs=2899;Scopes=3;Modules=12;Subgroups=*") {
+    "*SyntyAssetFunctionalModulesValid:Packs=13;Prefabs=4211;PurchasedProfiles=6;Scopes=3;Modules=12;Subgroups=*") {
     throw "SyntyAssetFunctionalModuleManagerFailed:$($result -join ';')"
 }
-
 $taxonomy = Get-Content -LiteralPath (Join-Path $root `
     "eng/execution-ledgers/synty-asset-human-taxonomy.json") -Raw -Encoding UTF8 |
     ConvertFrom-Json
@@ -26,6 +25,9 @@ if ($moduleCodes.Count -ne 12 -or @($moduleCodes | Sort-Object -Unique).Count -n
 $catalog = Get-Content -LiteralPath (Join-Path $root `
     "eng/execution-ledgers/synty-asset-functional-modules.json") -Raw -Encoding UTF8 |
     ConvertFrom-Json
+if (@($catalog.purchasedAssetUsageProfiles).Count -ne 6) {
+    throw "PurchasedSyntyUsageProfilesMissing"
+}
 if ([bool] $catalog.legacyCompositionPolicy.newAuthoringAllowed) {
     throw "LegacySyntyCompositionAuthoringStillEnabled"
 }

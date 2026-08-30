@@ -2,9 +2,10 @@
 
 > `eng/execution-ledgers/synty-asset-functional-modules.json`에서 자동 생성된다. Unity의 전수 Prefab 판정은 EditMode 시험이 검증한다.
 
-- revision: `synty-asset-functional-modules.r2`
-- 현재 원본 Prefab 기준 수량: `2899`
-- 원본 팩: `7`
+- revision: `synty-asset-functional-modules.r3`
+- 현재 원본 Prefab 기준 수량: `4211`
+- 원본 팩: `13`
+- 신규 구매 활용 프로필: `6` (Prefab과 AnimationClip 분리)
 - 기능군: `12`
 - 사람이 읽는 표현 범위: `3` (실외 표현 / 실내 표현 / 공통 표현)
 - 세부 기능군: `41`
@@ -21,6 +22,25 @@
 | construction | 584 | SharedConstructionStateLayer |
 | generic | 495 | SharedBase |
 | starter | 58 | PrototypeFallbackOnly |
+| animation-base-locomotion | 4 | AnimationSourceNeedsReview |
+| animation-emotes-and-taunts | 2 | AnimationSourceNeedsReview |
+| animation-sword-combat | 1 | AnimationSourceNeedsReview |
+| alpine-mountain | 125 | AreaAndSharedCandidatesNeedsReview |
+| dungeon-realms | 1128 | AreaAndSharedCandidatesNeedsReview |
+| dwarven-dungeon-map | 52 | AreaAndSharedCandidatesNeedsReview |
+
+## 신규 구매 자산의 WI·H 활용 후보
+
+> 새 팩은 새 Area가 아니다. 아래 연결은 E4 후보 조사 입력이며 실제 채택과 E5 배치를 승인하지 않는다.
+
+| 원본 팩 | 원천 종류 | H Capability 후보 | PlayableLoop 후보 |
+| --- | --- | --- | --- |
+| animation-base-locomotion | AnimationClip | PlayerMovementArea, NpcMovementArea, TacticalCommandArea | nature-navigation, farm-work-movement, town-hub-actor-movement |
+| animation-emotes-and-taunts | AnimationClip | MeditationWorkArea, CommunityInteractionArea, NpcRelationshipArea | player-mind-meditation, community-resonance, npc-cooperation |
+| animation-sword-combat | AnimationClip | ThreatEncounterArea, DirectCombatArea, OutpostDefenseArea | nature-twilight-combat, corridor-defense, squad-combat |
+| alpine-mountain | Prefab | NatureTravelArea, ShelterSiteChoiceArea, ClimateExposureArea | nature-shelter-foundation, nature-night-day2, nature-exploration |
+| dungeon-realms | Prefab | ThreatEncounterArea, RuinsExplorationArea, OutpostDefenseArea, BarracksWorkArea | nature-twilight-combat, corridor-defense, ruins-exploration |
+| dwarven-dungeon-map | Prefab | MineExplorationArea, UndergroundCorridorArea, ResourceExtractionArea | mine-exploration, resource-extraction, corridor-defense |
 
 ## 사람이 읽는 한국어 분류
 

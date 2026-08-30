@@ -28,6 +28,33 @@ Require ([string] $protocol.schemaVersion -eq
     "simulation-e7-vertical-implementation-protocol.v2") "ProtocolSchemaInvalid"
 Require ([string] $protocol.evidenceModelRevision -eq
     "horizontal-dual-cycle-evidence.r3") "EvidenceModelInvalid"
+foreach ($principleName in @(
+    "presentationE4PreparesApplicableAssetPlacementHandoff",
+    "assetResearchAloneNeverPromotesE5",
+    "nonSpatialOrNonVisualWorkCanDeclareNotApplicable")) {
+    $principle = $protocol.principles.PSObject.Properties[$principleName]
+    Require ($null -ne $principle -and [bool] $principle.Value) `
+        "ProtocolPrincipleMissing:$principleName"
+}
+$presentationHandoff = $protocol.presentationE4ToE5Handoff
+Require ($null -ne $presentationHandoff) "PresentationE4HandoffMissing"
+foreach ($applicabilityCode in @("Required", "NotApplicable")) {
+    Require (@($presentationHandoff.allowedApplicabilityCodes) -contains
+        $applicabilityCode) "PresentationApplicabilityMissing:$applicabilityCode"
+}
+foreach ($readinessCode in @("Ready", "Conditional", "Blocked")) {
+    Require (@($presentationHandoff.allowedReadinessCodes) -contains
+        $readinessCode) "PresentationReadinessMissing:$readinessCode"
+}
+foreach ($fieldName in @(
+    "playerReadableMoment", "requiredHCapabilities", "visualKeys",
+    "primaryAssetCandidateRefs", "alternativeAssetCandidateRefs",
+    "fallbackPresentationRefs", "placementIntent",
+    "interactionAnchorIntent", "candidateRevisionOrFingerprint",
+    "e5ReadinessCode", "openGapRefs")) {
+    Require (@($presentationHandoff.requiredFieldsWhenApplicable) -contains
+        $fieldName) "PresentationHandoffFieldMissing:$fieldName"
+}
 Require ([string] $workOrder.schemaVersion -eq
     [string] $protocol.workOrderSchemaVersion) "WorkOrderSchemaInvalid"
 Require ([string] $workOrder.protocolRevision -eq
@@ -91,6 +118,23 @@ Require ($presentationStageNumber -lt 5 -or $logicStageNumber -ge 5) `
     "PresentationE5RequiresLogicE5"
 
 $isTemplate = [string] $workOrder.workOrderId -eq "E7-WO-TEMPLATE"
+$preparationProperty = $workOrder.PSObject.Properties["presentationE4Preparation"]
+if ($isTemplate -or $null -ne $preparationProperty) {
+    $preparation = $workOrder.presentationE4Preparation
+    Require ($null -ne $preparation) "PresentationE4PreparationMissing"
+    Require (@($presentationHandoff.allowedApplicabilityCodes) -contains
+        [string] $preparation.applicabilityCode) `
+        "PresentationApplicabilityInvalid"
+    Require (@($presentationHandoff.allowedReadinessCodes) -contains
+        [string] $preparation.e5ReadinessCode) `
+        "PresentationReadinessInvalid"
+    foreach ($fieldName in @($presentationHandoff.requiredFieldsWhenApplicable)) {
+        Require ($null -ne $preparation.PSObject.Properties[$fieldName]) `
+            "PresentationFieldMissing:$fieldName"
+    }
+    Require ($null -ne $preparation.PSObject.Properties["notApplicableReason"]) `
+        "PresentationNotApplicableReasonMissing"
+}
 if (-not $isTemplate) {
     $loop = @($loops.items | Where-Object {
         [string] $_.loopStableId -eq [string] $workOrder.playableUnitStableId

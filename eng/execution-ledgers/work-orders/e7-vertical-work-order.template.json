@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-TEMPLATE",
   "title": "새 PlayableUnit 수직 구현 작업",
@@ -14,6 +14,21 @@
     "nextReopenCondition": "상향 검증에서 계약·권위·표현·귀환 결함이 발견되면 가장 이른 E1~E7을 다시 연다."
   },
   "changeImpactReviewRef": "",
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "",
+    "requiredHCapabilities": [],
+    "visualKeys": [],
+    "primaryAssetCandidateRefs": [],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [],
+    "placementIntent": "",
+    "interactionAnchorIntent": "",
+    "candidateRevisionOrFingerprint": "",
+    "e5ReadinessCode": "Blocked",
+    "openGapRefs": []
+  },
   "trackPlans": {
     "logic": {
       "trackCode": "Logic",

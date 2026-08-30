@@ -26,12 +26,12 @@
     {
       "code": "E4",
       "label": "WI 실행 문맥 결속",
-      "completionGate": "하나 이상의 E3 세계 상호작용에 허용 발생원, 발의·수행 주체, 대상, 자료·자원·예약, 시간 규칙과 공간 적용 여부가 결속되었다. 공간이 필요한 WI만 위치 독립 H 역할·능력·용량·연결구를 요구하며 비공간 WI는 NotApplicable을 명시한다."
+      "completionGate": "하나 이상의 E3 세계 상호작용에 허용 발생원, 발의·수행 주체, 대상, 자료·자원·예약, 시간 규칙과 공간 적용 여부가 결속되었다. 공간이 필요한 WI만 위치 독립 H 역할·능력·용량·연결구를 요구하며 비공간 WI는 NotApplicable을 명시한다. Presentation에서 실제 물체·공간 표현이 필요한 WI는 플레이어가 읽을 순간, VisualKey, 주·대체·fallback 자산 후보, 배치 의도와 E5 준비 상태를 인계 자료로 남기되 이 조사만으로 E5를 선언하지 않는다."
     },
     {
       "code": "E5",
       "label": "WI 세계 발현",
-      "completionGate": "결정적 Simulation 세계에서 허용 발생원 중 하나가 WI를 만들고 Preview·Confirm 또는 권위 판정, Task·Effect, 결과 상태와 후속·복귀 WI까지 연결되었다. 공간 WI는 H·AreaSet·Graph·통행 조립 증거를 추가로 요구하지만 공간 조립만으로 E5를 선언하지 않으며, 비공간 WI는 자료·상태·인과 발현으로 검증한다."
+      "completionGate": "결정적 Simulation 세계에서 허용 발생원 중 하나가 WI를 만들고 Preview·Confirm 또는 권위 판정, Task·Effect, 결과 상태와 후속·복귀 WI까지 연결되었다. 공간·물체 표현 WI는 E4에서 판본화한 표현 준비 인계의 후보를 실제 Prefab 또는 대체 표현, 배치 객체와 InteractionAnchor에 결속하고 활성 Renderer·Collider·Bounds를 검증한다. 공간 WI는 H·AreaSet·Graph·통행 조립 증거를 추가로 요구하지만 공간 조립이나 자산 조사만으로 E5를 선언하지 않으며, 비공간 WI는 자료·상태·인과 발현으로 검증한다."
     },
     {
       "code": "E6",

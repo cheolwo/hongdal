@@ -86,7 +86,7 @@ foreach ($binding in @($actualE5.interactionSpatialCatalog.bindings)) {
 }
 
 Require ([string] $worldCatalog.revision -eq [string] $priority.worldInteractionCatalogRevision) "PriorityWorldCatalogRevisionMismatch"
-Require (@($worldCatalog.items).Count -eq 66) "WorldInteractionCountMustBe66"
+Require (@($worldCatalog.items).Count -eq 105) "WorldInteractionCountMustBe105"
 Require ([string] $priority.schemaVersion -eq "simulation-world-interaction-spatial-priorities.v1") "PrioritySchemaInvalid"
 Require ([string] $compositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "CompositionPlanSchemaInvalid"
 Require ([string] $p2CompositionPlan.schemaVersion -eq "simulation-world-interaction-spatial-composition-plan.v1") "P2CompositionPlanSchemaInvalid"
@@ -233,7 +233,10 @@ foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) 
     if ($graphBindings.Count -gt 0 -and $official.Count -eq 0) { $warnings.Add("GraphBindingWithoutApprovedH1") }
     $resolvedE5Bindings = @($e5Refs | Where-Object { $actualE5BindingsById.ContainsKey([string] $_) })
     if ($e5Refs.Count -gt 0 -and $resolvedE5Bindings.Count -ne $e5Refs.Count) { $warnings.Add("E5PlacementReferenceMissing") }
-    if ([string] $item.integration.currentStage -eq "E4" -and $official.Count -eq 0) { $warnings.Add("E4WithoutApprovedH1") }
+    if ([string] $item.integration.currentStage -eq "E4" -and
+        $participation -ne "NotRequired" -and $official.Count -eq 0) {
+        $warnings.Add("E4WithoutApprovedH1")
+    }
     if ([string] $item.integration.currentStage -in @("E5", "E6", "E7") -and
         $participation -eq "Required" -and $e5Refs.Count -eq 0) {
         $warnings.Add("E5WithoutActualPlacement")
@@ -283,7 +286,10 @@ foreach ($item in @($worldCatalog.items | Sort-Object groupCode, sequence, id)) 
 
 $summary = [ordered]@{
     totalWorldInteractions = $rows.Count
-    implementationE3Count = @($rows | Where-Object implementationEvidenceStage -eq "E3").Count
+    implementationE3Count = @($rows | Where-Object {
+        @("E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10") -contains
+            [string] $_.implementationEvidenceStage
+    }).Count
     establishedH1Count = @($rows | Where-Object spatialDesignStateCode -eq "EstablishedH1").Count
     establishedH3Count = @($rows | Where-Object spatialDesignStateCode -eq "EstablishedH3").Count
     candidateLineageCount = @($rows | Where-Object spatialDesignStateCode -eq "CandidateLineage").Count
@@ -294,12 +300,13 @@ $summary = [ordered]@{
     definedH3Count = 5
     definedH4Count = 1
 }
-Require ($summary.implementationE3Count -eq 61) "ImplementationE3CountMustBe61"
+$catalogE3Count = @($worldCatalog.items | Where-Object { @('E3','E4','E5','E6','E7','E8','E9','E10') -contains [string] $_.implementation.currentStage }).Count
+Require ($summary.implementationE3Count -eq $catalogE3Count) "ImplementationE3CatalogProjectionMismatch"
 Require ($summary.establishedH1Count -eq 14) "EstablishedH1CountMustBe14"
 Require ($summary.establishedH3Count -eq 15) "EstablishedH3CountMustBe15"
-Require ($summary.candidateLineageCount -eq 21) "CandidateLineageCountMustBe21"
+Require ($summary.candidateLineageCount -eq 23) "CandidateLineageCountMustBe23"
 Require ($summary.missingRequiredCount -eq 5) "MissingRequiredCountMustBe5"
-Require ($summary.notApplicableCount -eq 11) "NotApplicableCountMustBe11"
+Require ($summary.notApplicableCount -eq 12) "NotApplicableCountMustBe12"
 Require ($summary.officialH2DefinitionCount -eq 0) "OfficialH2MustRemainZero"
 $missingSpatialIds = @($rows | Where-Object {
     $_.warningCodes -contains "RequiredSpatialDesignMissing"

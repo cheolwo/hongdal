@@ -22,8 +22,8 @@ if ($check -notmatch "CodexPlayableLoopGoalsValid:Goals=$expectedGoalCount") {
 }
 
 $generated = Get-Content -LiteralPath $outputPath -Raw -Encoding UTF8
-$expectedGoalWip = if ([string] $ledger.activeGoal.goalStateCode -eq "Completed") { 0 } else { 1 }
-$expectedWiWip = $expectedGoalWip
+$expectedGoalWip = @($ledger.items | Where-Object goalStateCode -eq 'Active').Count
+$expectedWiWip = @($ledger.workItems | Where-Object { $_.statusCode -in @('Active','ReadyForIntegration') } | ForEach-Object { $_.worldInteractionId } | Sort-Object -Unique).Count
 foreach ($expected in @(
     [string] $ledger.activeGoal.loopStableId,
     [string] $ledger.activeGoal.activeWorldInteractionId,
@@ -31,8 +31,8 @@ foreach ($expected in @(
     "$($ledger.activeGoal.targetEvidenceStage) $($ledger.activeGoal.targetClosureStateCode)",
     "파이프라인 관문: Logic $($ledger.activeGoal.pipelineValidation.logicStatusCode) / Presentation $($ledger.activeGoal.pipelineValidation.presentationStatusCode) / 통합 $($ledger.activeGoal.pipelineValidation.integratedStatusCode)",
     "Nature → Farm → Hub → Town → City",
-    "Goal WIP: ``$expectedGoalWip/1``",
-    "WI WIP: ``$expectedWiWip/1``")) {
+    "Goal WIP: ``$expectedGoalWip/상한 없음``",
+    "WI WIP: ``$expectedWiWip/상한 없음``")) {
     if (-not $generated.Contains($expected)) {
         throw "CodexPlayableLoopGoalGeneratedEntryMissing:$expected"
     }
@@ -80,8 +80,8 @@ $aggregate.activeGoal.loopStableId = "playable-loop:nature-survival-homestead.v1
 Require-Rejected "aggregate-as-goal" $aggregate "GoalSubjectIsNotPlayableUnit"
 
 $secondActive = Read-Ledger
-$secondActive.items[1].goalStateCode = "Active"
-Require-Rejected "two-active-goals" $secondActive "ActiveGoalCountInvalid"
+$secondActive.items[8].goalStateCode = "Active"
+Require-Rejected "active-goal-without-work-item" $secondActive "ActiveGoalWorkItemsMismatch"
 
 $e9Target = Read-Ledger
 $e9Target.items[2].targetEvidenceStage = "E9"
@@ -143,7 +143,65 @@ $legacyTransferredGoal.playableLoopCatalogPath = Relative $legacyTransferredCata
 Require-Rejected "legacy-transferred-goal" $legacyTransferredGoal `
     "LegacyPlanningGateTransferred"
 
-Write-Output "CodexPlayableLoopGoalTestsPassed:Positive=3;Negative=8;Goals=$expectedGoalCount"
+function Require-Accepted([string] $Name, [object] $Ledger) {
+    $path = Join-Path $artifactDirectory "$Name.json"
+    [IO.File]::WriteAllText($path, ($Ledger | ConvertTo-Json -Depth 50), $utf8)
+    & $manager -Mode Write -InputPath (Relative $path) -OutputPath (Relative (Join-Path $artifactDirectory "$Name.md")) | Out-Null
+}
+$parallelFixture = Read-Ledger
+$nonfocus = $parallelFixture.workItems[0] | ConvertTo-Json -Depth 40 | ConvertFrom-Json
+$nonfocus.workItemId = 'test:nonfocus'
+$nonfocus.worldInteractionId = 'WI-ACTOR-PLAN-SET'
+$nonfocus.writePaths = @('synthetic-fixture/nonfocus')
+$nonfocus.sharedContractKeys = @()
+$nonfocusOrder = Get-Content (Join-Path $repositoryRoot $nonfocus.workOrderRef) -Raw -Encoding UTF8 | ConvertFrom-Json
+$nonfocusOrder.activeWorldInteractionId = $nonfocus.worldInteractionId
+$nonfocusOrder.pipelineValidation.profileKey = "$($nonfocus.loopStableId)|$($nonfocus.worldInteractionId)"
+$nonfocusOrderPath = Join-Path $artifactDirectory 'nonfocus-order.json'
+[IO.File]::WriteAllText($nonfocusOrderPath, ($nonfocusOrder | ConvertTo-Json -Depth 40), $utf8)
+$nonfocus.workOrderRef = Relative $nonfocusOrderPath
+$nonfocus.workOrderSha256 = (Get-FileHash $nonfocusOrderPath).Hash
+$parallelFixture.workItems += $nonfocus
+Require-Accepted 'same-goal-two-active-wis' $parallelFixture
+$parallelFixture.workItems[0].statusCode = 'Blocked'
+$parallelFixture.workItems[0].workOrderSha256 = '0' * 64
+Require-Accepted 'blocked-stale-representative-with-independent-work' $parallelFixture
+$parallelFixture.workItems[1].statusCode = 'Blocked'
+Require-Accepted 'all-work-blocked-without-global-failure' $parallelFixture
+
+# 복수 Goal도 같은 관리자 전체 경로로 검증한다. 합성 승인/명세는 artifacts에만 둔다.
+$twoGoals = Read-Ledger
+$twoLoops = Get-Content (Join-Path $repositoryRoot $twoGoals.playableLoopCatalogPath) -Raw -Encoding UTF8 | ConvertFrom-Json
+$farmGoal = @($twoGoals.items | Where-Object loopStableId -eq 'playable-loop:farm-crop-cycle.v1')[0]
+$farmGoal.goalStateCode='Active'
+$farmLoop = @($twoLoops.items | Where-Object loopStableId -eq $farmGoal.loopStableId)[0]
+$sourceLoop = @($twoLoops.items | Where-Object loopStableId -eq $twoGoals.activeGoal.loopStableId)[0]
+$farmLoop.planningGate = $sourceLoop.planningGate | ConvertTo-Json -Depth 20 | ConvertFrom-Json
+$farmLoop.planningGate.topicStableId = 'topic:farm-crop-cycle.v1'
+$farmLoop | Add-Member -NotePropertyName sourcePlanningDocumentRefs -NotePropertyValue $sourceLoop.sourcePlanningDocumentRefs -Force
+$twoLoopsPath = Join-Path $artifactDirectory 'two-goals-loops.json'
+[IO.File]::WriteAllText($twoLoopsPath, ($twoLoops | ConvertTo-Json -Depth 70), $utf8)
+$twoGoals.playableLoopCatalogPath = Relative $twoLoopsPath
+$farmWork = $nonfocus | ConvertTo-Json -Depth 40 | ConvertFrom-Json
+$farmWork.workItemId='test:farm';$farmWork.loopStableId=$farmGoal.loopStableId;$farmWork.worldInteractionId=$farmGoal.nextWorldInteractionId
+$farmOrder=$nonfocusOrder | ConvertTo-Json -Depth 40 | ConvertFrom-Json
+$farmOrder.playableUnitStableId=$farmWork.loopStableId;$farmOrder.activeWorldInteractionId=$farmWork.worldInteractionId
+$farmOrder.pipelineValidation.profileKey="$($farmWork.loopStableId)|$($farmWork.worldInteractionId)"
+$farmOrderPath=Join-Path $artifactDirectory 'farm-order.json'
+[IO.File]::WriteAllText($farmOrderPath, ($farmOrder | ConvertTo-Json -Depth 40), $utf8)
+$farmWork.workOrderRef=Relative $farmOrderPath;$farmWork.workOrderSha256=(Get-FileHash $farmOrderPath).Hash
+$twoGoals.workItems+=$farmWork
+Require-Accepted 'two-independent-active-goals' $twoGoals
+
+# 구형 단일 작업 원장은 새 작업 목록으로 자동 확장하지 않고 읽는다.
+$legacy = Read-Ledger
+$legacy.schemaVersion = 'codex-playable-loop-goals.v3'
+$legacy.PSObject.Properties.Remove('workItems')
+$legacy.policy.goalWorkInProgressLimit = 1
+$legacy.policy.worldInteractionWorkInProgressLimit = 1
+Require-Accepted 'legacy-v3-read' $legacy
+
+Write-Output "CodexPlayableLoopGoalTestsPassed:Positive=8;Negative=8;Goals=$expectedGoalCount"
 Write-Output $first
 Write-Output $second
 Write-Output $check

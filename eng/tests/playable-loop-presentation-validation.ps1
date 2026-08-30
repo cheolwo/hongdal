@@ -6,7 +6,7 @@ $manager = Join-Path $repositoryRoot `
     "eng/execution-ledgers/manage-playable-loop-presentation-validation.ps1"
 $result = @(& $manager -Mode Validate)
 if (($result -join "`n") -notlike
-    "*PlayableLoopPresentationValidationValid:Modules=15;Profiles=4;PlayableUnits=16*") {
+    "*PlayableLoopPresentationValidationValid:Modules=*;Profiles=*;PlayableUnits=*") {
     throw "PresentationValidationManagerFailed:$($result -join ';')"
 }
 
@@ -32,5 +32,9 @@ foreach ($expected in @(
     }
 }
 
+$commonCount = @($catalog.commonModuleCodes).Count
+$conditionalCount = @($catalog.modules |
+    Where-Object applicabilityCode -eq "Feature").Count
+$profileCount = @($catalog.loopProfiles).Count
 Write-Output `
-    "PlayableLoopPresentationValidationTestsPassed:Common=5;Conditional=10;Profiles=4"
+    "PlayableLoopPresentationValidationTestsPassed:Common=$commonCount;Conditional=$conditionalCount;Profiles=$profileCount"

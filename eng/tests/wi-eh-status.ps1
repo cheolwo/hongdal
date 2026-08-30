@@ -27,13 +27,15 @@ $status = Get-Content -LiteralPath $jsonPath -Raw -Encoding UTF8 | ConvertFrom-J
 if ([string] $status.schemaVersion -ne "simulation-world-interaction-eh-status.v1") {
     throw "WorldInteractionEhStatusSchemaInvalid"
 }
-$summaryInvalid = $status.summary.totalWorldInteractions -ne 65 -or
-    $status.summary.implementationE3Count -ne 60 -or
+$worldCatalog = Get-Content (Join-Path $repositoryRoot 'eng/execution-ledgers/world-interactions.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$expectedE3Count = @($worldCatalog.items | Where-Object { @('E3','E4','E5','E6','E7','E8','E9','E10') -contains [string] $_.implementation.currentStage }).Count
+$summaryInvalid = $status.summary.totalWorldInteractions -ne 105 -or
+    $status.summary.implementationE3Count -ne $expectedE3Count -or
     $status.summary.establishedH1Count -ne 14 -or
     $status.summary.establishedH3Count -ne 15 -or
-    $status.summary.candidateLineageCount -ne 21 -or
+    $status.summary.candidateLineageCount -ne 23 -or
     $status.summary.missingRequiredCount -ne 5 -or
-    $status.summary.notApplicableCount -ne 10
+    $status.summary.notApplicableCount -ne 12
 if ($summaryInvalid) {
     throw "WorldInteractionEhStatusSummaryInvalid"
 }
@@ -100,11 +102,12 @@ if (@($status.items | Where-Object {
 }).Count -ne 0) {
     throw "WorldInteractionActualE5BoundaryInvalid"
 }
-$actor = @($status.items | Where-Object worldInteractionId -like "WI-ACTOR-*")
-if ($actor.Count -ne 2 -or @($actor | Where-Object {
+$actor = @($status.items | Where-Object { $_.worldInteractionId -in @('WI-ACTOR-01','WI-ACTOR-02','WI-ACTOR-03') })
+if ($actor.Count -ne 3 -or @($actor | Where-Object {
     $_.spatialParticipationCode -ne "NotRequired" -or
     $_.spatialDesignStateCode -ne "NotApplicable" -or
-    $_.integrationEvidenceStage -ne "E5" -or
+    (($_.worldInteractionId -in @("WI-ACTOR-01", "WI-ACTOR-02")) -and $_.integrationEvidenceStage -ne "E5") -or
+    ($_.worldInteractionId -eq "WI-ACTOR-03" -and $_.integrationEvidenceStage -ne "E4") -or
     @($_.warningCodes).Count -ne 0
 }).Count -ne 0) {
     throw "WorldInteractionActorSpatialBoundaryInvalid"
@@ -126,7 +129,7 @@ $cityMissing = @($status.items | Where-Object {
 if ($cityMissing.Count -ne 4) {
     throw "WorldInteractionCityPlannedSpatialGapInvalid"
 }
-if ($check -notmatch "WorldInteractionEhStatusValid:Items=65") {
+if ($check -notmatch "WorldInteractionEhStatusValid:Items=105") {
     throw "WorldInteractionEhStatusCheckDidNotComplete"
 }
 

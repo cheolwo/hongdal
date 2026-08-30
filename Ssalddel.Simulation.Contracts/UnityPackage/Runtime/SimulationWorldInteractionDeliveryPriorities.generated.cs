@@ -34,10 +34,21 @@ namespace Ssalddel.Simulation.Contracts
 
     public static class SimulationWI실행우선순위Catalog
     {
-        public const string Revision = "world-interaction-delivery-priorities.r26";
-        public const string ActiveWorldInteractionId = "WI-ACTOR-03";
-        public const string ActiveEvidenceStage = "E5";
+        public const string Revision = "world-interaction-delivery-priorities.r40";
+        [Obsolete("대표 표시 호환 값입니다. 실행 판단은 ActiveWorldInteractionIds를 사용하세요.")]
+        public const string ActiveWorldInteractionId = "WI-WORLD-RESOURCE-REGENERATE";
+        public const string ActiveEvidenceStage = "E1";
+        [Obsolete("구형 호환 값이며 실행 제한이 아닙니다. MaximumConcurrentWorkItems를 사용하세요.")]
         public const int WorkInProgressLimit = 1;
+        public static int? MaximumConcurrentWorkItems => null;
+        public const string ConcurrencyModeCode = "DependencyAndOwnership";
+        public static IReadOnlyList<string> ActiveWorldInteractionIds { get; } = Array.AsReadOnly(new string[] { "WI-ACTOR-03", "WI-COMMUNITY-VISITOR-STAY", "WI-FARM-01", "WI-WORLD-RESOURCE-REGENERATE" });
+        public static bool IsActiveWorldInteraction(string worldInteractionId)
+        {
+            foreach (var id in ActiveWorldInteractionIds)
+                if (string.Equals(id, worldInteractionId, StringComparison.Ordinal)) return true;
+            return false;
+        }
         private static readonly SimulationWI실행우선순위Definition[] 항목들 =
         {
             new SimulationWI실행우선순위Definition("WI-ACTOR-01", "D1", 1, "Core", "Queued", "Conditional", "Shared", new[] { "playable-loop:nature-shelter-foundation.v1" }),
@@ -63,12 +74,18 @@ namespace Ssalddel.Simulation.Contracts
             new SimulationWI실행우선순위Definition("WI-REFLECT-01", "D1", 21, "Extension", "Queued", "NotApplicable", "Nature", new[] { "playable-loop:nature-base-reflection.v1" }),
             new SimulationWI실행우선순위Definition("WI-NATURE-18", "D1", 22, "Core", "E7Closed", "NotApplicable", "Nature", new[] { "playable-loop:nature-shelter-foundation.v1" }),
             new SimulationWI실행우선순위Definition("WI-ACTOR-03", "D1", 23, "Core", "Active", "NotApplicable", "Shared", new[] { "playable-loop:nature-basic-herbal-recovery.v1" }),
-            new SimulationWI실행우선순위Definition("WI-FARM-01", "D2", 1, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
+            new SimulationWI실행우선순위Definition("WI-COMMUNITY-VISITOR-STAY", "D1", 24, "Core", "Active", "NotApplicable", "Nature", new[] { "playable-loop:nature-camp-visitor-stay.v1" }),
+            new SimulationWI실행우선순위Definition("WI-FARM-01", "D2", 1, "Core", "Active", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-02", "D2", 2, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-03", "D2", 3, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-04", "D2", 4, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-crop-cycle.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-05", "D2", 5, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-pack-store-return.v1" }),
             new SimulationWI실행우선순위Definition("WI-FARM-06", "D2", 6, "Core", "Queued", "Conditional", "Farm", new[] { "playable-loop:farm-pack-store-return.v1" }),
+            new SimulationWI실행우선순위Definition("WI-FARM-DEFENSE-MOBILIZE", "D2", 7, "Core", "Queued", "NotApplicable", "Farm", new[] { "playable-loop:farm-barracks-defense.v1" }),
+            new SimulationWI실행우선순위Definition("WI-SQUAD-ASSIGN", "D2", 8, "Core", "Queued", "NotApplicable", "Farm", new[] { "playable-loop:farm-barracks-defense.v1" }),
+            new SimulationWI실행우선순위Definition("WI-SQUAD-SUPPLY", "D2", 9, "Core", "Queued", "NotApplicable", "Farm", new[] { "playable-loop:farm-barracks-defense.v1" }),
+            new SimulationWI실행우선순위Definition("WI-FARM-DEFENSE-RESOLVE", "D2", 10, "Core", "Queued", "NotApplicable", "Farm", new[] { "playable-loop:farm-barracks-defense.v1" }),
+            new SimulationWI실행우선순위Definition("WI-FARM-DEFENSE-RETURN", "D2", 11, "Core", "Queued", "NotApplicable", "Farm", new[] { "playable-loop:farm-barracks-defense.v1" }),
             new SimulationWI실행우선순위Definition("WI-001", "D3", 1, "Core", "Queued", "Required", "Hub", new[] { "playable-loop:hub-inbound-putaway.v1" }),
             new SimulationWI실행우선순위Definition("WI-002", "D3", 2, "Core", "Queued", "Required", "Hub", new[] { "playable-loop:hub-inbound-putaway.v1" }),
             new SimulationWI실행우선순위Definition("WI-HUB-03", "D3", 3, "Core", "Queued", "Required", "Hub", new[] { "playable-loop:hub-outbound-ready-return.v1" }),
@@ -106,6 +123,39 @@ namespace Ssalddel.Simulation.Contracts
             new SimulationWI실행우선순위Definition("WI-WORLD-07", "D6", 18, "DeferredIntegration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
             new SimulationWI실행우선순위Definition("WI-WORLD-08", "D6", 19, "DeferredIntegration", "Deferred", "NotApplicable", "None", new[] { "playable-loop:solo-world-day.v1" }),
             new SimulationWI실행우선순위Definition("WI-REVIEW-01", "D6", 20, "DeferredIntegration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-ACTOR-CONSUME", "D7", 1, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-ACTOR-PLAN-SET", "D7", 2, "Extension", "Queued", "NotApplicable", "None", new[] { "playable-loop:nature-night-day2.v1" }),
+            new SimulationWI실행우선순위Definition("WI-COMBAT-DIRECT-CONTROL-SET", "D7", 3, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-COMBAT-TACTICAL-COMMAND", "D7", 4, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-COMMUNITY-COOPERATION-PROPOSE", "D7", 5, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-COMMUNITY-ENTRANCE-POLICY-SET", "D7", 6, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-COMMUNITY-HIRE", "D7", 7, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-COMMUNITY-MEMBERSHIP-CONFIRM", "D7", 8, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-COMMUNITY-REMOTE-RESPONSE", "D7", 9, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-COMMUNITY-SUPPORT-MISSION-JOIN", "D7", 10, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-CON-BLUEPRINT-PLACE", "D7", 11, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-CON-DEMOLISH", "D7", 12, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-CON-MATERIAL-DEPOSIT", "D7", 13, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-CON-WORK-CONTRIBUTE", "D7", 14, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-CRAFT-BREW", "D7", 15, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-EXPEDITION-DISPATCH", "D7", 16, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-FARM-FIELD-BOUNDARY-CONFIRM", "D7", 17, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-FARM-SOIL-AMEND", "D7", 18, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-FARM-WATER-TRANSFER", "D7", 19, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-GUEST-PERMISSION-SET", "D7", 20, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-HEAT-SOURCE-STATE-CHANGE", "D7", 21, "Extension", "Queued", "Conditional", "None", new[] { "playable-loop:nature-night-day2.v1" }),
+            new SimulationWI실행우선순위Definition("WI-HUB-DEMAND-ALLOCATE", "D7", 22, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-HUB-SUPPLY-TASK-ACCEPT", "D7", 23, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM", "D7", 24, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-NATURE-HERB-GATHER", "D7", 25, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-NATURE-TRACE-INVESTIGATE", "D7", 26, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-SURVIVAL-RATION-POLICY-SET", "D7", 27, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-TOWN-DELIVERY-INSPECT", "D7", 28, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-TOWN-DELIVERY-RECEIVE", "D7", 29, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-TOWN-STOCK-PUTAWAY", "D7", 30, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-TOWN-STOCK-REPLENISH", "D7", 31, "DeferredRegistration", "Deferred", "NotApplicable", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-TOWN-SUPPLY-DISPATCH", "D7", 32, "DeferredRegistration", "Deferred", "Conditional", "None", Array.Empty<string>()),
+            new SimulationWI실행우선순위Definition("WI-WORLD-RESOURCE-REGENERATE", "D7", 33, "Extension", "Active", "NotApplicable", "None", new[] { "playable-loop:nature-night-day2.v1" }),
         };
         public static IReadOnlyList<SimulationWI실행우선순위Definition> All => 항목들;
         public static SimulationWI실행우선순위Definition? Find(string worldInteractionId)

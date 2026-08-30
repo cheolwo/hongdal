@@ -1,60 +1,87 @@
 {
   "schemaVersion": "world-interaction-delivery-priorities.v1",
-  "revision": "world-interaction-delivery-priorities.r27",
-  "lastVerifiedDate": "2026-08-28",
+"revision": "world-interaction-delivery-priorities.r40",
+  "lastVerifiedDate": "2026-08-30",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "wiEhStatusPath": "eng/world-seedbeds/generated/wi-eh-status.v1.json",
   "syntyCatalogPath": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json",
-  "deliveryModeCode": "SingleWorldInteractionVertical",
-  "workInProgressLimit": 1,
+  "deliveryModeCode": "DependencyAndOwnership",
+  "concurrencyModeCode": "DependencyAndOwnership",
+  "workInProgressLimit": null,
   "defaultIndividualTargetEvidenceStage": "E7",
   "activeWork": {
-    "worldInteractionId": "WI-ACTOR-03",
+    "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
     "workStateCode": "Active",
-    "currentEvidenceStage": "E3",
+    "currentEvidenceStage": "E1",
     "targetEvidenceStage": "E7",
-    "startedReason": "승인된 Nature 기초 약초 회복 기획 r3에서 WI-ACTOR-03의 기존 Logic E4를 보존하고 Recipe 지식 카드 Presentation을 E3까지 닫아 통합 E3를 만든다.",
+    "startedReason": "32개 순차 E3: 개인 계획 증거 보존 후 세계 자원 재생.",
     "stageReviews": [
       {
-        "stageCode": "E3",
+        "stageCode": "E1",
         "resultCode": "Passed",
-        "summary": "지식 원장과 Preview의 같은 revision을 읽어 Recipe 지식 카드를 결정적으로 투영하고 읽기 가능·이미 앎·차단 상태와 권위 불변을 자동시험으로 검증했다.",
-        "evidenceRefs": ["evidence:nature-basic-herbal-recovery-presentation-e3-20260828", "Ssalddel.Unity.Tests/Simulation처방지식CardFamilyTests.cs"]
+        "summary": "정책·WorldTick 자동 재생 계약 요구.",
+        "evidenceRefs": [
+          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        ]
+      },
+      {
+        "stageCode": "E2",
+        "resultCode": "Pending",
+        "summary": "실제 공간·표현·Runtime은 별도 범위.",
+        "evidenceRefs": [
+          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        ]
+      },
+      {
+        "stageCode": "E3",
+        "resultCode": "Pending",
+        "summary": "실제 공간·표현·Runtime은 별도 범위.",
+        "evidenceRefs": [
+          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        ]
       },
       {
         "stageCode": "E4",
-        "resultCode": "Passed",
-        "summary": "LocalSimulationRuntime과 RemoteHost HTTP Adapter가 같은 Application 서비스를 호출하며 Query·Preview·Confirm 결과가 일치한다.",
-        "evidenceRefs": ["evidence:nature-basic-herbal-recovery-logic-e4-20260828", "test:SimulationPlayerKnowledgeTests:12/12"]
+        "resultCode": "Pending",
+        "summary": "실제 공간·표현·Runtime은 별도 범위.",
+        "evidenceRefs": [
+          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        ]
       },
       {
         "stageCode": "E5",
         "resultCode": "Pending",
-        "summary": "지식 출처의 실제 H 결속과 같은 revision 표현은 후속 승인 범위다.",
-        "evidenceRefs": ["eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json"]
+        "summary": "실제 공간·표현·Runtime은 별도 범위.",
+        "evidenceRefs": [
+          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        ]
       },
       {
         "stageCode": "E6",
         "resultCode": "Pending",
-        "summary": "플레이어 피드백 정제는 표현 문답과 자산 연구 뒤 수행한다.",
-        "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"],
+        "summary": "실제 공간·표현·Runtime은 별도 범위.",
+        "evidenceRefs": [
+          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        ],
         "refinement": {
-          "playerQuestion": "플레이어가 처방을 읽을 수 있고 이미 아는지, 습득이 성공했는지 구분할 수 있는가?",
-          "answer": "E3 관점별 조회 결과는 읽기 가능·이미 앎·차단을 구분한다. 실제 카드 서랍 배선과 화면 판독성은 E4 이상 후속 Presentation 작업으로 남긴다.",
-          "costAndRisk": "지식 습득 자체는 자원을 소비하지 않으며 승인되지 않은 저장·원격·약효 규칙을 열지 않는다.",
-          "feedback": "후속 표현은 같은 WorldRevision의 지식 원장과 행위 기록을 읽어야 한다.",
-          "returnOrNextChoice": "습득 뒤 다시 탐색·휴식 또는 후속 재료 선택으로 돌아간다.",
+          "playerQuestion": "재성장 단계와 채집 가능 여부를 구분하는가?",
+          "answer": "성장 규칙만 시험하며 실제 판독은 미검증.",
+          "costAndRisk": "자동 전이는 플레이어 자원을 소비하지 않는다.",
+          "feedback": "같은 revision 자원 단계 상태를 읽는다.",
+          "returnOrNextChoice": "성장 대기 또는 다른 채집 지점 선택",
           "realityGroundingCode": "NotApplied",
           "authorityCode": "SimulationCore",
-          "presentationBoundary": "표현은 지식 원장과 WorldRevision을 변경하지 않는다."
+          "presentationBoundary": "표현은 채집 가능 상태를 바꾸지 않는다."
         }
       },
       {
         "stageCode": "E7",
         "resultCode": "Pending",
-        "summary": "실제 입력·Play Mode·Game View는 이번 인계에서 수행하지 않는다.",
-        "evidenceRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md"]
+        "summary": "실제 공간·표현·Runtime은 별도 범위.",
+        "evidenceRefs": [
+          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        ]
       }
     ]
   },
@@ -93,6 +120,7 @@
       "WI-WORLD-02"
     ],
     "conditionalCodes": [
+      "WI-CON-BLUEPRINT-PLACE", "WI-CON-DEMOLISH", "WI-CON-MATERIAL-DEPOSIT", "WI-CON-WORK-CONTRIBUTE", "WI-CRAFT-BREW", "WI-EXPEDITION-DISPATCH", "WI-FARM-SOIL-AMEND", "WI-FARM-WATER-TRANSFER", "WI-HEAT-SOURCE-STATE-CHANGE", "WI-NATURE-HERB-GATHER", "WI-NATURE-TRACE-INVESTIGATE", "WI-TOWN-DELIVERY-INSPECT", "WI-TOWN-DELIVERY-RECEIVE", "WI-TOWN-STOCK-PUTAWAY", "WI-TOWN-SUPPLY-DISPATCH",
       "WI-ACTOR-01",
       "WI-ACTOR-02",
       "WI-FARM-01",
@@ -115,18 +143,20 @@
     "independentAreasPrecedeIntegrationRoutes": true
   },
   "allowedCompletionRoleCodes": [
+    "DeferredRegistration",
     "Core",
     "Extension",
     "Shared",
     "DeferredIntegration"
   ],
   "waves": [
+    { "code": "D7", "order": 7, "title": "문답 신규 WI 등록·독립 작업 구현", "areaCode": "CrossArea", "expectedWorldInteractionCount": 33, "entryRule": "등록만으로 실행하지 않는다. 승인 기획·작업 명세·쓰기 소유권·선행 의존성을 확인한 각 작업은 독립적으로 병렬 구현할 수 있다. D1~D6 완료나 다른 WI의 종료는 일괄 선행 조건이 아니다.", "exitRule": "미착수 항목은 DeferredRegistration을 유지한다. Logic E3 뒤 공간·표현·Runtime 승격은 별도 기획과 승인 상한으로 판정한다." },
     {
       "code": "D1",
       "order": 1,
       "title": "Nature 행동 폐루프",
       "areaCode": "Nature",
-      "expectedWorldInteractionCount": 23,
+      "expectedWorldInteractionCount": 24,
       "entryRule": "현재 E5 황혼 대응부터 시작해 생활거점·Day2·현장 보급을 순서대로 닫는다.",
       "exitRule": "Nature 필수 Core가 E7 PlayClosed이고 선택 Extension의 상태가 별도로 표시된다."
     },
@@ -135,7 +165,7 @@
       "order": 2,
       "title": "Farm 독립 생산 폐루프",
       "areaCode": "Farm",
-      "expectedWorldInteractionCount": 6,
+      "expectedWorldInteractionCount": 11,
       "entryRule": "Nature Core E7 뒤 기존 E6 Farm 공간 결속을 실제 생산 입력으로 검증한다.",
       "exitRule": "경작부터 포장·내부 보관 반환까지 Farm Core가 E7 PlayClosed다."
     },
@@ -177,9 +207,66 @@
     }
   ],
   "items": [
+    {"worldInteractionId":"WI-ACTOR-CONSUME","deliveryWaveCode":"D7","orderInWave":1,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {
+      "worldInteractionId": "WI-ACTOR-PLAN-SET",
+      "deliveryWaveCode": "D7",
+      "orderInWave": 2,
+      "completionRoleCode": "Extension",
+      "playableLoopRefs": [
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "syntyTrackCode": "None"
+    },
+    {"worldInteractionId":"WI-COMBAT-DIRECT-CONTROL-SET","deliveryWaveCode":"D7","orderInWave":3,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-COMBAT-TACTICAL-COMMAND","deliveryWaveCode":"D7","orderInWave":4,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-COMMUNITY-COOPERATION-PROPOSE","deliveryWaveCode":"D7","orderInWave":5,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-COMMUNITY-ENTRANCE-POLICY-SET","deliveryWaveCode":"D7","orderInWave":6,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-COMMUNITY-HIRE","deliveryWaveCode":"D7","orderInWave":7,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-COMMUNITY-MEMBERSHIP-CONFIRM","deliveryWaveCode":"D7","orderInWave":8,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-COMMUNITY-REMOTE-RESPONSE","deliveryWaveCode":"D7","orderInWave":9,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-COMMUNITY-SUPPORT-MISSION-JOIN","deliveryWaveCode":"D7","orderInWave":10,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-CON-BLUEPRINT-PLACE","deliveryWaveCode":"D7","orderInWave":11,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-CON-DEMOLISH","deliveryWaveCode":"D7","orderInWave":12,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-CON-MATERIAL-DEPOSIT","deliveryWaveCode":"D7","orderInWave":13,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-CON-WORK-CONTRIBUTE","deliveryWaveCode":"D7","orderInWave":14,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-CRAFT-BREW","deliveryWaveCode":"D7","orderInWave":15,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-EXPEDITION-DISPATCH","deliveryWaveCode":"D7","orderInWave":16,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-FARM-FIELD-BOUNDARY-CONFIRM","deliveryWaveCode":"D7","orderInWave":17,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-FARM-SOIL-AMEND","deliveryWaveCode":"D7","orderInWave":18,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-FARM-WATER-TRANSFER","deliveryWaveCode":"D7","orderInWave":19,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-GUEST-PERMISSION-SET","deliveryWaveCode":"D7","orderInWave":20,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-HEAT-SOURCE-STATE-CHANGE","deliveryWaveCode":"D7","orderInWave":21,"completionRoleCode":"Extension","playableLoopRefs":["playable-loop:nature-night-day2.v1"],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-HUB-DEMAND-ALLOCATE","deliveryWaveCode":"D7","orderInWave":22,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-HUB-SUPPLY-TASK-ACCEPT","deliveryWaveCode":"D7","orderInWave":23,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM","deliveryWaveCode":"D7","orderInWave":24,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-NATURE-HERB-GATHER","deliveryWaveCode":"D7","orderInWave":25,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-NATURE-TRACE-INVESTIGATE","deliveryWaveCode":"D7","orderInWave":26,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-SURVIVAL-RATION-POLICY-SET","deliveryWaveCode":"D7","orderInWave":27,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-TOWN-DELIVERY-INSPECT","deliveryWaveCode":"D7","orderInWave":28,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-TOWN-DELIVERY-RECEIVE","deliveryWaveCode":"D7","orderInWave":29,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-TOWN-STOCK-PUTAWAY","deliveryWaveCode":"D7","orderInWave":30,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-TOWN-STOCK-REPLENISH","deliveryWaveCode":"D7","orderInWave":31,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {"worldInteractionId":"WI-TOWN-SUPPLY-DISPATCH","deliveryWaveCode":"D7","orderInWave":32,"completionRoleCode":"DeferredRegistration","playableLoopRefs":[],"syntyTrackCode":"None"},
+    {
+      "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+      "deliveryWaveCode": "D7",
+      "orderInWave": 33,
+      "completionRoleCode": "Extension",
+      "playableLoopRefs": [
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "syntyTrackCode": "None"
+    },
     { "worldInteractionId": "WI-ACTOR-01", "deliveryWaveCode": "D1", "orderInWave": 1, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Shared" },
     { "worldInteractionId": "WI-ACTOR-02", "deliveryWaveCode": "D1", "orderInWave": 2, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Shared" },
     { "worldInteractionId": "WI-ACTOR-03", "deliveryWaveCode": "D1", "orderInWave": 23, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-basic-herbal-recovery.v1"], "syntyTrackCode": "Shared" },
+    { "worldInteractionId": "WI-COMMUNITY-VISITOR-STAY", "deliveryWaveCode": "D1", "orderInWave": 24, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-camp-visitor-stay.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-FARM-DEFENSE-MOBILIZE", "deliveryWaveCode": "D2", "orderInWave": 7, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:farm-barracks-defense.v1"], "syntyTrackCode": "Farm" },
+    { "worldInteractionId": "WI-SQUAD-ASSIGN", "deliveryWaveCode": "D2", "orderInWave": 8, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:farm-barracks-defense.v1"], "syntyTrackCode": "Farm" },
+    { "worldInteractionId": "WI-SQUAD-SUPPLY", "deliveryWaveCode": "D2", "orderInWave": 9, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:farm-barracks-defense.v1"], "syntyTrackCode": "Farm" },
+    { "worldInteractionId": "WI-FARM-DEFENSE-RESOLVE", "deliveryWaveCode": "D2", "orderInWave": 10, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:farm-barracks-defense.v1"], "syntyTrackCode": "Farm" },
+    { "worldInteractionId": "WI-FARM-DEFENSE-RETURN", "deliveryWaveCode": "D2", "orderInWave": 11, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:farm-barracks-defense.v1"], "syntyTrackCode": "Farm" },
     { "worldInteractionId": "WI-NATURE-01", "deliveryWaveCode": "D1", "orderInWave": 10, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-twilight-return.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-02", "deliveryWaveCode": "D1", "orderInWave": 12, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-03", "deliveryWaveCode": "D1", "orderInWave": 13, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"], "syntyTrackCode": "Nature" },

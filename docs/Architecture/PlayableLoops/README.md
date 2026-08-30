@@ -9,6 +9,8 @@
 - 새 주제 기획 틀: `docs/ProjectOverview/templates/PlayableLoop주제기획서템플릿.md`
 - 문답 정밀화 기록 틀: `docs/ProjectOverview/templates/PlayableLoop문답정밀화기록템플릿.md`
 - 전문 심화 연구 틀: `docs/ProjectOverview/templates/PlayableLoop전문심화연구템플릿.md`
+- 효과음·환경음·배경음·음성 요구 재고: [PlayableLoop 오디오 요구사항 대장](오디오요구사항대장.md)
+- 현재 승인 전달: [기존 WI 세계 발현 E5 계획](../기존WI세계발현E5개발계획.md) — 지식 습득·방문자 응대의 실행/저장/실제 배치와 [Farm 경작 E5](Farm경작세계발현E5.md)를 병행한다. 계획 승인은 증거 승격이 아니다.
 
 같은 현재 상태를 개별 설계 문서에 복사하지 않는다. 신규 또는 의미가 크게 바뀐 폐루프는 대장의 `designDocumentationPolicy.requiredDetailedDesignLoopStableIds`에 등록하고 다음을 검증한다.
 
@@ -29,6 +31,7 @@
 
 ## 진행 중 문답 정밀화
 
+- [Q-001~268 전체 문답 정리 상태판](PlanningSessions/문답정리상태판.md)
 - [문답 기록 routing과 주제별 색인](PlanningSessions/README.md)
 - [Nature 거점·수면·날씨·방어](PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md)
 - [플레이어 내면·명상·계획](PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md)

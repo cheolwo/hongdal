@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-playable-loop-catalog.v6",
-  "revision": "ssalddel-playable-loop-catalog.r24",
+"revision": "playable-loops.r36",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -73,27 +73,60 @@
         "playable-loop:nature-twilight-return.v1",
         "playable-loop:nature-night-day2.v1",
         "playable-loop:nature-workbench-foundation.v1",
-        "playable-loop:nature-field-supply-return.v1"
+        "playable-loop:nature-field-supply-return.v1",
+        "playable-loop:nature-camp-visitor-stay.v1"
       ],
-      "optionalExtensionChildLoopStableIds": ["playable-loop:nature-base-reflection.v1", "playable-loop:nature-building-learning.v1", "playable-loop:nature-regional-threat-recovery.v1"],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "optionalExtensionChildLoopStableIds": [
+        "playable-loop:nature-base-reflection.v1",
+        "playable-loop:nature-building-learning.v1",
+        "playable-loop:nature-regional-threat-recovery.v1"
+      ],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "도끼와 자원으로 생활 거점을 만들고 황혼 위협과 밤을 지나 Day2의 다음 선택으로 돌아온다.",
-      "entryStateCodes": ["NatureSafeClearingAvailable", "PlayerReady"],
+      "entryStateCodes": [
+        "NatureSafeClearingAvailable",
+        "PlayerReady"
+      ],
       "worldInteractionIds": [],
-      "successStateCodes": ["CabinOperational", "TwilightThreatResolvedOrRetreated", "Day2Ready"],
+      "successStateCodes": [
+        "CabinOperational",
+        "TwilightThreatResolvedOrRetreated",
+        "Day2Ready"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["NatureSafeChoiceAvailable", "Day2Ready"],
-      "requiredHCapabilities": ["NatureHomeArea", "ThreatRetreatRoute", "ShelterInterior"],
+      "returnStateCodes": [
+        "NatureSafeChoiceAvailable",
+        "Day2Ready"
+      ],
+      "requiredHCapabilities": [
+        "NatureHomeArea",
+        "ThreatRetreatRoute",
+        "ShelterInterior"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterCabinOperational", "AfterThreatResolution", "Day2Ready"],
+      "saveCheckpointCodes": [
+        "AfterCabinOperational",
+        "AfterThreatResolution",
+        "Day2Ready"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E9",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
-      "evidencePackageRefs": ["evidence:nature-r2-core-20260825", "evidence:nature-dual-combat-core-20260825"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json"],
-      "blockers": ["생활 거점 기초와 밤→Day2 핵심 자식 폐루프가 아직 E5 CoreClosed가 아니다.", "Hosted 동등성과 실제 Unity 입력 증거가 없다."],
+      "evidencePackageRefs": [
+        "evidence:nature-r2-core-20260825",
+        "evidence:nature-dual-combat-core-20260825"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json"
+      ],
+      "blockers": [
+        "생활 거점 기초와 밤→Day2 핵심 자식 폐루프가 아직 E5 CoreClosed가 아니다.",
+        "Hosted 동등성과 실제 Unity 입력 증거가 없다."
+      ],
       "nextAction": "생활 거점 기초와 밤→Day2 자식 폐루프를 각각 E5로 닫은 뒤 영역 CoreClosed를 파생 판정한다."
     },
     {
@@ -102,22 +135,51 @@
       "title": "Nature 전술 자기 캐릭터 선택·이동",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-tactical-self-navigation.v1", "designDocumentRef": "docs/Architecture/PlayableLoops/Nature전술자기캐릭터이동.md", "designRevision": "nature-tactical-self-navigation.design.r1", "designHashSha256": "111b5a86a4aa0adabd878b73ffbdf6ff38ebb7381831d33ed26a2dafc0ef48cf", "statusCode": "Approved", "approvalEvidenceRef": "D-273" },
-      "sourcePlanningDocumentRefs": ["docs/Architecture/플레이어중심게임개발업무구조.md", "docs/Architecture/UnityLandscapeRenderingPipeline.md"],
+      "planningGate": {
+        "topicStableId": "topic:nature-tactical-self-navigation.v1",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature전술자기캐릭터이동.md",
+        "designRevision": "nature-tactical-self-navigation.design.r1",
+        "designHashSha256": "111b5a86a4aa0adabd878b73ffbdf6ff38ebb7381831d33ed26a2dafc0ef48cf",
+        "statusCode": "Approved",
+        "approvalEvidenceRef": "D-273"
+      },
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/플레이어중심게임개발업무구조.md",
+        "docs/Architecture/UnityLandscapeRenderingPipeline.md"
+      ],
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "높은 사선 전술 시점에서 자기 캐릭터를 클릭 또는 박스로 선택하고 우클릭·방향키로 이동하며, 자유 시야 뒤 캐릭터에 재집중해 도끼를 획득한다.",
-      "entryStateCodes": ["NatureSafeClearingAvailable", "PlayerReady", "AxeAvailable"],
-      "worldInteractionIds": ["WI-NATURE-05"],
-      "successStateCodes": ["AxeOwnedInInventory", "PlayerCanChooseAgain"],
+      "entryStateCodes": [
+        "NatureSafeClearingAvailable",
+        "PlayerReady",
+        "AxeAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-NATURE-05"
+      ],
+      "successStateCodes": [
+        "AxeOwnedInInventory",
+        "PlayerCanChooseAgain"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["PlayerCanChooseAgain"],
-      "requiredHCapabilities": ["Traversable", "PlayerAccessible", "ToolPickupPoint"],
+      "returnStateCodes": [
+        "PlayerCanChooseAgain"
+      ],
+      "requiredHCapabilities": [
+        "Traversable",
+        "PlayerAccessible",
+        "ToolPickupPoint"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterToolAcquired"],
+      "saveCheckpointCodes": [
+        "AfterToolAcquired"
+      ],
       "currentEvidenceStage": "E7",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
@@ -129,7 +191,9 @@
           "currentStage": "E7",
           "targetStage": "E7",
           "statusCode": "Validated",
-          "evidencePackageRefs": ["evidence:nature-tactical-axe-hosted-parity-20260828"],
+          "evidencePackageRefs": [
+            "evidence:nature-tactical-axe-hosted-parity-20260828"
+          ],
           "blockers": []
         },
         "presentation": {
@@ -137,13 +201,20 @@
           "currentStage": "E7",
           "targetStage": "E7",
           "statusCode": "Validated",
-          "evidencePackageRefs": ["evidence:nature-tactical-axe-playmode-20260828"],
+          "evidencePackageRefs": [
+            "evidence:nature-tactical-axe-playmode-20260828"
+          ],
           "blockers": []
         }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:nature-tactical-axe-hosted-parity-20260828", "evidence:nature-tactical-axe-playmode-20260828"],
-      "workOrderRefs": ["eng/execution-ledgers/work-orders/nature-tactical-self-navigation.e7-work-order.json"],
+      "evidencePackageRefs": [
+        "evidence:nature-tactical-axe-hosted-parity-20260828",
+        "evidence:nature-tactical-axe-playmode-20260828"
+      ],
+      "workOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-tactical-self-navigation.e7-work-order.json"
+      ],
       "legacyWorkOrderRefs": [],
       "blockers": [],
       "nextAction": "E7 PlayClosed 상태를 유지하고 다음 승인 Nature 내부 폐루프의 가장 이른 미완료 증거를 연다."
@@ -154,21 +225,61 @@
       "title": "Nature 도끼·벌목·오두막 기초",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-shelter-foundation.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-shelter-foundation.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "도끼를 얻고 나무를 베어 오두막을 완성한 뒤 다시 안전한 선택 상태로 돌아온다.",
-      "entryStateCodes": ["NatureSafeClearingAvailable", "ToolChoiceAvailable"],
-      "worldInteractionIds": ["WI-ACTOR-01", "WI-NATURE-05", "WI-ACTOR-02", "WI-NATURE-06", "WI-NATURE-18", "WI-NATURE-07", "WI-NATURE-08", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-12"],
-      "successStateCodes": ["CabinOperational", "NatureSafeChoiceAvailable"],
-      "failureRecoveryWorldInteractionIds": ["WI-NATURE-10", "WI-NATURE-12"],
-      "returnStateCodes": ["NatureSafeChoiceAvailable", "PlayerCanChooseAgain"],
-      "requiredHCapabilities": ["ToolAccessible", "HarvestWorkArea", "ShelterBuildingSite", "RecoveryWorkArea"],
+      "entryStateCodes": [
+        "NatureSafeClearingAvailable",
+        "ToolChoiceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-ACTOR-01",
+        "WI-NATURE-05",
+        "WI-ACTOR-02",
+        "WI-NATURE-06",
+        "WI-NATURE-18",
+        "WI-NATURE-07",
+        "WI-NATURE-08",
+        "WI-NATURE-09",
+        "WI-NATURE-10",
+        "WI-NATURE-12"
+      ],
+      "successStateCodes": [
+        "CabinOperational",
+        "NatureSafeChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-NATURE-10",
+        "WI-NATURE-12"
+      ],
+      "returnStateCodes": [
+        "NatureSafeChoiceAvailable",
+        "PlayerCanChooseAgain"
+      ],
+      "requiredHCapabilities": [
+        "ToolAccessible",
+        "HarvestWorkArea",
+        "ShelterBuildingSite",
+        "RecoveryWorkArea"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterToolAcquired", "AfterCabinOperational"],
+      "saveCheckpointCodes": [
+        "AfterToolAcquired",
+        "AfterCabinOperational"
+      ],
       "currentEvidenceStage": "E7",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
@@ -180,7 +291,10 @@
           "currentStage": "E7",
           "targetStage": "E7",
           "statusCode": "Validated",
-          "evidencePackageRefs": ["evidence:nature-shelter-hosted-parity-20260825", "evidence:nature-first-evening-equipment-logic-20260827"],
+          "evidencePackageRefs": [
+            "evidence:nature-shelter-hosted-parity-20260825",
+            "evidence:nature-first-evening-equipment-logic-20260827"
+          ],
           "blockers": []
         },
         "presentation": {
@@ -188,14 +302,32 @@
           "currentStage": "E7",
           "targetStage": "E7",
           "statusCode": "Validated",
-          "evidencePackageRefs": ["evidence:nature-shelter-playmode-20260825", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-shelter-explicit-equipment-e7-20260827"],
+          "evidencePackageRefs": [
+            "evidence:nature-shelter-playmode-20260825",
+            "evidence:nature-dual-loop-game-view-20260826",
+            "evidence:nature-shelter-explicit-equipment-e7-20260827"
+          ],
           "blockers": []
         }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:simulation-task-20260824", "evidence:nature-r2-core-20260825", "evidence:nature-shelter-playmode-20260825", "evidence:nature-shelter-hosted-parity-20260825", "evidence:nature-r5-logic-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-first-evening-equipment-logic-20260827", "evidence:nature-shelter-explicit-equipment-e7-20260827"],
-      "workOrderRefs": ["eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json", "eng/execution-ledgers/work-orders/actor-item-equipment.e9-work-order.json"],
+      "evidencePackageRefs": [
+        "evidence:simulation-task-20260824",
+        "evidence:nature-r2-core-20260825",
+        "evidence:nature-shelter-playmode-20260825",
+        "evidence:nature-shelter-hosted-parity-20260825",
+        "evidence:nature-r5-logic-20260826",
+        "evidence:nature-dual-loop-game-view-20260826",
+        "evidence:nature-first-evening-equipment-logic-20260827",
+        "evidence:nature-shelter-explicit-equipment-e7-20260827"
+      ],
+      "workOrderRefs": [
+        "eng/execution-ledgers/work-orders/actor-item-equipment.e7-work-order.json"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json",
+        "eng/execution-ledgers/work-orders/actor-item-equipment.e9-work-order.json"
+      ],
       "blockers": [],
       "nextAction": "stability:nature-shelter-foundation.v1 E8 통과를 유지하고 stability:nature-twilight-return.v1의 고정 후보를 검증한다."
     },
@@ -205,21 +337,48 @@
       "title": "Nature 황혼 위협 대응·귀환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-twilight-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-twilight-return.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "황혼 위협에 관찰 운영 또는 직접 개입하고 승리·후퇴·패배 결과를 거점 귀환 선택으로 연결한다.",
-      "entryStateCodes": ["TwilightEncounterReady"],
-      "worldInteractionIds": ["WI-NATURE-01", "WI-NATURE-11"],
-      "successStateCodes": ["TwilightThreatResolvedOrRetreated", "NatureSafeChoiceAvailable"],
-      "failureRecoveryWorldInteractionIds": ["WI-NATURE-11"],
-      "returnStateCodes": ["NatureSafeChoiceAvailable"],
-      "requiredHCapabilities": ["ThreatEncounterArea", "ThreatRetreatRoute", "ShelterOccupancy"],
+      "entryStateCodes": [
+        "TwilightEncounterReady"
+      ],
+      "worldInteractionIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-11"
+      ],
+      "successStateCodes": [
+        "TwilightThreatResolvedOrRetreated",
+        "NatureSafeChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-NATURE-11"
+      ],
+      "returnStateCodes": [
+        "NatureSafeChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "ThreatEncounterArea",
+        "ThreatRetreatRoute",
+        "ShelterOccupancy"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterThreatResolution"],
+      "saveCheckpointCodes": [
+        "AfterThreatResolution"
+      ],
       "currentEvidenceStage": "E7",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
@@ -231,7 +390,10 @@
           "currentStage": "E7",
           "targetStage": "E7",
           "statusCode": "Validated",
-          "evidencePackageRefs": ["evidence:nature-dual-combat-core-20260825", "evidence:nature-twilight-wi11-hosted-parity-20260826"],
+          "evidencePackageRefs": [
+            "evidence:nature-dual-combat-core-20260825",
+            "evidence:nature-twilight-wi11-hosted-parity-20260826"
+          ],
           "blockers": []
         },
         "presentation": {
@@ -239,13 +401,25 @@
           "currentStage": "E7",
           "targetStage": "E7",
           "statusCode": "Validated",
-          "evidencePackageRefs": ["evidence:nature-dual-combat-unity-editmode-20260825", "evidence:nature-twilight-wi11-playmode-20260826", "evidence:nature-dual-loop-game-view-20260826"],
+          "evidencePackageRefs": [
+            "evidence:nature-dual-combat-unity-editmode-20260825",
+            "evidence:nature-twilight-wi11-playmode-20260826",
+            "evidence:nature-dual-loop-game-view-20260826"
+          ],
           "blockers": []
         }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:nature-dual-combat-core-20260825", "evidence:nature-dual-combat-unity-editmode-20260825", "evidence:nature-twilight-wi11-playmode-20260826", "evidence:nature-twilight-wi11-hosted-parity-20260826", "evidence:nature-dual-loop-game-view-20260826"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-dual-combat-participation.e9-work-order.json"],
+      "evidencePackageRefs": [
+        "evidence:nature-dual-combat-core-20260825",
+        "evidence:nature-dual-combat-unity-editmode-20260825",
+        "evidence:nature-twilight-wi11-playmode-20260826",
+        "evidence:nature-twilight-wi11-hosted-parity-20260826",
+        "evidence:nature-dual-loop-game-view-20260826"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-dual-combat-participation.e9-work-order.json"
+      ],
       "blockers": [],
       "nextAction": "완료 상태를 유지하되 H3 ThreatInput·전투 상태·Skeleton 표현 계약 변경 시 논리와 표현 증거를 각각 재검증한다."
     },
@@ -255,34 +429,94 @@
       "title": "Nature 지역 위협 후퇴·복원·회복",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-regional-threat-recovery.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-regional-threat-recovery.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "관찰한 지역 위협에서 파티를 안전 생활핵으로 후퇴시키거나 원인 해결 뒤 경로를 복원하고 회복 선택으로 돌아온다.",
-      "entryStateCodes": ["ThreatObserved", "EncounterActive", "CauseResolved"],
-      "worldInteractionIds": ["WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-03", "WI-NATURE-04"],
-      "successStateCodes": ["RetreatedToSafeCore", "NatureRouteRestored", "PartyRecovered"],
-      "failureRecoveryWorldInteractionIds": ["WI-NATURE-02", "WI-NATURE-04"],
-      "returnStateCodes": ["NatureExplorationRestart", "NatureSafeChoiceAvailable"],
-      "requiredHCapabilities": ["ThreatRetreatRoute", "RestorationWorkArea", "SafeCore"],
+      "entryStateCodes": [
+        "ThreatObserved",
+        "EncounterActive",
+        "CauseResolved"
+      ],
+      "worldInteractionIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-02",
+        "WI-NATURE-03",
+        "WI-NATURE-04"
+      ],
+      "successStateCodes": [
+        "RetreatedToSafeCore",
+        "NatureRouteRestored",
+        "PartyRecovered"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-NATURE-02",
+        "WI-NATURE-04"
+      ],
+      "returnStateCodes": [
+        "NatureExplorationRestart",
+        "NatureSafeChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "ThreatRetreatRoute",
+        "RestorationWorkArea",
+        "SafeCore"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterRegionalThreatRecovery"],
+      "saveCheckpointCodes": [
+        "AfterRegionalThreatRecovery"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "Defined",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E3", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:nature-regional-threat-core-20260826"], "blockers": ["실제 Nature 경관 Graph와 귀환·회복 입력 결속이 남아 있다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["위협·후퇴·복원·회복의 표현 계약만 있고 Runtime 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-regional-threat-core-20260826"
+          ],
+          "blockers": [
+            "실제 Nature 경관 Graph와 귀환·회복 입력 결속이 남아 있다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "위협·후퇴·복원·회복의 표현 계약만 있고 Runtime 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:nature-regional-threat-core-20260826"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-farm-regional-development.e9-work-order.json"],
-      "blockers": ["WI-NATURE-02~04의 Scenario 공간을 실제 Nature 경관 Graph와 canonical SimulationWorldShell 귀환·회복 입력으로 닫지 않았다."],
+      "evidencePackageRefs": [
+        "evidence:nature-regional-threat-core-20260826"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-farm-regional-development.e9-work-order.json"
+      ],
+      "blockers": [
+        "WI-NATURE-02~04의 Scenario 공간을 실제 Nature 경관 Graph와 canonical SimulationWorldShell 귀환·회복 입력으로 닫지 않았다."
+      ],
       "nextAction": "Nature 핵심 첫날 폐루프와 분리된 Extension Goal로 선택될 때 WI-NATURE-02부터 E4→E7을 진행한다."
     },
     {
@@ -291,22 +525,54 @@
       "title": "Nature 보관·수면·Day2 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-night-day2.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-night-day2.v1",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md",
+        "designRevision": "nature-resource-regeneration.design.r1",
+        "designHashSha256": "f9a3e2043ba05a31f142615663aa061bf232e39d757aa7efd58d1d53bfd941cf",
+        "statusCode": "Approved",
+        "approvalEvidenceRef": "user:2026-08-30:remaining-32-wi-goal-sequential-logic-e3"
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "오두막에 자원을 보관하고 수면한 뒤 새벽에 다음 확장 계획을 선택한다.",
-      "entryStateCodes": ["CabinOperational", "EncounterResolved"],
-      "worldInteractionIds": ["WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15"],
-      "successStateCodes": ["ExpansionPlanSelected", "Day2Ready"],
+      "entryStateCodes": [
+        "CabinOperational",
+        "EncounterResolved"
+      ],
+      "worldInteractionIds": [
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
+        "WI-HEAT-SOURCE-STATE-CHANGE",
+        "WI-ACTOR-PLAN-SET",
+        "WI-WORLD-RESOURCE-REGENERATE"
+      ],
+      "successStateCodes": [
+        "ExpansionPlanSelected",
+        "Day2Ready"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["Day2Ready", "NatureSafeChoiceAvailable"],
-      "requiredHCapabilities": ["ShelterStorage", "ShelterSleep", "DawnPlanChoice"],
+      "returnStateCodes": [
+        "Day2Ready",
+        "NatureSafeChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "ShelterStorage",
+        "ShelterSleep",
+        "DawnPlanChoice"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterCabinStorage", "Day2Ready"],
-      "currentEvidenceStage": "E4",
+      "saveCheckpointCodes": [
+        "AfterCabinStorage",
+        "Day2Ready"
+      ],
+      "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
@@ -314,19 +580,39 @@
       "maturityTracks": {
         "logic": {
           "trackCode": "Logic",
-          "currentStage": "E5",
+          "currentStage": "E1",
           "targetStage": "E7",
           "statusCode": "InProgress",
-          "evidencePackageRefs": ["evidence:nature-night-day2-wi13-hosted-parity-20260826", "evidence:nature-night-day2-wi14-hosted-parity-20260826", "evidence:nature-night-day2-wi15-hosted-parity-20260826"],
-          "blockers": ["v28 행위 원장·분야 성장 계보가 포함된 실제 입력과 LocalProcess·RemoteHost 반복 증거를 다시 확보해야 한다."]
+          "evidencePackageRefs": [
+            "evidence:nature-personal-plan-logic-e3-20260830",
+            "evidence:nature-heat-source-logic-e3-20260830",
+            "evidence:nature-night-day2-wi13-hosted-parity-20260826",
+            "evidence:nature-night-day2-wi14-hosted-parity-20260826",
+            "evidence:nature-night-day2-wi15-hosted-parity-20260826"
+          ],
+          "blockers": [
+            "세계 자원 재생 E1→E3 구현 중. 개인 계획·열원 E3 증거는 보존.",
+            "열원 변경 경로 독립 Core E3까지만 시험. 이전 다른 WI의 증거는 보존하되 열원으로 전이하지 않는다.",
+            "v28 행위 원장·분야 성장 계보가 포함된 실제 입력과 LocalProcess·RemoteHost 반복 증거를 다시 확보해야 한다."
+          ]
         },
         "presentation": {
           "trackCode": "Presentation",
-          "currentStage": "E4",
+          "currentStage": "E1",
           "targetStage": "E7",
           "statusCode": "Blocked",
-          "evidencePackageRefs": ["evidence:nature-night-day2-wi13-playmode-20260826", "evidence:nature-night-day2-wi14-playmode-20260826", "evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-night-day2-presentation-e7-20260826"],
-          "blockers": ["표현 엔진의 행위 원장 cursor 소비와 같은 Revision Game View 증거가 없다.", "Day2 계획판의 세 선택·비용·다음 행동 판독과 오두막 주변 구도, 사람 직접 입력·청음 수용이 남았다."]
+          "evidencePackageRefs": [
+            "evidence:nature-night-day2-wi13-playmode-20260826",
+            "evidence:nature-night-day2-wi14-playmode-20260826",
+            "evidence:nature-night-day2-wi15-playmode-20260826",
+            "evidence:nature-dual-loop-game-view-20260826",
+            "evidence:nature-night-day2-presentation-e7-20260826"
+          ],
+          "blockers": [
+            "재생 성장 단계·채집 가능 상태의 판독 요구 E1만 정의.",
+            "표현 엔진의 행위 원장 cursor 소비와 같은 Revision Game View 증거가 없다.",
+            "Day2 계획판의 세 선택·비용·다음 행동 판독과 오두막 주변 구도, 사람 직접 입력·청음 수용이 남았다."
+          ]
         }
       },
       "openFeedbackItems": [
@@ -336,7 +622,10 @@
           "detectedAtStage": "E7",
           "targetTrackCode": "Presentation",
           "reopenStage": "E6",
-          "targetRefs": ["WI-NATURE-14", "world-atmosphere.r1"],
+          "targetRefs": [
+            "WI-NATURE-14",
+            "world-atmosphere.r1"
+          ],
           "statusCode": "Open"
         },
         {
@@ -345,14 +634,42 @@
           "detectedAtStage": "E7",
           "targetTrackCode": "Presentation",
           "reopenStage": "E5",
-          "targetRefs": ["WI-NATURE-15", "Simulation.ActionJournal", "World.Presentation"],
+          "targetRefs": [
+            "WI-NATURE-15",
+            "Simulation.ActionJournal",
+            "World.Presentation"
+          ],
           "statusCode": "Open"
         }
       ],
-      "evidencePackageRefs": ["evidence:nature-r2-core-20260825", "evidence:nature-night-day2-wi13-playmode-20260826", "evidence:nature-night-day2-wi13-hosted-parity-20260826", "evidence:nature-night-day2-wi14-playmode-20260826", "evidence:nature-night-day2-wi14-hosted-parity-20260826", "evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-night-day2-wi15-hosted-parity-20260826", "evidence:nature-dual-loop-game-view-20260826", "evidence:nature-night-day2-presentation-e7-20260826"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json", "eng/execution-ledgers/work-orders/nature-sky-engine.e9-work-order.json"],
-      "blockers": ["행위 원장·분야 성장 공통 관문 소급으로 기존 E6/E7 증거가 무효화됐다.", "Unity 표현 엔진의 cursor 소비와 현재 Game View 증거를 다시 검증해야 한다."],
-      "nextAction": "WI-NATURE-15 표현 엔진 cursor 소비를 연결한 뒤 v28 실제 입력·Save 재진입·Game View를 같은 revision에서 재검증한다."
+      "evidencePackageRefs": [
+        "evidence:nature-personal-plan-logic-e3-20260830",
+        "evidence:nature-heat-source-logic-e3-20260830",
+        "evidence:nature-r2-core-20260825",
+        "evidence:nature-night-day2-wi13-playmode-20260826",
+        "evidence:nature-night-day2-wi13-hosted-parity-20260826",
+        "evidence:nature-night-day2-wi14-playmode-20260826",
+        "evidence:nature-night-day2-wi14-hosted-parity-20260826",
+        "evidence:nature-night-day2-wi15-playmode-20260826",
+        "evidence:nature-night-day2-wi15-hosted-parity-20260826",
+        "evidence:nature-dual-loop-game-view-20260826",
+        "evidence:nature-night-day2-presentation-e7-20260826"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json",
+        "eng/execution-ledgers/work-orders/nature-sky-engine.e9-work-order.json"
+      ],
+      "blockers": [
+        "행위 원장·분야 성장 공통 관문 소급으로 기존 E6/E7 증거가 무효화됐다.",
+        "Unity 표현 엔진의 cursor 소비와 현재 Game View 증거를 다시 검증해야 한다."
+      ],
+      "nextAction": "세계 자원 재생 Logic E3 검증 후 캠페인 다음 WI로 전환.",
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/Nature열원관리E3.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/Nature개인계획E3.md",
+        "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md"
+      ]
     },
     {
       "priority": 5,
@@ -360,21 +677,49 @@
       "title": "Nature 작업대 기반",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-workbench-foundation.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-workbench-foundation.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "Day2에 작업대 위치와 비용을 확인하고 건설하거나 취소한 뒤 운영 가능한 제작 선택 상태로 돌아온다.",
-      "entryStateCodes": ["Day2Ready", "AreaBuildingChoiceAvailable"],
-      "worldInteractionIds": ["WI-CON-01", "WI-NATURE-12"],
-      "successStateCodes": ["NatureWorkbenchOperational", "FieldExpeditionChoiceAvailable"],
-      "failureRecoveryWorldInteractionIds": ["WI-NATURE-12"],
-      "returnStateCodes": ["FieldExpeditionChoiceAvailable", "AreaBuildingChoiceAvailable"],
-      "requiredHCapabilities": ["AreaBuildingPlacementAllowed", "CraftingWorkArea"],
+      "entryStateCodes": [
+        "Day2Ready",
+        "AreaBuildingChoiceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-CON-01",
+        "WI-NATURE-12"
+      ],
+      "successStateCodes": [
+        "NatureWorkbenchOperational",
+        "FieldExpeditionChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-NATURE-12"
+      ],
+      "returnStateCodes": [
+        "FieldExpeditionChoiceAvailable",
+        "AreaBuildingChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "AreaBuildingPlacementAllowed",
+        "CraftingWorkArea"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterNatureWorkbenchOperational"],
+      "saveCheckpointCodes": [
+        "AfterNatureWorkbenchOperational"
+      ],
       "currentEvidenceStage": "E6",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
@@ -386,7 +731,10 @@
           "currentStage": "E7",
           "targetStage": "E7",
           "statusCode": "Validated",
-          "evidencePackageRefs": ["evidence:nature-building-core-20260825", "evidence:nature-workbench-wi-con-01-hosted-parity-20260826"],
+          "evidencePackageRefs": [
+            "evidence:nature-building-core-20260825",
+            "evidence:nature-workbench-wi-con-01-hosted-parity-20260826"
+          ],
           "blockers": []
         },
         "presentation": {
@@ -394,8 +742,13 @@
           "currentStage": "E6",
           "targetStage": "E7",
           "statusCode": "InProgress",
-          "evidencePackageRefs": ["evidence:nature-workbench-wi-con-01-playmode-20260826", "evidence:nature-dual-loop-game-view-20260826"],
-          "blockers": ["Synty Table Saw는 식별되지만 건설 중·운영 중 상태 차이와 목재·상자·조명으로 구성된 작업 공간은 아직 부족하다."]
+          "evidencePackageRefs": [
+            "evidence:nature-workbench-wi-con-01-playmode-20260826",
+            "evidence:nature-dual-loop-game-view-20260826"
+          ],
+          "blockers": [
+            "Synty Table Saw는 식별되지만 건설 중·운영 중 상태 차이와 목재·상자·조명으로 구성된 작업 공간은 아직 부족하다."
+          ]
         }
       },
       "openFeedbackItems": [
@@ -405,13 +758,25 @@
           "detectedAtStage": "E7",
           "targetTrackCode": "Presentation",
           "reopenStage": "E6",
-          "targetRefs": ["WI-CON-01", "h1:nature:workbench"],
+          "targetRefs": [
+            "WI-CON-01",
+            "h1:nature:workbench"
+          ],
           "statusCode": "Open"
         }
       ],
-      "evidencePackageRefs": ["evidence:nature-building-core-20260825", "evidence:nature-workbench-wi-con-01-playmode-20260826", "evidence:nature-workbench-wi-con-01-hosted-parity-20260826", "evidence:nature-dual-loop-game-view-20260826"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-area-building-progression.e9-work-order.json"],
-      "blockers": ["작업대 상태별 공간 조립과 운영 가능성의 시각 E7 증거가 부족하다."],
+      "evidencePackageRefs": [
+        "evidence:nature-building-core-20260825",
+        "evidence:nature-workbench-wi-con-01-playmode-20260826",
+        "evidence:nature-workbench-wi-con-01-hosted-parity-20260826",
+        "evidence:nature-dual-loop-game-view-20260826"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-area-building-progression.e9-work-order.json"
+      ],
+      "blockers": [
+        "작업대 상태별 공간 조립과 운영 가능성의 시각 E7 증거가 부족하다."
+      ],
       "nextAction": "Table Saw·목재·상자·조명을 배치 통제 계층에서 하나의 작업 구역으로 조립하고 건설·취소·운영 화면 차이를 재검증한다."
     },
     {
@@ -420,34 +785,88 @@
       "title": "Nature 건물 발전·배움 확장",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-building-learning.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-building-learning.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "Core 작업대 이후 선택형 배움터를 건설하고 NPC 학습 방문 결과 뒤 다시 건물 선택으로 돌아온다.",
-      "entryStateCodes": ["Day2Ready", "AreaBuildingChoiceAvailable"],
-      "worldInteractionIds": ["WI-CON-01", "WI-NATURE-12"],
-      "successStateCodes": ["AreaBuildingOperational", "LearningVisitCompleted"],
-      "failureRecoveryWorldInteractionIds": ["WI-NATURE-12"],
-      "returnStateCodes": ["AreaBuildingChoiceAvailable"],
-      "requiredHCapabilities": ["AreaBuildingPlacementAllowed", "LearningVisitRoute"],
+      "entryStateCodes": [
+        "Day2Ready",
+        "AreaBuildingChoiceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-CON-01",
+        "WI-NATURE-12"
+      ],
+      "successStateCodes": [
+        "AreaBuildingOperational",
+        "LearningVisitCompleted"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-NATURE-12"
+      ],
+      "returnStateCodes": [
+        "AreaBuildingChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "AreaBuildingPlacementAllowed",
+        "LearningVisitRoute"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterAreaBuildingOperational", "AfterLearningVisit"],
+      "saveCheckpointCodes": [
+        "AfterAreaBuildingOperational",
+        "AfterLearningVisit"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E5", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:nature-building-core-20260825"], "blockers": ["Hosted 동등성과 NPC 생활 주기 검증이 남아 있다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["배움터의 배치·학습 방문·결과 표현 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E5",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-building-core-20260825"
+          ],
+          "blockers": [
+            "Hosted 동등성과 NPC 생활 주기 검증이 남아 있다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "배움터의 배치·학습 방문·결과 표현 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:nature-building-core-20260825"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-area-building-progression.e9-work-order.json"],
-      "blockers": ["배움터 실제 Unity 배치·Hosted 동등성과 NPC 판단→이동→학습 결과→다음 판단의 E7 폐루프 증거가 없다."],
+      "evidencePackageRefs": [
+        "evidence:nature-building-core-20260825"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-area-building-progression.e9-work-order.json"
+      ],
+      "blockers": [
+        "배움터 실제 Unity 배치·Hosted 동등성과 NPC 판단→이동→학습 결과→다음 판단의 E7 폐루프 증거가 없다."
+      ],
       "nextAction": "기존 StableId를 유지한 채 배움터 Extension의 NPC 생활 주기를 E7→E1로 검토하고 가장 낮은 미완료 의존성부터 구현한다."
     },
     {
@@ -456,34 +875,100 @@
       "title": "Nature 현장 성과·거점 제작·다음 원정 왕복",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-field-supply-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-field-supply-return.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "발산 흐름에서 얻은 재건 부품과 통나무를 수렴 흐름의 직접 제작 또는 NPC 위임 정책으로 보급품으로 바꾸고 다음 원정의 패배 위험 하나를 줄인 뒤 다시 귀환한다.",
-      "entryStateCodes": ["Day2Ready", "NatureWorkbenchOperational", "FieldExpeditionChoiceAvailable"],
-      "worldInteractionIds": ["WI-NATURE-06", "WI-NATURE-11", "WI-NATURE-12", "WI-NATURE-13", "WI-NATURE-16", "WI-NATURE-17"],
-      "successStateCodes": ["NatureFieldSupplyPackAdded", "ExpeditionPrepared", "OneCarriedMaterialStackProtected", "NatureSafeChoiceAvailable"],
-      "failureRecoveryWorldInteractionIds": ["WI-NATURE-11", "WI-NATURE-12"],
-      "returnStateCodes": ["FieldExpeditionChoiceAvailable", "NatureSafeChoiceAvailable"],
-      "requiredHCapabilities": ["CraftingWorkArea", "ShelterStorage", "HarvestWorkArea", "ThreatRetreatRoute"],
+      "entryStateCodes": [
+        "Day2Ready",
+        "NatureWorkbenchOperational",
+        "FieldExpeditionChoiceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-NATURE-06",
+        "WI-NATURE-11",
+        "WI-NATURE-12",
+        "WI-NATURE-13",
+        "WI-NATURE-16",
+        "WI-NATURE-17"
+      ],
+      "successStateCodes": [
+        "NatureFieldSupplyPackAdded",
+        "ExpeditionPrepared",
+        "OneCarriedMaterialStackProtected",
+        "NatureSafeChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-NATURE-11",
+        "WI-NATURE-12"
+      ],
+      "returnStateCodes": [
+        "FieldExpeditionChoiceAvailable",
+        "NatureSafeChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "CraftingWorkArea",
+        "ShelterStorage",
+        "HarvestWorkArea",
+        "ThreatRetreatRoute"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterFieldSupplyCrafted", "AfterExpeditionPrepared", "AfterThreatResolution"],
+      "saveCheckpointCodes": [
+        "AfterFieldSupplyCrafted",
+        "AfterExpeditionPrepared",
+        "AfterThreatResolution"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E4", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:nature-field-supply-core-20260825"], "blockers": ["실제 H1 발현과 LocalProcess·RemoteHost 동등성이 남아 있다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["직접 제작·NPC 위임·다음 원정 준비의 Unity 결과 표현 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-field-supply-core-20260825"
+          ],
+          "blockers": [
+            "실제 H1 발현과 LocalProcess·RemoteHost 동등성이 남아 있다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "직접 제작·NPC 위임·다음 원정 준비의 Unity 결과 표현 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:nature-field-supply-core-20260825"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-area-building-progression.e9-work-order.json"],
-      "blockers": ["직접 제작과 NPC 위임 Core 자동시험 뒤에도 실제 H1 작업대 입력, LocalProcess·RemoteHost revision별 hash 동등성과 Unity 결과 피드백이 필요하다."],
+      "evidencePackageRefs": [
+        "evidence:nature-field-supply-core-20260825"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-area-building-progression.e9-work-order.json"
+      ],
+      "blockers": [
+        "직접 제작과 NPC 위임 Core 자동시험 뒤에도 실제 H1 작업대 입력, LocalProcess·RemoteHost revision별 hash 동등성과 Unity 결과 피드백이 필요하다."
+      ],
       "nextAction": "WI-NATURE-16·17의 실제 공간 발현과 Hosted 동등성을 검증한 뒤 E4·E5를 판정한다."
     },
     {
@@ -494,45 +979,211 @@
       "loopLevelCode": "PlayableUnit",
       "planningGate": {
         "topicStableId": "topic:nature-basic-herbal-recovery.v1",
-        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
-        "designRevision": "nature-basic-herbal-recovery.design.r3",
-        "designHashSha256": "879F74092538A50BC6B0E8AFF5C4CEA2F4C18AE9BAA757467AA7E02B5C63B5C1",
         "statusCode": "Approved",
-        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
+        "designRevision": "nature-basic-herbal-recovery.design.r5",
+        "designHashSha256": "9002C88BA873FC15237594E2EADE80846EB78EC02CD8D779EAF0D4803F021DF6",
+        "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
       },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "기록에서 기초 처방을 배우고 약초를 모아 따뜻한 차를 달여 마심으로써 체온과 질병 위험을 관리한다.",
-      "entryStateCodes": ["NaturePlayerReady", "ReadableKnowledgeSourceAvailable"],
-      "worldInteractionIds": ["WI-ACTOR-03"],
-      "successStateCodes": ["RecipeKnown", "PlayerCanChooseAgain"],
-      "failureRecoveryWorldInteractionIds": ["WI-ACTOR-03"],
-      "returnStateCodes": ["PlayerCanChooseAgain"],
-      "requiredHCapabilities": [],
+      "entryStateCodes": [
+        "NaturePlayerReady",
+        "ReadableKnowledgeSourceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-ACTOR-03"
+      ],
+      "successStateCodes": [
+        "RecipeKnown",
+        "PlayerCanChooseAgain"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-ACTOR-03"
+      ],
+      "returnStateCodes": [
+        "PlayerCanChooseAgain"
+      ],
+      "requiredHCapabilities": [
+        "ReadableKnowledgeSource"
+      ],
       "independentExecutionRequired": true,
       "saveCheckpointCodes": [],
-      "currentEvidenceStage": "E3",
-      "nextClosureTargetStage": "E4",
+      "currentEvidenceStage": "E4",
+      "nextClosureTargetStage": "E5",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E4", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": ["evidence:nature-basic-herbal-recovery-logic-e4-20260828"], "blockers": ["Logic E5 이상은 새 기획 revision과 delivery 승인 전 열지 않는다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E3", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": ["evidence:nature-basic-herbal-recovery-presentation-e3-20260828"], "blockers": ["실제 카드 서랍 배선·공간·Unity 입력 증거는 후속 승인 범위다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-basic-herbal-recovery-logic-e4-20260828"
+          ],
+          "blockers": [
+            "Session·Save 영향 경로 재검증 필요"
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-basic-herbal-recovery-presentation-e3-20260828",
+            "evidence:nature-basic-herbal-recovery-presentation-e4-20260829"
+          ],
+          "blockers": [
+            "실제 자산·통행·입력·Game View 미검증"
+          ]
+        }
       },
       "openFeedbackItems": [
-        { "feedbackId": "feedback:nature-basic-herbal-recovery:save-boundary", "trackCode": "Logic", "reopenStage": "E1", "summary": "지식 원장의 저장이 필요해질 때 기존 Save 판본을 임의 변경하지 말고 별도 승인 작업 명세로 되돌린다.", "statusCode": "Open" }
+        {
+          "feedbackId": "feedback:nature-basic-herbal-recovery:save-boundary",
+          "trackCode": "Logic",
+          "reopenStage": "E1",
+          "summary": "D-286으로 Save 변경 승인. 실제 Session 소유와 v1~v29 호환은 Logic E1부터 재검증한다.",
+          "statusCode": "Open"
+        }
       ],
-      "evidencePackageRefs": ["evidence:nature-basic-herbal-recovery-logic-e3-20260828", "evidence:nature-basic-herbal-recovery-logic-e4-20260828", "evidence:nature-basic-herbal-recovery-presentation-e3-20260828"],
+      "evidencePackageRefs": [
+        "evidence:nature-basic-herbal-recovery-logic-e3-20260828",
+        "evidence:nature-basic-herbal-recovery-logic-e4-20260828",
+        "evidence:nature-basic-herbal-recovery-presentation-e3-20260828",
+        "evidence:nature-basic-herbal-recovery-presentation-e4-20260829"
+      ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json",
       "designDocumentRef": "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
-      "sourcePlanningDocumentRefs": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"],
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ],
       "predecessorLoopStableIds": [],
-      "blockers": ["통합 E4 이상, Save/Replay, 실제 Unity 배선, 약초 채집·달이기·섭취는 후속 승인 전 구현하지 않는다."],
-      "nextAction": "통합 E3에서 정지하고 다음 Goal 후보인 Farm 첫 밭갈기 기획·연구 관문을 준비한다."
+      "blockers": [
+        "E5 Session/Save/실제 World 결속 검증 미완료"
+      ],
+      "nextAction": "E5 승인 범위: Session·Save·같은 Core·실제 자산 발현을 검증한다. 현재 E는 보존한다.",
+      "requiredStudies": [
+        {
+          "studyStableId": "study:nature-player-knowledge:spatial-placement.r1",
+          "documentRef": "docs/Architecture/PlayableLoops/Nature지식습득-E5공간배치연구.r1.md",
+          "statusCode": "Accepted",
+          "sha256": "5FA7B245C7B93189DA4B77A0C9E2E165EEDED0F2BEF1FEA89AD29822F85027A4"
+        }
+      ]
+    },
+    {
+      "priority": 75,
+      "loopStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "title": "Nature 야영지 방문자 임시 체류",
+      "loopKind": "IndependentArea",
+      "loopLevelCode": "PlayableUnit",
+      "planningGate": {
+        "topicStableId": "topic:nature-camp-visitor-stay.v1",
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md",
+        "designRevision": "nature-camp-visitor-stay.design.r3",
+        "designHashSha256": "87F6CF282753D70908BEC278441122F5B6DD094713C599F305BB91E504AEC920",
+        "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      },
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md"
+      ],
+      "completionTierCode": "Core",
+      "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
+      "requiredCoreChildLoopStableIds": [],
+      "optionalExtensionChildLoopStableIds": [],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
+      "playerPromise": "야영지 입구의 방문자를 보고 남은 수용 여력을 확인한 뒤 임시 체류를 수용하거나 거절하고 후속 체류 검토로 돌아간다.",
+      "entryStateCodes": [
+        "NatureCampVisitorAwaitingDecision"
+      ],
+      "worldInteractionIds": [
+        "WI-COMMUNITY-VISITOR-STAY"
+      ],
+      "successStateCodes": [
+        "CommunityVisitorStayDecisionRecorded"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-COMMUNITY-VISITOR-STAY"
+      ],
+      "returnStateCodes": [
+        "CommunityVisitorReviewAvailable"
+      ],
+      "requiredHCapabilities": [
+        "NatureCampEntranceWaitingArea",
+        "GuestCapacityProjection",
+        "Spatial.VisitorWaitingAnchor",
+        "Spatial.GuestRestAnchor",
+        "Spatial.VisitorDepartureAnchor"
+      ],
+      "independentExecutionRequired": true,
+      "saveCheckpointCodes": [],
+      "currentEvidenceStage": "E4",
+      "nextClosureTargetStage": "E5",
+      "finalEvidenceStage": "E7",
+      "closureStateCode": "Open",
+      "statusCode": "InProgress",
+      "maturityTracks": {
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-camp-visitor-stay-e3-20260829",
+            "evidence:nature-camp-visitor-stay-e4-20260830"
+          ],
+          "blockers": [
+            "Session·Save 영향 경로 재검증 필요"
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-camp-visitor-stay-e3-20260829",
+            "evidence:nature-camp-visitor-stay-e4-20260830"
+          ],
+          "blockers": [
+            "실제 자산·통행·입력·Game View 미검증"
+          ]
+        }
+      },
+      "openFeedbackItems": [],
+      "evidencePackageRefs": [
+        "evidence:nature-camp-visitor-stay-e3-20260829",
+        "evidence:nature-camp-visitor-stay-e4-20260830"
+      ],
+      "legacyWorkOrderRefs": [],
+      "blockers": [
+        "E5 Session/Save/실제 World 결속 검증 미완료"
+      ],
+      "nextAction": "E5 승인 범위: Session·Save·같은 Core·실제 자산 발현을 검증한다. 현재 E는 보존한다.",
+      "requiredStudies": [
+        {
+          "studyStableId": "study:nature-camp-visitor-stay:presentation.r2",
+          "documentRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E5표현연구.r2.md",
+          "statusCode": "Accepted",
+          "sha256": "847D2A57CA215CD9B3310B2AD70331CF3A8F2D7586492E1964621E98346C67E0"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-camp-visitor-stay.e7-work-order.json"
     },
     {
       "priority": 8,
@@ -540,37 +1191,96 @@
       "title": "Nature 거점 성찰·다음 원정 준비",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:nature-base-reflection.v1", "designDocumentRef": "docs/Architecture/PlayableLoops/nature-base-reflection.v1.md", "designRevision": "nature-base-reflection.design.r1", "designHashSha256": "C6564C4CFE18CF4C33305925D4ECC7AF870FA773488244309131CB3095EE4DF8", "statusCode": "Draft", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:nature-base-reflection.v1",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/nature-base-reflection.v1.md",
+        "designRevision": "nature-base-reflection.design.r1",
+        "designHashSha256": "C6564C4CFE18CF4C33305925D4ECC7AF870FA773488244309131CB3095EE4DF8",
+        "statusCode": "Draft",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:nature-survival-homestead.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1"
+      ],
       "playerPromise": "원정 결과를 가지고 거점에 돌아오면 그냥 쉬거나 승인 자료로 오늘의 행동을 성찰할 수 있고, 성찰한 경우 다음 원정의 선택 정보가 영구 내면 성장에 따라 달라진다.",
-      "entryStateCodes": ["NatureSafeChoiceAvailable", "FieldExpeditionChoiceAvailable", "ReturnedToBase"],
-      "worldInteractionIds": ["WI-REFLECT-01"],
-      "successStateCodes": ["InnerLearningPending", "InnerLearningApplied", "FieldExpeditionChoiceAvailable"],
+      "entryStateCodes": [
+        "NatureSafeChoiceAvailable",
+        "FieldExpeditionChoiceAvailable",
+        "ReturnedToBase"
+      ],
+      "worldInteractionIds": [
+        "WI-REFLECT-01"
+      ],
+      "successStateCodes": [
+        "InnerLearningPending",
+        "InnerLearningApplied",
+        "FieldExpeditionChoiceAvailable"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["NatureSafeChoiceAvailable", "FieldExpeditionChoiceAvailable"],
-      "requiredHCapabilities": ["ReflectionInteractionAnchor", "ShelterInterior"],
+      "returnStateCodes": [
+        "NatureSafeChoiceAvailable",
+        "FieldExpeditionChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "ReflectionInteractionAnchor",
+        "ShelterInterior"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterReflectionConfirmed", "AfterInnerLearningApplied"],
+      "saveCheckpointCodes": [
+        "AfterReflectionConfirmed",
+        "AfterInnerLearningApplied"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "Defined",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E3", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:nature-base-reflection-e3-20260826"], "blockers": ["WI-REFLECT-01의 E4 결속과 주 세션 Adapter가 남아 있다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["성찰 선택·근거·내면 성장 결과를 읽는 표현 계약 이후 Runtime 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:nature-base-reflection-e3-20260826"
+          ],
+          "blockers": [
+            "WI-REFLECT-01의 E4 결속과 주 세션 Adapter가 남아 있다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "성찰 선택·근거·내면 성장 결과를 읽는 표현 계약 이후 Runtime 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:nature-base-reflection-e3-20260826"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-base-reflection.e9-work-order.json"],
+      "evidencePackageRefs": [
+        "evidence:nature-base-reflection-e3-20260826"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-base-reflection.e9-work-order.json"
+      ],
       "designDocumentRef": "docs/Architecture/PlayableLoops/nature-base-reflection.v1.md",
-      "sourcePlanningDocumentRefs": ["docs/Architecture/플레이폐루프완결로드맵.md", "docs/Architecture/플레이어중심게임개발업무구조.md"],
-      "predecessorLoopStableIds": ["playable-loop:nature-field-supply-return.v1"],
-      "blockers": ["WI-REFLECT-01과 H1 ReflectionInteractionAnchor의 E4 결속, 주 세션 저장·LocalProcess·RemoteHost Adapter, SimulationWorldShell 실제 입력 증거가 없다."],
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/플레이폐루프완결로드맵.md",
+        "docs/Architecture/플레이어중심게임개발업무구조.md"
+      ],
+      "predecessorLoopStableIds": [
+        "playable-loop:nature-field-supply-return.v1"
+      ],
+      "blockers": [
+        "WI-REFLECT-01과 H1 ReflectionInteractionAnchor의 E4 결속, 주 세션 저장·LocalProcess·RemoteHost Adapter, SimulationWorldShell 실제 입력 증거가 없다."
+      ],
       "nextAction": "공용 E1~E3 계약·시험을 기준선으로 삼아 WI-REFLECT-01과 기존 Nature 오두막 H1을 결속한다."
     },
     {
@@ -581,26 +1291,52 @@
       "loopLevelCode": "AreaAggregate",
       "completionTierCode": "Aggregate",
       "parentLoopStableId": "",
-      "requiredCoreChildLoopStableIds": ["playable-loop:town-order-consume-return.v1"],
-      "optionalExtensionChildLoopStableIds": ["playable-loop:town-arcana-context.v1"],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:town-market.v1"],
+      "requiredCoreChildLoopStableIds": [
+        "playable-loop:town-order-consume-return.v1"
+      ],
+      "optionalExtensionChildLoopStableIds": [
+        "playable-loop:town-arcana-context.v1"
+      ],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:town-market.v1"
+      ],
       "playerPromise": "Town 내부 재고로 주민 욕구·주문·소비·상태 변화와 다음 목표를 닫는다.",
-      "entryStateCodes": ["TownIndependentInventoryFixtureReady"],
+      "entryStateCodes": [
+        "TownIndependentInventoryFixtureReady"
+      ],
       "worldInteractionIds": [],
-      "successStateCodes": ["ResidentConsumptionCompleted", "TownLifeChoiceAvailable"],
+      "successStateCodes": [
+        "ResidentConsumptionCompleted",
+        "TownLifeChoiceAvailable"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["TownLifeChoiceAvailable"],
-      "requiredHCapabilities": ["TownMarketArea", "ResidentPickupArea", "ConsumptionPlace"],
+      "returnStateCodes": [
+        "TownLifeChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "TownMarketArea",
+        "ResidentPickupArea",
+        "ConsumptionPlace"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterResidentConsumption"],
+      "saveCheckpointCodes": [
+        "AfterResidentConsumption"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E9",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
-      "evidencePackageRefs": ["evidence:town-arcana-core-20260825"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json"],
-      "blockers": ["주문·소비 핵심 자식이 E5 CoreClosed가 아니다.", "타로 확장은 핵심 완결을 막지 않지만 현재 E4다."],
+      "evidencePackageRefs": [
+        "evidence:town-arcana-core-20260825"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json"
+      ],
+      "blockers": [
+        "주문·소비 핵심 자식이 E5 CoreClosed가 아니다.",
+        "타로 확장은 핵심 완결을 막지 않지만 현재 E4다."
+      ],
       "nextAction": "타로 유무와 무관한 주문→소비→다음 욕구 E5 Fixture부터 닫는다."
     },
     {
@@ -609,34 +1345,97 @@
       "title": "Town 주문·소비·다음 욕구",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:town-order-consume-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:town-order-consume-return.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:town-resident-market.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:town-market.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:town-market.v1"
+      ],
       "playerPromise": "주민이 욕구를 평가해 물품을 주문·수령·소비하고 변경된 상태로 다음 목표를 고른다.",
-      "entryStateCodes": ["TownIndependentInventoryFixtureReady", "ResidentNeedDetected"],
-      "worldInteractionIds": ["WI-ORDER-01", "WI-ORDER-02", "WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-05", "WI-ORDER-06", "WI-ORDER-07"],
-      "successStateCodes": ["ResidentConsumptionCompleted", "NextResidentGoalSelected"],
-      "failureRecoveryWorldInteractionIds": ["WI-ORDER-01"],
-      "returnStateCodes": ["TownLifeChoiceAvailable", "NextResidentGoalSelected"],
-      "requiredHCapabilities": ["OrderWorkArea", "PickingWorkArea", "PackingWorkArea", "ResidentPickupArea", "ConsumptionPlace"],
+      "entryStateCodes": [
+        "TownIndependentInventoryFixtureReady",
+        "ResidentNeedDetected"
+      ],
+      "worldInteractionIds": [
+        "WI-ORDER-01",
+        "WI-ORDER-02",
+        "WI-ORDER-03",
+        "WI-ORDER-04",
+        "WI-ORDER-05",
+        "WI-ORDER-06",
+        "WI-ORDER-07"
+      ],
+      "successStateCodes": [
+        "ResidentConsumptionCompleted",
+        "NextResidentGoalSelected"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-ORDER-01"
+      ],
+      "returnStateCodes": [
+        "TownLifeChoiceAvailable",
+        "NextResidentGoalSelected"
+      ],
+      "requiredHCapabilities": [
+        "OrderWorkArea",
+        "PickingWorkArea",
+        "PackingWorkArea",
+        "ResidentPickupArea",
+        "ConsumptionPlace"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterOrderReserved", "AfterResidentConsumption"],
+      "saveCheckpointCodes": [
+        "AfterOrderReserved",
+        "AfterResidentConsumption"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E4", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:town-arcana-core-20260825"], "blockers": ["욕구·경쟁·소비·다음 목표의 E5 Fixture가 남아 있다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["주문·수령·소비·다음 욕구의 화면 표현 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:town-arcana-core-20260825"
+          ],
+          "blockers": [
+            "욕구·경쟁·소비·다음 목표의 E5 Fixture가 남아 있다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "주문·수령·소비·다음 욕구의 화면 표현 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:town-arcana-core-20260825"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json"],
-      "blockers": ["배터리 경쟁·대체 물품·소비 Effect 뒤 다음 목표까지 한 E5 생활세계 Fixture로 판정하지 않았다."],
+      "evidencePackageRefs": [
+        "evidence:town-arcana-core-20260825"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json"
+      ],
+      "blockers": [
+        "배터리 경쟁·대체 물품·소비 Effect 뒤 다음 목표까지 한 E5 생활세계 Fixture로 판정하지 않았다."
+      ],
       "nextAction": "타로 배율을 끈 기준선에서도 욕구→경쟁→소비→다음 욕구가 결정적으로 닫히게 한다."
     },
     {
@@ -645,34 +1444,82 @@
       "title": "Town 메이저 아르카나 문맥 확장",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:town-arcana-context.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:town-arcana-context.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:town-resident-market.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:town-market.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:town-market.v1"
+      ],
       "playerPromise": "메이저 아르카나를 선택하고 이번 활성화의 정·역방향 근거가 Town 생활복구 효과에 한 번만 적용되는 것을 관찰한다.",
-      "entryStateCodes": ["MajorArcanaChoiceAvailable"],
-      "worldInteractionIds": ["WI-CARD-01"],
-      "successStateCodes": ["MajorArcanaActivationFrozen", "ArcanaInfluenceSnapshotsCreated"],
+      "entryStateCodes": [
+        "MajorArcanaChoiceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-CARD-01"
+      ],
+      "successStateCodes": [
+        "MajorArcanaActivationFrozen",
+        "ArcanaInfluenceSnapshotsCreated"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["TownLifeChoiceAvailable"],
-      "requiredHCapabilities": ["TownArcanaContextAvailable"],
+      "returnStateCodes": [
+        "TownLifeChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "TownArcanaContextAvailable"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterMajorArcanaActivation"],
+      "saveCheckpointCodes": [
+        "AfterMajorArcanaActivation"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E4", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:town-arcana-core-20260825"], "blockers": ["Town 핵심 폐루프에 적용된 최종 E5 계보가 없다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["정·역방향 근거와 적용 결과의 Unity 설명 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:town-arcana-core-20260825"
+          ],
+          "blockers": [
+            "Town 핵심 폐루프에 적용된 최종 E5 계보가 없다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "정·역방향 근거와 적용 결과의 Unity 설명 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:town-arcana-core-20260825"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json"],
-      "blockers": ["활성화 Snapshot은 시험됐지만 Town 핵심 폐루프에 적용된 최종 E5 계보와 Unity 설명 화면이 없다."],
+      "evidencePackageRefs": [
+        "evidence:town-arcana-core-20260825"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/town-arcana-npc-life-recovery.e9-work-order.json"
+      ],
+      "blockers": [
+        "활성화 Snapshot은 시험됐지만 Town 핵심 폐루프에 적용된 최종 E5 계보와 Unity 설명 화면이 없다."
+      ],
       "nextAction": "핵심 주문 폐루프와 분리된 확장 Fixture에서 방향 판정·단일 전개·저장 복원을 발현한다."
     },
     {
@@ -683,26 +1530,51 @@
       "loopLevelCode": "AreaAggregate",
       "completionTierCode": "Aggregate",
       "parentLoopStableId": "",
-      "requiredCoreChildLoopStableIds": ["playable-loop:farm-crop-cycle.v1", "playable-loop:farm-pack-store-return.v1"],
-      "optionalExtensionChildLoopStableIds": ["playable-loop:farm-player-placement.v1"],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:farm-production.v1"],
+      "requiredCoreChildLoopStableIds": [
+        "playable-loop:farm-crop-cycle.v1",
+        "playable-loop:farm-pack-store-return.v1",
+        "playable-loop:farm-barracks-defense.v1"
+      ],
+      "optionalExtensionChildLoopStableIds": [
+        "playable-loop:farm-player-placement.v1"
+      ],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
       "playerPromise": "Farm 안에서 생산·포장·내부 보관을 끝내고 다음 생산 선택으로 돌아온다.",
-      "entryStateCodes": ["FarmProductionReady"],
+      "entryStateCodes": [
+        "FarmProductionReady"
+      ],
       "worldInteractionIds": [],
-      "successStateCodes": ["FarmLotPacked", "FarmInternalStorageChoiceAvailable"],
+      "successStateCodes": [
+        "FarmLotPacked",
+        "FarmInternalStorageChoiceAvailable"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["FarmProductionChoiceAvailable"],
-      "requiredHCapabilities": ["FarmProductionArea", "FarmInternalStorage"],
+      "returnStateCodes": [
+        "FarmProductionChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "FarmProductionArea",
+        "FarmInternalStorage"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterHarvestLotCreated", "AfterFarmPacking"],
+      "saveCheckpointCodes": [
+        "AfterHarvestLotCreated",
+        "AfterFarmPacking"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E9",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
-      "evidencePackageRefs": ["evidence:simulation-task-20260824"],
+      "evidencePackageRefs": [
+        "evidence:simulation-task-20260824"
+      ],
       "legacyWorkOrderRefs": [],
-      "blockers": ["두 핵심 자식의 E4 결속과 E5 반환이 닫히지 않았다."],
+      "blockers": [
+        "두 핵심 자식의 E4 결속과 E5 반환이 닫히지 않았다."
+      ],
       "nextAction": "생산 주기와 포장·내부 보관 반환을 별도 Fixture로 닫은 뒤 영역 집계를 올린다."
     },
     {
@@ -711,35 +1583,97 @@
       "title": "Farm 경작·성장·수확",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:farm-crop-cycle.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:farm-crop-cycle.v1",
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "designRevision": "farm-crop-cycle.design.r1",
+        "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+        "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:farm-internal-production.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:farm-production.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
       "playerPromise": "경작을 시작해 성장과 수확을 거쳐 추적 가능한 수확 Lot을 만든다.",
-      "entryStateCodes": ["FarmProductionReady"],
-      "worldInteractionIds": ["WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04"],
-      "successStateCodes": ["HarvestLotCreated"],
+      "entryStateCodes": [
+        "FarmProductionReady"
+      ],
+      "worldInteractionIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04"
+      ],
+      "successStateCodes": [
+        "HarvestLotCreated"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["FarmHarvestChoiceAvailable"],
-      "requiredHCapabilities": ["CultivationWorkArea", "HarvestWorkArea"],
+      "returnStateCodes": [
+        "FarmHarvestChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "CultivationWorkArea",
+        "HarvestWorkArea"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterHarvestLotCreated"],
+      "saveCheckpointCodes": [
+        "AfterHarvestLotCreated"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E3", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:simulation-task-20260824"], "blockers": ["E4 실행 문맥과 E5 수확·반환 Fixture가 없다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["경작·성장·수확의 표현 계약 이후 Runtime 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:simulation-task-20260824"
+          ],
+          "blockers": [
+            "Session·Save 영향 경로 재검증 필요"
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "실제 자산·통행·입력·Game View 미검증"
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:simulation-task-20260824"],
+      "evidencePackageRefs": [
+        "evidence:simulation-task-20260824"
+      ],
       "legacyWorkOrderRefs": [],
-      "blockers": ["독립 Fixture의 E4 주체·자원·시간 결속과 E5 성공·복구 반환 판정이 없다."],
-      "nextAction": "감자 독립 Fixture로 경작→수확 Lot과 재시도 상태를 닫는다."
+      "blockers": [
+        "E5 Session/Save/실제 World 결속 검증 미완료"
+      ],
+      "nextAction": "E5 승인 범위: Session·Save·같은 Core·실제 자산 발현을 검증한다. 현재 E는 보존한다.",
+      "requiredStudies": [
+        {
+          "studyStableId": "study:farm-crop-cycle:spatial-placement.r1",
+          "documentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
+          "statusCode": "Accepted",
+          "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
     },
     {
       "priority": 22,
@@ -747,70 +1681,278 @@
       "title": "Farm 집하·포장·내부 보관 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:farm-pack-store-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:farm-pack-store-return.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:farm-internal-production.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:farm-production.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
       "playerPromise": "수확 Lot을 집하·포장하고 Farm 내부 보관 뒤 다음 생산 선택으로 돌아온다.",
-      "entryStateCodes": ["HarvestLotCreated"],
-      "worldInteractionIds": ["WI-FARM-05", "WI-FARM-06"],
-      "successStateCodes": ["FarmLotPacked", "FarmInternalStorageChoiceAvailable"],
+      "entryStateCodes": [
+        "HarvestLotCreated"
+      ],
+      "worldInteractionIds": [
+        "WI-FARM-05",
+        "WI-FARM-06"
+      ],
+      "successStateCodes": [
+        "FarmLotPacked",
+        "FarmInternalStorageChoiceAvailable"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["FarmProductionChoiceAvailable"],
-      "requiredHCapabilities": ["CollectionWorkArea", "PackingWorkArea", "FarmInternalStorage"],
+      "returnStateCodes": [
+        "FarmProductionChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "CollectionWorkArea",
+        "PackingWorkArea",
+        "FarmInternalStorage"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterFarmPacking"],
+      "saveCheckpointCodes": [
+        "AfterFarmPacking"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E3", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:simulation-task-20260824"], "blockers": ["내부 보관·재생산 반환 상태 계약과 E5 Fixture가 없다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["집하·포장·보관·다음 생산 반환의 Runtime 표현 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:simulation-task-20260824"
+          ],
+          "blockers": [
+            "내부 보관·재생산 반환 상태 계약과 E5 Fixture가 없다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "집하·포장·보관·다음 생산 반환의 Runtime 표현 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:simulation-task-20260824"],
+      "evidencePackageRefs": [
+        "evidence:simulation-task-20260824"
+      ],
       "legacyWorkOrderRefs": [],
-      "blockers": ["WI-FARM-07~09 예약 번호를 재사용하지 않는 내부 보관·반환 상태 계약과 E5 Fixture가 없다."],
+      "blockers": [
+        "WI-FARM-07~09 예약 번호를 재사용하지 않는 내부 보관·반환 상태 계약과 E5 Fixture가 없다."
+      ],
       "nextAction": "새 WI를 성급히 만들지 않고 WI-FARM-06 완료 결과에 내부 보관·재생산 반환 계약을 먼저 확정한다."
     },
     {
       "priority": 23,
+      "loopStableId": "playable-loop:farm-barracks-defense.v1",
+      "title": "Farm 병영·방위·분대 운영",
+      "loopKind": "IndependentArea",
+      "loopLevelCode": "PlayableUnit",
+      "planningGate": {
+        "topicStableId": "topic:farm-barracks-defense.v1",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm병영방위.md",
+        "designRevision": "farm-barracks-defense.design.r6",
+        "designHashSha256": "61B9C1498BAD969F03123BA36918E365934A9C1403BF717773B50ABB408EEE63",
+        "statusCode": "Approved",
+        "approvalEvidenceRef": "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md"
+      },
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/Farm병영방위.md"
+      ],
+      "completionTierCode": "Core",
+      "parentLoopStableId": "playable-loop:farm-internal-production.v1",
+      "requiredCoreChildLoopStableIds": [],
+      "optionalExtensionChildLoopStableIds": [],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
+      "playerPromise": "Farm 외곽 경비 초소의 분대를 출동시키고 생산 손실과 직접 참전 여부를 비교한 뒤 방어 결과를 Farm 생활로 돌려보낸다.",
+      "entryStateCodes": [
+        "FarmDefenseOutpostSlotEmpty",
+        "FarmDefenseSquadUnassigned",
+        "FarmDefenseThreatApproaching",
+        "FarmDefenseSquadReady"
+      ],
+      "worldInteractionIds": [
+        "WI-SQUAD-ASSIGN",
+        "WI-SQUAD-SUPPLY",
+        "WI-FARM-DEFENSE-MOBILIZE",
+        "WI-FARM-DEFENSE-RESOLVE",
+        "WI-FARM-DEFENSE-RETURN"
+      ],
+      "successStateCodes": [
+        "FarmDefenseResolved",
+        "FarmDefenseReturnCompleted"
+      ],
+      "failureRecoveryWorldInteractionIds": [],
+      "returnStateCodes": [
+        "FarmProductionChoiceAvailable",
+        "FarmDefenseChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "FarmPerimeterOutpostH2",
+        "SquadAssemblyH1"
+      ],
+      "independentExecutionRequired": true,
+      "saveCheckpointCodes": [],
+      "currentEvidenceStage": "E3",
+      "nextClosureTargetStage": "E4",
+      "finalEvidenceStage": "E7",
+      "closureStateCode": "Open",
+      "statusCode": "InProgress",
+      "maturityTracks": {
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:farm-barracks-defense-e3-20260829",
+            "evidence:farm-barracks-defense-e4-20260830",
+            "evidence:farm-barracks-squad-assignment-e3-20260830",
+            "evidence:farm-barracks-squad-supply-e3-20260830",
+            "evidence:farm-barracks-defense-resolution-e3-20260830",
+            "evidence:farm-barracks-defense-return-e3-20260830"
+          ],
+          "blockers": [
+            "활성 WI-FARM-DEFENSE-RETURN의 E4 판독 순간·InteractionAnchor·VisualKey는 승인되지 않았다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:farm-barracks-defense-e3-20260829",
+            "evidence:farm-barracks-defense-e4-20260830",
+            "evidence:farm-barracks-squad-assignment-e3-20260830",
+            "evidence:farm-barracks-squad-supply-e3-20260830",
+            "evidence:farm-barracks-defense-resolution-e3-20260830",
+            "evidence:farm-barracks-defense-return-e3-20260830"
+          ],
+          "blockers": [
+            "활성 WI-FARM-DEFENSE-RETURN은 결정적 귀환 카드까지만 검증했고 실제 이동·초소·치료·생산 재합류 표현 증거가 없다."
+          ]
+        }
+      },
+      "openFeedbackItems": [],
+      "evidencePackageRefs": [
+        "evidence:farm-barracks-defense-e3-20260829",
+        "evidence:farm-barracks-defense-e4-20260830",
+        "evidence:farm-barracks-squad-assignment-e3-20260830",
+        "evidence:farm-barracks-squad-supply-e3-20260830",
+        "evidence:farm-barracks-defense-resolution-e3-20260830",
+        "evidence:farm-barracks-defense-return-e3-20260830"
+      ],
+      "legacyWorkOrderRefs": [],
+      "blockers": [
+        "WI-FARM-DEFENSE-MOBILIZE는 통합 E4, 분대 배정·보급·결과 발현은 통합 E3에서 대기하고, 활성 WI-FARM-DEFENSE-RETURN은 통합 E3 상한에서 E4 승인을 기다린다."
+      ],
+      "nextAction": "다음 승인 revision에서 WI-FARM-DEFENSE-RETURN의 E4 판독 순간·InteractionAnchor·VisualKey를 동결하거나 치료·생산 재합류 후속 WI를 별도 승인한다."
+    },
+    {
+      "priority": 24,
       "loopStableId": "playable-loop:farm-player-placement.v1",
       "title": "Farm 플레이어 배치 확장",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:farm-player-placement.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:farm-player-placement.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Extension",
       "parentLoopStableId": "playable-loop:farm-internal-production.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:farm-production.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
       "playerPromise": "자원과 배치 규칙 안에서 울타리·나무·건물을 직접 배치하고 다시 건설 선택으로 돌아온다.",
-      "entryStateCodes": ["FarmPlacementChoiceAvailable"],
-      "worldInteractionIds": ["WI-CON-01", "WI-WORLD-03"],
-      "successStateCodes": ["FarmPlacementConfirmed"],
-      "failureRecoveryWorldInteractionIds": ["WI-WORLD-03"],
-      "returnStateCodes": ["FarmPlacementChoiceAvailable"],
-      "requiredHCapabilities": ["PlacementControlHierarchy", "FarmRoadsidePattern"],
+      "entryStateCodes": [
+        "FarmPlacementChoiceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-CON-01",
+        "WI-WORLD-03"
+      ],
+      "successStateCodes": [
+        "FarmPlacementConfirmed"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-WORLD-03"
+      ],
+      "returnStateCodes": [
+        "FarmPlacementChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "PlacementControlHierarchy",
+        "FarmRoadsidePattern"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterFarmPlacement"],
+      "saveCheckpointCodes": [
+        "AfterFarmPlacement"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E3", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:simulation-task-20260824"], "blockers": ["Farm 전용 배치 규칙·Save 계보·권위 Fixture가 없다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["Preview·Confirm·배치 결과의 Farm Runtime 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:simulation-task-20260824"
+          ],
+          "blockers": [
+            "Farm 전용 배치 규칙·Save 계보·권위 Fixture가 없다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "Preview·Confirm·배치 결과의 Farm Runtime 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:simulation-task-20260824"],
+      "evidencePackageRefs": [
+        "evidence:simulation-task-20260824"
+      ],
       "legacyWorkOrderRefs": [],
-      "blockers": ["현재 건물 WI의 실제 건설 상태 전이는 Nature 전용이며 Farm 배치는 별도 규칙·Scene 증거가 섞여 있다."],
+      "blockers": [
+        "현재 건물 WI의 실제 건설 상태 전이는 Nature 전용이며 Farm 배치는 별도 규칙·Scene 증거가 섞여 있다."
+      ],
       "nextAction": "Farm 핵심 생산 폐루프와 분리해 배치 Preview·Confirm·Tick·Save 계보를 전용 증거로 만든다."
     },
     {
@@ -821,18 +1963,37 @@
       "loopLevelCode": "AreaAggregate",
       "completionTierCode": "Aggregate",
       "parentLoopStableId": "",
-      "requiredCoreChildLoopStableIds": ["playable-loop:hub-inbound-putaway.v1", "playable-loop:hub-outbound-ready-return.v1"],
+      "requiredCoreChildLoopStableIds": [
+        "playable-loop:hub-inbound-putaway.v1",
+        "playable-loop:hub-outbound-ready-return.v1"
+      ],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:logistics-hub.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:logistics-hub.v1"
+      ],
       "playerPromise": "외부 Farm 성과 없이 Hub 내부 Fixture로 입고·적치·출고 준비를 반복한다.",
-      "entryStateCodes": ["HubIndependentInboundFixtureReady"],
+      "entryStateCodes": [
+        "HubIndependentInboundFixtureReady"
+      ],
       "worldInteractionIds": [],
-      "successStateCodes": ["HubOutboundReady", "HubWorkChoiceAvailable"],
+      "successStateCodes": [
+        "HubOutboundReady",
+        "HubWorkChoiceAvailable"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["HubWorkChoiceAvailable"],
-      "requiredHCapabilities": ["ReceivingWorkArea", "StorageCapacity", "PickingWorkArea"],
+      "returnStateCodes": [
+        "HubWorkChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "ReceivingWorkArea",
+        "StorageCapacity",
+        "PickingWorkArea"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterHubPutAway", "AfterHubOutboundReady"],
+      "saveCheckpointCodes": [
+        "AfterHubPutAway",
+        "AfterHubOutboundReady"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E9",
@@ -840,7 +2001,9 @@
       "statusCode": "Defined",
       "evidencePackageRefs": [],
       "legacyWorkOrderRefs": [],
-      "blockers": ["독립 입고 Fixture·E3 시험과 두 핵심 자식의 E4/E5 증거가 없다."],
+      "blockers": [
+        "독립 입고 Fixture·E3 시험과 두 핵심 자식의 E4/E5 증거가 없다."
+      ],
       "nextAction": "입고·적치 자식의 독립 Fixture부터 E3로 만든다."
     },
     {
@@ -849,34 +2012,78 @@
       "title": "Hub 입고·검수·적치",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:hub-inbound-putaway.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:hub-inbound-putaway.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:hub-internal-warehouse.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:logistics-hub.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:logistics-hub.v1"
+      ],
       "playerPromise": "독립 입고 Fixture를 검수하고 적치한 뒤 다음 창고 작업을 고른다.",
-      "entryStateCodes": ["HubIndependentInboundFixtureReady"],
-      "worldInteractionIds": ["WI-001", "WI-002"],
-      "successStateCodes": ["HubPutAwayCompleted"],
+      "entryStateCodes": [
+        "HubIndependentInboundFixtureReady"
+      ],
+      "worldInteractionIds": [
+        "WI-001",
+        "WI-002"
+      ],
+      "successStateCodes": [
+        "HubPutAwayCompleted"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["HubWorkChoiceAvailable"],
-      "requiredHCapabilities": ["ReceivingWorkArea", "InspectionWorkArea", "StorageCapacity"],
+      "returnStateCodes": [
+        "HubWorkChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "ReceivingWorkArea",
+        "InspectionWorkArea",
+        "StorageCapacity"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterHubPutAway"],
+      "saveCheckpointCodes": [
+        "AfterHubPutAway"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "Defined",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E2", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": [], "blockers": ["독립 Fixture·Save/Replay·결정적 적치 시험이 없다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["입고·검수·적치의 표현 계약 이후 Runtime 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E2",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "독립 Fixture·Save/Replay·결정적 적치 시험이 없다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "입고·검수·적치의 표현 계약 이후 Runtime 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
       "evidencePackageRefs": [],
       "legacyWorkOrderRefs": [],
-      "blockers": ["다른 영역 화물과 무관한 Fixture·Save/Replay·결정적 적치 시험이 없다."],
+      "blockers": [
+        "다른 영역 화물과 무관한 Fixture·Save/Replay·결정적 적치 시험이 없다."
+      ],
       "nextAction": "Hub 자체 입고 Lot과 용량·검수 실패·재선택 계약을 E3로 구현한다."
     },
     {
@@ -885,33 +2092,82 @@
       "title": "Hub 출고 준비·작업 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:hub-outbound-ready-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:hub-outbound-ready-return.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:hub-internal-warehouse.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:logistics-hub.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:logistics-hub.v1"
+      ],
       "playerPromise": "NPC가 내부 재고를 할당·피킹·출고 준비하는 동안 플레이어는 정책·우선순위·차단 해소를 선택하고 외부 차량 적재 없이 다음 Hub 운영 선택으로 돌아온다.",
-      "entryStateCodes": ["HubStoredInventoryAvailable"],
-      "worldInteractionIds": ["WI-HUB-03", "WI-HUB-04", "WI-HUB-05"],
-      "successStateCodes": ["HubOutboundReady"],
+      "entryStateCodes": [
+        "HubStoredInventoryAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-HUB-03",
+        "WI-HUB-04",
+        "WI-HUB-05"
+      ],
+      "successStateCodes": [
+        "HubOutboundReady"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["HubWorkChoiceAvailable"],
-      "requiredHCapabilities": ["StorageCapacity", "PickingWorkArea", "OutboundStagingArea"],
+      "returnStateCodes": [
+        "HubWorkChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "StorageCapacity",
+        "PickingWorkArea",
+        "OutboundStagingArea"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterHubOutboundReady"],
+      "saveCheckpointCodes": [
+        "AfterHubOutboundReady"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "InProgress",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E3", "targetStage": "E7", "statusCode": "InProgress", "evidencePackageRefs": ["evidence:hub-npc-routine-core-20260825"], "blockers": ["H 공간 결속과 실제 WI 발현이 없다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["플레이어 정책 개입과 NPC 업무 표현의 Game View 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [
+            "evidence:hub-npc-routine-core-20260825"
+          ],
+          "blockers": [
+            "H 공간 결속과 실제 WI 발현이 없다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "플레이어 정책 개입과 NPC 업무 표현의 Game View 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
-      "evidencePackageRefs": ["evidence:hub-npc-routine-core-20260825"],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/hub-npc-routine-outbound.e9-work-order.json"],
+      "evidencePackageRefs": [
+        "evidence:hub-npc-routine-core-20260825"
+      ],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/hub-npc-routine-outbound.e9-work-order.json"
+      ],
       "blockers": [
         "PickingWorkArea·OutboundStagingArea의 승인 H 공간 결속과 실제 WI Manifestation이 없다.",
         "SimulationWorldShell의 플레이어 정책 개입·NPC 업무 표현과 Game View 증거가 없다.",
@@ -927,17 +2183,31 @@
       "loopLevelCode": "AreaAggregate",
       "completionTierCode": "Aggregate",
       "parentLoopStableId": "",
-      "requiredCoreChildLoopStableIds": ["playable-loop:city-demand-service-return.v1"],
+      "requiredCoreChildLoopStableIds": [
+        "playable-loop:city-demand-service-return.v1"
+      ],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:city-service.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:city-service.v1"
+      ],
       "legacyAreaSetCompatibilityNote": "기존 CityHub 결합 StableId는 호환용이며 새 플레이 폐루프 판단에서는 City와 Hub를 분리한다.",
       "playerPromise": "City 내부 수요와 지역 재고 Fixture로 서비스를 처리하고 다음 도심 운영 선택으로 돌아온다.",
-      "entryStateCodes": ["CityIndependentDemandFixtureRequired"],
+      "entryStateCodes": [
+        "CityIndependentDemandFixtureRequired"
+      ],
       "worldInteractionIds": [],
-      "successStateCodes": ["CityServiceChoiceAvailable"],
+      "successStateCodes": [
+        "CityServiceChoiceAvailable"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["CityServiceChoiceAvailable"],
-      "requiredHCapabilities": ["UrbanDemandArea", "LastMileHandoffArea", "UrbanRecoveryRoute"],
+      "returnStateCodes": [
+        "CityServiceChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "UrbanDemandArea",
+        "LastMileHandoffArea",
+        "UrbanRecoveryRoute"
+      ],
       "independentExecutionRequired": true,
       "saveCheckpointCodes": [],
       "currentEvidenceStage": "E1",
@@ -947,7 +2217,9 @@
       "statusCode": "Defined",
       "evidencePackageRefs": [],
       "legacyWorkOrderRefs": [],
-      "blockers": ["City WI는 E1 계약만 등록됐고 독립 Core 상태·시험·발현이 없다."],
+      "blockers": [
+        "City WI는 E1 계약만 등록됐고 독립 Core 상태·시험·발현이 없다."
+      ],
       "nextAction": "도심 수요→재고 배정→서비스→결과 확인 자식을 E2/E3로 구현한다."
     },
     {
@@ -956,34 +2228,85 @@
       "title": "City 수요·서비스·결과 반환",
       "loopKind": "IndependentArea",
       "loopLevelCode": "PlayableUnit",
-      "planningGate": { "topicStableId": "topic:city-demand-service-return.v1", "designDocumentRef": "", "designRevision": "", "designHashSha256": "", "statusCode": "NotStarted", "approvalEvidenceRef": "" },
+      "planningGate": {
+        "topicStableId": "topic:city-demand-service-return.v1",
+        "designDocumentRef": "",
+        "designRevision": "",
+        "designHashSha256": "",
+        "statusCode": "NotStarted",
+        "approvalEvidenceRef": ""
+      },
       "completionTierCode": "Core",
       "parentLoopStableId": "playable-loop:city-urban-logistics.v1",
       "requiredCoreChildLoopStableIds": [],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:city-service.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:city-service.v1"
+      ],
       "playerPromise": "도심 수요를 확정하고 재고를 배정해 서비스 결과를 확인한 뒤 다음 운영을 선택한다.",
-      "entryStateCodes": ["CityDemandChoiceAvailable"],
-      "worldInteractionIds": ["WI-CITY-01", "WI-CITY-02", "WI-CITY-03", "WI-CITY-04"],
-      "successStateCodes": ["CityServiceCompleted", "CityServiceChoiceAvailable"],
-      "failureRecoveryWorldInteractionIds": ["WI-CITY-03", "WI-CITY-04"],
-      "returnStateCodes": ["CityServiceChoiceAvailable"],
-      "requiredHCapabilities": ["UrbanDemandArea", "UrbanSortingArea", "LastMileHandoffArea", "UrbanRecoveryRoute"],
+      "entryStateCodes": [
+        "CityDemandChoiceAvailable"
+      ],
+      "worldInteractionIds": [
+        "WI-CITY-01",
+        "WI-CITY-02",
+        "WI-CITY-03",
+        "WI-CITY-04"
+      ],
+      "successStateCodes": [
+        "CityServiceCompleted",
+        "CityServiceChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-CITY-03",
+        "WI-CITY-04"
+      ],
+      "returnStateCodes": [
+        "CityServiceChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "UrbanDemandArea",
+        "UrbanSortingArea",
+        "LastMileHandoffArea",
+        "UrbanRecoveryRoute"
+      ],
       "independentExecutionRequired": true,
-      "saveCheckpointCodes": ["AfterCityServiceResult"],
+      "saveCheckpointCodes": [
+        "AfterCityServiceResult"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E2",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
       "statusCode": "Defined",
       "maturityTracks": {
-        "logic": { "trackCode": "Logic", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["권위 Core·Save/Replay·Fixture가 없다."] },
-        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Waiting", "evidencePackageRefs": [], "blockers": ["도심 수요·배정·서비스 결과의 표현 계약 이후 Runtime 증거가 없다."] }
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "권위 Core·Save/Replay·Fixture가 없다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E1",
+          "targetStage": "E7",
+          "statusCode": "Waiting",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "도심 수요·배정·서비스 결과의 표현 계약 이후 Runtime 증거가 없다."
+          ]
+        }
       },
       "openFeedbackItems": [],
       "evidencePackageRefs": [],
       "legacyWorkOrderRefs": [],
-      "blockers": ["계약만 있으며 권위 Core·Save/Replay·Fixture가 없다."],
+      "blockers": [
+        "계약만 있으며 권위 Core·Save/Replay·Fixture가 없다."
+      ],
       "nextAction": "기존 도심마트 파생 엔진을 상태 권위로 오인하지 않고 독립 City 명령 Aggregate부터 만든다."
     },
     {
@@ -1002,24 +2325,47 @@
         "playable-loop:city-urban-logistics.v1"
       ],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1", "area-set:sim:pyeongchang:town-market.v1", "area-set:sim:pyeongchang:farm-production.v1", "area-set:sim:pyeongchang:logistics-hub.v1", "area-set:sim:pyeongchang:city-service.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1",
+        "area-set:sim:pyeongchang:town-market.v1",
+        "area-set:sim:pyeongchang:farm-production.v1",
+        "area-set:sim:pyeongchang:logistics-hub.v1",
+        "area-set:sim:pyeongchang:city-service.v1"
+      ],
       "playerPromise": "서버 없는 Solo에서 각 독립 영역의 하루 핵심 선택을 이어 실행하고 저장·복원 후 다시 선택할 수 있다.",
-      "entryStateCodes": ["SoloLocalProcessReady"],
-      "worldInteractionIds": ["WI-WORLD-08"],
-      "successStateCodes": ["SoloDayChoiceAvailable"],
+      "entryStateCodes": [
+        "SoloLocalProcessReady"
+      ],
+      "worldInteractionIds": [
+        "WI-WORLD-08"
+      ],
+      "successStateCodes": [
+        "SoloDayChoiceAvailable"
+      ],
       "failureRecoveryWorldInteractionIds": [],
-      "returnStateCodes": ["SoloDayChoiceAvailable"],
-      "requiredHCapabilities": ["CanonicalSimulationWorldShell", "AreaSetChoiceProjection"],
+      "returnStateCodes": [
+        "SoloDayChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "CanonicalSimulationWorldShell",
+        "AreaSetChoiceProjection"
+      ],
       "independentExecutionRequired": false,
-      "saveCheckpointCodes": ["AfterSoloDay"],
+      "saveCheckpointCodes": [
+        "AfterSoloDay"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E5",
       "finalEvidenceStage": "E9",
       "closureStateCode": "Open",
       "statusCode": "Defined",
       "evidencePackageRefs": [],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/solo-first-simulation-runtime.e9-work-order.json"],
-      "blockers": ["다섯 독립 영역 집계가 CoreClosed가 아니며 Solo 하루의 영역 선택·저장 반환 계약도 아직 E1이다."],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/solo-first-simulation-runtime.e9-work-order.json"
+      ],
+      "blockers": [
+        "다섯 독립 영역 집계가 CoreClosed가 아니며 Solo 하루의 영역 선택·저장 반환 계약도 아직 E1이다."
+      ],
       "nextAction": "영역 간 운송을 선행시키지 말고 각 영역 CoreClosed 뒤 하루 선택 집계를 조립한다."
     },
     {
@@ -1030,26 +2376,58 @@
       "loopLevelCode": "WorldAggregate",
       "completionTierCode": "Aggregate",
       "parentLoopStableId": "",
-      "requiredCoreChildLoopStableIds": ["playable-loop:nature-survival-homestead.v1", "playable-loop:farm-internal-production.v1"],
+      "requiredCoreChildLoopStableIds": [
+        "playable-loop:nature-survival-homestead.v1",
+        "playable-loop:farm-internal-production.v1"
+      ],
       "optionalExtensionChildLoopStableIds": [],
-      "areaSetStableIds": ["area-set:sim:pyeongchang:nature-home.v1", "area-set:sim:pyeongchang:farm-production.v1"],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1",
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
       "playerPromise": "Nature와 Farm이 독립 완결된 뒤 두 영역 사이를 선택적으로 왕복하고 양쪽 선택 상태로 돌아온다.",
-      "entryStateCodes": ["NatureIndependentLoopReady", "FarmIndependentLoopReady"],
-      "worldInteractionIds": ["WI-NATURE-02", "WI-NATURE-04", "WI-FARM-04", "WI-FARM-05", "WI-FARM-06"],
-      "successStateCodes": ["NatureFarmRoundtripChoiceAvailable"],
-      "failureRecoveryWorldInteractionIds": ["WI-NATURE-02", "WI-NATURE-04"],
-      "returnStateCodes": ["NatureChoiceAvailable", "FarmChoiceAvailable"],
-      "requiredHCapabilities": ["NatureFarmTransition", "BidirectionalReturnRoute"],
+      "entryStateCodes": [
+        "NatureIndependentLoopReady",
+        "FarmIndependentLoopReady"
+      ],
+      "worldInteractionIds": [
+        "WI-NATURE-02",
+        "WI-NATURE-04",
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06"
+      ],
+      "successStateCodes": [
+        "NatureFarmRoundtripChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [
+        "WI-NATURE-02",
+        "WI-NATURE-04"
+      ],
+      "returnStateCodes": [
+        "NatureChoiceAvailable",
+        "FarmChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "NatureFarmTransition",
+        "BidirectionalReturnRoute"
+      ],
       "independentExecutionRequired": false,
-      "saveCheckpointCodes": ["AfterAreaSetReturn"],
+      "saveCheckpointCodes": [
+        "AfterAreaSetReturn"
+      ],
       "currentEvidenceStage": "E1",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E9",
       "closureStateCode": "Open",
       "statusCode": "Deferred",
       "evidencePackageRefs": [],
-      "legacyWorkOrderRefs": ["eng/execution-ledgers/work-orders/nature-farm-regional-development.e9-work-order.json"],
-      "blockers": ["Nature와 Farm 독립 영역 집계가 모두 E7 PlayClosed가 아니다."],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-farm-regional-development.e9-work-order.json"
+      ],
+      "blockers": [
+        "Nature와 Farm 독립 영역 집계가 모두 E7 PlayClosed가 아니다."
+      ],
       "nextAction": "두 독립 영역이 E7로 닫힐 때까지 대표 다음 작업으로 선택하지 않는다."
     }
   ]

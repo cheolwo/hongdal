@@ -1,0 +1,4185 @@
+{
+  "schemaVersion": "playable-loop-inquiry-implementation-scope.v1",
+  "revision": "playable-loop-inquiry-implementation-scope.r65",
+  "questionRange": { "first": 1, "last": 339 },
+  "output": {
+    "titleKo": "Q-001~Q-339 PlayableLoop 반영·구현 점검 원장",
+    "questionCountNoteKo": "Q-001부터 Q-339까지 정확히 한 번씩 포함",
+    "commonModuleMaturityNoteKo": "공통 모듈과 보류 결정은 독립 Evidence 주체가 아니므로 현재 E를 N/A로 표시한다.",
+    "evidenceNoteKo": "실제 E는 연결된 PlayableLoop 원장의 Logic·Presentation 중 낮은 통합 단계이며, 문답 깊이는 E 승격 근거가 아니다.",
+    "checkLabelsKo": { "planningRecord": "기획", "designBinding": "기획서", "implementation": "구현", "automatedVerification": "자동", "runtimeVerification": "Runtime", "evidenceBinding": "Evidence" },
+    "summaryTitleKo": "상태 요약",
+    "implementationStatusCountsLabelKo": "구현 범위 상태",
+    "worldInteractionExtractionTitleKo": "Q 순차 WI 추출·정규화",
+    "worldInteractionExtractionBoundaryNoteKo": "주제 WI 연결과 작은 구현 묶음의 보완 연결을 합친 1차 후보이며, 질문별 세부 정제가 필요하다. 등록 WI와 승인 기획서가 있어야 구현 순환에 들어간다.",
+    "worldInteractionExtractionHeadersKo": ["WI 후보", "등록", "관련 Q 수", "Q 순차 추출 결과"],
+    "worldInteractionEvidenceCycleQueueTitleKo": "WI 증명 순환 대기열",
+    "worldInteractionEvidenceCycleQueueBoundaryNoteKo": "대기열은 질문 번호를 구현 우선순위로 사용하지 않는다. 작업별 승인 기획·작업 명세·의존성·WI 등록·가장 이른 재개 E로 판정하며 대표 표시 WI는 다른 작업을 차단하지 않는다.",
+    "worldInteractionEvidenceCycleQueueHeadersKo": ["WI", "등록 / 기획", "C# E 책임 결속", "관련 묶음", "가장 이른 재개 E", "대기 상태", "차단"],
+    "dispatchTitleKo": "개발 인계 판정",
+    "executionRoutingTitleKo": "실제 구현 순서",
+    "executionSelectionTitleKo": "다음 실행 자동 판정",
+    "executionSelectionRuleNoteKo": "Q 번호나 단일 대표 WI가 아니라 각 작업의 승인 상한과 의존성을 판정한다. 한 작업의 승인 관문이 닫혀도 독립적으로 승인된 작업은 실행할 수 있으며 다른 작업의 승인을 빌려 쓰지 않는다.",
+    "implementationBatchTitleKo": "작은 구현 묶음",
+    "readyToDispatchLabelKo": "ReadyToDispatch",
+    "notReadyLabelKo": "NotReady",
+    "dispatchRuleNoteKo": "Q 번호는 추적·열람과 WI 후보의 첫 순차 추출에 사용한다. 구현 인계는 번호와 별개로 활성 Goal·WI와 일치하고, 작업 명세가 허용하며, Confirmed 결정과 Incorporated 기획서, 미착수 또는 부분 구현 상태, 차단 0건을 모두 만족해야 ReadyToDispatch다.",
+    "implementationBatchHeadersKo": ["묶음", "주제", "질문 근거", "PlayableUnit / WI", "현재 / 다음 E", "실행 상태", "차단"],
+    "tableHeadersKo": ["질문", "주제 / 깊이", "결정", "분류 / 상태", "반영 점검", "연결 대상", "현재 L/P/I", "다음", "차단·증거"]
+  },
+  "questionDepthCatalogPath": "eng/execution-ledgers/playable-loop-inquiry-depths.json",
+  "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "codexGoalCatalogPath": "eng/execution-ledgers/codex-playable-loop-goals.json",
+  "evidenceResponsibilityCodeMapPath": "docs/AI/generated/evidence-responsibility-code-map.json",
+  "principles": {
+    "everyQuestionAppearsExactlyOnce": true,
+    "questionDoesNotEqualFeature": true,
+    "actualEvidenceComesFromLinkedEvidenceSubject": true,
+    "commonModuleDoesNotOwnEvidenceMaturity": true,
+    "deferredBranchDoesNotBlockUnrelatedWork": true,
+    "independentApprovedWorkMayRunConcurrently": true,
+    "questionNumberDoesNotSetImplementationPriority": true,
+    "implementationOrderComesFromActivePlayableUnitDependency": true,
+    "questionSequenceIsUsedForWorldInteractionExtraction": true,
+    "extractedWorldInteractionDrivesEvidenceCycle": true,
+    "impactReviewRunsE7ToE1": true,
+    "initialAssemblyStartsE1ToE7": true,
+    "implementationReopensEarliestAffectedStage": true,
+    "logicPresentationCycleBidirectionally": true,
+    "unrelatedQuestionCandidateCannotAdvanceActiveGoal": true
+  },
+  "executionRouting": {
+    "selectionModeCode": "ActivePlayableUnitDependency",
+    "questionNumberRoleCode": "TraceabilityAndExtractionTraversal",
+    "questionTraversalPurposeCode": "WorldInteractionExtraction",
+    "questionTraversalDirectionCode": "Q001ToQ339",
+    "impactReviewDirectionCode": "E7ToE1",
+    "initialAssemblyDirectionCode": "E1ToE7",
+    "implementationCycleCode": "EarliestAffectedStageReopen",
+    "logicPresentationCycleCode": "Bidirectional",
+    "activePlayableUnitStableId": "playable-loop:nature-night-day2.v1",
+    "activeWorldInteractionId": "WI-ACTOR-PLAN-SET",
+    "activeTopicCode": "player-mind-meditation",
+    "activeWorkOrderRef": "eng/execution-ledgers/work-orders/nature-personal-plan.e7-work-order.json",
+    "currentIntegratedStageCode": "E1",
+    "dispatchCeilingStageCode": "E3",
+    "dispatchStateCode": "WaitingForApprovedRevision",
+    "nextActionCode": "ApprovePresentationRevisionBeforeE2OrSelectNextLogicE3Batch",
+    "parkedCandidateQuestionIds": [
+      "Q-001",
+      "Q-002",
+      "Q-003",
+      "Q-004",
+      "Q-005",
+      "Q-006",
+      "Q-007",
+      "Q-008",
+      "Q-009",
+      "Q-010",
+      "Q-011",
+      "Q-012",
+      "Q-013",
+      "Q-014",
+      "Q-015",
+      "Q-016",
+      "Q-017",
+      "Q-018",
+      "Q-019",
+      "Q-020",
+      "Q-021",
+      "Q-022",
+      "Q-023",
+      "Q-024",
+      "Q-025",
+      "Q-026",
+      "Q-027",
+      "Q-028",
+      "Q-029",
+      "Q-030",
+      "Q-031",
+      "Q-035",
+      "Q-036",
+      "Q-037",
+      "Q-038",
+      "Q-039",
+      "Q-045",
+      "Q-046",
+      "Q-047",
+      "Q-048",
+      "Q-049",
+      "Q-050",
+      "Q-051",
+      "Q-052",
+      "Q-053",
+      "Q-054",
+      "Q-055",
+      "Q-056",
+      "Q-057",
+      "Q-058",
+      "Q-059",
+      "Q-060",
+      "Q-061",
+      "Q-062",
+      "Q-063",
+      "Q-064",
+      "Q-065",
+      "Q-066",
+      "Q-067",
+      "Q-068",
+      "Q-069",
+      "Q-070",
+      "Q-071",
+      "Q-072",
+      "Q-073",
+      "Q-074",
+      "Q-075",
+      "Q-076",
+      "Q-122",
+      "Q-123",
+      "Q-124",
+      "Q-125",
+      "Q-132",
+      "Q-134",
+      "Q-139",
+      "Q-140",
+      "Q-141",
+      "Q-142",
+      "Q-149",
+      "Q-150",
+      "Q-153",
+      "Q-156",
+      "Q-157",
+      "Q-196",
+      "Q-197",
+      "Q-198",
+      "Q-269",
+      "Q-270",
+      "Q-271",
+      "Q-272",
+      "Q-273",
+      "Q-274",
+      "Q-275",
+      "Q-276",
+      "Q-277",
+      "Q-278",
+      "Q-279",
+      "Q-280",
+      "Q-281",
+      "Q-282",
+      "Q-283",
+      "Q-284",
+      "Q-285",
+      "Q-286",
+      "Q-287",
+      "Q-288",
+      "Q-289",
+      "Q-290",
+      "Q-291",
+      "Q-292",
+      "Q-293",
+      "Q-294",
+      "Q-295",
+      "Q-296",
+      "Q-077",
+      "Q-078",
+      "Q-079",
+      "Q-080",
+      "Q-081",
+      "Q-082",
+      "Q-083",
+      "Q-084",
+      "Q-085",
+      "Q-086",
+      "Q-087",
+      "Q-088",
+      "Q-089",
+      "Q-090",
+      "Q-091",
+      "Q-092",
+      "Q-093",
+      "Q-094",
+      "Q-095",
+      "Q-096",
+      "Q-097",
+      "Q-098",
+      "Q-099",
+      "Q-100",
+      "Q-101",
+      "Q-102",
+      "Q-103",
+      "Q-104",
+      "Q-105",
+      "Q-106",
+      "Q-107",
+      "Q-108",
+      "Q-109",
+      "Q-110",
+      "Q-111",
+      "Q-112",
+      "Q-113",
+      "Q-114",
+      "Q-115",
+      "Q-116",
+      "Q-117",
+      "Q-118",
+      "Q-119",
+      "Q-120",
+      "Q-121",
+      "Q-126",
+      "Q-127",
+      "Q-128",
+      "Q-129",
+      "Q-130",
+      "Q-136",
+      "Q-143",
+      "Q-144",
+      "Q-146",
+      "Q-147",
+      "Q-155",
+      "Q-135",
+      "Q-137",
+      "Q-138",
+      "Q-145",
+      "Q-148",
+      "Q-151",
+      "Q-152",
+      "Q-154",
+      "Q-158",
+      "Q-159",
+      "Q-160",
+      "Q-161",
+      "Q-162",
+      "Q-163",
+      "Q-164",
+      "Q-165",
+      "Q-166",
+      "Q-167",
+      "Q-168",
+      "Q-169",
+      "Q-170",
+      "Q-171",
+      "Q-172",
+      "Q-173",
+      "Q-174",
+      "Q-175",
+      "Q-176",
+      "Q-177",
+      "Q-178",
+      "Q-179",
+      "Q-180",
+      "Q-181",
+      "Q-182",
+      "Q-183",
+      "Q-184",
+      "Q-185",
+      "Q-186",
+      "Q-187",
+      "Q-188",
+      "Q-189",
+      "Q-190",
+      "Q-191",
+      "Q-192",
+      "Q-193",
+      "Q-194",
+      "Q-195",
+      "Q-199",
+      "Q-200",
+      "Q-201",
+      "Q-202",
+      "Q-203",
+      "Q-204",
+      "Q-205",
+      "Q-206",
+      "Q-207",
+      "Q-208",
+      "Q-209",
+      "Q-210",
+      "Q-211",
+      "Q-212",
+      "Q-213",
+      "Q-214",
+      "Q-215",
+      "Q-216",
+      "Q-217",
+      "Q-218",
+      "Q-219",
+      "Q-220",
+      "Q-221",
+      "Q-222",
+      "Q-338",
+      "Q-032",
+      "Q-033",
+      "Q-034"
+    ],
+    "parkedCandidateReasonCode": "NotActivePlayableUnitDependency",
+    "invariants": [
+      "TraverseQuestionsByNumericOrderForWorldInteractionExtraction",
+      "DoNotSelectImplementationByNumericOrder",
+      "DoNotSelectImplementationByReverseNumericOrder",
+      "KeepOneActivePlayableUnitAndWorldInteraction",
+      "ReviewImpactTopDownThenStartAssemblyBottomUp",
+      "ReopenEarliestAffectedStageInsteadOfForcingLinearOrder",
+      "CycleLogicAndPresentationUntilIntegratedGateCloses",
+      "DoNotPromoteFromQuestionCandidateEvidence"
+    ]
+  },
+  "worldInteractionExtraction": {
+    "phaseOrderCodes": ["QuestionSequentialTraversal", "WorldInteractionCandidateNormalization", "WorldInteractionEvidenceCycle"],
+    "candidateSourceCode": "TopicSeedPlusSmallBatchRefinement",
+    "normalizationCode": "StableWorldInteractionIdDeduplicate",
+    "implementationEntryCode": "RegisteredWorldInteractionAndApprovedDesignOnly",
+    "questionLevelRefinementRequired": true,
+    "evidenceCycleQueueSelectionBasisCodes": ["ApprovedWorkItemDependencies", "ApprovedPlanningGate", "RegisteredWorldInteraction", "EarliestReopenEvidenceStage"],
+    "evidenceCycleQueueTieBreakCode": "WorldInteractionStableIdForDeterministicOutputOnly"
+  },
+  "allowedImplementationBatchStateCodes": ["Active", "WaitingForApprovedRevision", "PlanningBlocked", "ParkedCandidate", "ImplementedParked", "Completed"],
+  "currentWorkBatchStableId": "batch:player-mind:personal-plan-and-progress.r1",
+  "fullyPartitionedTopicCodes": ["herbal-recipe-crafting", "nature-shelter-sleep", "player-mind-meditation", "nature-resource-construction", "save-load-runtime", "farm-building-spatial-placement", "town-order-pickup", "region-five-elements-monster", "community-membership-visitor", "building-placement-assistance", "farm-barracks-defense", "hub-demand-allocation", "survival-economy", "solo-work-delegation", "farm-landscape-pattern-inventory"],
+  "smallImplementationBatches": [
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:knowledge-record-e4.r1",
+      "titleKo": "처방 기록 발견과 지식 습득 E4",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-131",
+        "Q-133"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-03"
+      ],
+      "currentStageCode": "E4",
+      "nextStageCode": "E5",
+      "executionStateCode": "Active",
+      "blockerCodes": [
+        "SessionSaveAndWorldManifestationPending"
+      ],
+      "checkRefs": [
+        "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json",
+        "evidence:nature-basic-herbal-recovery-logic-e4-20260828",
+        "evidence:nature-basic-herbal-recovery-presentation-e4-20260829",
+        "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:consume-and-recovery-rules.r1",
+      "titleKo": "약초차 섭취·체온·초기 질병 회복 규칙",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-045",
+        "Q-046",
+        "Q-047",
+        "Q-048",
+        "Q-049",
+        "Q-050"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-ACTOR-CONSUME"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActiveWorldInteractionDependency",
+        "ApprovedConsumeRecoveryRuleRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Nature기초약초회복.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:recipe-inference-and-failure.r1",
+      "titleKo": "Recipe 추론·실패·정체불명 혼합물 규칙",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-061",
+        "Q-062",
+        "Q-063",
+        "Q-064",
+        "Q-068",
+        "Q-069",
+        "Q-070",
+        "Q-071"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-CRAFT-BREW"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActiveWorldInteractionDependency",
+        "PlayerAuthoredRecipeDeferred",
+        "ApprovedBrewInferenceRuleRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:workbench-draft-presentation.r1",
+      "titleKo": "3x3 작업대 초안·위협 중 입력 경계",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-142",
+        "Q-150",
+        "Q-157"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-CRAFT-BREW"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActiveWorldInteractionDependency",
+        "CraftDraftPresentationWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:official-herb-observation-and-gathering.r1",
+      "titleKo": "공식 약초 관찰·식별·채집·재생",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-269",
+        "Q-270",
+        "Q-275",
+        "Q-276",
+        "Q-277",
+        "Q-278"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-03"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-NATURE-HERB-GATHER"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActiveWorldInteractionDependency",
+        "AcceptedOfficialHerbResearchRequired",
+        "HerbGatherWorldInteractionRegistrationRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:source-recovery-decisions.r1",
+      "titleKo": "중단 문답 복구·대체 결정",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-271",
+        "Q-272",
+        "Q-273",
+        "Q-274"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E1",
+      "executionStateCode": "PlanningBlocked",
+      "blockerCodes": [
+        "InterruptedTurnQuestionTextMissing",
+        "SpecificFixtureDecisionSuperseded"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:brew-layout-and-feedback.r1",
+      "titleKo": "배합 배치·달이기·완성 피드백",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-279",
+        "Q-280",
+        "Q-281",
+        "Q-282",
+        "Q-283",
+        "Q-284",
+        "Q-285",
+        "Q-286"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-CRAFT-BREW"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActiveWorldInteractionDependency",
+        "AcceptedOfficialPrescriptionResearchRequired",
+        "BrewWorldInteractionRegistrationRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-basic-herbal-recovery:sourcing-and-knowledge-persistence.r1",
+      "titleKo": "획득 경로·단서 단계·지식 보존",
+      "topicCode": "herbal-recipe-crafting",
+      "questionIds": [
+        "Q-287",
+        "Q-288",
+        "Q-289",
+        "Q-290",
+        "Q-291",
+        "Q-292",
+        "Q-293",
+        "Q-294",
+        "Q-295",
+        "Q-296"
+      ],
+      "playableUnitStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-03"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-NATURE-HERB-GATHER",
+        "WI-CRAFT-BREW",
+        "WI-ACTOR-CONSUME"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActiveWorldInteractionDependency",
+        "CrossAreaAcquisitionRemainsOptional",
+        "KnowledgeSaveRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:shelter-purpose-and-difficulty.r1",
+      "titleKo": "오두막 수면 목적·보호·난이도 후보",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-001",
+        "Q-002",
+        "Q-003",
+        "Q-004",
+        "Q-005"
+      ],
+      "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-02"
+      ],
+      "currentStageCode": "E4",
+      "nextStageCode": "E5",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedNightDay2RevisionAndRuntimeEvidenceRequired"
+      ],
+      "checkRefs": [
+        "Ssalddel.Simulation.Tests/SimulationNatureShelterPurposeReadinessTests.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:player-mind:meditation-access-and-observation.r1",
+      "titleKo": "명상 접근·전투 성장·심층 관찰 후보",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-006",
+        "Q-007",
+        "Q-008",
+        "Q-009"
+      ],
+      "playableUnitStableId": "playable-loop:nature-base-reflection.v1",
+      "worldInteractionIds": [
+        "WI-REFLECT-01"
+      ],
+      "currentStageCode": "E4",
+      "nextStageCode": "E5",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "HostPlayableLoopMustProveRuntimeUse"
+      ],
+      "checkRefs": [
+        "Ssalddel.Simulation.Tests/SimulationMeditationFocusAccessCandidateTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationDeepObservationCandidateTests.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:player-mind:party-resonance.r1",
+      "titleKo": "근접 파티 공명·회복·잔향 후보",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-010",
+        "Q-011",
+        "Q-012",
+        "Q-013",
+        "Q-014",
+        "Q-015",
+        "Q-016"
+      ],
+      "playableUnitStableId": "playable-loop:nature-base-reflection.v1",
+      "worldInteractionIds": [
+        "WI-REFLECT-01"
+      ],
+      "currentStageCode": "E3",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "HostPlayableLoopMustProveRuntimeUse"
+      ],
+      "checkRefs": [
+        "Ssalddel.Simulation.Tests/SimulationPartyProximityResonanceCandidateTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationPartyResonanceAfterglowCandidateTests.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:player-mind:recovery-lifecycle.r1",
+      "titleKo": "개인 회복 감쇠·위협 상쇄·암흑기 접근 후보",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-017",
+        "Q-018",
+        "Q-019",
+        "Q-020",
+        "Q-021",
+        "Q-022"
+      ],
+      "playableUnitStableId": "playable-loop:nature-base-reflection.v1",
+      "worldInteractionIds": [
+        "WI-REFLECT-01"
+      ],
+      "currentStageCode": "E3",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "HostPlayableLoopMustProveRuntimeUse"
+      ],
+      "checkRefs": [
+        "Ssalddel.Simulation.Tests/SimulationPersonalRecoveryDecayCandidateTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationDarkAgeMindfulnessAccessCandidateTests.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:player-mind:personal-plan-and-progress.r1",
+      "titleKo": "개인 계획 설정·진척·내면의 울림",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-040",
+        "Q-041",
+        "Q-042",
+        "Q-043",
+        "Q-044"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-PLAN-SET"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "WaitingForApprovedRevision",
+      "blockerCodes": [
+        "PersonalPlanLogicE3PassedPresentationE1Only",
+        "NumericRecoveryAndProgressPolicyUndefined"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/Nature개인계획E3.md",
+        "eng/execution-ledgers/work-orders/nature-personal-plan.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs"
+      ],
+      "logicEvidenceStageCode": "E3",
+      "presentationEvidenceStageCode": "E1"
+    },
+    {
+      "batchStableId": "batch:player-mind:focus-resource-hud-feedback.r1",
+      "titleKo": "집중력 자원·내면 HUD·Audio 접근성",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-065",
+        "Q-066",
+        "Q-067"
+      ],
+      "playableUnitStableId": "playable-loop:nature-base-reflection.v1",
+      "worldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FocusResourceAuthorityContractRequired",
+        "FocusHudAudioPresentationWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:player-mind:completion-recovery-wi-family.r1",
+      "titleKo": "전 플레이어 WI 완료 회복·명상 WI군",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-122",
+        "Q-123"
+      ],
+      "playableUnitStableId": "playable-loop:nature-base-reflection.v1",
+      "worldInteractionIds": [],
+      "currentStageCode": "E2",
+      "nextStageCode": "E3",
+      "executionStateCode": "ImplementedParked",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CompletionRecoveryProfileNotImplemented",
+        "HostPlayableLoopRuntimeEvidenceRequired"
+      ],
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation명상WiFamilyContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationMeditationWiFamilyCatalog.cs",
+        "Ssalddel.Simulation.Tests/SimulationFocusMeditationTests.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:player-mind:gwangbok-entry-feedback.r1",
+      "titleKo": "개인 광복기 진입 빛·음악 피드백",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-124",
+        "Q-125"
+      ],
+      "playableUnitStableId": "playable-loop:nature-base-reflection.v1",
+      "worldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "GwangbokAudioVisualPresentationWorkOrderRequired",
+        "AccessibilitySettingsContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:player-mind:community-mind-projection.r1",
+      "titleKo": "공동체의 마음 파생 조회·단계형 회복",
+      "topicCode": "player-mind-meditation",
+      "questionIds": [
+        "Q-196",
+        "Q-197",
+        "Q-198"
+      ],
+      "playableUnitStableId": "playable-loop:nature-base-reflection.v1",
+      "worldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CommunityMindProjectionAuthorityContractRequired",
+        "CommunityMindHostPlayableUnitNotApproved"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md",
+        "docs/assets/planning/playable-loops/player-mind-meditation/q-196-198-community-mind-panel-concept.png"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:risky-sleep-weather-spatial.r1",
+      "titleKo": "위험 수면·날씨 동결·보호 공간층 후보",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-023",
+        "Q-024",
+        "Q-025"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-14"
+      ],
+      "currentStageCode": "E3",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedNightDay2RevisionAndRuntimeEvidenceRequired",
+        "ActualHPlacementGraphEvidenceNotBound"
+      ],
+      "checkRefs": [
+        "Ssalddel.Simulation.Tests/SimulationNatureRiskySleepOutcomeCandidateTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureWeatherProfileFreezeCandidateTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureSleepProtectionSpatialLayerCandidateTests.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:fuel-duration-preview-save.r1",
+      "titleKo": "연료 지속·수면 Preview·체크포인트",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-026",
+        "Q-027",
+        "Q-028"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-14"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedHeatFuelAndSleepCheckpointRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:layered-defense.r1",
+      "titleKo": "울타리·마법진 중첩 방어",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-029",
+        "Q-030"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-14"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedDefenseLayerRuleRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:wake-combat-handoff.r1",
+      "titleKo": "강제 각성·전투 조작 반환",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-031",
+        "Q-141"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-14",
+        "WI-NATURE-11"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "WakeCombatInputHandoffWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:heat-source-and-fuel-acquisition.r1",
+      "titleKo": "열원 점화·보충·소화와 마른 연료 획득",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-032",
+        "Q-033",
+        "Q-034"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-01",
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ImplementedParked",
+      "blockerCodes": [
+        "HeatSourceLogicE3PassedPresentationE1Only",
+        "PresentationRevisionRequired",
+        "DryFuelAcquisitionRemainsActor01Responsibility"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/Nature열원관리E3.md",
+        "eng/execution-ledgers/work-orders/nature-heat-source.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+      ],
+      "logicEvidenceStageCode": "E3",
+      "presentationEvidenceStageCode": "E1"
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:remaining-night-retry.r1",
+      "titleKo": "위협 해결 뒤 남은 밤 재수면",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-035"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-11",
+        "WI-NATURE-14"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "RemainingNightRetryRuleRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:protection-overlay.r1",
+      "titleKo": "수면 안전 보호 범위 Overlay",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-132"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-14"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ProtectionOverlayPresentationWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:defense-segment-repair.r1",
+      "titleKo": "방어 구간 손상·부분 수리",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-149"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-DEFENSE-SEGMENT-REPAIR"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "DefenseRepairWorldInteractionRegistrationRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-shelter-sleep:thermal-growth-and-stove.r1",
+      "titleKo": "침구·단열·난로 성장과 설치 안전",
+      "topicCode": "nature-shelter-sleep",
+      "questionIds": [
+        "Q-153",
+        "Q-156"
+      ],
+      "playableUnitStableId": "playable-loop:nature-night-day2.v1",
+      "worldInteractionIds": [
+        "WI-CON-01"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "AcceptedThermalPlacementResearchRequired",
+        "HeatSourceWorldInteractionRegistrationRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:world-resource-regeneration.r1",
+      "titleKo": "세계 자원 재성장·신규 Spawn·WorldTick",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-036",
+        "Q-037"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-WORLD-RESOURCE-REGENERATE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "WorldResourceRegenerationWorldInteractionRegistrationRequired",
+        "ApprovedResourceProfileRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:land-use-spawn-exclusion.r1",
+      "titleKo": "LandUse 자원 Spawn 제외·Preview Overlay",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-038",
+        "Q-039"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "LandUseAuthorityEffectContractRequired",
+        "LandUseOverlayPresentationWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:abandoned-camp-knowledge.r1",
+      "titleKo": "폐야영지 처방 기록 발견",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-051"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-03"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "AbandonedCampKnowledgeSourcePlacementRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:abandoned-camp-guidance.r1",
+      "titleKo": "폐야영지 연기·천 조각 환경 유도",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-052"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "AbandonedCampGuidancePresentationWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:smoldering-heat-source.r1",
+      "titleKo": "폐야영지 Smoldering 열원 복구",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-053"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "HeatSourceWorldInteractionRegistrationRequired",
+        "SmolderingStateRuleRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:construction-sub-wi-contracts.r1",
+      "titleKo": "청사진·재료·시공·수리·해체 하위 WI",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-054",
+        "Q-055",
+        "Q-056"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [
+        "WI-CON-01",
+        "WI-NATURE-07",
+        "WI-WORLD-04"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-CON-BLUEPRINT-PLACE",
+        "WI-CON-MATERIAL-DEPOSIT",
+        "WI-CON-WORK-CONTRIBUTE",
+        "WI-CON-DEMOLISH"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ConstructionSubWorldInteractionRegistrationRequired",
+        "LegacyConstructionContractCompatibilityReviewRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:construction-visual-profiles.r1",
+      "titleKo": "영역별 Construction Synty VisualProfile",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-057"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ConstructionVisualProfileApprovalRequired",
+        "ActualPrefabFingerprintRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/synty-asset-functional-modules.json"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:work-contribution-pause-hud.r1",
+      "titleKo": "시공 기여·중단 보존·건설 HUD",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-058",
+        "Q-059",
+        "Q-060"
+      ],
+      "playableUnitStableId": "playable-loop:nature-building-learning.v1",
+      "worldInteractionIds": [
+        "WI-CON-01"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-CON-WORK-CONTRIBUTE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ConstructionContributionWorldInteractionRegistrationRequired",
+        "ConstructionPauseSaveAndHudWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:nature-resource-construction:workbench-anchor.r1",
+      "titleKo": "첫 작업대 단일 Actor 작업·재료 Anchor",
+      "topicCode": "nature-resource-construction",
+      "questionIds": [
+        "Q-134"
+      ],
+      "playableUnitStableId": "playable-loop:nature-workbench-foundation.v1",
+      "worldInteractionIds": [
+        "WI-CON-01"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "AcceptedWorkbenchPlacementResearchRequired",
+        "ActualPrefabBoundsAndGameViewEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:save-load-runtime:autosave-authority-boundaries.r1",
+      "titleKo": "권위 경계 자동 저장·전투 저장 묶음",
+      "topicCode": "save-load-runtime",
+      "questionIds": [
+        "Q-072"
+      ],
+      "commonModuleStableId": "module:save-replay",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "HostPlayableLoopFrozenRevisionRequired",
+        "SaveRevisionAndMigrationWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/저장재진입/save-load-runtime.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:save-load-runtime:save-feedback-and-recovery-slots.r1",
+      "titleKo": "저장 피드백·실패 복구·순환 Slot",
+      "topicCode": "save-load-runtime",
+      "questionIds": [
+        "Q-073",
+        "Q-075"
+      ],
+      "commonModuleStableId": "module:save-replay",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "SaveFailureRecoveryContractRequired",
+        "SaveUiPresentationWorkOrderRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/저장재진입/save-load-runtime.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:save-load-runtime:safe-reentry-lh-gate.r1",
+      "titleKo": "SafeReentryAnchor·LH 최소 준비·조작 반환",
+      "topicCode": "save-load-runtime",
+      "questionIds": [
+        "Q-074",
+        "Q-076",
+        "Q-140"
+      ],
+      "commonModuleStableId": "module:runtime-reentry",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "SafeReentryAnchorRuntimeContractRequired",
+        "ActualTerrainColliderNavMeshReadinessEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/저장재진입/save-load-runtime.inquiry.r1.md",
+        "Ssalddel.Simulation.Application/SimulationLhAssetPlanLifecycleService.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:save-load-runtime:farm-cultivation-checkpoint-reentry.r1",
+      "titleKo": "Farm 개간 checkpoint 저장·안전 재개",
+      "topicCode": "save-load-runtime",
+      "questionIds": [
+        "Q-139"
+      ],
+      "commonModuleStableId": "module:runtime-reentry",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FarmCultivationCheckpointSaveContractRequired",
+        "FarmSafeReentryRuntimeEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/저장재진입/save-load-runtime.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:foundation-and-first-field.r1",
+      "titleKo": "Farm 기본 골격·자유 이동·첫 개간",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-077",
+        "Q-078",
+        "Q-079",
+        "Q-080",
+        "Q-111"
+      ],
+      "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionIds": [
+        "WI-FARM-01",
+        "WI-CON-01"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "IndependentFarmFoundationDesignApprovalRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:farmland-suitability-preview.r1",
+      "titleKo": "농지 후보 적합도·현장 조사 Preview",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-081",
+        "Q-090",
+        "Q-120"
+      ],
+      "playableUnitStableId": "playable-loop:farm-player-placement.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ReadOnlySuitabilityPreviewContractRequired",
+        "TerrainWaterSoilEvidenceBindingRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:terrain-improvement-checkpoints.r1",
+      "titleKo": "장애물 제거·평탄화·개간 checkpoint",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-082",
+        "Q-092",
+        "Q-095",
+        "Q-096",
+        "Q-097",
+        "Q-106",
+        "Q-107",
+        "Q-136"
+      ],
+      "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-02",
+        "WI-FARM-01"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-FARM-LAND-IMPROVE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmLandImproveWorldInteractionRegistrationRequired",
+        "TerrainMutationAndCheckpointRuleApprovalRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:soil-recovery-and-knowledge.r1",
+      "titleKo": "토양 회복·단계형 정보·농업 지식",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-083",
+        "Q-084",
+        "Q-085",
+        "Q-086",
+        "Q-098"
+      ],
+      "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-03"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-FARM-SOIL-AMEND"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmSoilAmendWorldInteractionRegistrationRequired",
+        "AcceptedAgriculturalSoilResearchRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:field-boundary-row-and-path.r1",
+      "titleKo": "자유형 밭 경계·이랑·관리 통로",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-087",
+        "Q-088",
+        "Q-089",
+        "Q-091",
+        "Q-103",
+        "Q-104",
+        "Q-105",
+        "Q-109",
+        "Q-110"
+      ],
+      "playableUnitStableId": "playable-loop:farm-player-placement.v1",
+      "worldInteractionIds": [
+        "WI-FARM-01",
+        "WI-FARM-02"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-FARM-FIELD-BOUNDARY-CONFIRM"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmFieldBoundaryWorldInteractionRegistrationRequired",
+        "PlantingDistanceProfileDecisionDeferredByQ089",
+        "FreeformBoundarySaveContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:land-project-pause-resume.r1",
+      "titleKo": "개간 프로젝트 중단·재개·완료 구획 보존",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-093",
+        "Q-094"
+      ],
+      "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionIds": [
+        "WI-FARM-01",
+        "WI-WORLD-03"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmCultivationProjectCheckpointContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:irrigation-weather-and-route.r1",
+      "titleKo": "강수·수동 급수·관수 경로·비용 Preview",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-099",
+        "Q-100",
+        "Q-101",
+        "Q-102",
+        "Q-143",
+        "Q-144",
+        "Q-146",
+        "Q-147",
+        "Q-155"
+      ],
+      "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionIds": [
+        "WI-FARM-03",
+        "WI-CON-01"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-FARM-WATER-TRANSFER"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmWaterTransferWorldInteractionRegistrationRequired",
+        "WeatherFrozenSnapshotAndIrrigationRouteContractsRequired",
+        "ActualSyntyCandidateEvidenceRequiredBeforePresentationE5"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:late-heavy-equipment.r1",
+      "titleKo": "후반 대형 개간 장비 연구 보류",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-108"
+      ],
+      "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E1",
+      "executionStateCode": "PlanningBlocked",
+      "blockerCodes": [
+        "HeavyEquipmentDecisionDeferred",
+        "LateGameFarmResearchRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:npc-route-visit-hire-and-guest.r1",
+      "titleKo": "Farm 연결로·NPC 방문·고용·손님 권한",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-112",
+        "Q-113",
+        "Q-114",
+        "Q-115",
+        "Q-116",
+        "Q-117",
+        "Q-118"
+      ],
+      "playableUnitStableId": "playable-loop:farm-pack-store-return.v1",
+      "worldInteractionIds": [
+        "WI-WORLD-04"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-COMMUNITY-HIRE",
+        "WI-GUEST-PERMISSION-SET",
+        "WI-ROUTE-SAFETY-IMPROVE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "IndependentFarmRelationshipDesignApprovalRequired",
+        "HostedGuestAuthorityDeferredFromSoloFirstSlice"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:patrol-exploration-and-provision.r1",
+      "titleKo": "NPC 순찰·탐사·보고·보급",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-119",
+        "Q-121"
+      ],
+      "playableUnitStableId": "playable-loop:farm-pack-store-return.v1",
+      "worldInteractionIds": [
+        "WI-WORLD-01",
+        "WI-WORLD-05"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-EXPEDITION-DISPATCH"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ExpeditionDispatchWorldInteractionRegistrationRequired",
+        "NpcLifeContinuityIsLaterAreaHarmonyCondition"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-spatial:survey-assistance-and-delegation.r1",
+      "titleKo": "농지 조사·개간 협력·권한·보수",
+      "topicCode": "farm-building-spatial-placement",
+      "questionIds": [
+        "Q-126",
+        "Q-127",
+        "Q-128",
+        "Q-129",
+        "Q-130"
+      ],
+      "playableUnitStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionIds": [
+        "WI-WORLD-01",
+        "WI-WORLD-02"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmAssistancePermissionAndCompensationDesignApprovalRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:town-order:resident-pickup-space-and-feedback.r1",
+      "titleKo": "주민 주문 수령대·접근·상태 피드백",
+      "topicCode": "town-order-pickup",
+      "questionIds": [
+        "Q-135"
+      ],
+      "playableUnitStableId": "playable-loop:town-order-consume-return.v1",
+      "worldInteractionIds": [
+        "WI-ORDER-06"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "IndependentTownDesignApprovalRequired",
+        "PickupCounterAssetAndHResearchRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:town-order:store-stock-replenishment.r1",
+      "titleKo": "상점 부족 재고 보충 주문 Preview·Confirm",
+      "topicCode": "town-order-pickup",
+      "questionIds": [
+        "Q-137",
+        "Q-138",
+        "Q-145",
+        "Q-148"
+      ],
+      "playableUnitStableId": "playable-loop:town-order-consume-return.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-TOWN-STOCK-REPLENISH"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "TownStockReplenishWorldInteractionRegistrationRequired",
+        "LocalWholesaleFixtureContractRequired",
+        "DemandAndSafetyStockNumbersUnresolved"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:town-order:delivery-receive-inspect-putaway.r1",
+      "titleKo": "트럭 도착·인수·검수·후방 적재",
+      "topicCode": "town-order-pickup",
+      "questionIds": [
+        "Q-151"
+      ],
+      "playableUnitStableId": "playable-loop:town-order-consume-return.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-TOWN-DELIVERY-RECEIVE",
+        "WI-TOWN-DELIVERY-INSPECT",
+        "WI-TOWN-STOCK-PUTAWAY"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "TownInboundWorldInteractionRegistrationRequired",
+        "UnloadingInspectionStorageHResearchRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:town-order:inbound-learning-and-delegation.r1",
+      "titleKo": "입고 단계 직접 학습·NPC 위임",
+      "topicCode": "town-order-pickup",
+      "questionIds": [
+        "Q-152",
+        "Q-154"
+      ],
+      "playableUnitStableId": "playable-loop:town-order-consume-return.v1",
+      "worldInteractionIds": [
+        "WI-WORLD-01",
+        "WI-WORLD-02"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "TownInboundCapabilityTrustAndPermissionRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:town-order:supply-route-delay.r1",
+      "titleKo": "공급 트럭 회랑 이동·구간별 지연",
+      "topicCode": "town-order-pickup",
+      "questionIds": [
+        "Q-158"
+      ],
+      "playableUnitStableId": "playable-loop:town-order-consume-return.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-TOWN-SUPPLY-DISPATCH"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "TownSupplyDispatchWorldInteractionRegistrationRequired",
+        "DeterministicCorridorFixtureRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:town-order:corridor-safety-maintenance.r1",
+      "titleKo": "위험 회랑 조사·안전화·감쇠·재출현",
+      "topicCode": "town-order-pickup",
+      "questionIds": [
+        "Q-159",
+        "Q-160"
+      ],
+      "playableUnitStableId": "playable-loop:town-order-consume-return.v1",
+      "worldInteractionIds": [
+        "WI-WORLD-04"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-ROUTE-SAFETY-IMPROVE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "RouteSafetyImproveWorldInteractionRegistrationRequired",
+        "CorridorThreatDecayAndRespawnRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:five-element-profile.r1",
+      "titleKo": "지역·몬스터 오행 구성·연성 상성·날씨 변동",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-161",
+        "Q-162",
+        "Q-163",
+        "Q-167"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "RegionElementProfileRuleRevisionRequired",
+        "FiveElementCombatFixtureNumbersUnresolved"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:trace-investigation-and-knowledge.r1",
+      "titleKo": "흔적·관찰·표본 조사와 오행 지식 축적",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-164",
+        "Q-165",
+        "Q-166"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [
+        "WI-ACTOR-03",
+        "WI-NATURE-01"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-NATURE-TRACE-INVESTIGATE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "NatureTraceInvestigateWorldInteractionRegistrationRequired",
+        "ObservationEvidenceAndConfidenceRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:vine-core-clearance-and-regrowth.r1",
+      "titleKo": "덩굴 핵 절단·통제 소각·재침범 관리",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-168",
+        "Q-169",
+        "Q-170",
+        "Q-171",
+        "Q-172",
+        "Q-173",
+        "Q-174"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-03"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-NATURE-THREAT-CORE-CLEAR",
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ThreatCoreClearWorldInteractionRegistrationRequired",
+        "ControlledBurnAndRegrowthRuleRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:maintenance-cooperation-and-delegation.r1",
+      "titleKo": "회랑 유지관리 협력 제안·동행·위임",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-175",
+        "Q-176",
+        "Q-177",
+        "Q-178",
+        "Q-179"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [
+        "WI-WORLD-01",
+        "WI-WORLD-02"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-COMMUNITY-SUPPORT-MISSION-JOIN"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CooperationProposalWorldInteractionRegistrationRequired",
+        "MaintenanceTrustMaterialAndPermissionRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:roadside-maintenance-outpost.r1",
+      "titleKo": "길가 관리 초소 건설·작업일 주재·캘린더",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-180",
+        "Q-181",
+        "Q-182"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [
+        "WI-CON-01",
+        "WI-WORLD-07"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "AcceptedRoadsideOutpostPlacementResearchRequired",
+        "NpcDayShiftScheduleContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:tactical-view-command-and-direct-control.r1",
+      "titleKo": "전술 지휘 시점·분대 명령·영웅 직접 개입",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-183",
+        "Q-184",
+        "Q-185",
+        "Q-186",
+        "Q-187",
+        "Q-188",
+        "Q-189",
+        "Q-190"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [
+        "WI-WORLD-06",
+        "WI-WORLD-07"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-COMBAT-TACTICAL-COMMAND",
+        "WI-COMBAT-DIRECT-CONTROL-SET"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CombatCommandWorldInteractionRegistrationRequired",
+        "TacticalCameraSelectionAndTimeScaleArePresentationPolicies",
+        "ActualBattleInputAndGameViewEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:squad-casualty-response-and-recovery.r1",
+      "titleKo": "분대 개별 정체성·부상·구조·생산 공백",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-191",
+        "Q-192",
+        "Q-193"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [
+        "WI-NATURE-04"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-COMBAT-CASUALTY-RESPONSE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CombatCasualtyResponseWorldInteractionRegistrationRequired",
+        "NpcInjuryDeathAndLaborImpactRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:region-threat:noncombat-resolution-and-world-return.r1",
+      "titleKo": "비전투 위협 해결·회랑 안정·세계 귀환",
+      "topicCode": "region-five-elements-monster",
+      "questionIds": [
+        "Q-194",
+        "Q-195"
+      ],
+      "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-THREAT-NONCOMBAT-RESOLVE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E1",
+      "executionStateCode": "PlanningBlocked",
+      "blockerCodes": [
+        "NonCombatRewardChoiceDeferredByQ195",
+        "ThreatNoncombatResolveWorldInteractionRegistrationRequiresApprovedDecision"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:scope-and-readable-mind.r1",
+      "titleKo": "동적 공동체 범위·손님 내면 정보 공개",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-199",
+        "Q-201"
+      ],
+      "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CommunityScopeAndVisitorMindPrivacyContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:membership-confirmation.r1",
+      "titleKo": "관계 수락·조건부 공동체 편입 확정",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-200",
+        "Q-205",
+        "Q-206"
+      ],
+      "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-COMMUNITY-MEMBERSHIP-CONFIRM"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CommunityMembershipWorldInteractionRegistrationRequired",
+        "ConsentCapacityAndConditionalAdmissionRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:temporary-stay-and-next-relation.r1",
+      "titleKo": "임시 손님 수용·거절 결정",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-202"
+      ],
+      "playableUnitStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "worldInteractionIds": [
+        "WI-COMMUNITY-VISITOR-STAY"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E4",
+      "nextStageCode": "E5",
+      "executionStateCode": "Active",
+      "blockerCodes": [
+        "SessionSaveAndWorldManifestationPending"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md",
+        "eng/execution-ledgers/work-orders/nature-camp-visitor-stay.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/SimulationCommunityVisitorStayTests.cs",
+        "Ssalddel.Unity.Tests/Simulation방문자체류PresentationPreparationTests.cs",
+        "evidence:nature-camp-visitor-stay-e4-20260830",
+        "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:stay-duration-and-next-relation.r1",
+      "titleKo": "임시 손님 체류 기한·다음 관계 선택",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-203",
+        "Q-204"
+      ],
+      "playableUnitStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "StayDurationAndReturnWorldInteractionRequired",
+        "StayDurationCapacityAndReturnRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:guest-space-and-arrival.r1",
+      "titleKo": "손님 침상·완충 공간·실제 경로 도착",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-207",
+        "Q-208",
+        "Q-209"
+      ],
+      "playableUnitStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "worldInteractionIds": [
+        "WI-CON-01",
+        "WI-COMMUNITY-VISITOR-STAY"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E4",
+      "nextStageCode": "E5",
+      "executionStateCode": "PlanningBlocked",
+      "blockerCodes": [
+        "ActualHAnchorPrefabRigBindingRequired",
+        "WI-CON-01OutsideCurrentDispatch"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E4표현연구.r1.md",
+        "Ssalddel.Unity/Runtime/Cards/Simulation방문자체류PresentationPreparation.cs",
+        "Ssalddel.Unity.Tests/Simulation방문자체류PresentationPreparationTests.cs",
+        "evidence:nature-camp-visitor-stay-e4-20260830",
+        "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:remote-response-and-event-review.r1",
+      "titleKo": "원격 응대 지시·현장 수행·사건 검토",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-210",
+        "Q-211",
+        "Q-212",
+        "Q-213",
+        "Q-214"
+      ],
+      "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-COMMUNITY-REMOTE-RESPONSE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "RemoteResponseWorldInteractionRegistrationRequired",
+        "FieldExecutorAvailabilityAndSafeWaitingRulesRequired",
+        "CameraReturnAndAlertBundleArePresentationPolicies"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:solo-decision-time-assistance.r1",
+      "titleKo": "Solo 중요 결정 감속·정지·복합 피드백",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-215",
+        "Q-216",
+        "Q-217"
+      ],
+      "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "SoloHostedTimeAssistancePolicyRequired",
+        "ActualAudioAnimationAndGameViewEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:community-visitor:entrance-growth-policy.r1",
+      "titleKo": "출입구 대기 쉼터·생활/경비 성장 선택",
+      "topicCode": "community-membership-visitor",
+      "questionIds": [
+        "Q-218",
+        "Q-219"
+      ],
+      "playableUnitStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionIds": [
+        "WI-CON-01"
+      ],
+      "plannedWorldInteractionIds": [
+        "WI-COMMUNITY-ENTRANCE-POLICY-SET"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "CommunityEntrancePolicyWorldInteractionRegistrationRequired",
+        "VisitorVolumeThreatAndConflictGrowthRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:building-placement-assistance:complete-candidate-generation.r1",
+      "titleKo": "온전한 배치안 생성·유효 대안 제시",
+      "topicCode": "building-placement-assistance",
+      "questionIds": [
+        "Q-220",
+        "Q-222"
+      ],
+      "commonModuleStableId": "module:placement-candidate-generation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerMustOwnPrefabAndHResearch",
+        "CandidateRankingAndFallbackContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/배치엔진보조/building-placement-assistance.inquiry.r1.md",
+        "Ssalddel.Simulation.Application/SimulationSeparatedWorldAssetPlacement.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:building-placement-assistance:blocking-and-warning-validation.r1",
+      "titleKo": "배치 차단·경고·근거 검증",
+      "topicCode": "building-placement-assistance",
+      "questionIds": [
+        "Q-221"
+      ],
+      "commonModuleStableId": "module:placement-validation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerMustOwnPrefabAndHResearch",
+        "RequiredExitAndCapabilityValidationContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/배치엔진보조/building-placement-assistance.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:defense-mobilization-and-production-cost.r1",
+      "titleKo": "Farm 방위 소집·자동 출동·생산 기회비용",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-223",
+        "Q-224",
+        "Q-227",
+        "Q-229",
+        "Q-231"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [
+        "WI-FARM-DEFENSE-MOBILIZE"
+      ],
+      "currentStageCode": "E4",
+      "nextStageCode": "E5",
+      "executionStateCode": "WaitingForApprovedRevision",
+      "blockerCodes": [
+        "PromotionBeyondIntegratedE4DeferredByDeliveryCap",
+        "ActualHAnchorPrefabRigBindingRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Farm병영방위.md",
+        "docs/Architecture/PlayableLoops/Farm병영방위-E4표현연구.r1.md",
+        "eng/execution-ledgers/work-orders/farm-barracks-defense.e7-work-order.json",
+        "Ssalddel.Unity/Runtime/Cards/SimulationFarm방위소집PresentationPreparation.cs",
+        "Ssalddel.Unity.Tests/SimulationFarm방위소집PresentationPreparationTests.cs",
+        "evidence:farm-barracks-defense-e4-20260830"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:squad-assignment-and-hero-control.r1",
+      "titleKo": "초소 슬롯 분대 배정과 영웅 직접 조작 분리",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-225",
+        "Q-235"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [
+        "WI-SQUAD-ASSIGN"
+      ],
+      "currentStageCode": "E3",
+      "nextStageCode": "E4",
+      "executionStateCode": "WaitingForApprovedRevision",
+      "blockerCodes": [
+        "PromotionBeyondIntegratedE3DeferredByDeliveryCap",
+        "SquadAssignmentE4PresentationRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Farm병영방위.md",
+        "eng/execution-ledgers/work-orders/farm-barracks-squad-assignment.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/SimulationFarmSquadAssignmentTests.cs",
+        "evidence:farm-barracks-squad-assignment-e3-20260830"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:squad-supply-and-readiness.r1",
+      "titleKo": "분대 식량·장비 내구도 보급",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-226"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [
+        "WI-SQUAD-SUPPLY"
+      ],
+      "currentStageCode": "E3",
+      "nextStageCode": "E4",
+      "executionStateCode": "WaitingForApprovedRevision",
+      "blockerCodes": [
+        "PromotionBeyondIntegratedE3DeferredByDeliveryCap",
+        "SquadSupplyE4PresentationRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Farm병영방위.md",
+        "eng/execution-ledgers/work-orders/farm-barracks-squad-supply.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/SimulationFarmSquadSupplyTests.cs",
+        "evidence:farm-barracks-squad-supply-e3-20260830"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:casualty-and-labor-impact.r1",
+      "titleKo": "경상·중상·사망·치료·생산 공백",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-230"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-COMBAT-CASUALTY-RESPONSE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmBarracksPlayableUnitRegistrationRequired",
+        "CombatCasualtyResponseWorldInteractionRegistrationRequired",
+        "NpcInjuryDeathTreatmentAndLaborReturnRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:defense-result-and-safe-period.r1",
+      "titleKo": "방어 결과·전리품·안전 기간·회복 귀환",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-232"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [
+        "WI-FARM-DEFENSE-RESOLVE"
+      ],
+      "currentStageCode": "E3",
+      "nextStageCode": "E4",
+      "executionStateCode": "WaitingForApprovedRevision",
+      "blockerCodes": [
+        "PromotionBeyondIntegratedE3DeferredByDeliveryCap",
+        "DefenseResolutionE4PresentationRevisionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Farm병영방위.md",
+        "eng/execution-ledgers/work-orders/farm-barracks-defense-resolution.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/SimulationFarmDefenseResolutionTests.cs",
+        "evidence:farm-barracks-defense-resolution-e3-20260830"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:outpost-spatial-and-alert-presentation.r1",
+      "titleKo": "외곽 경비 초소 H 조립·상태 외형·경보 카드",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-228",
+        "Q-233",
+        "Q-234",
+        "Q-237"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmBarracksPlayableUnitRegistrationRequired",
+        "AcceptedCompositeOutpostHAndSyntyResearchRequired",
+        "ActualPrefabBoundsInteractionAnchorAndAlertCardEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:offscreen-continuity-and-hosted-support.r1",
+      "titleKo": "화면 밖 WorldTick 지속·승인 방문 지원",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-236",
+        "Q-238"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-COMMUNITY-COOPERATION-PROPOSE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E3",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "FarmBarracksPlayableUnitRegistrationRequired",
+        "NpcWorldTickContinuityAndSaveReplayRulesRequired",
+        "HostedSupportPermissionAndAuditContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-barracks:return-loot-treatment-and-production.r1",
+      "titleKo": "초소 귀환·전리품 인계·치료·생산 재합류",
+      "topicCode": "farm-barracks-defense",
+      "questionIds": [
+        "Q-239"
+      ],
+      "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+      "worldInteractionIds": [
+        "WI-FARM-DEFENSE-RETURN"
+      ],
+      "currentStageCode": "E3",
+      "nextStageCode": "E4",
+      "executionStateCode": "WaitingForApprovedRevision",
+      "blockerCodes": [
+        "PromotionBeyondIntegratedE3DeferredByDeliveryCap",
+        "DefenseReturnE4PresentationRevisionRequired",
+        "TreatmentAndProductionRejoinRemainSeparateWorldInteractions"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Farm병영방위.md",
+        "eng/execution-ledgers/work-orders/farm-barracks-defense-return.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/SimulationFarmDefenseReturnTests.cs",
+        "evidence:farm-barracks-defense-return-e3-20260830"
+      ]
+    },
+    {
+      "batchStableId": "batch:hub-demand:demand-cards-and-scarcity-comparison.r1",
+      "titleKo": "영역별 수요 카드·희소 재고 갈등 비교",
+      "topicCode": "hub-demand-allocation",
+      "questionIds": [
+        "Q-240",
+        "Q-241",
+        "Q-242"
+      ],
+      "playableUnitStableId": "playable-loop:hub-outbound-ready-return.v1",
+      "worldInteractionIds": [
+        "WI-HUB-03"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedHubDemandDesignAndWorkOrderRequired",
+        "DemandSignalFixtureAndScarcityComparisonContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ]
+    },
+    {
+      "batchStableId": "batch:hub-demand:site-candidates-adjustment-and-construction.r1",
+      "titleKo": "Hub 입지 후보·조정·재평가·건설 확정",
+      "topicCode": "hub-demand-allocation",
+      "questionIds": [
+        "Q-243",
+        "Q-244"
+      ],
+      "playableUnitStableId": "playable-loop:hub-outbound-ready-return.v1",
+      "worldInteractionIds": [
+        "WI-CON-01"
+      ],
+      "plannedWorldInteractionIds": [],
+      "currentStageCode": "E1",
+      "nextStageCode": "E4",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedHubDemandDesignAndWorkOrderRequired",
+        "HubSiteCandidateEvaluationAndHResearchRequired",
+        "ActualPlacementPreviewAndConstructionEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/배치엔진보조/building-placement-assistance.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:hub-demand:inventory-allocation-confirm.r1",
+      "titleKo": "희소 재고 권장안 조정·할당 확정",
+      "topicCode": "hub-demand-allocation",
+      "questionIds": [
+        "Q-245"
+      ],
+      "playableUnitStableId": "playable-loop:hub-outbound-ready-return.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-HUB-DEMAND-ALLOCATE"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedHubDemandDesignAndWorkOrderRequired",
+        "HubDemandAllocateWorldInteractionRegistrationRequired",
+        "InventoryReservationAndAllocationReasonContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:hub-demand:partial-fulfillment-and-open-remainder.r1",
+      "titleKo": "부분 충족·지연 통지·열린 부족 수요 귀환",
+      "topicCode": "hub-demand-allocation",
+      "questionIds": [
+        "Q-246"
+      ],
+      "playableUnitStableId": "playable-loop:hub-outbound-ready-return.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-HUB-DEMAND-REMAINDER-RETURN"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedHubDemandDesignAndWorkOrderRequired",
+        "HubDemandRemainderReturnWorldInteractionRegistrationRequired",
+        "PartialFulfillmentDelayAndAlternativeRouteContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:hub-demand:supply-task-preview-and-accept.r1",
+      "titleKo": "부족 수요 조달 과제 Preview·수락",
+      "topicCode": "hub-demand-allocation",
+      "questionIds": [
+        "Q-247"
+      ],
+      "playableUnitStableId": "playable-loop:hub-outbound-ready-return.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-HUB-SUPPLY-TASK-ACCEPT"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedHubDemandDesignAndWorkOrderRequired",
+        "HubSupplyTaskAcceptWorldInteractionRegistrationRequired",
+        "DeadlineRewardRiskFeasibilityAndCommitmentContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:hub-demand:criticality-and-obligation-evaluation.r1",
+      "titleKo": "수요 필수성·플레이어 의무·판정 근거",
+      "topicCode": "hub-demand-allocation",
+      "questionIds": [
+        "Q-248",
+        "Q-249"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerMustOwnDemandCriticalityRules",
+        "SurvivalEconomyInputsAndReasonProjectionRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:hub-demand:mandatory-task-failure-response-decision.r1",
+      "titleKo": "필수 조달 과제 실패 예상 대응 결정",
+      "topicCode": "hub-demand-allocation",
+      "questionIds": [
+        "Q-250"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "PlanningBlocked",
+      "blockerCodes": [
+        "Q250DecisionDeferred",
+        "SurvivalEconomySynthesisRequiredBeforeReopen"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:days-of-survival-and-flow-projection.r1",
+      "titleKo": "생존 가능 일수·생산/소비 비율·7일 흐름",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-251",
+        "Q-252",
+        "Q-253"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerFixtureAndCalculationProfileRequired",
+        "PopulationSeasonRiskAndForecastUnitContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:shortage-cause-and-remedy-paths.r1",
+      "titleKo": "부족 원인·직접 수행·위임·외부 조달 비교",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-254",
+        "Q-256",
+        "Q-257"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerFixtureAndCalculationProfileRequired",
+        "RemedyTimeCostRiskQuantityQualityRecoveryComparisonRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:minimum-line-and-ration-policy.r1",
+      "titleKo": "생존 최소선 보호·소비 및 배급 정책 변경",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-255"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-SURVIVAL-RATION-POLICY-SET"
+      ],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerPlayableUnitNotSelected",
+        "SurvivalRationPolicyWorldInteractionRegistrationRequired",
+        "MinimumLineOptionalConsumptionAndLastResortRationRulesRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:bounded-price-and-forecast-projection.r1",
+      "titleKo": "제한 가격 변동·미래 범위·신뢰도",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-258",
+        "Q-259"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerFixtureAndCalculationProfileRequired",
+        "BoundedPriceInputsForecastRangeAndConfidenceContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:below-reserve-sale-confirm.r1",
+      "titleKo": "목표 비축 아래 판매 Preview·재확인·확정",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-260"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM"
+      ],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerPlayableUnitNotSelected",
+        "BelowReserveSaleWorldInteractionRegistrationRequired",
+        "SurvivalDaysCommunityImpactRiskPreviewAndReconfirmationRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:hud-storage-and-task-presentation.r1",
+      "titleKo": "경제 HUD·현장 재고 묶음·Task 몸짓·StorageSlot",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-261",
+        "Q-262",
+        "Q-263",
+        "Q-264"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerMustOwnPresentationEvidence",
+        "AcceptedStorageHAndSyntyAssetResearchRequired",
+        "ActualTaskAnimationStorageSlotAndGameViewEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+        "eng/execution-ledgers/synty-asset-functional-modules.json"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:frozen-day-observation-and-save.r1",
+      "titleKo": "하루 관측 상태 사본·계산 revision·다음 날 갱신",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-265"
+      ],
+      "commonModuleStableId": "module:frozen-day-observation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "FirstConsumerMustOwnSaveReplayEvidence",
+        "DailyObservationRevisionAndNextWorldDayRefreshContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:survival-economy:hosted-economic-authority-decision.r1",
+      "titleKo": "Hosted 경제 결정 권한 보류",
+      "topicCode": "survival-economy",
+      "questionIds": [
+        "Q-266"
+      ],
+      "commonModuleStableId": "module:survival-economy-projection",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "PlanningBlocked",
+      "blockerCodes": [
+        "Q266HostedAuthorityDecisionDeferred",
+        "SoloFirstConsumerEvidenceRequiredBeforeHostedPolicy"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:solo-work-delegation:existing-direct-experience-and-assignment-rules.r1",
+      "titleKo": "직접 경험 뒤 NPC 업무 배정 규칙 재사용",
+      "topicCode": "solo-work-delegation",
+      "questionIds": [
+        "Q-267"
+      ],
+      "commonModuleStableId": "module:solo-work-delegation",
+      "worldInteractionIds": [
+        "WI-WORLD-01"
+      ],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ImplementedParked",
+      "blockerCodes": [
+        "SupersededByQ129Q152Q154",
+        "RepresentativeConsumerRuntimeEvidenceStillRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/솔로업무위임/solo-work-delegation.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json",
+        "Ssalddel.Simulation.Tests/SimulationNpcWorkforceTests.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:solo-work-delegation:exception-auto-resolution-boundary.r1",
+      "titleKo": "NPC 작은 예외 자동 해결 상한 결정",
+      "topicCode": "solo-work-delegation",
+      "questionIds": [
+        "Q-268"
+      ],
+      "commonModuleStableId": "module:solo-work-delegation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "PlanningBlocked",
+      "blockerCodes": [
+        "Q268DecisionDeferred",
+        "DelegationExceptionCostRiskQualityAndIrreversibilityBoundsRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/솔로업무위임/solo-work-delegation.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:pattern-inventory-recommendation-and-preview.r1",
+      "titleKo": "경관 패턴 재고·지형 호환 추천·청사진 Preview",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-297",
+        "Q-298",
+        "Q-299"
+      ],
+      "commonModuleStableId": "module:landscape-pattern-inventory",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "ApprovedFarmLandscapePatternDesignRequired",
+        "TerrainCompatibilityAndBlueprintPreviewContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:river-axis-density-roads-and-landmark.r1",
+      "titleKo": "수로 본거지·하천축·밀도·도로·Barn 랜드마크",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-300",
+        "Q-301",
+        "Q-302",
+        "Q-303",
+        "Q-304",
+        "Q-305",
+        "Q-306"
+      ],
+      "commonModuleStableId": "module:landscape-pattern-inventory",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "ApprovedFarmLandscapePatternDesignRequired",
+        "RiverTerrainDensityRoadAndLandmarkProfilesRequired",
+        "ActualHAndPrefabEvidenceRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md",
+        "eng/execution-ledgers/synty-asset-functional-modules.json"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:test-world-variants-and-approval.r1",
+      "titleKo": "시험 월드 변형 생성·자동 검사·사람 승인",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-307",
+        "Q-308",
+        "Q-309",
+        "Q-310",
+        "Q-311",
+        "Q-312"
+      ],
+      "commonModuleStableId": "module:landscape-pattern-inventory",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "PatternTestWorldRequired",
+        "ThreeToFiveDeterministicVariantsRequired",
+        "AutomatedAndHumanGameViewApprovalRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:riverside-h2-skeleton-and-terrain-adaptation.r1",
+      "titleKo": "강변 실용 H2 골격·지형 적응·부적합 거부",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-313",
+        "Q-314",
+        "Q-315",
+        "Q-316",
+        "Q-317"
+      ],
+      "commonModuleStableId": "module:placement-validation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "AcceptedRiversideFarmH2ResearchRequired",
+        "EntryBarnWorkRoadExitAnchorContractRequired",
+        "TerrainAdaptationAndRejectionTestsRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:scoring-runtime-views-and-approval-threshold.r1",
+      "titleKo": "지형 점수·반복 억제·상공/낮/밤 검토·승인 상한",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-318",
+        "Q-319",
+        "Q-320"
+      ],
+      "commonModuleStableId": "module:placement-validation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "PlacementScoringProfileRequired",
+        "ActualTraversalDayNightAndAerialRuntimeEvidenceRequired",
+        "MinimumThreeVisualApprovalsRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:revision-hash-save-and-catalog-lifecycle.r1",
+      "titleKo": "Pattern Revision·Hash·Save 고정·후보/승인/폐기 수명주기",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-321",
+        "Q-324",
+        "Q-333"
+      ],
+      "commonModuleStableId": "module:landscape-pattern-inventory",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "PatternRevisionHashAndSaveCompatibilityContractRequired",
+        "CandidateApprovedRetiredLifecycleTestsRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:h3-capacity-connectors-buffers-and-growth.r1",
+      "titleKo": "H3 수용력·연결부·자연 완충·표식·성장",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-322",
+        "Q-323",
+        "Q-325",
+        "Q-326",
+        "Q-327",
+        "Q-328"
+      ],
+      "commonModuleStableId": "module:landscape-pattern-inventory",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "AcceptedFarmH3AssemblyResearchRequired",
+        "ConnectorCapacityBufferLandmarkAndGrowthProfilesRequired",
+        "BufferTraversalGatheringAndDiscoveryWiBindingsRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:world-cause-blueprint-confirm-and-lineage.r1",
+      "titleKo": "세계 원인·청사진 제안·플레이어 Confirm·배치 계보",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-329",
+        "Q-330",
+        "Q-331",
+        "Q-332"
+      ],
+      "playableUnitStableId": "playable-loop:farm-player-placement.v1",
+      "worldInteractionIds": [],
+      "plannedWorldInteractionIds": [
+        "WI-WORLD-PATTERN-PLACEMENT-CONFIRM"
+      ],
+      "currentStageCode": "E1",
+      "nextStageCode": "E2",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedFarmLandscapePatternDesignRequired",
+        "PatternPlacementConfirmWorldInteractionRegistrationRequired",
+        "CauseChoiceWorldStatePatternRevisionSeedAndResultHashContractRequired"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:visual-key-fallback-and-e5-asset-validation.r1",
+      "titleKo": "VisualKey·AssetFamily·fallback·E5 자산 검증",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-334",
+        "Q-335",
+        "Q-336",
+        "Q-337"
+      ],
+      "commonModuleStableId": "module:placement-validation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "AcceptedVisualKeyAssetFamilyAndFallbackCandidatesRequired",
+        "ActualPrefabRendererColliderBoundsAnchorAndFingerprintEvidenceRequired",
+        "CanonicalScenePlacementNotVerified"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md",
+        "eng/execution-ledgers/synty-asset-functional-modules.json"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:placement-plan-lh-lifecycle.r1",
+      "titleKo": "배치 계획과 LH 수명주기 경계",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-338"
+      ],
+      "commonModuleStableId": "module:lh-space-lifecycle",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ImplementedParked",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ActualGameObjectLifecycleRuntimeEvidenceRequired"
+      ],
+      "checkRefs": [
+        "Ssalddel.Simulation.Application/SimulationLhAssetPlanLifecycleService.cs",
+        "Ssalddel.Unity/Runtime/WorldProjection/SimulationLhAssetPlanPresentationReconciler.cs"
+      ]
+    },
+    {
+      "batchStableId": "batch:farm-landscape:actual-input-route-and-game-view.r1",
+      "titleKo": "입구→주요 H1→출구 실제 입력·카메라·충돌·낮/밤 시야",
+      "topicCode": "farm-landscape-pattern-inventory",
+      "questionIds": [
+        "Q-339"
+      ],
+      "commonModuleStableId": "module:placement-validation",
+      "worldInteractionIds": [],
+      "currentStageCode": "N/A",
+      "nextStageCode": "N/A",
+      "executionStateCode": "ParkedCandidate",
+      "blockerCodes": [
+        "CanonicalSimulationWorldShellRuntimeEvidenceRequired",
+        "ActualInputCameraCollisionDayNightGameViewNotVerified"
+      ],
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ]
+    }
+  ],
+  "allowedImplementationStatusCodes": ["Implemented", "Partial", "Ready", "CrossCutting", "Deferred", "Superseded", "NeedsSourceRecovery"],
+  "allowedImplementationKindCodes": ["PlayableLoop", "CommonModule", "DeferredDecision"],
+  "allowedDecisionStatusCodes": ["Confirmed", "Deferred", "Superseded", "NeedsSourceRecovery"],
+  "checkDefaults": {
+    "planningRecord": "Recorded",
+    "designBinding": "LinkedOnly",
+    "implementation": "NotVerified",
+    "automatedVerification": "NotVerified",
+    "runtimeVerification": "NotVerified",
+    "evidenceBinding": "Unbound"
+  },
+  "allowedCheckStatusCodes": {
+    "planningRecord": ["Recorded", "NeedsSourceRecovery"],
+    "designBinding": ["Incorporated", "LinkedOnly", "Missing", "Deferred"],
+    "implementation": ["Implemented", "Partial", "NotStarted", "NotVerified", "NotApplicable"],
+    "automatedVerification": ["Passed", "Partial", "Failed", "NotRun", "NotVerified", "NotApplicable"],
+    "runtimeVerification": ["Passed", "Blocked", "Failed", "NotRun", "NotVerified", "NotApplicable"],
+    "evidenceBinding": ["Bound", "Unbound", "Invalidated", "NotApplicable"]
+  },
+  "topics": [
+    {
+      "topicCode": "nature-shelter-sleep",
+      "titleKo": "Nature 거점·수면·날씨·방어",
+      "questionSelector": "1-5,23-35,132,141,149,153,156",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Partial",
+      "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1", "playable-loop:nature-twilight-return.v1", "playable-loop:nature-night-day2.v1"],
+      "worldInteractionRefs": ["WI-ACTOR-02", "WI-NATURE-11", "WI-NATURE-15"],
+      "hCapabilityRefs": ["ShelterInterior", "ThreatRetreatRoute"],
+      "commonModuleRefs": ["module:weather-frozen-snapshot", "module:recovery-threat"],
+      "nextTargetStageCode": "E7",
+      "blockerCodes": ["ApprovedNightDay2RevisionAndRuntimeEvidenceRequired"]
+    },
+    {
+      "topicCode": "player-mind-meditation",
+      "titleKo": "플레이어 내면·명상·계획·공동체 마음",
+      "questionSelector": "6-22,40-44,65-67,122-125,196-198",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md",
+      "implementationKindCode": "CommonModule",
+      "implementationStatusCode": "CrossCutting",
+      "playableLoopRefs": ["playable-loop:nature-base-reflection.v1", "playable-loop:town-arcana-context.v1"],
+      "worldInteractionRefs": ["WI-REFLECT-01", "WI-CARD-01"],
+      "hCapabilityRefs": [],
+      "commonModuleRefs": ["module:player-mind", "module:meditation-progression", "module:recovery-threat"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["HostPlayableLoopMustProveRuntimeUse"]
+    },
+    {
+      "topicCode": "nature-resource-construction",
+      "titleKo": "Nature 자원·LandUse·건설",
+      "questionSelector": "36-39,51-60,134",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Implemented",
+      "playableLoopRefs": ["playable-loop:nature-workbench-foundation.v1", "playable-loop:nature-field-supply-return.v1", "playable-loop:nature-building-learning.v1"],
+      "worldInteractionRefs": ["WI-CON-01", "WI-NATURE-16"],
+      "hCapabilityRefs": ["ConstructionAnchor", "WorkbenchInteractionAnchor"],
+      "commonModuleRefs": ["module:placement-candidate-generation"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["ActiveHerbalGoalMustCloseFirst"]
+    },
+    {
+      "topicCode": "herbal-recipe-crafting",
+      "titleKo": "약초·Recipe·조합 제작",
+      "questionSelector": "45-50,61-64,68-71,131,133,142,150,157,269-296",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Partial",
+      "playableLoopRefs": ["playable-loop:nature-basic-herbal-recovery.v1"],
+      "worldInteractionRefs": ["WI-ACTOR-03", "WI-NATURE-HERB-GATHER", "WI-CRAFT-BREW", "WI-ACTOR-CONSUME"],
+      "hCapabilityRefs": ["ReadableKnowledgeSource", "HerbGatherPoint", "CampfireBrewPoint", "ConsumableUsePoint"],
+      "commonModuleRefs": ["module:recipe-knowledge-ledger", "module:combination-draft"],
+      "nextTargetStageCode": "E7",
+      "blockerCodes": ["IntegratedE4DeliveryCap", "NextApprovedDesignRevisionRequired"]
+    },
+    {
+      "topicCode": "save-load-runtime",
+      "titleKo": "저장·Load·재진입",
+      "questionSelector": "72-76,139-140",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/저장재진입/save-load-runtime.inquiry.r1.md",
+      "implementationKindCode": "CommonModule",
+      "implementationStatusCode": "CrossCutting",
+      "playableLoopRefs": [],
+      "worldInteractionRefs": [],
+      "hCapabilityRefs": ["TraversalReady"],
+      "commonModuleRefs": ["module:save-replay", "module:runtime-reentry"],
+      "nextTargetStageCode": "E8",
+      "blockerCodes": ["EachHostLoopRequiresFrozenRevisionApproval"]
+    },
+    {
+      "topicCode": "farm-building-spatial-placement",
+      "titleKo": "Farm 건물·공간·배치·협력",
+      "questionSelector": "77-121,126-130,136,143-144,146-147,155",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Partial",
+      "playableLoopRefs": ["playable-loop:farm-crop-cycle.v1", "playable-loop:farm-pack-store-return.v1", "playable-loop:farm-player-placement.v1"],
+      "worldInteractionRefs": ["WI-ACTOR-02", "WI-ACTOR-03", "WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-CON-01", "WI-WORLD-01", "WI-WORLD-02", "WI-WORLD-03", "WI-WORLD-04", "WI-WORLD-05"],
+      "hCapabilityRefs": ["FarmField", "BuildingPlacementZone", "WaterServiceRoute", "FarmConnectionRoute"],
+      "commonModuleRefs": ["module:placement-candidate-generation", "module:solo-work-delegation", "module:weather-frozen-snapshot"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["IndependentFarmLoopPlanningGateRequired"]
+    },
+    {
+      "topicCode": "town-order-pickup",
+      "titleKo": "Town 주문·입고·회랑 안전화",
+      "questionSelector": "135,137-138,145,148,151-152,154,158-160",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Partial",
+      "playableLoopRefs": ["playable-loop:town-order-consume-return.v1"],
+      "worldInteractionRefs": ["WI-ORDER-06", "WI-WORLD-01", "WI-WORLD-02", "WI-WORLD-04"],
+      "hCapabilityRefs": ["TownOrderCounter", "TownUnloadingWorkArea", "TownInspectionWorkArea", "TownBackStorage", "SafeCorridor"],
+      "commonModuleRefs": ["module:npc-work-assignment"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["IndependentTownDesignApprovalRequired"]
+    },
+    {
+      "topicCode": "region-five-elements-monster",
+      "titleKo": "지역 오행·몬스터·개척·회랑 전술",
+      "questionSelector": "161-195",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Partial",
+      "playableLoopRefs": ["playable-loop:nature-regional-threat-recovery.v1"],
+      "worldInteractionRefs": ["WI-ACTOR-03", "WI-NATURE-01", "WI-NATURE-03", "WI-NATURE-04", "WI-CON-01", "WI-WORLD-01", "WI-WORLD-02", "WI-WORLD-06", "WI-WORLD-07"],
+      "hCapabilityRefs": ["ThreatTraceObservationPoint", "RegionalCorridor", "RoadsideMaintenanceOutpost", "BattlefieldRetreatRoute"],
+      "commonModuleRefs": ["module:region-profile", "module:threat-recovery", "module:battlefield-derivation", "module:tactical-camera-selection"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["RegionProfileAndCombatReturnFixtureRequired"]
+    },
+    {
+      "topicCode": "community-membership-visitor",
+      "titleKo": "공동체 편입·손님·원격 응대",
+      "questionSelector": "199-219",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Ready",
+      "playableLoopRefs": ["playable-loop:nature-camp-visitor-stay.v1"],
+      "worldInteractionRefs": ["WI-CON-01", "WI-COMMUNITY-VISITOR-STAY"],
+      "hCapabilityRefs": ["VisitorBedH1", "GuestBufferSpace", "CampEntranceWaitingPoint"],
+      "commonModuleRefs": ["module:community-mind", "module:remote-event-review", "module:solo-decision-time-assistance"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["VisitorPlayableUnitRegistrationRequired", "ApprovedTopicDesignAndWorkOrderRequired"]
+    },
+    {
+      "topicCode": "building-placement-assistance",
+      "titleKo": "시스템 보조 건물 배치",
+      "questionSelector": "220-222",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/배치엔진보조/building-placement-assistance.inquiry.r1.md",
+      "implementationKindCode": "CommonModule",
+      "implementationStatusCode": "CrossCutting",
+      "playableLoopRefs": [],
+      "worldInteractionRefs": [],
+      "hCapabilityRefs": ["PlacementCandidateZone", "RequiredExitRoute"],
+      "commonModuleRefs": ["module:placement-candidate-generation", "module:placement-validation"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["FirstConsumerMustOwnPrefabAndHResearch"]
+    },
+    {
+      "topicCode": "farm-barracks-defense",
+      "titleKo": "Farm 병영·방위·분대 운영",
+      "questionSelector": "223-239",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Ready",
+      "playableLoopRefs": ["playable-loop:farm-barracks-defense.v1"],
+      "worldInteractionRefs": ["WI-FARM-DEFENSE-MOBILIZE", "WI-FARM-DEFENSE-RESOLVE", "WI-FARM-DEFENSE-RETURN"],
+      "hCapabilityRefs": ["FarmPerimeterOutpostH2", "SquadAssemblyH1"],
+      "commonModuleRefs": ["module:squad-command", "module:placement-candidate-generation"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["ApprovedTopicDesignAndWorkOrderRequired"]
+    },
+    {
+      "topicCode": "hub-demand-allocation",
+      "titleKo": "Hub 수요·분배·출고 준비",
+      "questionSelector": "240-250",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Partial",
+      "playableLoopRefs": ["playable-loop:hub-outbound-ready-return.v1"],
+      "worldInteractionRefs": ["WI-HUB-03"],
+      "hCapabilityRefs": ["HubAllocationReviewPoint", "OutboundReadyZone"],
+      "commonModuleRefs": ["module:survival-economy-projection"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["Q250DeferredBranch", "IndependentHubDesignApprovalRequired"]
+    },
+    {
+      "topicCode": "survival-economy",
+      "titleKo": "생존경제·생산·소비·비축",
+      "questionSelector": "251-266",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "implementationKindCode": "CommonModule",
+      "implementationStatusCode": "CrossCutting",
+      "playableLoopRefs": ["playable-loop:farm-crop-cycle.v1", "playable-loop:hub-outbound-ready-return.v1"],
+      "worldInteractionRefs": [],
+      "hCapabilityRefs": [],
+      "commonModuleRefs": ["module:survival-economy-projection", "module:frozen-day-observation"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["FirstConsumerFixtureAndCalculationProfileRequired"]
+    },
+    {
+      "topicCode": "solo-work-delegation",
+      "titleKo": "Solo 업무 위임·예외",
+      "questionSelector": "267-268",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/솔로업무위임/solo-work-delegation.inquiry.r1.md",
+      "implementationKindCode": "CommonModule",
+      "implementationStatusCode": "CrossCutting",
+      "playableLoopRefs": ["playable-loop:farm-crop-cycle.v1"],
+      "worldInteractionRefs": ["WI-FARM-04"],
+      "hCapabilityRefs": ["FarmField"],
+      "commonModuleRefs": ["module:solo-work-delegation", "module:npc-work-assignment"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["Q268DeferredBranch", "HarvestApprovalBoundsRequired"]
+    },
+    {
+      "topicCode": "farm-landscape-pattern-inventory",
+      "titleKo": "Farm 경관·H 패턴 재고·LH 조립",
+      "questionSelector": "297-339",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md",
+      "implementationKindCode": "PlayableLoop",
+      "implementationStatusCode": "Ready",
+    "playableLoopRefs": ["playable-loop:farm-player-placement.v1"],
+    "worldInteractionRefs": [],
+      "hCapabilityRefs": ["FarmField", "BuildingPlacementZone", "H1WorkSpace", "H2BlockPattern", "H3LandscapeAssemblyPattern"],
+      "commonModuleRefs": ["module:placement-candidate-generation", "module:placement-validation", "module:landscape-pattern-inventory", "module:lh-space-lifecycle"],
+      "nextTargetStageCode": "E3",
+      "blockerCodes": ["ApprovedFarmLandscapePatternDesignRequired", "PatternTestWorldAndRuntimeEvidenceRequired"],
+      "checkDefaults": {
+        "planningRecord": "Recorded",
+        "designBinding": "LinkedOnly",
+        "implementation": "NotStarted",
+        "automatedVerification": "NotRun",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      }
+    }
+  ],
+  "depthOverrides": {
+    "Q-199": "D1", "Q-200": "D1", "Q-201": "D2", "Q-202": "D2",
+    "Q-203": "D3", "Q-204": "D3", "Q-205": "D2", "Q-206": "D3",
+    "Q-207": "D4", "Q-208": "D4", "Q-209": "D4", "Q-210": "D5",
+    "Q-211": "D5", "Q-212": "D4", "Q-213": "D4", "Q-214": "D4",
+    "Q-215": "D5", "Q-216": "D5", "Q-217": "D4", "Q-218": "D4",
+    "Q-219": "D3", "Q-220": "D4", "Q-221": "D4", "Q-222": "D4",
+    "Q-267": "D5", "Q-268": "D3",
+    "Q-269": "D3", "Q-270": "D3", "Q-271": "D3", "Q-272": "D3", "Q-273": "D3", "Q-274": "D3",
+    "Q-275": "D3", "Q-276": "D3", "Q-277": "D3", "Q-278": "D3", "Q-279": "D3", "Q-280": "D3",
+    "Q-281": "D3", "Q-282": "D3", "Q-283": "D3", "Q-284": "D3", "Q-285": "D3", "Q-286": "D3",
+    "Q-287": "D3", "Q-288": "D3", "Q-289": "D3", "Q-290": "D3", "Q-291": "D3", "Q-292": "D3",
+    "Q-293": "D3", "Q-294": "D3", "Q-295": "D3", "Q-296": "D3",
+    "Q-297": "D1", "Q-298": "D2", "Q-299": "D2", "Q-300": "D2", "Q-301": "D2", "Q-302": "D2", "Q-303": "D2",
+    "Q-304": "D3", "Q-305": "D3", "Q-306": "D3", "Q-307": "D3", "Q-308": "D3", "Q-309": "D3",
+    "Q-310": "D3", "Q-311": "D3", "Q-312": "D3", "Q-313": "D3", "Q-314": "D3", "Q-315": "D3",
+    "Q-316": "D4", "Q-317": "D4", "Q-318": "D4", "Q-319": "D4", "Q-320": "D4", "Q-321": "D4",
+    "Q-322": "D4", "Q-323": "D4", "Q-324": "D4", "Q-325": "D4", "Q-326": "D4", "Q-327": "D4",
+    "Q-328": "D4", "Q-329": "D4", "Q-330": "D4", "Q-331": "D4", "Q-332": "D4", "Q-333": "D4",
+    "Q-334": "D4", "Q-335": "D4", "Q-336": "D4", "Q-337": "D5", "Q-338": "D5", "Q-339": "D5"
+  },
+  "questionOverrides": {
+    "Q-032": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "playableLoopRefs": [
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "worldInteractionRefs": [
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "blockerCodes": [
+        "PresentationAndSessionBindingNotImplemented"
+      ],
+      "checks": {
+        "designBinding": "Incorporated",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Bound"
+      },
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Nature열원관리E3.md",
+        "eng/execution-ledgers/work-orders/nature-heat-source.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+      ],
+      "scopeNoteKo": "Q032~034 열원 변경 단일 플레이어 Core Logic E3만 검증. 수면·채집·NPC·실제 입력과 표현은 포함하지 않는다."
+    },
+    "Q-033": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "playableLoopRefs": [
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "worldInteractionRefs": [
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "blockerCodes": [
+        "PresentationAndSessionBindingNotImplemented"
+      ],
+      "checks": {
+        "designBinding": "Incorporated",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Bound"
+      },
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Nature열원관리E3.md",
+        "eng/execution-ledgers/work-orders/nature-heat-source.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+      ],
+      "scopeNoteKo": "Q032~034 열원 변경 단일 플레이어 Core Logic E3만 검증. 수면·채집·NPC·실제 입력과 표현은 포함하지 않는다."
+    },
+    "Q-034": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "playableLoopRefs": [
+        "playable-loop:nature-night-day2.v1"
+      ],
+      "worldInteractionRefs": [
+        "WI-HEAT-SOURCE-STATE-CHANGE"
+      ],
+      "blockerCodes": [
+        "PresentationAndSessionBindingNotImplemented",
+        "DryFuelAcquisitionRemainsActor01Responsibility"
+      ],
+      "checks": {
+        "designBinding": "Incorporated",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Bound"
+      },
+      "checkRefs": [
+        "docs/Architecture/PlayableLoops/Nature열원관리E3.md",
+        "eng/execution-ledgers/work-orders/nature-heat-source.e7-work-order.json",
+        "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+      ],
+      "scopeNoteKo": "Q032~034 열원 변경 단일 플레이어 Core Logic E3만 검증. 수면·채집·NPC·실제 입력과 표현은 포함하지 않는다."
+    },
+    "Q-001": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedShelterSleepBodyStateRevisionRequired",
+        "TemperatureFatigueDiseaseRulesNotImplemented",
+        "RuntimeSleepBenefitEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureShelterPurposeReadinessEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureShelterPurposeReadinessTests.cs",
+        "test:SimulationNatureShelterPurposeAndSurvival:50/50"
+      ]
+    },
+    "Q-002": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedSleepSafetyRevisionRequired",
+        "SleepPermissionAndInterruptionPolicyUnresolved",
+        "FireFuelCostUnresolved",
+        "DiseaseOnsetRecoveryRulesNotImplemented",
+        "RuntimeSleepSafetyEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSleepSafetyCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureSleepSafetyCandidateTests.cs",
+        "test:SimulationNatureSleepSafetyAndSurvival:53/53"
+      ]
+    },
+    "Q-003": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedRiskySleepPresentationRevisionRequired",
+        "PreviewWarningUiNotWired",
+        "PlayerWarningPreferencePersistenceNotImplemented",
+        "RiskOutcomeRulesNotImplemented",
+        "RuntimeRiskySleepEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureRiskySleepWarningPolicyResolver.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureRiskySleepWarningPolicyTests.cs",
+        "test:SimulationNatureRiskySleepAndSurvival:58/58"
+      ]
+    },
+    "Q-004": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedDifficultySpawnProfileRevisionRequired",
+        "ThreatSpawnFrequencyValuesNotDefined",
+        "DifficultyProfileSaveReplayBindingNotImplemented",
+        "RuntimeDifficultyExposureEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureDifficultyBoundaryResolver.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureDifficultyBoundaryTests.cs",
+        "test:SimulationNatureDifficultyAndSurvival:60/60"
+      ]
+    },
+    "Q-005": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedExpertThreatAndFocusRevisionRequired",
+        "ThreatIntensityValuesNotDefined",
+        "FocusRequirementThresholdNotDefined",
+        "FocusInsufficiencyOutcomeUnresolved",
+        "ThreatRewardAndProgressionCouplingUnresolved",
+        "RuntimeExpertThreatEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureExpertThreatCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureExpertThreatCandidateTests.cs",
+        "test:SimulationNatureExpertThreatFocusAndSurvival:72/72"
+      ]
+    },
+    "Q-006": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedMeditationFocusAccessRevisionRequired",
+        "MeditationProficiencyAccessCurveNotDefined",
+        "CurrentFocusRoleNotDefined",
+        "BasicAttackCombatEffectNotApproved",
+        "RuntimeMeditationFocusAccessEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationMeditationFocusAccessCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationMeditationFocusAccessCandidateTests.cs",
+        "test:SimulationMeditationFocusAccessAndNature:62/62"
+      ]
+    },
+    "Q-007": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedMeditationCombatProgressionRevisionRequired",
+        "CriticalChanceCurveNotDefined",
+        "BasicDamageStabilizationValuesNotDefined",
+        "CombatEffectRevisionNotApproved",
+        "DeepObservationScopeOwnedByQ008",
+        "RuntimeMeditationCombatEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationMeditationCombatProgressionCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs",
+        "Ssalddel.Simulation.Tests/SimulationMeditationCombatProgressionCandidateTests.cs",
+        "test:SimulationMeditationCombatAndLocalCombat:21/21"
+      ]
+    },
+    "Q-008": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedDeepObservationRevisionRequired",
+        "ObservationProficiencyThresholdsNotDefined",
+        "ObservationProjectionGrammarNotApproved",
+        "SocialGrowthHintResolutionOwnedByQ009",
+        "RuntimeDeepObservationEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDeepObservationCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureInteractionContracts.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLocalCombatContracts.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationTeamObservationContracts.cs",
+        "Ssalddel.Simulation.Tests/SimulationDeepObservationCandidateTests.cs",
+        "test:SimulationDeepObservationAndExistingObservation:64/64"
+      ]
+    },
+    "Q-009": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedOnlineGrowthHintRevisionRequired",
+        "GrowthHintAuthorizationPolicyNotBoundToOnlineIdentity",
+        "MeditationObservationThresholdNotDefined",
+        "PartyBenefitOwnedByQ010",
+        "RuntimeOnlineGrowthHintEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayerDomainProficiencyContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerGrowthHintProjection.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerDomainCatalog.cs",
+        "Ssalddel.Simulation.Tests/SimulationPlayerGrowthHintProjectionTests.cs",
+        "test:SimulationPlayerGrowthHintAndRelatedObservation:23/23"
+      ]
+    },
+    "Q-010": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedPartyResonanceRevisionRequired",
+        "MeditationEligibilityPolicyNotBoundToAccountProfile",
+        "RuntimePartyDistanceAuthorityNotBound",
+        "RecoveryEffectOutcomeOwnedByQ011",
+        "RuntimePartyResonanceEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyProximityResonanceCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationOnlineWorldContracts.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Tests/SimulationPartyProximityResonanceCandidateTests.cs",
+        "test:SimulationPartyResonanceAndRelatedMindOnline:21/21"
+      ]
+    },
+    "Q-011": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedPartyResonanceEffectRevisionRequired",
+        "RecoveryEffectMagnitudeNotDefined",
+        "NatureMindImpactApplicationNotImplemented",
+        "ResonancePersistenceOwnedByQ012",
+        "RuntimePartyRecoveryEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyResonanceRecoveryCandidateResolver.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureMind.cs",
+        "Ssalddel.Simulation.Tests/SimulationPartyResonanceRecoveryCandidateTests.cs",
+        "test:SimulationPartyRecoveryCandidateAndRelatedMindOnline:20/20"
+      ]
+    },
+    "Q-012": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedResonanceAfterglowRevisionRequired",
+        "AfterglowDurationAndDecayCoefficientsNotDefined",
+        "AfterglowWorldTickApplicationNotImplemented",
+        "AfterglowSaveReplayBindingNotImplemented",
+        "ResonanceStackingOwnedByQ013",
+        "RuntimeAfterglowEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyResonanceAfterglowCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationReplayHasher.cs",
+        "Ssalddel.Simulation.Tests/SimulationPartyResonanceAfterglowCandidateTests.cs",
+        "test:SimulationPartyAfterglowAndRelatedMindSave:21/21"
+      ]
+    },
+    "Q-013": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedResonanceStackingRevisionRequired",
+        "AttenuationCoefficientsNotDefined",
+        "MaximumContributorCountNotDefined",
+        "StackedRecoveryApplicationNotImplemented",
+        "GwangbokEntryCapOwnedByQ014",
+        "RuntimeResonanceStackingEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPartyResonanceStackingCandidatePlanner.cs",
+        "Ssalddel.Simulation.Tests/SimulationPartyResonanceStackingCandidateTests.cs",
+        "test:SimulationPartyResonanceStackingAndPrerequisites:8/8"
+      ]
+    },
+    "Q-014": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedGwangbokEntryCapRevisionRequired",
+        "ResonanceEntryMarginNotDefined",
+        "PeriodTransitionApplicationNotImplemented",
+        "EligibleSelfRecoveryActionOwnedByQ015",
+        "RuntimeGwangbokEntryCapEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationGwangbokResonanceEntryCapCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNaturePeriod.cs",
+        "Ssalddel.Simulation.Tests/SimulationGwangbokResonanceEntryCapCandidateTests.cs",
+        "test:SimulationGwangbokEntryCapAndPrerequisites:6/6"
+      ]
+    },
+    "Q-015": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedSelfRecoveryActionProfileRevisionRequired",
+        "ReflectRecoveryActionRecordNotImplemented",
+        "GwangbokPeriodEntryApplicationNotImplemented",
+        "ResonanceMaintenanceOwnedByQ016",
+        "RuntimeSelfRecoveryEntryEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFocusMeditationContracts.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationActionManifestationLedgerContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationGwangbokSelfRecoveryActionCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationGwangbokSelfRecoveryActionCandidateTests.cs",
+        "test:SimulationSelfRecoveryActionAndPrerequisites:12/12"
+      ]
+    },
+    "Q-016": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedGwangbokMaintenanceRevisionRequired",
+        "SelfRecoveryRefreshIntervalNotDefined",
+        "RecoveryDecayApplicationNotImplemented",
+        "RecoveryDecayProfileOwnedByQ017",
+        "RuntimeGwangbokMaintenanceEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationGwangbokResonanceMaintenanceCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationGwangbokResonanceMaintenanceCandidateTests.cs",
+        "test:SimulationGwangbokMaintenanceAndPrerequisites:7/7"
+      ]
+    },
+    "Q-017": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedRecoveryDecayProfileRevisionRequired",
+        "RecoveryDecayNumericCoefficientsNotDefined",
+        "RecoveryDecayWorldTickApplicationNotImplemented",
+        "OfflineRecoveryDecayOwnedByQ018",
+        "RuntimeRecoveryDecayEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPersonalRecoveryDecayCandidatePlanner.cs",
+        "Ssalddel.Simulation.Tests/SimulationPersonalRecoveryDecayCandidateTests.cs",
+        "test:SimulationRecoveryDecayAndPrerequisites:6/6"
+      ]
+    },
+    "Q-018": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedOfflineRecoveryPolicyRevisionRequired",
+        "RecoverySaveReferenceTickBindingNotImplemented",
+        "AuthorityGameTimeResumeApplicationNotImplemented",
+        "RecoveryThreatOffsetOwnedByQ019",
+        "RuntimeOfflineRecoveryEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPersonalRecoveryOfflineTimeCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationPersonalRecoveryOfflineTimeCandidateTests.cs",
+        "test:SimulationRecoveryOfflineTimeAndPrerequisites:8/8"
+      ]
+    },
+    "Q-019": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedRecoveryThreatOffsetPolicyRevisionRequired",
+        "RecoveryThreatOffsetRatioNotDefined",
+        "MeditationProficiencyThresholdCurveNotDefined",
+        "GwangbokDarkAgeConflictOwnedByQ020",
+        "RuntimeRecoveryThreatOffsetEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPersonalRecoveryThreatOffsetCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationPersonalRecoveryThreatOffsetCandidateTests.cs",
+        "test:SimulationRecoveryThreatOffsetAndPrerequisites:8/8"
+      ]
+    },
+    "Q-020": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedPeriodConflictPolicyRevisionRequired",
+        "ExtremeMeditationProficiencyThresholdNotDefined",
+        "AllowedMindfulnessEffectScopeOwnedByQ021",
+        "MindfulnessEffectStrengthOwnedByQ022",
+        "RuntimeDarkAgeMindfulnessAccessEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDarkAgeMindfulnessAccessCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationDarkAgeMindfulnessAccessCandidateTests.cs",
+        "test:SimulationDarkAgeMindfulnessAccessAndPrerequisites:8/8"
+      ]
+    },
+    "Q-021": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedDarkAgeMindfulnessEffectCatalogRevisionRequired",
+        "PersonalEffectConsumersNotBoundToRuntime",
+        "PersonalMindfulnessEffectStrengthOwnedByQ022",
+        "DarkAgeMindfulnessEffectSaveReplayBindingNotImplemented",
+        "RuntimeDarkAgeMindfulnessEffectEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDarkAgeMindfulnessEffectScopeCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationDarkAgeMindfulnessEffectScopeCandidateTests.cs",
+        "test:SimulationDarkAgeMindfulnessEffectScopeAndPrerequisites:12/12"
+      ]
+    },
+    "Q-022": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedMindfulnessEffectStrengthProfileRevisionRequired",
+        "LongTermMeditationStrengthCurveNotDefined",
+        "MindfulnessEffectDurationAndCostNotDefined",
+        "MindfulnessEffectRuntimeApplicationNotImplemented",
+        "RuntimeMindfulnessEffectStrengthEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationDarkAgeMindfulnessEffectStrengthCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationDarkAgeMindfulnessEffectStrengthCandidateTests.cs",
+        "test:SimulationDarkAgeMindfulnessEffectStrengthAndPrerequisites:12/12"
+      ]
+    },
+    "Q-023": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedRiskySleepOutcomePolicyRevisionRequired",
+        "RiskySleepThreatInterruptionRuntimeNotImplemented",
+        "RiskySleepWakeOutcomeNumericRulesNotDefined",
+        "WeatherProfileBindingOwnedByQ024",
+        "RuntimeRiskySleepOutcomeEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureRiskySleepOutcomeCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureRiskySleepOutcomeCandidateTests.cs",
+        "test:SimulationRiskySleepOutcomeAndPrerequisites:12/12"
+      ]
+    },
+    "Q-024": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "ApprovedWeatherGeneralizationRuleRevisionRequired",
+        "LiveKmaObservationApprovalNotVerified",
+        "UnavailableWeatherFallbackProfileNotDefined",
+        "WeatherProfileSaveReplayBindingNotImplemented",
+        "RuntimeWeatherProfileFreezeEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureWeatherProfileFreezeCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureWeatherProfileFreezeCandidateTests.cs",
+        "test:SimulationWeatherProfileFreezeAndPrerequisites:10/10"
+      ]
+    },
+    "Q-025": {
+      "implementationStatusCode": "Partial",
+      "nextTargetStageCode": "E2",
+      "blockerCodes": [
+        "NotActivePlayableUnitDependency",
+        "ApprovedSleepProtectionSpatialPolicyRevisionRequired",
+        "ProtectionLayerRangeAndShapeNotDefined",
+        "DoorOpeningAndBoundaryGraphRulesNotDefined",
+        "ActualHPlacementGraphEvidenceNotBound",
+        "RuntimeSleepProtectionSpatialEvidenceRequired"
+      ],
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Partial",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSleepProtectionSpatialLayerCandidateEvaluator.cs",
+        "Ssalddel.Simulation.Tests/SimulationNatureSleepProtectionSpatialLayerCandidateTests.cs",
+        "test:SimulationNatureSleepProtectionSpatialAndPrerequisites:10/10",
+        "routing:NotActivePlayableUnitDependency"
+      ]
+    },
+    "Q-071": { "decisionStatusCode": "Deferred", "implementationStatusCode": "Deferred", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["PlayerAuthoredRecipeDeferred"] },
+    "Q-195": { "decisionStatusCode": "Deferred", "implementationStatusCode": "Deferred", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["NonCombatRewardChoiceDeferred"] },
+    "Q-250": { "decisionStatusCode": "Deferred", "implementationStatusCode": "Deferred", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["HubFailureResponseDeferred"] },
+    "Q-266": { "decisionStatusCode": "Deferred", "implementationStatusCode": "Deferred", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["HostedEconomyAuthorityDeferred"] },
+    "Q-267": { "decisionStatusCode": "Superseded", "implementationStatusCode": "Superseded", "implementationKindCode": "CommonModule", "nextTargetStageCode": "E3", "blockerCodes": ["ReusesQ129Q152Q154"] },
+    "Q-268": { "decisionStatusCode": "Deferred", "implementationStatusCode": "Deferred", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["DelegationExceptionAutoResolutionDeferred"] },
+    "Q-269": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-270": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-271": { "decisionStatusCode": "Superseded", "implementationStatusCode": "Superseded", "implementationKindCode": "PlayableLoop", "nextTargetStageCode": "E1", "blockerCodes": ["SpecificGamgukHyangyuFixtureReplacedByQ284"], "checks": { "designBinding": "Deferred", "implementation": "NotApplicable", "automatedVerification": "NotApplicable", "runtimeVerification": "NotApplicable", "evidenceBinding": "NotApplicable" } },
+    "Q-272": { "decisionStatusCode": "NeedsSourceRecovery", "implementationStatusCode": "NeedsSourceRecovery", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["InterruptedTurnQuestionTextMissing"], "checks": { "planningRecord": "NeedsSourceRecovery", "designBinding": "Missing", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-273": { "decisionStatusCode": "NeedsSourceRecovery", "implementationStatusCode": "NeedsSourceRecovery", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["InterruptedTurnQuestionTextMissing"], "checks": { "planningRecord": "NeedsSourceRecovery", "designBinding": "Missing", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-274": { "decisionStatusCode": "NeedsSourceRecovery", "implementationStatusCode": "NeedsSourceRecovery", "implementationKindCode": "DeferredDecision", "nextTargetStageCode": "E1", "blockerCodes": ["InterruptedTurnQuestionTextMissing"], "checks": { "planningRecord": "NeedsSourceRecovery", "designBinding": "Missing", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-275": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-276": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-277": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-278": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-279": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-280": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-281": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-282": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-283": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-284": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-285": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-286": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-287": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-288": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-289": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-290": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-291": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-292": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-293": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-294": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-295": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-296": { "checks": { "designBinding": "LinkedOnly", "implementation": "NotStarted", "automatedVerification": "NotRun", "runtimeVerification": "NotRun", "evidenceBinding": "Unbound" } },
+    "Q-338": {
+      "implementationStatusCode": "Implemented",
+      "checks": {
+        "designBinding": "LinkedOnly",
+        "implementation": "Implemented",
+        "automatedVerification": "Passed",
+        "runtimeVerification": "NotRun",
+        "evidenceBinding": "Unbound"
+      },
+      "checkRefs": [
+        "Ssalddel.Simulation.Application/SimulationWorldAssetPlacementPlanPartitioning.cs",
+        "Ssalddel.Simulation.Application/SimulationSeparatedWorldAssetPlacement.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationLhAssetPlanLifecycleContracts.cs",
+        "Ssalddel.Simulation.Application/SimulationLhAssetPlanLifecycleService.cs",
+        "Ssalddel.Simulation.Application/SimulationLhAssetPlanWindowReconciler.cs",
+        "Ssalddel.Unity/Runtime/WorldProjection/SimulationLhAssetPlanPresentationReconciler.cs",
+        "Ssalddel.CodeMetadata/SsalddelEvidenceResponsibility.cs",
+        "docs/AI/generated/simulation-unity-code-map.json",
+        "docs/AI/generated/evidence-responsibility-code-map.json",
+        "Ssalddel.Simulation.Tests/SimulationWorldAssetPlacementPlanPartitioningTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationLhAssetPlanLifecycleServiceTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationLhAssetPlanWindowReconcilerTests.cs",
+        "Ssalddel.Unity.Tests/SimulationLhAssetPlanPresentationReconcilerTests.cs",
+        "test:SimulationWorldAssetPlacementAndLhLifecycle:31/31",
+        "test:UnityLhPresentationAndStableIdReconcile:21/21",
+        "check:SimulationUnityCodeMap:Passed",
+        "check:EvidenceResponsibilityCodeMap:Passed"
+      ]
+    }
+  }
+}

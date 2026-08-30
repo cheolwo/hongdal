@@ -2,21 +2,25 @@
 
 > 이 문서는 `eng/execution-ledgers/world-interaction-delivery-priorities.json`와 WI·폐루프·H 상태 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 실행 우선순위 개정: `world-interaction-delivery-priorities.r26`
-- 전체 WI: `66`
-- 진행 방식: `SingleWorldInteractionVertical` / 작업 중 한도 `1`
-- 현재 활성 WI: `WI-ACTOR-03` / `E5` → `E7`
+- 실행 우선순위 개정: `world-interaction-delivery-priorities.r40`
+- 전체 WI: `105`
+- 진행 방식: 의존성·담당 소유권 기반 병렬 개발 / 고정 작업 수 제한 없음
+- 실행 중 WI: `WI-ACTOR-03, WI-COMMUNITY-VISITOR-STAY, WI-FARM-01, WI-WORLD-RESOURCE-REGENERATE` / 원본: `eng/execution-ledgers/codex-playable-loop-goals.json`
+- 대표 표시 WI: `WI-WORLD-RESOURCE-REGENERATE` / `E1` → `E7` (전체 실행 목록이 아님)
 - Synty H1 설계 재고: `84`
 - E7은 최신 PlayMode·Game View·Hosted 동등성 증거가 있을 때만 승격한다.
 
-## 현재 단일 WI 증거 관문
+## 대표 표시 WI 증거 관문
 
 | E 단계 | 판정 | 정제·검증 요약 |
 | --- | --- | --- |
-| E4 | Passed | LocalSimulationRuntime과 RemoteHost HTTP Adapter가 같은 Application 서비스를 호출하며 Query·Preview·Confirm 결과가 일치한다. |
-| E5 | Pending | 지식 출처의 실제 H 결속과 같은 revision 표현은 후속 승인 범위다. |
-| E6 | Pending | 플레이어 피드백 정제는 표현 문답과 자산 연구 뒤 수행한다. |
-| E7 | Pending | 실제 입력·Play Mode·Game View는 이번 인계에서 수행하지 않는다. |
+| E1 | Passed | 정책·WorldTick 자동 재생 계약 요구. |
+| E2 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
+| E3 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
+| E4 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
+| E5 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
+| E6 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
+| E7 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
 
 ## D1 Nature 행동 폐루프
 
@@ -47,7 +51,8 @@
 | 20 | 현장 보급 제작 업무 위임<br>`WI-NATURE-17` | Queued | Core | E3 | E4 | E5 | Required | EstablishedH1 | Nature | playable-loop:nature-field-supply-return.v1 |
 | 21 | 승인 자료로 거점 성찰 확정<br>`WI-REFLECT-01` | Queued | Extension | E3 | E3 | E4 | NotApplicable | MissingRequired | Nature | playable-loop:nature-base-reflection.v1 |
 | 22 | 벌목 통나무 줍기<br>`WI-NATURE-18` | E7Closed | Core | E3 | E7 | Complete | NotApplicable | EstablishedH3 | Nature | playable-loop:nature-shelter-foundation.v1 |
-| 23 | 지식 습득<br>`WI-ACTOR-03` | Active | Core | E3 | E5 | E6 | NotApplicable | NotApplicable | Shared | playable-loop:nature-basic-herbal-recovery.v1 |
+| 23 | 지식 습득<br>`WI-ACTOR-03` | Active | Core | E3 | E4 | E5 | NotApplicable | NotApplicable | Shared | playable-loop:nature-basic-herbal-recovery.v1 |
+| 24 | 방문자 임시 체류 결정<br>`WI-COMMUNITY-VISITOR-STAY` | Active | Core | E4 | E4 | E5 | NotApplicable | CandidateLineage | Nature | playable-loop:nature-camp-visitor-stay.v1 |
 
 ## D2 Farm 독립 생산 폐루프
 
@@ -56,12 +61,17 @@
 
 | 순서 | 한국어 행동명 · 고유 식별자 | 작업 | 역할 | 현재 구현 | 현재 통합 | 다음 관문 | NPC E8 | H 상태 | Synty | 폐루프 |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 경작지 밭갈이<br>`WI-FARM-01` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
+| 1 | 경작지 밭갈이<br>`WI-FARM-01` | Active | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
 | 2 | 경작지 씨앗 파종<br>`WI-FARM-02` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
 | 3 | 농작물 생육 관리<br>`WI-FARM-03` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
 | 4 | 익은 농작물 수확<br>`WI-FARM-04` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-crop-cycle.v1 |
 | 5 | 수확물 집하장 모으기<br>`WI-FARM-05` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-pack-store-return.v1 |
 | 6 | 출하 물량 포장<br>`WI-FARM-06` | Queued | Core | E3 | E6 | E7 | Conditional | EstablishedH3 | Farm | playable-loop:farm-pack-store-return.v1 |
+| 7 | 방위 분대 소집<br>`WI-FARM-DEFENSE-MOBILIZE` | Queued | Core | E4 | E4 | E5 | NotApplicable | CandidateLineage | Farm | playable-loop:farm-barracks-defense.v1 |
+| 8 | 경비 초소 분대 배정<br>`WI-SQUAD-ASSIGN` | Queued | Core | E3 | E3 | E4 | NotApplicable | NeedsDecision | Farm | playable-loop:farm-barracks-defense.v1 |
+| 9 | 경비 분대 식량·장비 보급<br>`WI-SQUAD-SUPPLY` | Queued | Core | E3 | E3 | E4 | NotApplicable | NeedsDecision | Farm | playable-loop:farm-barracks-defense.v1 |
+| 10 | Farm 방어 성공 결과 발현<br>`WI-FARM-DEFENSE-RESOLVE` | Queued | Core | E3 | E3 | E4 | NotApplicable | NotApplicable | Farm | playable-loop:farm-barracks-defense.v1 |
+| 11 | Farm 방위 분대 초소 귀환 인계<br>`WI-FARM-DEFENSE-RETURN` | Queued | Core | E3 | E3 | E4 | NotApplicable | NeedsDecision | Farm | playable-loop:farm-barracks-defense.v1 |
 
 ## D3 Hub 독립 창고 NPC 폐루프
 
@@ -131,3 +141,44 @@
 | 18 | 세계 활동 상태 변경<br>`WI-WORLD-07` | Deferred | DeferredIntegration | E3 | E1 | E2 | NotApplicable | CandidateLineage | None | 후속 정의 |
 | 19 | 하루 운영 턴 마감<br>`WI-WORLD-08` | Deferred | DeferredIntegration | E3 | E1 | E2 | NotApplicable | NotApplicable | None | playable-loop:solo-world-day.v1 |
 | 20 | NPC 업무 결과 검토 확정<br>`WI-REVIEW-01` | Deferred | DeferredIntegration | E2 | E1 | E2 | NotApplicable | NotApplicable | None | 후속 정의 |
+
+## D7 문답 신규 WI 등록·독립 작업 구현
+
+- 진입: 등록만으로 실행하지 않는다. 승인 기획·작업 명세·쓰기 소유권·선행 의존성을 확인한 각 작업은 독립적으로 병렬 구현할 수 있다. D1~D6 완료나 다른 WI의 종료는 일괄 선행 조건이 아니다.
+- 완료: 미착수 항목은 DeferredRegistration을 유지한다. Logic E3 뒤 공간·표현·Runtime 승격은 별도 기획과 승인 상한으로 판정한다.
+
+| 순서 | 한국어 행동명 · 고유 식별자 | 작업 | 역할 | 현재 구현 | 현재 통합 | 다음 관문 | NPC E8 | H 상태 | Synty | 폐루프 |
+| ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 물품 섭취<br>`WI-ACTOR-CONSUME` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 2 | 개인 계획 설정<br>`WI-ACTOR-PLAN-SET` | Queued | Extension | E3 | E1 | E2 | NotApplicable | NeedsDecision | None | playable-loop:nature-night-day2.v1 |
+| 3 | 직접 전투 조종 전환<br>`WI-COMBAT-DIRECT-CONTROL-SET` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 4 | 분대 전술 명령 확정<br>`WI-COMBAT-TACTICAL-COMMAND` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 5 | 공동체 협력 제안<br>`WI-COMMUNITY-COOPERATION-PROPOSE` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 6 | 공동체 출입 정책 설정<br>`WI-COMMUNITY-ENTRANCE-POLICY-SET` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 7 | NPC 고용 확정<br>`WI-COMMUNITY-HIRE` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 8 | 공동체 정식 편입 확정<br>`WI-COMMUNITY-MEMBERSHIP-CONFIRM` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 9 | 원격 응대 지시 확정<br>`WI-COMMUNITY-REMOTE-RESPONSE` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 10 | 공동 지원 임무 참여<br>`WI-COMMUNITY-SUPPORT-MISSION-JOIN` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 11 | 건설 청사진 배치<br>`WI-CON-BLUEPRINT-PLACE` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 12 | 건설물 해체<br>`WI-CON-DEMOLISH` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 13 | 건설 재료 투입<br>`WI-CON-MATERIAL-DEPOSIT` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 14 | 건설 시공 기여<br>`WI-CON-WORK-CONTRIBUTE` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 15 | 배합물 달이기<br>`WI-CRAFT-BREW` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 16 | 탐사 임무 파견<br>`WI-EXPEDITION-DISPATCH` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 17 | 밭 경계 확정<br>`WI-FARM-FIELD-BOUNDARY-CONFIRM` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 18 | 토양 개량<br>`WI-FARM-SOIL-AMEND` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 19 | 농업 용수 이송<br>`WI-FARM-WATER-TRANSFER` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 20 | 손님 활동 권한 설정<br>`WI-GUEST-PERMISSION-SET` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 21 | 열원 상태 변경<br>`WI-HEAT-SOURCE-STATE-CHANGE` | Queued | Extension | E3 | E1 | E2 | Conditional | NeedsDecision | None | playable-loop:nature-night-day2.v1 |
+| 22 | Hub 수요 재고 할당<br>`WI-HUB-DEMAND-ALLOCATE` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 23 | Hub 조달 과제 수락<br>`WI-HUB-SUPPLY-TASK-ACCEPT` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 24 | 목표 비축 미달 판매 확정<br>`WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 25 | 약초 채집<br>`WI-NATURE-HERB-GATHER` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 26 | 자연 흔적 조사<br>`WI-NATURE-TRACE-INVESTIGATE` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 27 | 생존 배급 정책 설정<br>`WI-SURVIVAL-RATION-POLICY-SET` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 28 | Town 납품 검수<br>`WI-TOWN-DELIVERY-INSPECT` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 29 | Town 납품 인수<br>`WI-TOWN-DELIVERY-RECEIVE` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 30 | Town 후방 재고 적재<br>`WI-TOWN-STOCK-PUTAWAY` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 31 | Town 재고 보충 주문<br>`WI-TOWN-STOCK-REPLENISH` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
+| 32 | Town 공급 운송 출발 확정<br>`WI-TOWN-SUPPLY-DISPATCH` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
+| 33 | 세계 자원 재생<br>`WI-WORLD-RESOURCE-REGENERATE` | Active | Extension | E3 | E1 | E2 | NotApplicable | NeedsDecision | None | playable-loop:nature-night-day2.v1 |

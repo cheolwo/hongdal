@@ -2,12 +2,12 @@
 
 > 이 문서는 E/H 원장·공간 재고·공식 H 정의를 대조해 자동 생성한다. 직접 수정하지 않는다.
 
-- WI: `66개` · E3: `61개`
+- WI: `105개` · E3: `70개`
 - E4/H1 실행 성립: `14개`
 - E5/H3 실제 공간 결속: `15개`
-- H1~H4 설계 후보 계보만 존재: `21개`
+- H1~H4 설계 후보 계보만 존재: `23개`
 - 필수 공간 설계 누락: `5개`
-- 공간 비적용: `11개`
+- 공간 비적용: `12개`
 - 공식 H 정의: `H1 8 / H2 0 / H3 5 / H4 1`
 
 후보 H2·H3·H4 계보와 Graph binding은 설계 입력이며 E 단계나 실제 배치를 자동 승격하지 않는다.
@@ -18,13 +18,15 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 물품 획득 · `WI-ACTOR-01` | `E3/E5` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 | 장착 상태 변경 · `WI-ACTOR-02` | `E3/E5` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
-| 지식 습득 · `WI-ACTOR-03` | `E3/E5` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
+| 지식 습득 · `WI-ACTOR-03` | `E3/E4` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
+| 물품 섭취 · `WI-ACTOR-CONSUME` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 개인 계획 설정 · `WI-ACTOR-PLAN-SET` | `E3/E1` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
 ## 메이저 아르카나 (`CARD`)
 
 | WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 현재 세계의 메이저 아르카나 활성화 · `WI-CARD-01` | `E3/E4` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` | E4WithoutApprovedH1 |
+| 현재 세계의 메이저 아르카나 활성화 · `WI-CARD-01` | `E3/E4` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 
 ## 도심 운영 (`CITY`)
 
@@ -35,11 +37,28 @@
 | 도심 주민 서비스 처리 · `WI-CITY-03` | `E1/E1` | `Required` | `-` | `MissingRequired` | `P5` | `BlockedMissingDesign` | RequiredSpatialDesignMissing |
 | 도심 서비스 결과 확인 · `WI-CITY-04` | `E1/E1` | `Required` | `-` | `MissingRequired` | `P5` | `BlockedMissingDesign` | RequiredSpatialDesignMissing |
 
+## 공동체 방문·관계 (`COMMUNITY`)
+
+| WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 방문자 임시 체류 결정 · `WI-COMMUNITY-VISITOR-STAY` | `E4/E4` | `Contextual` | `-` | `CandidateLineage` | `P5` | `DesignCandidateOnly` | E4WithoutApprovedH1 |
+| 공동체 협력 제안 · `WI-COMMUNITY-COOPERATION-PROPOSE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 공동체 출입 정책 설정 · `WI-COMMUNITY-ENTRANCE-POLICY-SET` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| NPC 고용 확정 · `WI-COMMUNITY-HIRE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 공동체 정식 편입 확정 · `WI-COMMUNITY-MEMBERSHIP-CONFIRM` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 원격 응대 지시 확정 · `WI-COMMUNITY-REMOTE-RESPONSE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 공동 지원 임무 참여 · `WI-COMMUNITY-SUPPORT-MISSION-JOIN` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 손님 활동 권한 설정 · `WI-GUEST-PERMISSION-SET` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+
 ## 영역 건설 (`CON`)
 
 | WI | E | 공간 참여 | 성립 H | 설계 상태 | 우선순위 | LH 인계 | 경고 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 영역 건물 건설 확정 · `WI-CON-01` | `E3/E7` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
+| 건설 청사진 배치 · `WI-CON-BLUEPRINT-PLACE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 건설물 해체 · `WI-CON-DEMOLISH` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 건설 재료 투입 · `WI-CON-MATERIAL-DEPOSIT` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 건설 시공 기여 · `WI-CON-WORK-CONTRIBUTE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
 ## 농장 생산 (`FARM`)
 
@@ -51,6 +70,14 @@
 | 익은 농작물 수확 · `WI-FARM-04` | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P2` | `ReadyForActualE5Input` |  |
 | 수확물 집하장 모으기 · `WI-FARM-05` | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P2` | `ReadyForActualE5Input` |  |
 | 출하 물량 포장 · `WI-FARM-06` | `E3/E6` | `Required` | `H3` | `EstablishedH3` | `P2` | `ReadyForActualE5Input` |  |
+| 방위 분대 소집 · `WI-FARM-DEFENSE-MOBILIZE` | `E4/E4` | `Contextual` | `-` | `CandidateLineage` | `P5` | `DesignCandidateOnly` | E4WithoutApprovedH1 |
+| 경비 초소 분대 배정 · `WI-SQUAD-ASSIGN` | `E3/E3` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 경비 분대 식량·장비 보급 · `WI-SQUAD-SUPPLY` | `E3/E3` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| Farm 방어 성공 결과 발현 · `WI-FARM-DEFENSE-RESOLVE` | `E3/E3` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
+| Farm 방위 분대 초소 귀환 인계 · `WI-FARM-DEFENSE-RETURN` | `E3/E3` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 밭 경계 확정 · `WI-FARM-FIELD-BOUNDARY-CONFIRM` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 토양 개량 · `WI-FARM-SOIL-AMEND` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 농업 용수 이송 · `WI-FARM-WATER-TRANSFER` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
 ## 물류 거점 창고 (`HUB`)
 
@@ -62,6 +89,8 @@
 | 출고 대상 재고 피킹 · `WI-HUB-04` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
 | 피킹 화물 포장 · `WI-HUB-05` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
 | 출고 차량 상차 · `WI-HUB-06` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
+| Hub 수요 재고 할당 · `WI-HUB-DEMAND-ALLOCATE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| Hub 조달 과제 수락 · `WI-HUB-SUPPLY-TASK-ACCEPT` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
 ## 영역 간 화물 이동 (`LOG`)
 
@@ -82,6 +111,11 @@
 | 마트 입고 상품 검수 · `WI-MARKET-03` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
 | 검수 상품 후방 창고 적재 · `WI-MARKET-04` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
 | 매장 진열대 상품 보충 · `WI-MARKET-05` | `E3/E1` | `Required` | `-` | `CandidateLineage` | `P4` | `DesignCandidateOnly` |  |
+| Town 납품 검수 · `WI-TOWN-DELIVERY-INSPECT` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| Town 납품 인수 · `WI-TOWN-DELIVERY-RECEIVE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| Town 후방 재고 적재 · `WI-TOWN-STOCK-PUTAWAY` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| Town 재고 보충 주문 · `WI-TOWN-STOCK-REPLENISH` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| Town 공급 운송 출발 확정 · `WI-TOWN-SUPPLY-DISPATCH` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
 ## 자연 탐사·생활 거점 (`NATURE`)
 
@@ -105,6 +139,10 @@
 | 현장 보급 꾸러미 제작 · `WI-NATURE-16` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 현장 보급 제작 업무 위임 · `WI-NATURE-17` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 벌목 통나무 줍기 · `WI-NATURE-18` | `E3/E7` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
+| 배합물 달이기 · `WI-CRAFT-BREW` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 열원 상태 변경 · `WI-HEAT-SOURCE-STATE-CHANGE` | `E3/E1` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 약초 채집 · `WI-NATURE-HERB-GATHER` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 자연 흔적 조사 · `WI-NATURE-TRACE-INVESTIGATE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
 ## 주민 주문·소비 (`ORDER`)
 
@@ -142,6 +180,12 @@
 | 일행 역할 카드 장착 · `WI-WORLD-06` | `E3/E1` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 | 세계 활동 상태 변경 · `WI-WORLD-07` | `E3/E1` | `Contextual` | `-` | `CandidateLineage` | `P5` | `DesignCandidateOnly` |  |
 | 하루 운영 턴 마감 · `WI-WORLD-08` | `E3/E1` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
+| 직접 전투 조종 전환 · `WI-COMBAT-DIRECT-CONTROL-SET` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 분대 전술 명령 확정 · `WI-COMBAT-TACTICAL-COMMAND` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 탐사 임무 파견 · `WI-EXPEDITION-DISPATCH` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 목표 비축 미달 판매 확정 · `WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 생존 배급 정책 설정 · `WI-SURVIVAL-RATION-POLICY-SET` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 세계 자원 재생 · `WI-WORLD-RESOURCE-REGENERATE` | `E3/E1` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
 ## P1 기준 플레이 공간 구성
 
@@ -155,11 +199,12 @@
 
 ## 확인이 필요한 공백
 
-- `WI-CARD-01` 현재 세계의 메이저 아르카나 활성화: `E4WithoutApprovedH1`
 - `WI-CITY-01` 도심 서비스 수요 확정: `RequiredSpatialDesignMissing`
 - `WI-CITY-02` 도심 서비스용 지역 재고 배정: `RequiredSpatialDesignMissing`
 - `WI-CITY-03` 도심 주민 서비스 처리: `RequiredSpatialDesignMissing`
 - `WI-CITY-04` 도심 서비스 결과 확인: `RequiredSpatialDesignMissing`
+- `WI-COMMUNITY-VISITOR-STAY` 방문자 임시 체류 결정: `E4WithoutApprovedH1`
+- `WI-FARM-DEFENSE-MOBILIZE` 방위 분대 소집: `E4WithoutApprovedH1`
 - `WI-NATURE-05` 벌목 도끼 획득: `E5PlacementReferenceMissing`
 - `WI-REFLECT-01` 승인 자료로 거점 성찰 확정: `RequiredSpatialDesignMissing`
 - `WI-WORLD-04` 손상된 시설 수리: `GraphBindingWithoutApprovedH1`

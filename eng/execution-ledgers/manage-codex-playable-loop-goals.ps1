@@ -9,6 +9,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot "../common/deterministic-text-output.ps1")
+. (Join-Path $PSScriptRoot "../common/parallel-development-work.ps1")
 
 function Require([bool] $Condition, [string] $Code) {
     if (-not $Condition) { throw "CodexPlayableLoopGoalInvalid:$Code" }
@@ -30,11 +31,11 @@ $delivery = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledge
 $evidence = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.evidencePackageCatalogPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 $pipeline = Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $ledger.engineInteractionValidationPath)) -Raw -Encoding UTF8 | ConvertFrom-Json
 
-Require ([string] $ledger.schemaVersion -eq "codex-playable-loop-goals.v3") "SchemaInvalid"
+Require ([string] $ledger.schemaVersion -in @("codex-playable-loop-goals.v3", "codex-playable-loop-goals.v4")) "SchemaInvalid"
+$parallel = [string] $ledger.schemaVersion -eq "codex-playable-loop-goals.v4"
 foreach ($principle in @(
     "goalOwnsExactlyOnePlayableUnit",
     "aggregateMilestonesUseSeparateHarmonyCampaign",
-    "oneGoalAndOneWorldInteractionAtATime",
     "evidenceMaturityDoesNotEqualImplementationProgress",
     "sameGoalSurvivesDownwardReassessment",
     "playerPromiseChangeReplacesGoal",
@@ -58,8 +59,14 @@ Require ([string] $ledger.policy.goalSubjectLevelCode -eq "PlayableUnit") "GoalS
 Require ([string] $ledger.policy.aggregateTreatmentCode -eq
     "SeparateHarmonyCampaign") "AggregateTreatmentInvalid"
 Require ([string] $ledger.policy.priorityModeCode -eq "CoreFirstPlayerContinuity") "PriorityModeInvalid"
-Require ([int] $ledger.policy.goalWorkInProgressLimit -eq 1) "GoalWorkInProgressLimitMustBeOne"
-Require ([int] $ledger.policy.worldInteractionWorkInProgressLimit -eq 1) "WorldInteractionWorkInProgressLimitMustBeOne"
+if ($parallel) {
+    Require ([string] $ledger.policy.concurrencyModeCode -eq 'DependencyAndOwnership') 'ConcurrencyModeInvalid'
+    Require ($null -eq $ledger.policy.goalWorkInProgressLimit -and $null -eq $ledger.policy.worldInteractionWorkInProgressLimit) 'HardConcurrencyCapNotAllowed'
+    Require ([bool] $ledger.principles.independentWorkMayProceedInParallel) 'ParallelPrincipleMissing'
+} else {
+    Require ([int] $ledger.policy.goalWorkInProgressLimit -eq 1) "GoalWorkInProgressLimitMustBeOne"
+    Require ([int] $ledger.policy.worldInteractionWorkInProgressLimit -eq 1) "WorldInteractionWorkInProgressLimitMustBeOne"
+}
 Require ((@($ledger.policy.allowedMaturityTrackCodes) -join ",") -eq
     "Logic,Presentation") "MaturityTrackCodesInvalid"
 Require ([string] $ledger.policy.defaultPlayerTargetEvidenceStage -eq "E7") "DefaultPlayerTargetInvalid"
@@ -89,7 +96,7 @@ Require ($goalCount -eq $playableUnitIds.Count) "PlayableUnitGoalCoverageCountIn
 $orders = @($ledger.items.queueOrder | ForEach-Object { [int] $_ } | Sort-Object)
 Require (($orders -join ",") -eq ((1..$goalCount) -join ",")) "GoalQueueOrderInvalid"
 $activeItems = @($ledger.items | Where-Object goalStateCode -eq "Active")
-Require ($activeItems.Count -le 1) "ActiveGoalCountInvalid"
+if (-not $parallel) { Require ($activeItems.Count -le 1) "ActiveGoalCountInvalid" }
 $seen = @{}
 $areaOrder = @($ledger.policy.areaContinuityOrderCodes)
 $lastAreaIndexByRole = @{ Core = -1; Extension = -1 }
@@ -131,7 +138,25 @@ foreach ($item in @($ledger.items | Sort-Object queueOrder)) {
 Require ((@($seen.Keys | Sort-Object) -join "|") -eq
     (@($playableUnitIds | Sort-Object) -join "|")) "PlayableUnitGoalCoverageSetInvalid"
 
-$active = $ledger.activeGoal
+$workItems = @(Get-ParallelDevelopmentWorkItems -Ledger $ledger)
+$workChecks = @(Test-ParallelDevelopmentWorkItems -Ledger $ledger -Loops $loops -RepositoryRoot $repositoryRoot)
+if ($parallel) {
+    foreach ($result in $workChecks) {
+        if ($result.statusCode -in @('Active','ReadyForIntegration')) {
+            Require $result.canExecute "WorkItemNotExecutable:$($result.workItemId):$($result.blockerCodes -join ',')"
+        }
+    }
+    $executingLoopIds = @($workItems | Where-Object { $_.statusCode -in @('Active','ReadyForIntegration') } | ForEach-Object { $_.loopStableId } | Sort-Object -Unique)
+    foreach ($id in $executingLoopIds) {
+        Require (@($activeItems | Where-Object loopStableId -eq $id).Count -eq 1) 'ActiveGoalWorkItemsMismatch'
+    }
+    foreach ($item in $activeItems) {
+        Require (@($workItems | Where-Object { $_.loopStableId -eq $item.loopStableId -and $_.statusCode -ne 'Integrated' }).Count -gt 0) 'ActiveGoalWorkItemsMismatch'
+    }
+}
+$active = $ledger.activeGoal # 이전 소비자를 위한 대표 표시. 전체 실행 집합은 workItems다.
+$focusIsExecuting = @($workItems | Where-Object { $_.loopStableId -eq $active.loopStableId -and $_.worldInteractionId -eq $active.activeWorldInteractionId -and $_.trackCode -eq $active.activeMaturityTrackCode -and $_.workOrderRef -eq $active.workOrderRef -and $_.statusCode -in @('Active','ReadyForIntegration') }).Count -gt 0
+$validateFocus = (-not $parallel) -or $focusIsExecuting
 $activeItem = @($ledger.items | Where-Object {
         [string] $_.loopStableId -eq [string] $active.loopStableId
     })[0]
@@ -140,9 +165,10 @@ $planningGate = $activeLoop.planningGate
 Require ($null -ne $activeLoop.PSObject.Properties["planningGate"]) `
     "ActivePlanningGateMissing"
 $activePlanningStatus = [string] $planningGate.statusCode
-Require (@($ledger.policy.allowedActivePlanningStatusCodes) -contains `
-    $activePlanningStatus) "ActiveGoalPlanningNotApproved"
-if ($activePlanningStatus -eq "LegacyActiveMigration") {
+if ($validateFocus) {
+    Require (@($ledger.policy.allowedActivePlanningStatusCodes) -contains $activePlanningStatus) "ActiveGoalPlanningNotApproved"
+}
+if ($validateFocus -and $activePlanningStatus -eq "LegacyActiveMigration") {
     Require ([string] $loops.designDocumentationPolicy.legacyActiveMigrationLoopStableId `
         -eq [string] $active.loopStableId) "LegacyPlanningGateTransferred"
     Require ([string] $active.goalStateCode -eq "Active") `
@@ -153,13 +179,17 @@ $topicPlanningManager = Join-Path $PSScriptRoot `
 & $topicPlanningManager -Mode Validate `
     -PlayableLoopPath ([string] $ledger.playableLoopCatalogPath) `
     -GoalLedgerPath $InputPath | Out-Null
+$pipelineState = $active.pipelineValidation
+if ($validateFocus) {
 Require ([string] $active.goalStateCode -in @("Active", "Completed")) "ActiveGoalStateInvalid"
 Require ([string] $active.goalStateCode -eq [string] $activeItem.goalStateCode) "ActiveGoalStateDrift"
 if ([string] $active.goalStateCode -eq "Active") {
-    Require ($activeItems.Count -eq 1) "ActiveGoalCountInvalid"
+    if ($parallel) {
+        Require (@($workItems | Where-Object { $_.loopStableId -eq $active.loopStableId -and $_.worldInteractionId -eq $active.activeWorldInteractionId -and $_.trackCode -eq $active.activeMaturityTrackCode -and $_.workOrderRef -eq $active.workOrderRef }).Count -gt 0) 'RepresentativeWorkItemMissing'
+    } else { Require ($activeItems.Count -eq 1) "ActiveGoalCountInvalid" }
 }
 else {
-    Require ($activeItems.Count -eq 0) "ActiveGoalCountInvalid"
+    if (-not $parallel) { Require ($activeItems.Count -eq 0) "ActiveGoalCountInvalid" }
 }
 Require ([string] $active.loopStableId -eq [string] $activeItem.loopStableId) "ActiveGoalReferenceDrift"
 Require ([string] $active.targetEvidenceStage -eq [string] $activeItem.targetEvidenceStage) "ActiveGoalTargetDrift"
@@ -200,9 +230,10 @@ Require ([string] $workOrder.pipelineValidation.profileRevision -eq
     [string] $pipelineState.profileRevision) "WorkOrderPipelineRevisionDrift"
 Require ([string] $workOrder.pipelineValidation.integratedStatusCode -eq
     [string] $pipelineState.integratedStatusCode) "WorkOrderPipelineStatusDrift"
+}
 
 $goalCompleted = [string] $active.goalStateCode -eq "Completed"
-if ($goalCompleted) {
+if ($goalCompleted -and $validateFocus) {
     Require ([string] $activeLoop.currentEvidenceStage -eq [string] $active.targetEvidenceStage) "CompletedGoalEvidenceStageDrift"
     Require ([string] $activeLoop.closureStateCode -eq [string] $active.targetClosureStateCode) "CompletedGoalClosureDrift"
     Require ([string] $activeLoop.statusCode -eq "Validated") "CompletedGoalLoopStatusInvalid"
@@ -214,7 +245,7 @@ $currentWi = (Get-Content -LiteralPath (Join-Path $repositoryRoot ([string] $del
     Where-Object { [string] $_.id -eq $activeWiId }
 Require ($null -ne $currentWi) "ActiveWorldInteractionCatalogMissing"
 $activeEvidence = @($activeLoop.evidencePackageRefs | Where-Object { $evidenceById.ContainsKey([string] $_) })
-Require ($activeEvidence.Count -gt 0) "ActiveGoalEvidenceMissing"
+if ($validateFocus) { Require ($activeEvidence.Count -gt 0) "ActiveGoalEvidenceMissing" }
 
 $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("# Codex PlayableLoop Goal 상태")
@@ -222,13 +253,15 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("> 이 문서는 ``$InputPath``에서 자동 생성된다. 직접 수정하지 않는다.")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("- Goal 원장 개정: ``$($ledger.revision)``")
-[void] $builder.AppendLine("- Goal WIP: ``$($activeItems.Count)/$($ledger.policy.goalWorkInProgressLimit)``")
-$wiWip = if ($goalCompleted) { 0 } else { 1 }
-[void] $builder.AppendLine("- WI WIP: ``$wiWip/$($ledger.policy.worldInteractionWorkInProgressLimit)``")
+$limitLabel = if ($parallel) { '상한 없음' } else { '1' }
+[void] $builder.AppendLine("- Goal WIP: ``$($activeItems.Count)/$limitLabel``")
+$wiWip = @($workItems | Where-Object { $_.statusCode -in @('Active','ReadyForIntegration') } | ForEach-Object { $_.worldInteractionId } | Sort-Object -Unique).Count
+[void] $builder.AppendLine("- WI WIP: ``$wiWip/$limitLabel``")
+[void] $builder.AppendLine("- 담당별 강제 상한 없음. 승인·의존성·쓰기 소유권으로 실행 가능 여부를 판정한다.")
 [void] $builder.AppendLine("- 주제 기획 관문: ``$activePlanningStatus`` / ``$($planningGate.topicStableId)``")
 [void] $builder.AppendLine("- 우선순위: ``$($ledger.policy.priorityModeCode)`` / ``$(@($ledger.policy.areaContinuityOrderCodes) -join ' → ')``")
 [void] $builder.AppendLine()
-[void] $builder.AppendLine("## 현재 `/goal` 입력")
+[void] $builder.AppendLine("## 대표 작업 `/goal` 입력 (전체 실행 목록 아님)")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("``````text")
 [void] $builder.AppendLine("목표:")
@@ -248,7 +281,7 @@ $wiWip = if ($goalCompleted) { 0 } else { 1 }
 [void] $builder.AppendLine("- 기준 revision: $($active.baselineRevision) / $($active.workOrderTargetRevision)")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("운영 규칙:")
-[void] $builder.AppendLine("- 동시에 하나의 WI만 구현한다.")
+[void] $builder.AppendLine("- 승인된 독립 작업은 병렬로 구현한다. 같은 파일·계약 변경은 소유자를 조율한다.")
 [void] $builder.AppendLine("- E7→E1로 폐루프 영향을 검토하고 가장 낮은 미완료 의존성을 고른다.")
 [void] $builder.AppendLine("- 구현 후 E1→E7 방향으로 수직 증거를 검증한다.")
 [void] $builder.AppendLine("- H 전체가 아니라 현재 폐루프에 필요한 공간 능력만 사용한다.")
@@ -287,6 +320,19 @@ $wiBlockers = @($delivery.activeWork.stageReviews | Where-Object resultCode -eq 
 $allBlockers = @(@($activeLoop.blockers) + $wiBlockers | Select-Object -Unique)
 [void] $builder.AppendLine("| ``$($active.activeWorldInteractionId)`` $($currentWi.title) | 폐루프 $($activeLoop.currentEvidenceStage) / WI $($delivery.activeWork.currentEvidenceStage) → $($active.targetEvidenceStage) | $(@($activeLoop.evidencePackageRefs) -join '<br>') | $($allBlockers -join '<br>') | $nextDependency |")
 [void] $builder.AppendLine()
+if ($parallel) {
+    [void] $builder.AppendLine('## 병렬 작업과 통합 인계')
+    [void] $builder.AppendLine()
+    [void] $builder.AppendLine('| 작업 | Goal / WI | 궤적 / 목표 | 담당 | 상태 | 실제 차단 |')
+    [void] $builder.AppendLine('| --- | --- | --- | --- | --- | --- |')
+    foreach ($item in @($workItems | Sort-Object workItemId)) {
+        $result = @($workChecks | Where-Object workItemId -eq $item.workItemId)[0]
+        [void] $builder.AppendLine("| $(Escape-Cell $item.workItemId) | $(Escape-Cell $item.loopStableId)<br>$(Escape-Cell $item.worldInteractionId) | $($item.trackCode) / $($item.targetEvidenceStageCode) | $(Escape-Cell $item.ownerThreadId) | $($item.statusCode) | $(Escape-Cell ($result.blockerCodes -join ', ')) |")
+    }
+    [void] $builder.AppendLine()
+    [void] $builder.AppendLine('개발 스레드가 최종 통합한다. 공간 후보·코드 시험을 공식 Scene 승인이나 Evidence 승격으로 해석하지 않는다.')
+    [void] $builder.AppendLine()
+}
 [void] $builder.AppendLine("## Goal 대기열")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("| 순서 | 영역 | 역할 | PlayableLoop | 목표 | 상태 | 다음 WI |")

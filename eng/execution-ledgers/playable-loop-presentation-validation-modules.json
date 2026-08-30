@@ -1,6 +1,6 @@
 {
   "schemaVersion": "playable-loop-presentation-validation-modules.v1",
-  "revision": "playable-loop-presentation-validation-modules.r4",
+  "revision": "playable-loop-presentation-validation-modules.r8",
   "trackCode": "Presentation",
   "appliesToLoopLevelCodes": ["PlayableUnit"],
   "allowedEvidenceStageCodes": ["E4", "E5", "E6", "E7"],
@@ -14,7 +14,10 @@
     "warningDoesNotPromoteEvidence": true,
     "runtimeEvidenceDoesNotReplaceAutomatedPrecheck": true,
     "failureReopensEarliestOwningStage": true,
-    "presentationValidationDoesNotMutateSimulationAuthority": true
+    "presentationValidationDoesNotMutateSimulationAuthority": true,
+    "e4FreezesApplicableAssetPlacementHandoff": true,
+    "assetResearchAloneNeverPromotesE5": true,
+    "notApplicableDoesNotForceSpatialAssets": true
   },
   "generatedDocumentText": {
     "titleKo": "PlayableLoop 공통 표현 검증 모듈 상태",
@@ -50,14 +53,14 @@
   "modules": [
     {
       "moduleCode": "presentation-binding",
-      "displayNameKo": "표현 상태·H 기준점 결속 검증",
+      "displayNameKo": "표현 상태·H 기준점·E5 준비 인계 검증",
       "evidenceStageCode": "E4",
       "applicabilityCode": "Common",
       "requiredFeatureCodes": [],
       "severityCode": "Blocking",
       "automationLevelCode": "Automated",
-      "reads": ["권위 상태 사본", "H 기준점", "VisualKey"],
-      "failureReasonCodes": ["PresentationStateBindingMissing", "PresentationHAnchorMissing"]
+      "reads": ["권위 상태 사본", "H 기준점 또는 사유 있는 NotApplicable", "플레이어 판독 순간", "VisualKey", "주·대체·fallback 자산 후보", "배치 의도 또는 사유 있는 NotApplicable", "InteractionAnchor 의도", "후보 revision·fingerprint", "E5 준비 상태"],
+      "failureReasonCodes": ["PresentationStateBindingMissing", "PresentationHAnchorOrNotApplicableMissing", "PresentationAssetCandidateHandoffMissing", "PresentationFallbackMissing", "PresentationPlacementIntentMissing", "PresentationE5ReadinessMissing"]
     },
     {
       "moduleCode": "visual-source-bounds",
@@ -217,23 +220,79 @@
   "loopProfiles": [
     {
       "loopStableId": "playable-loop:nature-tactical-self-navigation.v1",
-      "featureCodes": ["GroundSurface", "Actor", "CameraOcclusion"]
+      "featureCodes": [
+        "GroundSurface",
+        "Actor",
+        "CameraOcclusion"
+      ]
     },
     {
       "loopStableId": "playable-loop:nature-shelter-foundation.v1",
-      "featureCodes": ["GroundSurface", "Building", "CameraOcclusion"]
+      "featureCodes": [
+        "GroundSurface",
+        "Building",
+        "CameraOcclusion"
+      ]
     },
     {
       "loopStableId": "playable-loop:nature-twilight-return.v1",
-      "featureCodes": ["GroundSurface", "Actor", "CameraOcclusion"]
+      "featureCodes": [
+        "GroundSurface",
+        "Actor",
+        "CameraOcclusion"
+      ]
     },
     {
       "loopStableId": "playable-loop:nature-night-day2.v1",
-      "featureCodes": ["Building", "Interior", "CameraOcclusion", "Atmosphere", "DirectionalLighting"]
+      "featureCodes": [
+        "Building",
+        "Interior",
+        "CameraOcclusion",
+        "Atmosphere",
+        "DirectionalLighting"
+      ]
     },
     {
       "loopStableId": "playable-loop:nature-workbench-foundation.v1",
-      "featureCodes": ["GroundSurface", "WorkZone", "CameraOcclusion"]
+      "featureCodes": [
+        "GroundSurface",
+        "WorkZone",
+        "CameraOcclusion"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "featureCodes": [
+        "GroundSurface",
+        "Actor",
+        "Interior",
+        "CameraOcclusion"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-barracks-defense.v1",
+      "featureCodes": [
+        "GroundSurface",
+        "Actor",
+        "Building",
+        "CameraOcclusion"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "featureCodes": [
+        "GroundSurface",
+        "WorkZone",
+        "CameraOcclusion"
+      ]
+    },
+    {
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "featureCodes": [
+        "GroundSurface",
+        "WorkZone",
+        "CameraOcclusion"
+      ]
     }
   ]
 }

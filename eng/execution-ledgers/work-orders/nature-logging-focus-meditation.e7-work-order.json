@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-NATURE-LOGGING-FOCUS-MEDITATION",
   "title": "Nature 벌목 집중과 명상 숙련",

@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "playable-loop-inquiry-depth-catalog.v1",
+  "revision": "playable-loop-inquiry-depth-catalog.r1",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "principles": {
+    "depthForecastsEvidenceReadiness": true,
+    "depthNeverPromotesEvidenceAutomatically": true,
+    "logicAndPresentationForecastsRemainDistinct": true,
+    "actualEvidenceComesFromLedgersAndEvidencePackages": true,
+    "globalQuestionNumberRemainsImmutable": true,
+    "depthCanReopenEarlierQuestions": true
+  },
+  "allowedDepthStatusCodes": ["Waiting", "InProgress", "Confirmed", "ReopenRequired", "NotApplicable"],
+  "items": [
+    {
+      "depthCode": "D1",
+      "displayNameKo": "목적과 플레이어 약속",
+      "questionScopeKo": "존재 목적, 플레이어 약속, 첫 적용 영역과 역할",
+      "logicReadinessStageCodes": ["E1"],
+      "presentationReadinessStageCodes": ["E1"],
+      "horizontalCampaignReadinessCodes": [],
+      "requiredEvidenceAfterInquiryKo": "승인 기획 revision·hash와 E1 작업 명세 검증"
+    },
+    {
+      "depthCode": "D2",
+      "displayNameKo": "폐루프와 기본 계약",
+      "questionScopeKo": "핵심 폐루프, 조작, 기본 규칙과 첫 임무",
+      "logicReadinessStageCodes": ["E2"],
+      "presentationReadinessStageCodes": ["E2"],
+      "horizontalCampaignReadinessCodes": [],
+      "requiredEvidenceAfterInquiryKo": "실제 Contract·Application·Unity 투영 코드와 경계 시험"
+    },
+    {
+      "depthCode": "D3",
+      "displayNameKo": "손익과 회복 규칙",
+      "questionScopeKo": "비용, 실패, 부상, 회복, 성장과 손익",
+      "logicReadinessStageCodes": ["E3", "E4"],
+      "presentationReadinessStageCodes": ["E3"],
+      "horizontalCampaignReadinessCodes": [],
+      "requiredEvidenceAfterInquiryKo": "결정성·거부·회복 시험과 LocalProcess·RemoteHost 동등성"
+    },
+    {
+      "depthCode": "D4",
+      "displayNameKo": "공간과 표현 조립",
+      "questionScopeKo": "건물, H 공간, 배치, Synty 자산, UI와 애니메이션",
+      "logicReadinessStageCodes": ["E5"],
+      "presentationReadinessStageCodes": ["E4", "E5"],
+      "horizontalCampaignReadinessCodes": [],
+      "requiredEvidenceAfterInquiryKo": "후보 fingerprint, H 결속, 실제 Prefab·World 배치·Renderer·Collider·상태 발현"
+    },
+    {
+      "depthCode": "D5",
+      "displayNameKo": "실행 안정성과 영역 조화",
+      "questionScopeKo": "Save/Replay, NPC 연속성, 멀티플레이, 영역 통합과 Runtime 완료 조건",
+      "logicReadinessStageCodes": ["E6", "E7"],
+      "presentationReadinessStageCodes": ["E6", "E7"],
+      "horizontalCampaignReadinessCodes": ["E8", "E9"],
+      "requiredEvidenceAfterInquiryKo": "실제 입력·Play Mode·Game View·Save 재진입·반복 안정성·사람 승인"
+    }
+  ]
+}

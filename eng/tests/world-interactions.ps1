@@ -50,7 +50,7 @@ $flows = Get-Content -LiteralPath (
 $polarities = Get-Content -LiteralPath (
     Join-Path $repositoryRoot ([string] $catalog.polarityQuadrantCatalogPath)) -Raw -Encoding UTF8 |
     ConvertFrom-Json
-if (@($responsibilities.primaryOutcomeCodes.PSObject.Properties).Count -ne 65) {
+if (@($responsibilities.primaryOutcomeCodes.PSObject.Properties).Count -ne 105) {
     throw "WorldInteractionPrimaryOutcomeCountInvalid"
 }
 if (@($responsibilities.legacyCompositeMigrations).Count -ne 6) {
@@ -81,9 +81,9 @@ if (@($flows.flows.edges).Count -ne 60) {
     throw "WorldInteractionFlowEdgeCountInvalid"
 }
 if (@($polarities.fixedYangWorldInteractionIds).Count -ne 27 -or
-    @($polarities.fixedYinWorldInteractionIds).Count -ne 24 -or
-    @($polarities.contextualWorldInteractionIds).Count -ne 6 -or
-    @($polarities.notApplicableWorldInteractionIds).Count -ne 8) {
+    @($polarities.fixedYinWorldInteractionIds).Count -ne 28 -or
+    @($polarities.contextualWorldInteractionIds).Count -ne 38 -or
+    @($polarities.notApplicableWorldInteractionIds).Count -ne 12) {
     throw "WorldInteractionPolarityCoverageInvalid"
 }
 if ((@($polarities.actorMigrationGatedWorldInteractionIds | Sort-Object) -join ",") -ne
@@ -151,18 +151,19 @@ if ((@($natureItems.actionCode) -join ",") -ne "RegionalThreatObservation,Emerge
 }
 $e4Items = @($catalog.items | Where-Object { $_.integration.currentStage -eq "E4" })
 $e4SpatialItems = @($e4Items | Where-Object { @($_.spatialRequirements).Count -gt 0 })
+$e4SeedbedBackedSpatialItems = @($e4SpatialItems | Where-Object { $_.implementation.currentStage -ne "E4" })
 $e5Items = @($catalog.items | Where-Object { $_.integration.currentStage -eq "E5" })
 $e6Items = @($catalog.items | Where-Object { $_.integration.currentStage -eq "E6" })
 $e7Items = @($catalog.items | Where-Object { $_.integration.currentStage -eq "E7" })
-if ($e4Items.Count -ne 14) { throw "WorldInteractionE4SeedbedItemCountMustBe14" }
+if ($e4Items.Count -ne 17) { throw "WorldInteractionE4SeedbedItemCountMustBe17" }
 if ((@($e5Items.id | Sort-Object) -join ",") -ne
     "WI-ACTOR-01,WI-ACTOR-02,WI-NATURE-14") {
     throw "WorldInteractionE5ItemsInvalid"
 }
-if (@($e4SpatialItems | Where-Object { @($_.integration.e4SeedbedRefs).Count -eq 0 }).Count -ne 0) {
+if (@($e4SeedbedBackedSpatialItems | Where-Object { @($_.integration.e4SeedbedRefs).Count -eq 0 }).Count -ne 0) {
     throw "WorldInteractionE4SeedbedRefMissing"
 }
-if (@(($e4SpatialItems + $e6Items + $e7Items).integration.e4SeedbedRefs | Select-Object -Unique).Count -ne 7) {
+if (@(($e4SeedbedBackedSpatialItems + $e6Items + $e7Items).integration.e4SeedbedRefs | Select-Object -Unique).Count -ne 7) {
     throw "WorldInteractionE4SeedbedCountMustBe7"
 }
 if (@($e6Items | Where-Object id -notin @("WI-NATURE-05", "WI-NATURE-15") | Where-Object {
@@ -196,7 +197,7 @@ if ($natureAxe.Count -ne 1 -or
     @($natureAxe[0].integration.e7EvidenceRefs).Count -lt 3) {
     throw "WorldInteractionNatureAxeEvidenceInvalid"
 }
-if ($check -notmatch "WorldInteractionCatalogValid:65") {
+if ($check -notmatch "WorldInteractionCatalogValid:105") {
     throw "WorldInteractionCatalogValidationDidNotComplete"
 }
 

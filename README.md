@@ -30,7 +30,7 @@ Unity GameObject나 화면은 권위 상태를 직접 변경하지 않는다.
 2. [AI 공용 프로젝트 컨텍스트](docs/ProjectOverview/GptProjectContext.md)에서 시스템별 책임과 현재 경계를 읽는다.
 3. [확정 결정](docs/AI/DECISIONS.md)과 [현재 작업](docs/AI/CURRENT_WORK.md)에서 최신 기준과 실제 검증 상태를 확인한다.
 4. 게임 작업이면 [현재 Codex PlayableLoop Goal](docs/AI/generated/codex-playable-loop-goals.md)에서 활성 폐루프·WI·차단·다음 의존성을 확인한다.
-5. [문답 기록 routing](docs/Architecture/PlayableLoops/PlanningSessions/README.md)에서 해당 주제의 질문·답변·남은 미정을 읽는다.
+5. [전체 문답 정리 상태판](docs/Architecture/PlayableLoops/PlanningSessions/문답정리상태판.md)과 [문답 기록 routing](docs/Architecture/PlayableLoops/PlanningSessions/README.md)에서 해당 주제의 질문·답변·남은 미정을 읽는다.
 6. 활성 Goal이 참조하는 `Approved` 기획서와 E7 작업 명세만 구현 입력으로 사용한다.
 7. 코드 위치는 [Simulation·Unity 코드 지도](docs/AI/generated/simulation-unity-code-map.md)에서 찾고, 완료 여부는 [현재 완료 원장](docs/AI/authority-maps/07_CURRENT_COMPLETION_LEDGER.md)에서 확인한다.
 
@@ -54,6 +54,8 @@ Unity GameObject나 화면은 권위 상태를 직접 변경하지 않는다.
 
 현재 문답은 주제별로 분리돼 있다.
 
+- [Q-001~339 전체 문답 정리 상태판](docs/Architecture/PlayableLoops/PlanningSessions/문답정리상태판.md)
+- [질문별 기획·구현·시험·Runtime·Evidence 점검 원장](docs/AI/generated/playable-loop-inquiry-implementation-scope.md)
 - [Nature 거점·수면·날씨·방어](docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md)
 - [플레이어 내면·명상·계획](docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md)
 - [Nature 자원·LandUse·건설](docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md)
@@ -165,6 +167,8 @@ H1 행동·작업 공간
 ```
 
 이 과정에서 Synty 원본 팩은 출처이지 게임 영역이나 기능의 권위 분류가 아닙니다. 자산은 지면·식생·실외 구조·실내 설비·도구·건설 상태 같은 기능 역할로 분류한 뒤 WI의 현재 권위 상태를 표현할 때 선택합니다. Prefab이 생성됐다는 사실만으로 자원·건물·NPC 상태가 바뀌지는 않습니다.
+
+현재 13팩의 환경·건물·소품 Prefab과 이동·감정·검 전투 Animation Clip은 서로 다른 원천 대장으로 관리합니다. 구체적인 WI·H 결속, Rig·Avatar·Controller 호환, fallback과 E4→E5 검증 기준은 [플레이 폐루프 Synty 표현 모듈 체계](docs/Architecture/플레이폐루프Synty표현모듈체계.md)를 따릅니다.
 
 공간·WI 결속은 [세계 상호작용 단위 중심 공간·Simulation 통합](docs/Architecture/세계상호작용단위중심공간Simulation통합.md), H 정의와 실제 검증 상태는 [H1~H5 공간 포함 계층 조사](docs/Architecture/H1-H5공간포함계층조사.md), 현재 코드 위치는 [Simulation·Unity 코드 지도](docs/AI/generated/simulation-unity-code-map.md)에서 확인합니다. 계획·코드·시험·Runtime·Game View는 서로 다른 증거이며 하나를 다른 하나의 완료로 대신하지 않습니다.
 

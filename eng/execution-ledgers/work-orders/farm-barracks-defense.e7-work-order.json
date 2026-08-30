@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-FARM-BARRACKS-DEFENSE",
+  "title": "Farm 병영 방위 - 분대 자동 소집 E4",
+  "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+  "activeWorldInteractionId": "WI-FARM-DEFENSE-MOBILIZE",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E4",
+    "promotionBeyondStageAllowed": false,
+    "reason": "승인된 D4 문답과 Accepted 표현 연구에 따라 분대 소집 단일 책임의 Logic·Presentation E4 후보 동결까지만 승인한다."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "소집이 전투 결과·보급 소비·부상·귀환을 함께 변경하게 되면 Logic E1을 다시 연다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 인계 범위 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "전투 난이도·실패·회복·귀환은 후속 WI다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 초소·분대·위협 발현은 후속 범위다." },
+        { "code": "E4", "disposition": "Affected", "summary": "WorldDerived 발의·NPC 수행과 상태별 H·VisualKey 후보를 같은 revision에 결속한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "Preview·Confirm·멱등·거부·결정적 hash를 집중 시험한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "순수 Domain Aggregate와 Application Service를 구현한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "분대 출동과 생산 기여 중단만 한 번에 변경한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseMobilization.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseMobilizationService.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmDefenseMobilizationTests.cs", "test:SimulationFarmDefenseMobilizationTests:8/8"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위-E4표현연구.r1.md", "test:SimulationFarm방위소집PresentationPreparationTests:7/7"] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 인계 범위 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "경보·출동·생산 손실 피드백 정제는 후속 범위다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 카드 UI와 초소 배치는 후속 범위다." },
+        { "code": "E4", "disposition": "Affected", "summary": "판독 순간·H·VisualKey·보유 Synty·AnimationRole·fallback 후보를 동결한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "분대 카드의 StableId·정렬·revision·생산 중단 표시를 결정적으로 검증한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "권위 상태에서 읽기 전용 분대 카드 상태 사본을 만든다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어는 분대 대기·출동과 생산 기회비용을 읽어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseMobilizationContracts.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmDefenseMobilizationTests.cs", "test:SimulationFarmDefenseMobilizationTests:8/8"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["Ssalddel.Unity/Runtime/Cards/SimulationFarm방위소집PresentationPreparation.cs", "test:SimulationFarm방위소집PresentationPreparationTests:7/7"] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E4",
+    "status": "Passed",
+    "candidateRevision": "farm-barracks-defense.design.r2",
+    "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "test:SimulationFarmDefenseMobilizationTests:8/8", "test:SimulationFarm방위소집PresentationPreparationTests:7/7"],
+    "openFeedbackRefs": ["E5 실제 H 위치·Prefab·Renderer·Collider·Rig는 새 승인 전까지 차단한다."]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:farm-barracks-defense.v1|WI-FARM-DEFENSE-MOBILIZE",
+    "profileRevision": "farm-barracks-defense.engine-interaction.r2",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E5",
+    "evidenceRefs": ["test:SimulationFarmDefenseMobilizationTests:8/8", "test:SimulationFarm방위소집PresentationPreparationTests:7/7"],
+    "blockerCodes": ["PromotionBeyondIntegratedE4DeferredByDeliveryCap"]
+  }
+}

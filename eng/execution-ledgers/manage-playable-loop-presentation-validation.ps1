@@ -55,7 +55,10 @@ foreach ($principle in @(
     "warningDoesNotPromoteEvidence",
     "runtimeEvidenceDoesNotReplaceAutomatedPrecheck",
     "failureReopensEarliestOwningStage",
-    "presentationValidationDoesNotMutateSimulationAuthority")) {
+    "presentationValidationDoesNotMutateSimulationAuthority",
+    "e4FreezesApplicableAssetPlacementHandoff",
+    "assetResearchAloneNeverPromotesE5",
+    "notApplicableDoesNotForceSpatialAssets")) {
     $property = $catalog.principles.PSObject.Properties[$principle]
     Require ($null -ne $property -and [bool] $property.Value) `
         "PrincipleMissing:$principle"

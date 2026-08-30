@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r3",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-NATURE-NIGHT-DAY2",
   "title": "Nature 오두막 수면과 Day2 확장 계획 반환",

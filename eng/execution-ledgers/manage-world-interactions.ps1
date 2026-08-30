@@ -37,6 +37,8 @@ function Escape-CSharpString([string] $Value) {
 }
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
+. (Join-Path $PSScriptRoot 'world-interaction-registration-functions.ps1')
+$null = Read-WorldInteractionRegistration $repositoryRoot 'eng/execution-ledgers/world-interaction-registration-relations.json' $InputPath
 $resolvedInput = (Resolve-Path (Join-Path $repositoryRoot $InputPath)).Path
 $catalog = Get-Content -LiteralPath $resolvedInput -Raw -Encoding UTF8 | ConvertFrom-Json
 $resolvedStageCatalog = (Resolve-Path (Join-Path $repositoryRoot ([string] $catalog.evidenceStageCatalogPath))).Path
@@ -235,14 +237,15 @@ foreach ($item in @($catalog.items)) {
     Require ($integrationCurrent -ge 0 -and $integrationTarget -ge 0) "IntegrationStageInvalid:$id"
     Require ($implementationCurrent -le $implementationTarget) "ImplementationStageExceedsTarget:$id"
     Require ($integrationCurrent -le $integrationTarget) "IntegrationStageExceedsTarget:$id"
-    Require ([string] $implementation.targetStage -eq "E3") "ImplementationTargetMustBeE3:$id"
+    Require (@("E3", "E4") -contains [string] $implementation.targetStage) "ImplementationTargetMustBeE3OrE4:$id"
     Require ([string] $integration.targetStage -eq "E7") "IntegrationTargetMustBeE7:$id"
     if ([string] $implementation.status -eq "Done") {
-        Require ([string] $implementation.currentStage -eq "E3") "ImplementationDoneWithoutE3:$id"
+        Require ([string] $implementation.currentStage -eq [string] $implementation.targetStage) "ImplementationDoneBeforeTarget:$id"
         Require (@($implementation.evidence).Count -gt 0) "ImplementationEvidenceMissing:$id"
     }
     if ($integrationCurrent -ge (Get-StageIndex $evidenceStages "E4") -and
-        @($item.spatialRequirements).Count -gt 0) {
+        @($item.spatialRequirements).Count -gt 0 -and
+        $implementationCurrent -lt (Get-StageIndex $evidenceStages "E4")) {
         Require ($integration.PSObject.Properties.Name -contains "e4SeedbedRefs") "E4SeedbedRefsMissing:$id"
         Require (@($integration.e4SeedbedRefs).Count -gt 0) "E4SeedbedRefsEmpty:$id"
         foreach ($seedbedRef in @($integration.e4SeedbedRefs)) {
@@ -251,7 +254,13 @@ foreach ($item in @($catalog.items)) {
     }
     if ([string] $item.kind -eq "AutomaticTransition") {
         Require ($null -ne $item.automaticTransition) "AutomaticTransitionContractMissing:$id"
-        Require-Text $item.automaticTransition.triggerWiId "AutomaticTriggerMissing:$id"
+        $worldTickTrigger = $item.automaticTransition.PSObject.Properties['triggerKindCode']
+        if ($null -eq $worldTickTrigger -or [string] $worldTickTrigger.Value -ne 'WorldTick') {
+            Require-Text $item.automaticTransition.triggerWiId "AutomaticTriggerMissing:$id"
+        } else {
+            Require ([string] $item.controlPolicyCode -eq 'WorldAutomatic') "WorldTickAuthorityInvalid:$id"
+            Require ([string]::IsNullOrEmpty([string] $item.automaticTransition.triggerWiId)) "WorldTickCannotInventTriggerWi:$id"
+        }
         Require-Text $item.automaticTransition.triggerState "AutomaticTriggerStateMissing:$id"
         Require-Text $item.automaticTransition.targetState "AutomaticTargetStateMissing:$id"
         Require-Text $item.automaticTransition.causeLineage "AutomaticCauseLineageMissing:$id"
@@ -267,8 +276,8 @@ foreach ($item in @($catalog.items)) {
     $itemsById[$id] = $item
 }
 
-Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 54) "CommandCountMustBe54"
-Require (@($catalog.items | Where-Object kind -eq "AutomaticTransition").Count -eq 11) "AutomaticTransitionCountMustBe11"
+Require (@($catalog.items | Where-Object kind -eq "Command").Count -eq 92) "CommandCountMustBe92"
+Require (@($catalog.items | Where-Object kind -eq "AutomaticTransition").Count -eq 12) "AutomaticTransitionCountMustBe12"
 Require (@($catalog.items | Where-Object kind -eq "SharedPolicy").Count -eq 1) "SharedPolicyCountMustBe1"
 
 $groupCodes = @($catalog.items.groupCode | Select-Object -Unique)
@@ -397,7 +406,10 @@ foreach ($item in @($catalog.items)) {
     }
 
     if ([string] $item.kind -eq "AutomaticTransition") {
-        Require ($itemsById.ContainsKey([string] $item.automaticTransition.triggerWiId)) "AutomaticTriggerNotFound:$id"
+        $worldTickTrigger = $item.automaticTransition.PSObject.Properties['triggerKindCode']
+        if ($null -eq $worldTickTrigger -or [string] $worldTickTrigger.Value -ne 'WorldTick') {
+            Require ($itemsById.ContainsKey([string] $item.automaticTransition.triggerWiId)) "AutomaticTriggerNotFound:$id"
+        }
     }
     if ($proceduralStepsByWi.ContainsKey($id) -or
         $actorResponsibilityMigrationsByWi.ContainsKey($id)) {
@@ -431,12 +443,12 @@ Add-PolarityAssignments @($polarityCatalog.notApplicableWorldInteractionIds) `
 Require ($polarityByWi.Count -eq $itemsById.Count) "PolarityCoverageMismatch"
 Require (@($polarityCatalog.fixedYangWorldInteractionIds).Count -eq 27) `
     "FixedYangCountMustBe27"
-Require (@($polarityCatalog.fixedYinWorldInteractionIds).Count -eq 25) `
-    "FixedYinCountMustBe25"
-Require (@($polarityCatalog.contextualWorldInteractionIds).Count -eq 6) `
-    "ContextualPolarityCountMustBe6"
-Require (@($polarityCatalog.notApplicableWorldInteractionIds).Count -eq 8) `
-    "NotApplicablePolarityCountMustBe8"
+Require (@($polarityCatalog.fixedYinWorldInteractionIds).Count -eq 28) `
+    "FixedYinCountMustBe28"
+Require (@($polarityCatalog.contextualWorldInteractionIds).Count -eq 38) `
+    "ContextualPolarityCountMustBe38"
+Require (@($polarityCatalog.notApplicableWorldInteractionIds).Count -eq 12) `
+    "NotApplicablePolarityCountMustBe12"
 
 $actorMigrationGatedIds = @($polarityCatalog.actorMigrationGatedWorldInteractionIds |
     Sort-Object)

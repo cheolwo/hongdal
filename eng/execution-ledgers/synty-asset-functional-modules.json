@@ -1,9 +1,9 @@
 {
   "schemaVersion": "synty-asset-functional-modules.v1",
-  "revision": "synty-asset-functional-modules.r2",
-  "unityCatalogRevision": "synty-all-asset-modules.r1",
+  "revision": "synty-asset-functional-modules.r3",
+  "unityCatalogRevision": "synty-all-asset-modules.r2",
   "humanTaxonomyCatalogPath": "eng/execution-ledgers/synty-asset-human-taxonomy.json",
-  "expectedPrefabCount": 2899,
+  "expectedPrefabCount": 4211,
   "principles": {
     "sourcePackIsProvenanceNotGameplayModule": true,
     "everyPrefabHasModuleOrHoldReason": true,
@@ -12,7 +12,10 @@
     "starterIsPrototypeFallbackOnly": true,
     "playableLoopSelectsModuleBeforeAssetFamily": true,
     "humanDesignUsesKoreanTaxonomyAndStableCodes": true,
-    "presentationCannotMutateAuthorityRevision": true
+    "presentationCannotMutateAuthorityRevision": true,
+    "animationClipsUseSeparateSourceProfiles": true,
+    "purchasedPackDoesNotCreateGameplayArea": true,
+    "newPackStartsAsNeedsReview": true
   },
   "lifecycleCodes": [
     "production-ready",
@@ -29,7 +32,57 @@
     { "packCode": "city", "expectedPrefabCount": 335, "policyCode": "AreaAndSharedCandidates" },
     { "packCode": "construction", "expectedPrefabCount": 584, "policyCode": "SharedConstructionStateLayer" },
     { "packCode": "generic", "expectedPrefabCount": 495, "policyCode": "SharedBase" },
-    { "packCode": "starter", "expectedPrefabCount": 58, "policyCode": "PrototypeFallbackOnly" }
+    { "packCode": "starter", "expectedPrefabCount": 58, "policyCode": "PrototypeFallbackOnly" },
+    { "packCode": "animation-base-locomotion", "expectedPrefabCount": 4, "policyCode": "AnimationSourceNeedsReview" },
+    { "packCode": "animation-emotes-and-taunts", "expectedPrefabCount": 2, "policyCode": "AnimationSourceNeedsReview" },
+    { "packCode": "animation-sword-combat", "expectedPrefabCount": 1, "policyCode": "AnimationSourceNeedsReview" },
+    { "packCode": "alpine-mountain", "expectedPrefabCount": 125, "policyCode": "AreaAndSharedCandidatesNeedsReview" },
+    { "packCode": "dungeon-realms", "expectedPrefabCount": 1128, "policyCode": "AreaAndSharedCandidatesNeedsReview" },
+    { "packCode": "dwarven-dungeon-map", "expectedPrefabCount": 52, "policyCode": "AreaAndSharedCandidatesNeedsReview" }
+  ],
+  "purchasedAssetUsageProfiles": [
+    {
+      "packCode": "animation-base-locomotion",
+      "sourceKindCode": "AnimationClip",
+      "animationRoleCodes": ["locomotion"],
+      "requiredHCapabilities": ["PlayerMovementArea", "NpcMovementArea", "TacticalCommandArea"],
+      "playableLoopCandidateCodes": ["nature-navigation", "farm-work-movement", "town-hub-actor-movement"]
+    },
+    {
+      "packCode": "animation-emotes-and-taunts",
+      "sourceKindCode": "AnimationClip",
+      "animationRoleCodes": ["social-emote", "meditation-feedback"],
+      "requiredHCapabilities": ["MeditationWorkArea", "CommunityInteractionArea", "NpcRelationshipArea"],
+      "playableLoopCandidateCodes": ["player-mind-meditation", "community-resonance", "npc-cooperation"]
+    },
+    {
+      "packCode": "animation-sword-combat",
+      "sourceKindCode": "AnimationClip",
+      "animationRoleCodes": ["sword-combat"],
+      "requiredHCapabilities": ["ThreatEncounterArea", "DirectCombatArea", "OutpostDefenseArea"],
+      "playableLoopCandidateCodes": ["nature-twilight-combat", "corridor-defense", "squad-combat"]
+    },
+    {
+      "packCode": "alpine-mountain",
+      "sourceKindCode": "Prefab",
+      "functionalModuleCodes": ["world-surface", "nature-vegetation", "exterior-structure", "exterior-functional-prop", "world-transition", "world-feedback-fx"],
+      "requiredHCapabilities": ["NatureTravelArea", "ShelterSiteChoiceArea", "ClimateExposureArea"],
+      "playableLoopCandidateCodes": ["nature-shelter-foundation", "nature-night-day2", "nature-exploration"]
+    },
+    {
+      "packCode": "dungeon-realms",
+      "sourceKindCode": "Prefab",
+      "functionalModuleCodes": ["exterior-structure", "interior-structure", "interior-fixture", "interior-loose-item", "actor-vehicle-tool", "world-transition", "world-feedback-fx"],
+      "requiredHCapabilities": ["ThreatEncounterArea", "RuinsExplorationArea", "OutpostDefenseArea", "BarracksWorkArea"],
+      "playableLoopCandidateCodes": ["nature-twilight-combat", "corridor-defense", "ruins-exploration"]
+    },
+    {
+      "packCode": "dwarven-dungeon-map",
+      "sourceKindCode": "Prefab",
+      "functionalModuleCodes": ["world-surface", "exterior-structure", "interior-structure", "interior-fixture", "world-network", "world-transition", "actor-vehicle-tool", "world-feedback-fx"],
+      "requiredHCapabilities": ["MineExplorationArea", "UndergroundCorridorArea", "ResourceExtractionArea"],
+      "playableLoopCandidateCodes": ["mine-exploration", "resource-extraction", "corridor-defense"]
+    }
   ],
   "functionalModules": [
     { "moduleCode": "world-surface", "displayNameKo": "월드 지면", "scopeCode": "Outdoor" },

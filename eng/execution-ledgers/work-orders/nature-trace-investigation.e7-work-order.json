@@ -1,0 +1,233 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-NATURE-TRACE-INVESTIGATION",
+  "title": "자연 흔적 조사 Logic E3 준비",
+  "playableUnitStableId": "playable-loop:nature-regional-threat-recovery.v1",
+  "activeWorldInteractionId": "WI-NATURE-TRACE-INVESTIGATE",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "32개 캠페인 내 Q164~166 흔적 조사. 기획 승인·작업 목록 결속 전 실행 금지."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "미관찰 사실 공개·중복 진척·출처/현재 Profile 혼합이 발견되면 E1로 되돌린다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "흔적 출처·지식 공개·원자 기록·멱등·거부 요구."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "흔적 출처·지식 공개·원자 기록·멱등·거부 요구."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "흔적 출처·지식 공개·원자 기록·멱등·거부 요구."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "흔적 출처·지식 공개·원자 기록·멱등·거부 요구."
+        },
+        {
+          "code": "E3",
+          "disposition": "Affected",
+          "summary": "흔적 출처·지식 공개·원자 기록·멱등·거부 요구."
+        },
+        {
+          "code": "E2",
+          "disposition": "Affected",
+          "summary": "흔적 출처·지식 공개·원자 기록·멱등·거부 요구."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "흔적 출처·지식 공개·원자 기록·멱등·거부 요구."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Blocked",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature자연흔적조사E3.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        {
+          "code": "E7",
+          "disposition": "Blocked",
+          "summary": "흔적·출처·불확실성 판독 요구."
+        },
+        {
+          "code": "E6",
+          "disposition": "Blocked",
+          "summary": "흔적·출처·불확실성 판독 요구."
+        },
+        {
+          "code": "E5",
+          "disposition": "Blocked",
+          "summary": "흔적·출처·불확실성 판독 요구."
+        },
+        {
+          "code": "E4",
+          "disposition": "Blocked",
+          "summary": "흔적·출처·불확실성 판독 요구."
+        },
+        {
+          "code": "E3",
+          "disposition": "Blocked",
+          "summary": "흔적·출처·불확실성 판독 요구."
+        },
+        {
+          "code": "E2",
+          "disposition": "Blocked",
+          "summary": "흔적·출처·불확실성 판독 요구."
+        },
+        {
+          "code": "E1",
+          "disposition": "Affected",
+          "summary": "흔적·출처·불확실성 판독 요구."
+        }
+      ],
+      "upwardValidation": [
+        {
+          "code": "E1",
+          "status": "Blocked",
+          "evidenceRefs": [
+            "docs/Architecture/PlayableLoops/Nature자연흔적조사E3.md"
+          ]
+        },
+        {
+          "code": "E2",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E3",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E4",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E5",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E6",
+          "status": "Blocked",
+          "evidenceRefs": []
+        },
+        {
+          "code": "E7",
+          "status": "Blocked",
+          "evidenceRefs": []
+        }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "Blocked",
+    "candidateRevision": "nature-trace-investigation.design.r1",
+    "evidenceRefs": [],
+    "openFeedbackRefs": [
+      "PlanningBindingPending",
+      "공개 문턱·진척량·명상 수치·실제 공간은 후속 연구"
+    ]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:nature-regional-threat-recovery.v1|WI-NATURE-TRACE-INVESTIGATE",
+    "profileRevision": "nature-trace-investigation.engine-interaction.r1",
+    "logicStatusCode": "Pending",
+    "presentationStatusCode": "Pending",
+    "integratedStatusCode": "Pending",
+    "earliestReopenEvidenceStageCode": "E1",
+    "evidenceRefs": [
+      "docs/Architecture/PlayableLoops/Nature자연흔적조사E3.md"
+    ],
+    "blockerCodes": [
+      "PlanningBindingPending",
+      "ImplementationNotStarted"
+    ]
+  },
+  "playerProgression": {
+    "statusCode": "NotApplicable",
+    "reason": "TraceProgressionPolicyUndefined"
+  },
+  "approvedQuestionScope": [
+    "Q-164",
+    "Q-165",
+    "Q-166"
+  ],
+  "excludedQuestionScope": [
+    "Q-340",
+    "Q-341",
+    "Q-342",
+    "Q-343",
+    "Q-344",
+    "Q-345"
+  ],
+  "implementationEvidence": {
+    "test": "Simulation자연흔적조사Tests",
+    "passed": 0,
+    "failed": 0,
+    "runtimeVerified": false,
+    "playModeVerified": false
+  },
+  "activationStatusCode": "PendingPlanningBinding"
+}

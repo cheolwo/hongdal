@@ -88,7 +88,9 @@ foreach ($expected in @(
     '실제 입력 검증 명령열',
     '피드백 재개 기록',
     'activeMaturityTrackCode',
-    'openFeedbackItems'
+    'openFeedbackItems',
+    'E4→E5 표현 준비 인계',
+    'E5 준비 상태'
 )) {
     Require-Text $template $expected "GameDevelopmentWorkTemplateMissing:$expected"
 }
@@ -132,7 +134,9 @@ foreach ($expected in @(
     '세 번째 성숙도 궤적이 아니다',
     '통합성숙도 = min(논리성숙도, 표현성숙도)',
     'activeMaturityTrackCode',
-    'invalidationTriggers')) {
+    'invalidationTriggers',
+    '자산 후보 조사는 E4의 준비 책임',
+    'E5 준비 상태')) {
     Require-Text $loopMethod $expected `
         "PlayableLoopMethodMissing:$expected"
 }
@@ -147,6 +151,8 @@ foreach ($expected in @(
 }
 Require-Text $agents 'playable-loop-presentation-validation-modules.json' `
     'AgentsPresentationValidationCatalogMissing'
+Require-Text $agents 'presentationE4Preparation' `
+    'AgentsPresentationE4PreparationMissing'
 Require-Text $docsReadme 'AI/generated/playable-loop-presentation-validation.md' `
     'DocsReadmePresentationValidationStatusMissing'
 

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-FARM-BARRACKS-SQUAD-ASSIGNMENT",
+  "title": "Farm 병영 방위 - 초소 슬롯 분대 배정 E3",
+  "playableUnitStableId": "playable-loop:farm-barracks-defense.v1",
+  "activeWorldInteractionId": "WI-SQUAD-ASSIGN",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E3",
+  "promotionEligible": false,
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "Q-225·Q-235의 확정 결정을 분대 배정 단일 책임의 계약·도메인·응용·자동시험까지 먼저 닫는다."
+  },
+  "iterationState": {
+    "currentPass": "UpwardAssemblyAndValidation",
+    "nextReopenCondition": "분대 배정이 편성·훈련·보급·영웅 조작·출동을 함께 변경하면 Logic E1을 다시 연다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 묶음 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "배정 변경·해제·실패 회복은 후속 계약이다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 초소 슬롯·Actor·UI 발현은 후속 범위다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "InteractionAnchor·VisualKey·자산 후보는 별도 승인한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "Preview·Confirm·멱등·거부·결정적 hash를 집중 시험한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "순수 Aggregate와 Application Service를 구현한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "빈 초소 슬롯과 미배정 분대의 1:1 배정만 변경한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmSquadAssignment.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSquadAssignmentService.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmSquadAssignmentTests.cs", "test:SimulationFarmSquadAssignmentTests:10/10"] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 이번 묶음 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "선택 피드백과 변경·해제 흐름은 후속 범위다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 초소 관리 UI와 분대 Actor 배치는 후속 범위다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "판독 순간·InteractionAnchor·VisualKey는 별도 승인한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "초소·슬롯 카드 StableId·점유 상태·정렬·revision을 검증한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "권위 원장에서 읽기 전용 슬롯 카드를 만든다." },
+        { "code": "E1", "disposition": "Defined", "summary": "플레이어는 초소 슬롯의 비어 있음과 배정 분대를 읽어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmSquadAssignmentContracts.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationFarmSquadAssignmentTests.cs", "test:SimulationFarmSquadAssignmentTests:10/10"] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E3",
+    "status": "Passed",
+    "candidateRevision": "farm-barracks-defense.design.r3",
+    "evidenceRefs": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "test:SimulationFarmSquadAssignmentTests:10/10"],
+    "openFeedbackRefs": ["E4 판독 순간·InteractionAnchor·VisualKey와 E5 실제 UI·Actor 발현은 별도 승인한다."]
+  },
+  "pipelineValidation": {
+    "profileKey": "playable-loop:farm-barracks-defense.v1|WI-SQUAD-ASSIGN",
+    "profileRevision": "farm-barracks-squad-assignment.engine-interaction.r1",
+    "logicStatusCode": "Passed",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E4",
+    "evidenceRefs": ["test:SimulationFarmSquadAssignmentTests:10/10"],
+    "blockerCodes": ["PromotionBeyondIntegratedE3DeferredByDeliveryCap"]
+  }
+}

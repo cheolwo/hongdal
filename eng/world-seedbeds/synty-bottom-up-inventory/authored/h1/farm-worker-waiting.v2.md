@@ -4,17 +4,21 @@
 @hierarchy H1
 @state CandidateForReview
 @wi WI-WORLD-01
+@wi WI-FARM-DEFENSE-MOBILIZE
 @gameplay WorkerBriefing
 @gameplay ShiftHandoff
 @gameplay FarmReturn
 @gameplay FarmRest
 @gameplay NextTaskSelection
+@gameplay FarmDefenseSquadMuster
+@gameplay FarmDefenseProductionCostRead
 @role FarmWorkerWaitingArea
 @role FarmReturnPoint
 @role FarmRestArea
 @capability Spatial.WorkerAccessible
 @capability Spatial.NpcWorkArea
 @capability Spatial.RestArea
+@capability Spatial.FarmDefenseMusterAnchor
 @successor h1-stock:farm-production
 @successor h1-stock:farm-work-yard
 @connector WorkerAccess
@@ -33,6 +37,7 @@
 
 ## 미해결
 
-- 휴식은 표현·다음 작업 선택 기능이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다.
+- 휴식과 방위 집결은 표현·다음 작업 선택 후보이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다.
+- 실제 외곽 초소 좌표·분대 Actor·출동 경로는 Farm 방위 E5 승인 뒤 검증한다.
 
 이 문서는 상향식 공간 설계 지식이며 실제 좌표·AreaSet·LandscapeGraph·Unity 자산 권위를 만들지 않는다.

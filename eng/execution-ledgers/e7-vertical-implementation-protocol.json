@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-e7-vertical-implementation-protocol.v2",
-  "revision": "simulation-e7-vertical-implementation-protocol.r3",
+  "revision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderSchemaVersion": "simulation-e7-vertical-work-order.v2",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -9,14 +9,18 @@
     "everyStageFromE7ToE1MustBeAssessed": true,
     "implementationStartsFromLowestUnclosedDependency": true,
     "upwardFindingsReopenEarliestAffectedStage": true,
-    "onePlayableUnitAndOneWorldInteractionAtATime": true,
+    "eachWorkOrderOwnsOnePlayableUnitAndWorldInteraction": true,
+    "independentWorkOrdersMayProceedInParallel": true,
     "postE7EvidenceUsesSeparateSubjects": true,
     "changeImpactReviewIsCrossCutting": true,
     "logicAndPresentationEachReviewE7ToE1": true,
     "logicAndPresentationEachValidateE1ToE7": true,
     "integratedStageUsesLowerTrack": true,
     "presentationPlanningThroughE4MayPrecedeLogicE5": true,
-    "presentationEvidenceE5RequiresLogicE5": true
+    "presentationEvidenceE5RequiresLogicE5": true,
+    "presentationE4PreparesApplicableAssetPlacementHandoff": true,
+    "assetResearchAloneNeverPromotesE5": true,
+    "nonSpatialOrNonVisualWorkCanDeclareNotApplicable": true
   },
   "allowedTrackCodes": ["Logic", "Presentation"],
   "allowedCurrentPasses": [
@@ -34,9 +38,29 @@
     { "code": "E7", "question": "사람이 실제 입력으로 성공·실패·회복·귀환까지 폐루프를 완주하는가?", "requiredDimensions": ["playerLoop", "authorityModes", "canonicalScene", "runtimeEvidence"] },
     { "code": "E6", "question": "실제 플레이 전에 의미·인과·배치·통행·표현을 판독할 수 있는가?", "requiredDimensions": ["worldStateExplanation", "presentationReadability", "provenanceLimitations", "causalQuestionMatrix"] },
     { "code": "E5", "question": "WI가 권위 전이·Task·Effect·결과·후속 선택으로 세계에 발현되는가?", "requiredDimensions": ["triggerOccurrence", "authorityTransition", "taskEffectResult", "successorOrReturnPath"] },
-    { "code": "E4", "question": "WI 발생원과 주체·대상·자료·자원·시간·선택적 공간 문맥이 결속됐는가?", "requiredDimensions": ["allowedTriggerSources", "subjectAndTargetBindings", "dataResourceTimeBindings", "spatialApplicability"] },
+    { "code": "E4", "question": "WI 발생원과 주체·대상·자료·자원·시간·선택적 공간 문맥, 적용 가능한 E5 표현 준비 인계가 결속됐는가?", "requiredDimensions": ["allowedTriggerSources", "subjectAndTargetBindings", "dataResourceTimeBindings", "spatialApplicability", "presentationPreparationApplicability"] },
     { "code": "E3", "question": "계약·결정성·저장·재생과 소비자 자동 회귀가 통과하는가?", "requiredDimensions": ["contractTests", "determinism", "saveReplayRegression", "consumerRegression"] },
     { "code": "E2", "question": "공통 Core와 Local·Remote Adapter, Unity 투영 코드가 준비됐는가?", "requiredDimensions": ["contracts", "applicationDomain", "adapters", "unityProjection"] },
     { "code": "E1", "question": "플레이어 약속·권위·StableId·Revision·완료·제외 경계가 확정됐는가?", "requiredDimensions": ["playerPromiseAndReturn", "authorityAndTriggers", "stableIdsAndRevision", "acceptanceAndExclusions"] }
-  ]
+  ],
+  "presentationE4ToE5Handoff": {
+    "allowedApplicabilityCodes": ["Required", "NotApplicable"],
+    "allowedReadinessCodes": ["Ready", "Conditional", "Blocked"],
+    "requiredWhen": "플레이어가 실제 물체·공간·소품·Actor·UI 시각 자료를 식별해야 하는 Presentation WI",
+    "requiredFieldsWhenApplicable": [
+      "playerReadableMoment",
+      "requiredHCapabilities",
+      "visualKeys",
+      "primaryAssetCandidateRefs",
+      "alternativeAssetCandidateRefs",
+      "fallbackPresentationRefs",
+      "placementIntent",
+      "interactionAnchorIntent",
+      "candidateRevisionOrFingerprint",
+      "e5ReadinessCode",
+      "openGapRefs"
+    ],
+    "notApplicableRule": "비공간·비시각 WI는 사유를 기록하고 H·Prefab·배치 후보를 억지로 만들지 않는다.",
+    "promotionBoundary": "후보 조사와 문서 결속은 Presentation E4 준비이며 실제 World 배치·Renderer·Collider·Bounds·WI 발현 증거를 대신하지 않는다."
+  }
 }

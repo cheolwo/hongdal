@@ -64,11 +64,12 @@ synty-family:town:props:shelf → 실제 Prefab`으로 읽는다. `Interior`,
 `세부기능군이름`, `자산종류Code`, `자산종류이름`처럼 한국어로 쓴다. 값으로 쓰는
 Stable Code와 기존 `moduleCode`·`assetFamilyId`·Prefab GUID는 바꾸지 않는다.
 
-## 7팩 전수 기능군 대장
+## 13팩 전수 기능군 대장
 
 팩 이름은 자산 출처이고 게임 기능 모듈은 아니다. Unity의
-`Synty전체자산ModuleCatalog`은 Nature·Farm·Town·City·Construction·Generic·Starter
-7팩의 Prefab `2,899`개를 다음 12개 기능군으로 분류한다.
+`Synty전체자산ModuleCatalog`은 기존 Nature·Farm·Town·City·Construction·Generic·Starter와
+추가된 Base Locomotion·Emotes and Taunts·Sword Combat·Alpine Mountain·Dungeon Realms·
+Dwarven Dungeon Map까지 13팩의 Prefab `4,211`개를 다음 12개 기능군으로 분류한다.
 
 - 월드 지면, 자연 식생, 실외 구조물, 실외 기능 소품
 - 도로·통행망, 영역 전이, 건설·복구 상태
@@ -81,13 +82,104 @@ Stable Code와 기존 `moduleCode`·`assetFamilyId`·Prefab GUID는 바꾸지 �
 반드시 보류 이유가 있어야 한다.
 
 Construction은 AreaSet이 아니라 모든 영역이 사용할 수 있는 건설·복구 상태 계층이다.
-Generic은 공유 기반, Starter는 prototype fallback으로만 취급한다. 현재 자동 전수
-결과는 `174`개를 명시적 보류로 남겼고 나머지는 하나 이상의 기능 모듈을 가진다.
+Generic은 공유 기반, Starter는 prototype fallback으로만 취급한다. 새로 구매한 팩도
+새 AreaSet을 만들지 않으며 최초 상태는 모두 `needs-review`다.
 
 호환 기능군과 팩 정책의 관리 기준은
 `eng/execution-ledgers/synty-asset-functional-modules.json`, Unity 실제
 대장은 `Synty전체자산ModuleCatalog.asset`, 공개 수량 요약은 Unity 프로젝트의
 `Documentation/Generated/Synty전체자산ModuleCatalog.md`다.
+
+## 프리팹과 애니메이션 원천의 분리
+
+프리팹 기능 대장과 애니메이션 원천 대장은 같은 자산 사용 체계에 속하지만 같은 항목을
+세지 않는다. 애니메이션 팩에 포함된 예제 Prefab 수만으로 동작 가용성을 판단하지 않는다.
+
+| 원천 | 현재 확인량 | 주 용도 | 대장이 증명하지 않는 것 |
+| --- | ---: | --- | --- |
+| 전체 Prefab | `4,211` | 지면·식생·건물·소품·Actor·FX 후보 | 실제 H 배치와 WI 발현 |
+| Base Locomotion Clip | `823` | 플레이어·NPC·분대 이동 | 선택 캐릭터와 Avatar 호환, 조작감 |
+| Emotes and Taunts Clip | `280` | 명상·관계·협력·상태 피드백 | 광복기·회복 같은 권위 결과 |
+| Sword Combat Clip | `363` | 직접 전투·초소 방어·분대 전투 | 타격 판정·피해·전투 결과 |
+| Animator Controller | `176` | 공급자 예제와 상태 연결 참고 | 프로젝트 공식 Controller 채택 |
+
+Clip 수는 실제 Unity `AssetDatabase`에서 읽은 원천 재고다. Clip이 있다는 사실은
+`SyntyProvided` 표현 후보가 존재한다는 뜻일 뿐 특정 Character·Avatar·Controller에서
+정상 재생된다는 증거가 아니다. 기존 Town Character의 해소되지 않은 Controller 참조처럼
+공급자 Prefab 내부 결함이 있으면 원본 Prefab을 직접 고치지 않고 프로젝트 Wrapper와
+명시적 Controller/Avatar 결속 또는 procedural fallback을 사용한다.
+
+## 신규 6팩 활용 기준
+
+| 팩 | 우선 표현 역할 | 결속할 WI/H 후보 | 첫 채택 전에 확인할 것 |
+| --- | --- | --- | --- |
+| Base Locomotion | Idle·Walk·Run·방향 전환 | 플레이어 이동, NPC 작업 이동, 전술 명령 공간 | Humanoid Avatar, root motion 정책, 이동 속도와 보폭, 중단·재진입 |
+| Emotes and Taunts | 명상·정신 차림·협력·관계 신호 | 명상 작업 공간, 공동체 상호작용, NPC 관계 공간 | 동작 의미, 길이, 취소 가능 시점, UI·Audio 대체 신호 |
+| Sword Combat | 준비·공격·피격·회복 | 위협 조우, 직접 전투, 초소 방어 | 공격 Window, ToolContact, 피해 권위와 분리, 카메라·입력 복귀 |
+| Alpine Mountain | 산악 지면·식생·기후 노출·거점 | Nature 여행, 오두막 후보지, 기후 노출 공간 | 경사·Bounds·통행·기존 Nature와의 VisualKey 중복 |
+| Dungeon Realms | 몬스터·폐허·초소·병영·마법 FX | 황혼 위협, 회랑 방어, 폐허 탐사 | 사람형/비사람형 Rig, Collider, 속성 신호, 과도한 던전 문맥 |
+| Dwarven Dungeon Map | 광산·지하 회랑·자원 채취 | 광산 탐사, 지하 통행, 채취 작업 공간 | 모듈 연결부, 출입구, NavMesh, 광원, 지상 H와의 전이 |
+
+`Dungeon Realms`가 있다는 이유만으로 Dungeon Area를 만들지 않고, `Alpine Mountain`이
+있다는 이유만으로 기존 Nature를 교체하지 않는다. PlayableLoop가 요구하는 WI 순간과 H
+능력이 먼저 존재하고, 그 표현 후보로 팩을 선택한다.
+
+## WI·H에서 자산을 채택하는 절차
+
+환경·소품 WI는 다음 순서를 따른다.
+
+```text
+PlayableLoop의 판독 순간
+→ WI 권위 상태와 결과
+→ 필요한 H1 기능 공간과 H2·H3 문맥
+→ PlacementRole과 VisualKey
+→ 기능 모듈
+→ 자산 계열·Prefab 후보
+→ fingerprint 동결
+→ E5 실제 배치·Renderer·Collider·Bounds 검증
+```
+
+Actor 동작이 필요한 WI는 중간에 애니메이션 원천 절차를 추가한다.
+
+```text
+WI 순간
+→ AnimationRole (locomotion / social-emote / meditation-feedback / sword-combat)
+→ ActionCue와 권위 상태
+→ Clip 후보와 대체 후보
+→ Character Rig·Avatar·root motion 호환
+→ 프로젝트 AnimationAdapter·Controller 결속
+→ Clip revision·fingerprint 동결
+→ 실제 입력·전이·중단·귀환 검증
+```
+
+Presentation E4 준비 기록에는 최소한 다음을 남긴다.
+
+- 플레이어가 상태를 읽어야 하는 순간과 `WorldInteractionId`
+- 필요한 H1 Capability와 H2·H3 문맥, 비공간이면 사유 있는 `NotApplicable`
+- `VisualKey`, `PlacementRole`, `AnimationRole`, `ActionCue`
+- 주 후보·대체 후보·procedural fallback과 각 원천 팩
+- Prefab 또는 Clip GUID/fingerprint와 후보 revision
+- Character Rig·Avatar·root motion·Controller 호환 판정
+- Collider·Bounds·통로·접촉 Window·중단·귀환 의도
+- `Ready / Conditional / Blocked`와 열린 결함
+
+애니메이션이 필요 없는 정적 WI에 억지로 AnimationRole을 만들지 않는다. 반대로 이동·전투·
+도구 접촉·수면 기상처럼 동작이 플레이 결과의 판독과 입력 복귀에 영향을 주면 단순
+`Actor Prefab 준비됨`으로 대체하지 않는다.
+
+## 애니메이션 권위와 fallback
+
+- Clip·Animator·Avatar·IK·Animation Event는 모두 표현 계층이다.
+- 피해, 수확, 건설 기여, 회복, 재고 이동은 Simulation의 Confirm·Task·Effect가 결정한다.
+- Animation Event는 권위 결과를 만들지 않고 이미 승인된 접촉 Window와 피드백만 표시한다.
+- root motion을 쓰더라도 권위 위치·Navigation 결과와의 reconcile 정책을 먼저 정한다.
+- Clip 호환이 확인되지 않으면 `SyntyProvided`로 선언하지 않고 `Conditional` 또는 `Blocked`로 둔다.
+- procedural fallback은 기능 부재를 숨기지 않으며 Game View 증거에 fallback 사용을 표시한다.
+- 공급자 Controller를 공식 Controller로 자동 채택하거나 공급자 Prefab에 게임 규칙을 붙이지 않는다.
+
+첫 적용 순서는 `Base Locomotion → 현재 플레이어 이동`, `Sword Combat → Nature 황혼 전투`,
+`Emotes and Taunts → 명상·협력 피드백`이다. 환경 팩은 해당 WI가 Presentation E4 후보를
+요구할 때 실제 Prefab을 좁혀 사용한다.
 
 ## 기존 156개 A/B/C의 상태
 
@@ -139,4 +231,5 @@ WorldSeed
 - 같은 입력은 같은 자산 계열과 Prefab을 선택한다.
 - Bounds·지면·건물 출입구·실내 통로 검증을 통과한다.
 - 표현 전후 Simulation canonical hash와 `WorldRevision`이 같다.
+- 애니메이션은 실제 대상 Rig에서 시작·전이·중단·귀환하며 권위 결과를 중복 발생시키지 않는다.
 - 실제 E7은 canonical `SimulationWorldShell`의 입력·Game View·귀환 증거로만 판정한다.

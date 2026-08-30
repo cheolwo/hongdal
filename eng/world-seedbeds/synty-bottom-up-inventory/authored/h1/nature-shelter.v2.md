@@ -12,6 +12,7 @@
 @wi WI-NATURE-14
 @wi WI-NATURE-15
 @wi WI-CON-01
+@wi WI-COMMUNITY-VISITOR-STAY
 @gameplay TemporaryShelter
 @gameplay WeatherWait
 @gameplay Recovery
@@ -36,11 +37,15 @@
 @capability Spatial.FootprintAvailable
 @capability Spatial.CraftingWorkArea
 @capability Spatial.ActiveWorkReservationContext
+@capability Spatial.VisitorWaitingAnchor
+@capability Spatial.GuestRestAnchor
+@capability Spatial.VisitorDepartureAnchor
 @capacity BuildingSite
 @capacity WorkArea
 @capacity Material
 @capacity ShelterOccupancy
 @capacity ContainerCapacity
+@capacity GuestCapacity
 @predecessor h1-stock:nature-trailhead
 @successor h1-stock:nature-exploration-buffer
 @connector TrailInput

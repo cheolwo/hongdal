@@ -1,8 +1,8 @@
 {
   "catalogKey": "simulation-world-interactions",
   "schemaVersion": "5",
-  "revision": "simulation-world-interactions.r32",
-  "lastVerifiedDate": "2026-08-28",
+  "revision": "simulation-world-interactions.r43",
+  "lastVerifiedDate": "2026-08-29",
   "defaultImplementationTargetStage": "E3",
   "defaultIntegrationTargetStage": "E7",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -27,9 +27,2224 @@
     "CON": "영역 건설",
     "CITY": "도심 운영",
     "WORLD": "공통 세계 운영",
-    "REVIEW": "업무 검토"
+    "REVIEW": "업무 검토",
+    "COMMUNITY": "공동체 방문·관계"
   },
   "items": [
+    {
+      "id": "WI-ACTOR-CONSUME",
+      "groupCode": "ACTOR",
+      "sequence": 4,
+      "title": "물품 섭취",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "섭취 가능한 소유 물품 한 묶음을 소비한다. 주문 이행이나 치료 판정 전체는 소유하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "ItemConsumed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "ItemConsumed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "ActorConsume",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-ACTOR-PLAN-SET",
+      "groupCode": "ACTOR",
+      "sequence": 5,
+      "title": "개인 계획 설정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어 개인 계획 하나를 설정한다. 계획 완료나 성장 보상을 즉시 확정하지 않는다.",
+      "startStateCodes": [
+        "PersonalPlanPolicyReady"
+      ],
+      "completionStateCodes": [
+        "PersonalPlanSet"
+      ],
+      "actorRequirements": [
+        "현재 플레이어 본인"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [],
+      "reservationKinds": [],
+      "previewRule": "권한·계획 슬롯·목표·본문·예상 revision을 무변경 검증한다.",
+      "confirmRule": "동일 Command 재시도는 최초 결과를 재사용. 설정·최초 안정 자격 근거·행위 기록·revision을 원자적으로 확정한다.",
+      "taskRule": "즉시 설정이며 진척·완료·회복 수치 Task를 생성하지 않는다.",
+      "effectCodes": [
+        "PersonalPlanSet"
+      ],
+      "cancellationPolicy": "거부는 무변경. 수정은 새 Command와 현재 revision으로 요청한다.",
+      "blockReasonCodes": [
+        "PersonalPlanActorNotAuthorized",
+        "PersonalPlanUnknown",
+        "PersonalPlanObjectiveUnknown",
+        "PersonalPlanDescriptionInvalid",
+        "PersonalPlanExpectedRevisionMismatch",
+        "PersonalPlanUnchanged",
+        "PersonalPlanCommandPayloadConflict",
+        "PersonalPlanRevisionExhausted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "ActorPlanSet",
+      "ruleRevision": "personal-plan.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation개인계획.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/Simulation개인계획Service.cs",
+        "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs"
+      ],
+      "implementation": {
+        "status": "Done",
+        "currentStage": "E3",
+        "targetStage": "E3",
+        "evidence": [
+          "집중 시험 16/16: artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+        ]
+      },
+      "integration": {
+        "status": "InProgress",
+        "currentStage": "E1",
+        "targetStage": "E7",
+        "evidence": [
+          "docs/Architecture/PlayableLoops/Nature개인계획E3.md"
+        ]
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "독립 Logic E3만 검증. 회복 수치·진척·Save·RemoteHost·Unity 미구현."
+      ]
+    },
+    {
+      "id": "WI-COMBAT-DIRECT-CONTROL-SET",
+      "groupCode": "WORLD",
+      "sequence": 9,
+      "title": "직접 전투 조종 전환",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "자기 Actor의 자동 조종 보류·재개 상태만 전환한다. 카메라 전환은 표현이고 피해·승패는 별도다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "ActorDirectControlChanged"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "ActorDirectControlChanged"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CombatDirectControlSet",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-COMBAT-TACTICAL-COMMAND",
+      "groupCode": "WORLD",
+      "sequence": 10,
+      "title": "분대 전술 명령 확정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "대상 분대의 전술 명령 하나를 확정한다. 이동·방어·후퇴는 명령 종류이며 실제 NPC 전투 결과를 대행하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "SquadTacticalOrderConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "SquadTacticalOrderConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CombatTacticalCommand",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-COMMUNITY-COOPERATION-PROPOSE",
+      "groupCode": "COMMUNITY",
+      "sequence": 2,
+      "title": "공동체 협력 제안",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "협력 제안 하나를 기록한다. 제안만으로 수락·위임·현장 작업을 확정하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "CooperationProposed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "CooperationProposed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CommunityCooperationPropose",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Farm병영방위/farm-barracks-defense.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-COMMUNITY-ENTRANCE-POLICY-SET",
+      "groupCode": "COMMUNITY",
+      "sequence": 3,
+      "title": "공동체 출입 정책 설정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "입구 생활·경비 운영 정책을 설정한다. 실제 쉼터 건설은 건설 WI가 수행한다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "EntrancePolicySet"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "EntrancePolicySet"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CommunityEntrancePolicySet",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-COMMUNITY-HIRE",
+      "groupCode": "COMMUNITY",
+      "sequence": 4,
+      "title": "NPC 고용 확정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "고용 합의와 고용 관계를 확정한다. 작업 배정이나 역량 부여를 대신하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "NpcEmploymentConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "NpcEmploymentConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CommunityHire",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-COMMUNITY-MEMBERSHIP-CONFIRM",
+      "groupCode": "COMMUNITY",
+      "sequence": 5,
+      "title": "공동체 정식 편입 확정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "당사자 동의와 조건을 확인해 정식 소속 관계를 확정한다. 임시 방문자 체류와 별도 관계다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "CommunityMembershipConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "CommunityMembershipConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CommunityMembershipConfirm",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-COMMUNITY-REMOTE-RESPONSE",
+      "groupCode": "COMMUNITY",
+      "sequence": 6,
+      "title": "원격 응대 지시 확정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "응대 담당자에게 지시 하나를 확정한다. 지시의 현장 수행 결과는 담당 WI가 기록한다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "RemoteResponseOrderConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "RemoteResponseOrderConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CommunityRemoteResponse",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/공동체편입방문/community-membership-visitor.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-COMMUNITY-SUPPORT-MISSION-JOIN",
+      "groupCode": "COMMUNITY",
+      "sequence": 7,
+      "title": "공동 지원 임무 참여",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "승인된 지원 임무의 참여를 확정한다. 협력 제안이나 전체 유지관리 작업 완료와 다르다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "SupportMissionParticipationConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "SupportMissionParticipationConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CommunitySupportMissionJoin",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-CON-BLUEPRINT-PLACE",
+      "groupCode": "CON",
+      "sequence": 2,
+      "title": "건설 청사진 배치",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "검증된 건설 청사진 배치를 확정한다. 실제 시공·자재 소비·건물 완공은 별도 행동이다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "ConstructionBlueprintPlaced"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "ConstructionBlueprintPlaced"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "ConBlueprintPlace",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-CON-DEMOLISH",
+      "groupCode": "CON",
+      "sequence": 3,
+      "title": "건설물 해체",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "대상 건설물 하나를 해체한다. 재료 회수는 승인 규칙의 원자적 부수 결과로만 추가할 수 있다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "ConstructionDemolished"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "ConstructionDemolished"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "ConDemolish",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-CON-MATERIAL-DEPOSIT",
+      "groupCode": "CON",
+      "sequence": 4,
+      "title": "건설 재료 투입",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "소유 재료를 대상 건설 원장에 투입한다. 시공 기여나 완공을 대신하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "ConstructionMaterialDeposited"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "ConstructionMaterialDeposited"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "ConMaterialDeposit",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-CON-WORK-CONTRIBUTE",
+      "groupCode": "CON",
+      "sequence": 5,
+      "title": "건설 시공 기여",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "대상 건설 작업에 유효 시공 기여를 기록한다. 작업 시간 경과만으로 다른 책임을 실행하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "ConstructionWorkContributed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "ConstructionWorkContributed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "ConWorkContribute",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "eng/execution-ledgers/world-interactions.json"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-CRAFT-BREW",
+      "groupCode": "NATURE",
+      "sequence": 19,
+      "title": "배합물 달이기",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "확정한 배합 배치 하나를 열원에서 달여 완성한다. 지식 습득·재료 채집·완성품 섭취는 제외한다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "BrewBatchCompleted"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "BrewBatchCompleted"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "CraftBrew",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-EXPEDITION-DISPATCH",
+      "groupCode": "WORLD",
+      "sequence": 11,
+      "title": "탐사 임무 파견",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "승인한 탐사 임무의 인력·목적지·보급 파견을 확정한다. 보고·교전 결과는 별도 책임이다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "ExpeditionDispatched"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "ExpeditionDispatched"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "ExpeditionDispatch",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-FARM-FIELD-BOUNDARY-CONFIRM",
+      "groupCode": "FARM",
+      "sequence": 12,
+      "title": "밭 경계 확정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "검증된 밭 경계와 관리 통로 범위를 확정한다. 경작·파종·개간을 동시에 완료하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "FieldBoundaryConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "FieldBoundaryConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "FarmFieldBoundaryConfirm",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-FARM-SOIL-AMEND",
+      "groupCode": "FARM",
+      "sequence": 13,
+      "title": "토양 개량",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "승인 자재로 토양 상태를 개량한다. 생육 중인 작물 관리나 경계 확정과 다른 대상 원장이다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "SoilAmended"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "SoilAmended"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "FarmSoilAmend",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-FARM-WATER-TRANSFER",
+      "groupCode": "FARM",
+      "sequence": 14,
+      "title": "농업 용수 이송",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "수원에서 지정 수용처로 용수를 이송한다. 강수 생성·관수 설비 건설은 포함하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "IrrigationWaterTransferred"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "IrrigationWaterTransferred"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "FarmWaterTransfer",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-GUEST-PERMISSION-SET",
+      "groupCode": "COMMUNITY",
+      "sequence": 8,
+      "title": "손님 활동 권한 설정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "특정 손님의 허용 활동 범위를 설정한다. 고용 관계나 NPC 업무 역량을 생성하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "GuestPermissionSet"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "GuestPermissionSet"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "GuestPermissionSet",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-HEAT-SOURCE-STATE-CHANGE",
+      "groupCode": "NATURE",
+      "sequence": 20,
+      "title": "열원 상태 변경",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "같은 열원의 점화·연료 보충·소화를 작업 코드로 구분한다. 범위는 열원 상태와 승인된 자원 비용이다.",
+      "startStateCodes": [
+        "Off",
+        "Smoldering",
+        "Burning"
+      ],
+      "completionStateCodes": [
+        "HeatSourceStateChanged"
+      ],
+      "actorRequirements": [
+        "신뢰된 단일 플레이어·열원 접근 권한",
+        "점화 시 기초 생존 능력"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "신뢰된 초기화의 연료 UnitEnergy·재고·Capacity. 출시 수치 제외"
+      ],
+      "reservationKinds": [],
+      "previewRule": "권한·접근·revision·작업·상태·연료·용량을 무변경 검사한다.",
+      "confirmRule": "복사 후보의 연료·열원·행위 기록을 동일 revision으로 원자 교체. Command 멱등·입력 충돌 검사.",
+      "taskRule": "즉시 상태 변경만 수행. 연소 Tick·수면·명상 제외.",
+      "effectCodes": [
+        "HeatSourceStateChanged"
+      ],
+      "cancellationPolicy": "거부 무변경·소화 환불 없음.",
+      "blockReasonCodes": [
+        "HeatExpectedRevisionMismatch",
+        "HeatActorNotAuthorized",
+        "HeatSourceUnknown",
+        "HeatSourceInaccessible",
+        "HeatBasicSurvivalRequired",
+        "HeatFuelNotApproved",
+        "HeatFuelQuantityInvalid",
+        "HeatFuelInsufficient",
+        "HeatCapacityExceeded",
+        "HeatIgnitionRequired",
+        "HeatAlreadyOff",
+        "HeatAlreadyBurning",
+        "HeatExtinguishPayloadInvalid",
+        "HeatOperationInvalid",
+        "HeatRevisionExhausted",
+        "HeatCommandPayloadConflict"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "HeatSourceStateChange",
+      "ruleRevision": "heat-source-state.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation열원상태Contracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation열원상태.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/Simulation열원상태Service.cs",
+        "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+      ],
+      "implementation": {
+        "status": "Done",
+        "currentStage": "E3",
+        "targetStage": "E3",
+        "evidence": [
+          "Simulation열원상태Tests 23/23: Q032~034의 단일 플레이어 열원 상태 변경. 멱등·경합·거부·정수경계·정책 사본·행위 기록."
+        ]
+      },
+      "integration": {
+        "status": "InProgress",
+        "currentStage": "E1",
+        "targetStage": "E7",
+        "evidence": [
+          "Logic E3 / Presentation E1. Session·Save·RemoteHost·Unity·NPC·연소 Tick은 미연결."
+        ]
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature거점수면/nature-shelter-sleep.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/Nature열원관리E3.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "2026-08-30 신규 33개 E3 요청 중 첫 WI. Q032~034/Q053 열원 변경만 구현; 날씨·수면·화재 분기는 미구현."
+      ]
+    },
+    {
+      "id": "WI-HUB-DEMAND-ALLOCATE",
+      "groupCode": "HUB",
+      "sequence": 7,
+      "title": "Hub 수요 재고 할당",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "Hub 내부 재고를 선택한 수요에 할당한다. City 서비스 배정이나 외부 수요 충족을 직접 확정하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "HubDemandInventoryAllocated"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "HubDemandInventoryAllocated"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "HubDemandAllocate",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-HUB-SUPPLY-TASK-ACCEPT",
+      "groupCode": "HUB",
+      "sequence": 8,
+      "title": "Hub 조달 과제 수락",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "기한·위험·대가를 확인한 조달 과제 하나를 수락한다. 실패 해결 정책 Q250은 결정하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "HubSupplyTaskAccepted"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "HubSupplyTaskAccepted"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "HubSupplyTaskAccept",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Hub수요분배/hub-demand-allocation.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM",
+      "groupCode": "WORLD",
+      "sequence": 12,
+      "title": "목표 비축 미달 판매 확정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "비축 미달 위험을 재확인하고 판매 거래를 확정한다. 비축 경고 자체는 별도 WI로 만들지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "BelowReserveSaleConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "BelowReserveSaleConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "InventoryBelowReserveSaleConfirm",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-NATURE-HERB-GATHER",
+      "groupCode": "NATURE",
+      "sequence": 21,
+      "title": "약초 채집",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "접근 가능한 약초 노드에서 허용량을 채집한다. 일반 물품 획득 의미를 특화하지만 노드 잔량 검증을 별도로 요구한다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "HerbGathered"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "HerbGathered"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "NatureHerbGather",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-NATURE-TRACE-INVESTIGATE",
+      "groupCode": "NATURE",
+      "sequence": 22,
+      "title": "자연 흔적 조사",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "현장 흔적 관찰 결과를 조사 원장에 기록한다. 승인 Recipe 지식 추가와 다른 관찰 기록이다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "NatureTraceInvestigated"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "NatureTraceInvestigated"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "NatureTraceInvestigate",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/지역오행몬스터/region-five-elements-monster.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-SURVIVAL-RATION-POLICY-SET",
+      "groupCode": "WORLD",
+      "sequence": 13,
+      "title": "생존 배급 정책 설정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "소비·배급 정책을 확정한다. 재고 이동이나 실제 소비는 각 실행 WI가 수행한다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "RationPolicySet"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "RationPolicySet"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "SurvivalRationPolicySet",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-TOWN-DELIVERY-INSPECT",
+      "groupCode": "MARKET",
+      "sequence": 6,
+      "title": "Town 납품 검수",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "Town 독립 보충 주문의 도착 물품 수량·품질을 검수한다. 기존 Hub 출고 연계 마트 검수와 자동 동일시하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "TownDeliveryInspected"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "TownDeliveryInspected"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "TownDeliveryInspect",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-TOWN-DELIVERY-RECEIVE",
+      "groupCode": "MARKET",
+      "sequence": 7,
+      "title": "Town 납품 인수",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "Town 보충 주문에 대한 도착 화물 인수를 확정한다. 주민 주문 수령이나 Hub 화물 인계와 다른 원장이다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "TownDeliveryReceived"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "TownDeliveryReceived"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "TownDeliveryReceive",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-TOWN-STOCK-PUTAWAY",
+      "groupCode": "MARKET",
+      "sequence": 8,
+      "title": "Town 후방 재고 적재",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "Town에서 검수된 재고를 승인 후방 슬롯에 적재한다. 검수나 진열을 대신하지 않는다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "TownStockPutAway"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "TownStockPutAway"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "TownStockPutaway",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-TOWN-STOCK-REPLENISH",
+      "groupCode": "MARKET",
+      "sequence": 9,
+      "title": "Town 재고 보충 주문",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerDirect",
+      "worldAction": "운영자가 부족한 상점 재고의 보충 주문을 확정한다. 주민 소비 주문·기존 진열 이동과 다르다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "TownReplenishmentOrderConfirmed"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "TownReplenishmentOrderConfirmed"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "TownStockReplenish",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-TOWN-SUPPLY-DISPATCH",
+      "groupCode": "MARKET",
+      "sequence": 10,
+      "title": "Town 공급 운송 출발 확정",
+      "kind": "Command",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "PlayerOrNpc",
+      "worldAction": "Town 보충 주문의 운송 출발을 확정한다. 회랑 진행·도착·인수는 이후 책임이다.",
+      "startStateCodes": [
+        "RegistrationOnly:PreconditionsRequireApprovedDesign"
+      ],
+      "completionStateCodes": [
+        "TownSupplyDispatched"
+      ],
+      "actorRequirements": [
+        "승인된 실행 주체·대상 권한 필요"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "등록 기준: 권한·예상 revision·대상 조건을 읽기 전용 평가한다. 실제 규칙은 미구현이다.",
+      "confirmRule": "등록 기준: ExpectedRevision·Command 멱등성을 검증하고 한 책임의 결과·행위 기록을 같은 WorldRevision에 반영한다. 실제 실행은 미승인이다.",
+      "taskRule": "작업 시작·중단·완료 및 원자성 규칙은 승인 기획과 시험으로 확정한다. 등록만으로 Task를 실행하지 않는다.",
+      "effectCodes": [
+        "TownSupplyDispatched"
+      ],
+      "cancellationPolicy": "미착수 등록. 취소·재시도·회복 정책은 구현 전 승인해야 한다.",
+      "blockReasonCodes": [
+        "ApprovedDesignRequired",
+        "ImplementationNotStarted"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "TownSupplyDispatch",
+      "ruleRevision": "registration-only.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [],
+      "implementation": {
+        "status": "NotStarted",
+        "currentStage": "E0",
+        "targetStage": "E3",
+        "evidence": []
+      },
+      "integration": {
+        "status": "NotSelected",
+        "currentStage": "E0",
+        "targetStage": "E7",
+        "evidence": []
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Town주문수령/town-order-pickup.inquiry.r1.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "등록은 C# 규칙·Runtime·H 공간·저장·API의 존재나 승인 증거가 아니다. 기존 활성 Goal/WI와 승인 상한을 유지한다."
+      ]
+    },
+    {
+      "id": "WI-WORLD-RESOURCE-REGENERATE",
+      "groupCode": "WORLD",
+      "sequence": 14,
+      "title": "세계 자원 재생",
+      "kind": "AutomaticTransition",
+      "originCode": "SimulationNative",
+      "controlPolicyCode": "WorldAutomatic",
+      "worldAction": "신뢰된 Tick 입력으로 판본화된 자원 재생 조건을 평가해 노드·시계·행위 기록을 원자적으로 반영한다. 실제 Session 연결과 출시 수치·재생 주기는 보류다.",
+      "startStateCodes": [
+        "TrustedResourcePolicyReady",
+        "ConsecutiveWorldTickAvailable"
+      ],
+      "completionStateCodes": [
+        "ResourceAvailabilityRestored",
+        "ResourceAvailabilityUnchanged"
+      ],
+      "actorRequirements": [
+        "권위 WorldTick 평가"
+      ],
+      "spatialRequirements": [],
+      "resourceRequirements": [
+        "비용·수량·공간 조건은 후속 승인 기획에서 확정"
+      ],
+      "reservationKinds": [],
+      "previewRule": "PreviewTick 내부 진단은 무변경. 플레이어 Preview/Confirm 미노출.",
+      "confirmRule": "신뢰된 ApplyTick만 연속 Tick·권한·ExpectedRevision·TransitionId 멱등성을 검증해 노드·시계·행위 기록을 원자적으로 반영한다.",
+      "taskRule": "Profile 성장 단계와 Tick당 결정적 빈셀 생성 상한. 자연 외 토지 제외.",
+      "effectCodes": [
+        "ResourceAvailabilityRestored",
+        "ResourceAvailabilityUnchanged"
+      ],
+      "cancellationPolicy": "거부된 Tick은 상태를 변경하지 않고 동일 TransitionId 재전송은 멱등 처리한다. 실제 Session 취소·복구 연결은 보류다.",
+      "blockReasonCodes": [
+        "ResourceRegenerationAuthorityRequired",
+        "ResourceRegenerationExpectedRevisionMismatch",
+        "ResourceRegenerationNextTickRequired",
+        "ResourceRegenerationRevisionExhausted",
+        "ResourceRegenerationTickOverflow",
+        "ResourceRegenerationTransitionConflict",
+        "ResourceRegenerationNodeCollision"
+      ],
+      "predecessorWiIds": [],
+      "successorWiIds": [],
+      "actionCode": "WorldResourceRegenerate",
+      "ruleRevision": "resource-regeneration.r1",
+      "saveReplayPayloadCodes": [
+        "NotApproved:SaveReplayContract"
+      ],
+      "httpContracts": [
+        "NotApproved:RemoteHostContract"
+      ],
+      "existingImplementationReferences": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation세계자원재생.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/Simulation세계자원재생Service.cs",
+        "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs"
+      ],
+      "implementation": {
+        "status": "Done",
+        "currentStage": "E3",
+        "targetStage": "E3",
+        "evidence": ["artifacts/local/remaining-32-wi/resource-regeneration-isolated.trx"]
+      },
+      "integration": {
+        "status": "InProgress",
+        "currentStage": "E1",
+        "targetStage": "E7",
+        "evidence": ["docs/Architecture/PlayableLoops/Nature세계자원재생E3.md"]
+      },
+      "sourceReferences": [
+        "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
+        "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md"
+      ],
+      "notes": [
+        "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
+        "분리 집중시험 Debug/Release 각각 35/35, 개인계획·열원 포함 분리 회귀 74/74. 공유 프로젝트 집중시험 35/35와 관련 회귀 77/77. Logic E3 / Presentation E1 / 통합 E1이며 실제 Session·Save·RemoteHost·Unity 화면은 미검증이다."
+      ],
+      "automaticTransition": {
+        "triggerKindCode": "WorldTick",
+        "triggerWiId": null,
+        "triggerState": "ApprovedResourceRegenerationDue",
+        "targetState": "ResourceAvailabilityRestored",
+        "causeLineage": "WorldTick + ResourceNodeStableId + ApprovedRuleRevision"
+      }
+    },
     {
       "id": "WI-ACTOR-01", "groupCode": "ACTOR", "sequence": 1, "title": "물품 획득", "kind": "Command",
       "originCode": "SimulationNative", "controlPolicyCode": "PlayerOrNpc",
@@ -70,10 +2285,100 @@
       "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 이미 아는 처방의 재확정은 무변경으로 재사용한다.", "blockReasonCodes": ["PlayerKnowledgeExpectedRevisionMismatch", "PlayerKnowledgePlayerMismatch", "PlayerKnowledgeRecipeUnknown", "PlayerKnowledgeSourceUnavailable"],
       "predecessorWiIds": [], "successorWiIds": [], "actionCode": "AcquireRecipeKnowledge", "ruleRevision": "player-knowledge.r1",
       "saveReplayPayloadCodes": ["NotApproved:PlayerKnowledgeSaveContract"], "httpContracts": ["GET api/simulation/v1/player-knowledge-ledgers/{ledgerStableId}", "POST api/simulation/v1/player-knowledge-ledgers/{ledgerStableId}/previews", "POST api/simulation/v1/player-knowledge-ledgers/{ledgerStableId}/confirmations"],
-      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayerKnowledgeContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerKnowledge.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayerKnowledgeService.cs", "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs", "Ssalddel.Simulation.Server/Controllers/SimulationPlayerKnowledgeController.cs", "Ssalddel.Simulation.Tests/SimulationPlayerKnowledgeTests.cs", "Ssalddel.Unity/Runtime/Cards/Simulation처방지식CardFamily.cs", "Ssalddel.Unity.Tests/Simulation처방지식CardFamilyTests.cs"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationPlayerKnowledgeContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationPlayerKnowledge.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationPlayerKnowledgeService.cs", "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs", "Ssalddel.Simulation.Server/Controllers/SimulationPlayerKnowledgeController.cs", "Ssalddel.Simulation.Tests/SimulationPlayerKnowledgeTests.cs", "Ssalddel.Unity/Runtime/Cards/Simulation처방지식CardFamily.cs", "Ssalddel.Unity.Tests/Simulation처방지식CardFamilyTests.cs", "Ssalddel.Unity/Runtime/Cards/Simulation처방기록PresentationPreparation.cs", "Ssalddel.Unity.Tests/Simulation처방기록PresentationPreparationTests.cs"],
       "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationPlayerKnowledgeTests 8/8에서 Preview 무변경, Confirm 원자적 추가·동일 revision 행위 기록, Command 멱등성, 재확정 무변경, 접근·처방·revision 거부와 Application 경계를 검증했다."] },
-      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Logic E4에서 LocalSimulationRuntime과 RemoteHost HTTP Adapter가 같은 Application 서비스를 호출하며 Query·Preview·Confirm·멱등·거부 결과 동등성 집중시험 12/12를 통과했다.", "Presentation E3에서 같은 WorldRevision의 지식 원장과 Preview를 RecipeKnowledge 카드 가족으로 결정적으로 투영하고 Known·Readable·Blocked 상태와 권위 불변을 자동시험으로 검증했다. 통합 단계는 두 궤적 중 낮은 Presentation E3다."] },
-      "sourceReferences": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json"], "notes": ["새 Save 판본은 만들지 않았고 통합 E4 이상과 실제 Unity 카드 서랍 배선은 다음 승인까지 차단한다."]
+      "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "evidence": ["Logic E4에서 LocalSimulationRuntime과 RemoteHost HTTP Adapter가 같은 Application 서비스를 호출하며 Query·Preview·Confirm·멱등·거부 결과 동등성 집중시험 12/12를 통과했다.", "Presentation E4에서 같은 WorldRevision의 RecipeKnowledge 카드 상태를 ReadableKnowledgeSource·VisualKey·fallback·Preview 앵커 준비 계획으로 결정적으로 투영하고 권위 불변을 포함한 집중 회귀 12/12를 통과했다. 통합 단계는 두 궤적의 E4다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/Nature기초약초회복.md", "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json"], "notes": ["새 Save 판본은 만들지 않았고 통합 E5 이상과 실제 Unity Prefab·H1 좌표·Renderer·Collider·입력은 다음 승인까지 차단한다."]
+    },
+    {
+      "id": "WI-COMMUNITY-VISITOR-STAY", "groupCode": "COMMUNITY", "sequence": 1, "title": "방문자 임시 체류 결정", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 Nature 야영지 입구에서 대기하는 방문자 한 명의 현재 임시 체류를 수용하거나 거절한다.",
+      "startStateCodes": ["NatureCampVisitorAwaitingDecision"], "completionStateCodes": ["CommunityVisitorTemporaryStayAccepted", "CommunityVisitorRejected"],
+      "actorRequirements": ["Nature 야영지 공동체를 응대할 수 있는 Player"], "spatialRequirements": ["Spatial.VisitorWaitingAnchor", "Spatial.GuestRestAnchor", "Spatial.VisitorDepartureAnchor"], "resourceRequirements": ["대기 방문자", "수용 선택일 때 남은 손님 수용 칸"], "reservationKinds": ["CommunityVisitor", "GuestCapacity"],
+      "previewRule": "WorldRevision·방문자 대기 상태·선택 코드·수용 여력을 검사하고 예상 상태와 마음 계보만 반환한다.", "confirmRule": "ExpectedWorldRevision으로 수용 또는 거절을 한 번 확정하고 방문자 상태·수용 칸·공동체 마음 계보·행위 기록을 같은 revision에 남긴다.", "taskRule": "첫 판본은 즉시 결정까지만 완료하며 체류 기간·연장·정식 편입은 후속 WI로 분리한다.", "effectCodes": ["CommunityVisitorStayDecisionRecorded", "CommunityMindTraceRecorded"],
+      "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 결정 뒤 재검토는 후속 관계 WI가 소유한다.", "blockReasonCodes": ["CommunityVisitorStayExpectedRevisionMismatch", "CommunityVisitorUnknown", "CommunityVisitorAlreadyDecided", "CommunityVisitorCapacityUnavailable", "CommunityVisitorDecisionInvalid", "CommunityVisitorStayCommandPayloadConflict"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "DecideCommunityVisitorTemporaryStay", "ruleRevision": "community-visitor-stay.r1",
+      "saveReplayPayloadCodes": ["NotApproved:CommunityVisitorStaySaveContract"], "httpContracts": ["NotApproved:CommunityVisitorStayRemoteHostContract"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationCommunityVisitorStayContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationCommunityVisitorStay.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationCommunityVisitorStayService.cs", "Ssalddel.Simulation.Tests/SimulationCommunityVisitorStayTests.cs", "Ssalddel.Unity/Runtime/Cards/Simulation방문자체류PresentationPreparation.cs", "Ssalddel.Unity.Tests/Simulation방문자체류PresentationPreparationTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E4", "targetStage": "E4", "evidence": ["SimulationCommunityVisitorStayTests 10/10에서 Preview 무변경, 수용·거절 Confirm, 수용 한도, 마음 계보, Command 멱등성, revision·방문자·선택·재결정 거부와 결정적 카드 투영을 검증했다.", "Simulation방문자체류PresentationPreparationTests 7/7에서 동일 revision 상태 사본의 H 후보·VisualKey·Synty 후보·fallback·결정적 fingerprint를 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "evidence": ["Logic·Presentation 통합 E4 후보 동결과 자동시험까지 완료했으며 실제 H 위치·Prefab·Renderer/Collider·Unity Runtime은 아직 결속하지 않았다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md", "eng/execution-ledgers/work-orders/nature-camp-visitor-stay.e7-work-order.json"], "notes": ["수용과 거절은 마음 점수나 선악 판정이 아니라 환대 확인·경계 보호 계보로만 기록한다."]
+    },
+    {
+      "id": "WI-FARM-DEFENSE-MOBILIZE", "groupCode": "FARM", "sequence": 7, "title": "방위 분대 소집", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "WorldAutomatic",
+      "worldAction": "접근 중인 위협에 대응할 준비 분대 하나를 출동시키고 배정 작업자의 Farm 생산 기여를 중단한다.",
+      "startStateCodes": ["FarmDefenseThreatApproaching", "FarmDefenseSquadReady"], "completionStateCodes": ["FarmDefenseSquadMobilized", "FarmProductionContributionSuspended"],
+      "actorRequirements": ["준비 상태의 Farm 방위 분대"], "spatialRequirements": ["Spatial.FarmDefenseWatchAnchor", "Spatial.FarmDefenseMusterAnchor"], "resourceRequirements": ["접근 중인 위협", "분대에 배정된 작업자"], "reservationKinds": ["DefenseSquad", "ApproachingThreat"],
+      "previewRule": "WorldRevision·분대 준비 상태·위협 존재·기존 출동 여부를 검사하고 상태를 바꾸지 않는다.", "confirmRule": "ExpectedWorldRevision으로 분대 출동과 배정 작업자의 생산 기여 중단을 한 번에 확정하고 같은 revision의 행위 기록을 남긴다.", "taskRule": "첫 판본은 소집 확정까지만 즉시 완료하며 전투 결과·부상·보급·귀환은 후속 WI로 분리한다.", "effectCodes": ["FarmDefenseSquadMobilized", "FarmProductionContributionSuspended"],
+      "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 출동 뒤 복귀는 WI-FARM-DEFENSE-RETURN이 소유한다.", "blockReasonCodes": ["FarmDefenseMobilizationExpectedRevisionMismatch", "FarmDefenseSquadUnknown", "FarmDefenseSquadNotReady", "FarmDefenseThreatUnknown", "FarmDefenseSquadAlreadyMobilized", "FarmDefenseMobilizationCommandPayloadConflict"],
+      "predecessorWiIds": [], "successorWiIds": [], "actionCode": "MobilizeFarmDefenseSquad", "ruleRevision": "farm-defense-mobilization.r1",
+      "saveReplayPayloadCodes": ["NotApproved:FarmDefenseMobilizationSaveContract"], "httpContracts": ["NotApproved:FarmDefenseMobilizationRemoteHostContract"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseMobilizationContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseMobilization.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseMobilizationService.cs", "Ssalddel.Simulation.Tests/SimulationFarmDefenseMobilizationTests.cs", "Ssalddel.Unity/Runtime/Cards/SimulationFarm방위소집PresentationPreparation.cs", "Ssalddel.Unity.Tests/SimulationFarm방위소집PresentationPreparationTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E4", "targetStage": "E4", "evidence": ["SimulationFarmDefenseMobilizationTests 8/8에서 Preview 무변경, Confirm의 원자적 출동·생산 기여 중단, Command 멱등성, revision·분대·위협·중복 거부와 결정적 카드 투영을 검증했다.", "SimulationFarm방위소집PresentationPreparationTests 7/7에서 상태별 H·VisualKey·Synty 후보·fallback·결정적 fingerprint를 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E4", "targetStage": "E7", "evidence": ["Logic·Presentation 통합 E4 후보 동결과 자동시험까지 완료했으며 실제 H 위치·Prefab·Renderer/Collider·Unity Runtime은 아직 결속하지 않았다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "eng/execution-ledgers/work-orders/farm-barracks-defense.e7-work-order.json"], "notes": ["자동 출동의 권위 판정이며 전투 결과와 귀환을 한 WI에 합치지 않는다."]
+    },
+    {
+      "id": "WI-SQUAD-ASSIGN", "groupCode": "FARM", "sequence": 8, "title": "경비 초소 분대 배정", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 Farm 경비 초소의 빈 배치 슬롯 하나에 미배정 방위 분대 하나를 배정한다.",
+      "startStateCodes": ["FarmDefenseOutpostSlotEmpty", "FarmDefenseSquadUnassigned"], "completionStateCodes": ["FarmDefenseSquadAssignedToOutpostSlot"],
+      "actorRequirements": ["Farm 방위 편성 권한이 있는 Host Player", "미배정 Farm 방위 분대"], "spatialRequirements": ["Spatial.FarmDefenseMusterAnchor"], "resourceRequirements": ["등록된 Farm 경비 초소", "빈 초소 배치 슬롯", "미배정 분대"], "reservationKinds": ["DefenseOutpostSlot", "DefenseSquad"],
+      "previewRule": "ExpectedWorldRevision과 초소·슬롯·분대 존재, 슬롯 점유와 기존 분대 배정을 검사하고 상태를 바꾸지 않는다.", "confirmRule": "ExpectedWorldRevision으로 빈 초소 슬롯과 미배정 분대를 1:1로 결속하고 같은 revision의 행위 기록을 한 번 남긴다.", "taskRule": "첫 판본은 분대 배정 확정까지만 즉시 완료하며 편성·훈련·보급·영웅 조작·출동은 후속 WI로 분리한다.", "effectCodes": ["FarmDefenseSquadAssigned"],
+      "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 배정 해제·교체는 별도 후속 WI가 소유한다.", "blockReasonCodes": ["FarmSquadAssignmentExpectedRevisionMismatch", "FarmDefenseOutpostUnknown", "FarmDefenseOutpostSlotUnknown", "FarmDefenseSquadUnknown", "FarmDefenseSquadAlreadyAssigned", "FarmDefenseOutpostSlotOccupied", "FarmSquadAssignmentCommandPayloadConflict"],
+      "predecessorWiIds": [], "successorWiIds": ["WI-FARM-DEFENSE-MOBILIZE"], "actionCode": "AssignFarmDefenseSquad", "ruleRevision": "farm-defense-squad-assignment.r1",
+      "saveReplayPayloadCodes": ["NotApproved:FarmDefenseSquadAssignmentSaveContract"], "httpContracts": ["NotApproved:FarmDefenseSquadAssignmentRemoteHostContract"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmSquadAssignmentContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmSquadAssignment.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSquadAssignmentService.cs", "Ssalddel.Simulation.Tests/SimulationFarmSquadAssignmentTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationFarmSquadAssignmentTests 10/10에서 Preview 무변경, Confirm의 1:1 배정·행위 기록·revision 증가, Command 멱등과 payload 충돌, revision·초소·슬롯·분대·점유 거부, 빈 슬롯을 포함한 결정적 카드 투영을 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Logic·Presentation 통합 E3 계약과 자동시험까지 완료했으며 E4 판독 순간·InteractionAnchor·VisualKey와 실제 초소 UI·Actor는 아직 승인하지 않았다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "eng/execution-ledgers/work-orders/farm-barracks-squad-assignment.e7-work-order.json"], "notes": ["분대와 초소 슬롯의 배정만 소유하며 분대원 구성·훈련·출동을 함께 변경하지 않는다."]
+    },
+    {
+      "id": "WI-SQUAD-SUPPLY", "groupCode": "FARM", "sequence": 9, "title": "경비 분대 식량·장비 보급", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "PlayerDirect",
+      "worldAction": "플레이어가 초기 권위 상태에 기록된 필요량만큼 식량과 장비 내구도 복구 능력을 소비해 Farm 경비 분대 하나를 보급 완료로 만든다.",
+      "startStateCodes": ["FarmDefenseSquadSupplyRequired"], "completionStateCodes": ["FarmDefenseSquadSupplied"],
+      "actorRequirements": ["Farm 방위 보급 권한이 있는 Host Player", "보급이 필요한 Farm 방위 분대"], "spatialRequirements": ["Spatial.FarmDefenseSupplyAnchor"], "resourceRequirements": ["분대별 식량 필요량", "분대별 장비 내구도 복구 필요량"], "reservationKinds": ["FarmDefenseFoodStock", "FarmDefenseDurabilityRestoreCapacity", "DefenseSquad"],
+      "previewRule": "ExpectedWorldRevision·분대 존재·기보급 여부와 식량·내구도 복구 능력 충족 여부를 검사하고 상태를 바꾸지 않는다.", "confirmRule": "초기 권위 상태가 정한 필요량만큼 두 자원을 원자적으로 소비하고 분대를 보급 완료로 바꾸며 같은 revision의 행위 기록을 남긴다.", "taskRule": "첫 판본은 보급 확정까지만 즉시 완료하며 개별 장비 수리·훈련·출동·자동 재보급은 후속 WI로 분리한다.", "effectCodes": ["FarmDefenseSquadSupplied"],
+      "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 확정 뒤 소비 취소나 재보급은 별도 후속 규칙이 소유한다.", "blockReasonCodes": ["FarmSquadSupplyExpectedRevisionMismatch", "FarmSquadSupplySquadUnknown", "FarmSquadSupplySquadAlreadySupplied", "FarmSquadSupplyFoodInsufficient", "FarmSquadSupplyDurabilityRestoreInsufficient", "FarmSquadSupplyCommandPayloadConflict"],
+      "predecessorWiIds": ["WI-SQUAD-ASSIGN"], "successorWiIds": ["WI-FARM-DEFENSE-MOBILIZE"], "actionCode": "SupplyFarmDefenseSquad", "ruleRevision": "farm-defense-squad-supply.r1",
+      "saveReplayPayloadCodes": ["NotApproved:FarmDefenseSquadSupplySaveContract"], "httpContracts": ["NotApproved:FarmDefenseSquadSupplyRemoteHostContract"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmSquadSupplyContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmSquadSupply.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmSquadSupplyService.cs", "Ssalddel.Simulation.Tests/SimulationFarmSquadSupplyTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationFarmSquadSupplyTests 9/9에서 Preview 무변경, 식량·내구도 복구 능력 동시 소비 Confirm, 행위 기록·revision, Command 멱등과 payload 충돌, revision·분대·기보급·자원 부족 거부, 결정적 보급 카드 투영을 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Logic·Presentation 통합 E3 계약과 자동시험까지 완료했으며 E4 보급 판독 순간·InteractionAnchor·VisualKey와 실제 보급 UI·Actor는 아직 승인하지 않았다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "eng/execution-ledgers/work-orders/farm-barracks-squad-supply.e7-work-order.json"], "notes": ["필요량은 초기 권위 상태 입력이며 플레이어가 보급 수량이나 게임 밸런스를 결정하지 않는다."]
+    },
+    {
+      "id": "WI-FARM-DEFENSE-RESOLVE", "groupCode": "FARM", "sequence": 10, "title": "Farm 방어 성공 결과 발현", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "WorldAutomatic",
+      "worldAction": "전투 권위가 확정한 Farm 방어 성공 결과 묶음을 위협 감소·안전 기간·생산/회복 보정·전리품으로 한 번 발현한다.",
+      "startStateCodes": ["FarmDefenseResultConfirmed"], "completionStateCodes": ["FarmDefenseResultManifested"],
+      "actorRequirements": ["전투 권위가 확정한 결과", "결과를 만든 Farm 방위 분대"], "spatialRequirements": [], "resourceRequirements": ["확정 위협 감소", "확정 안전 종료 Tick", "확정 생산/회복 보정", "확정 전리품"], "reservationKinds": ["FarmDefenseEncounterResult"],
+      "previewRule": "ExpectedWorldRevision·조우 존재·미발현 여부·성공 결과 여부를 검사하고 확정 결과 수치를 읽기만 한다.", "confirmRule": "확정 성공 결과를 위협·안전 기간·생산/회복 보정·전리품에 원자적으로 발현하고 같은 revision의 행위 기록을 남긴다.", "taskRule": "즉시 발현하며 전투 승패·피해·보상 수치를 계산하지 않고 부상·치료·귀환을 후속 WI에 남긴다.", "effectCodes": ["FarmDefenseResolved", "FarmThreatReduced", "FarmSafePeriodExtended", "FarmProductionRecoveryModified", "FarmDefenseLootAdded"],
+      "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 발현 뒤 결과 취소·보정은 별도 권위 명령이 소유한다.", "blockReasonCodes": ["FarmDefenseResolutionExpectedRevisionMismatch", "FarmDefenseResolutionEncounterUnknown", "FarmDefenseResolutionEncounterAlreadyResolved", "FarmDefenseResolutionResultNotSuccessful", "FarmDefenseResolutionCommandPayloadConflict"],
+      "predecessorWiIds": ["WI-FARM-DEFENSE-MOBILIZE"], "successorWiIds": ["WI-FARM-DEFENSE-RETURN"], "actionCode": "ResolveFarmDefenseResult", "ruleRevision": "farm-defense-resolution.r1",
+      "saveReplayPayloadCodes": ["NotApproved:FarmDefenseResolutionSaveContract"], "httpContracts": ["NotApproved:FarmDefenseResolutionRemoteHostContract"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseResolutionContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseResolution.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseResolutionService.cs", "Ssalddel.Simulation.Tests/SimulationFarmDefenseResolutionTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationFarmDefenseResolutionTests 10/10에서 Preview 무변경, 확정 결과 원자 발현, 행위 기록·revision, Command 멱등과 payload 충돌, revision·조우·실패·기발현 거부, 위협 하한·안전 기간·전리품 합산과 결정적 결과 카드를 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Logic·Presentation 통합 E3 계약과 자동시험까지 완료했으며 E4 판독 순간·VisualKey와 실제 결과 UI·전리품 표현은 아직 승인하지 않았다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "eng/execution-ledgers/work-orders/farm-barracks-defense-resolution.e7-work-order.json"], "notes": ["결과 수치는 전투 권위 입력이며 이 WI와 플레이어가 재계산하거나 선택하지 않는다."]
+    },
+    {
+      "id": "WI-FARM-DEFENSE-RETURN", "groupCode": "FARM", "sequence": 11, "title": "Farm 방위 분대 초소 귀환 인계", "kind": "Command",
+      "originCode": "SimulationNative", "controlPolicyCode": "WorldAutomatic",
+      "worldAction": "결과가 확정된 Farm 방위 분대를 지정 초소로 귀환 완료시키고 부상자와 생존 작업자를 치료·생산 재합류 후속 대기열에 인계한다.",
+      "startStateCodes": ["FarmDefenseResultResolved", "FarmDefenseReturnPending"], "completionStateCodes": ["FarmDefenseSquadReturned"],
+      "actorRequirements": ["결과가 확정된 Farm 방위 분대"], "spatialRequirements": ["Spatial.FarmDefenseReturnOutpostAnchor"], "resourceRequirements": ["귀환 정의", "치료 필요 Actor", "생산 재합류 후보 Actor"], "reservationKinds": ["FarmDefenseReturn"],
+      "previewRule": "ExpectedWorldRevision·귀환 정의·결과 확정·기귀환 여부를 검사하고 후속 인계 건수를 읽기만 한다.", "confirmRule": "분대를 초소 귀환 완료로 바꾸고 치료·생산 재합류 후보를 서로 겹치지 않는 대기열에 한 번 인계하며 같은 revision의 행위 기록을 남긴다.", "taskRule": "첫 판본은 귀환 인계까지만 즉시 완료하며 치료·휴식·생산 재합류와 이동 표현은 별도 WI가 소유한다.", "effectCodes": ["FarmDefenseSquadReturned"],
+      "cancellationPolicy": "확정 전 Preview는 폐기할 수 있고 귀환 뒤 치료·재합류 취소나 재배정은 후속 권위 규칙이 소유한다.", "blockReasonCodes": ["FarmDefenseReturnExpectedRevisionMismatch", "FarmDefenseReturnUnknown", "FarmDefenseReturnResultNotResolved", "FarmDefenseReturnAlreadyReturned", "FarmDefenseReturnCommandPayloadConflict"],
+      "predecessorWiIds": ["WI-FARM-DEFENSE-RESOLVE"], "successorWiIds": [], "actionCode": "ReturnFarmDefenseSquad", "ruleRevision": "farm-defense-return.r1",
+      "saveReplayPayloadCodes": ["NotApproved:FarmDefenseReturnSaveContract"], "httpContracts": ["NotApproved:FarmDefenseReturnRemoteHostContract"],
+      "existingImplementationReferences": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarmDefenseReturnContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFarmDefenseReturn.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationFarmDefenseReturnService.cs", "Ssalddel.Simulation.Tests/SimulationFarmDefenseReturnTests.cs"],
+      "implementation": { "status": "Done", "currentStage": "E3", "targetStage": "E3", "evidence": ["SimulationFarmDefenseReturnTests 9/9에서 Preview 무변경, 초소 귀환과 치료·생산 재합류 후속 대기열 인계, 행위 기록·revision, 멱등·payload 충돌, revision·미확정·기귀환 거부와 결정적 귀환 카드를 검증했다."] },
+      "integration": { "status": "InProgress", "currentStage": "E3", "targetStage": "E7", "evidence": ["Logic·Presentation 통합 E3까지 완료했으며 E4 판독 순간·InteractionAnchor·VisualKey와 실제 이동·치료·재합류는 승인하지 않았다."] },
+      "sourceReferences": ["docs/Architecture/PlayableLoops/Farm병영방위.md", "eng/execution-ledgers/work-orders/farm-barracks-defense-return.e7-work-order.json"], "notes": ["전리품은 결과 발현 WI가 이미 인계했으므로 귀환 WI가 다시 지급하지 않는다."]
     },
     {
       "id": "WI-FARM-01", "groupCode": "FARM", "sequence": 1, "title": "경작지 밭갈이", "kind": "Command",

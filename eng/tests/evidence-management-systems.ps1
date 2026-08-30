@@ -106,9 +106,9 @@ if ([string] $responsibilityMap.schemaVersion -ne
     throw "EvidenceManagementResponsibilityMapSchemaInvalid"
 }
 $submodules = @($responsibilityMap.submodules)
-if ($submodules.Count -ne 15 -or
+if ($submodules.Count -ne 16 -or
     @($submodules | Where-Object evidenceStage -eq "E1").Count -ne 5 -or
-    @($submodules | Where-Object evidenceStage -eq "E2").Count -ne 5 -or
+    @($submodules | Where-Object evidenceStage -eq "E2").Count -ne 6 -or
     @($submodules | Where-Object evidenceStage -eq "E3").Count -ne 5) {
     throw "EvidenceManagementSubmoduleCatalogInvalid"
 }

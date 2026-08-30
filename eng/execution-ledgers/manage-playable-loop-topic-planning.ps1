@@ -10,6 +10,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot "../common/deterministic-text-output.ps1")
+. (Join-Path $PSScriptRoot "../common/parallel-development-work.ps1")
 
 function Require([bool] $Condition, [string] $Code) {
     if (-not $Condition) { throw "PlayableLoopTopicPlanningInvalid:$Code" }
@@ -39,6 +40,8 @@ Require (($allowed -join ",") -eq "NotStarted,Draft,ReadyForReview,Approved,Lega
 $goalByLoop = @{}
 foreach ($goal in @($goals.items)) { $goalByLoop[[string] $goal.loopStableId] = $goal }
 $activeLoopId = [string] $goals.activeGoal.loopStableId
+$workItems = @(Get-ParallelDevelopmentWorkItems -Ledger $goals)
+$activeLoopIds = @(@($goals.items | Where-Object { $_.goalStateCode -eq 'Active' } | ForEach-Object { $_.loopStableId }) + @($workItems | Where-Object { $_.statusCode -in @('Active','ReadyForIntegration') } | ForEach-Object { $_.loopStableId }) | Sort-Object -Unique)
 $legacyLoopId = [string] $policy.legacyActiveMigrationLoopStableId
 $seenTopics = @{}
 $units = @($loops.items | Where-Object loopLevelCode -eq "PlayableUnit")
@@ -75,8 +78,8 @@ foreach ($loop in @($loops.items)) {
     elseif ($status -eq "LegacyActiveMigration") {
         $legacyCount++
         Require ($id -eq $legacyLoopId) "LegacyMigrationTransferred:$id"
-        Require ($id -eq $activeLoopId) "LegacyMigrationIsNotActive:$id"
-        Require ([string] $goals.activeGoal.goalStateCode -eq "Active") "LegacyMigrationGoalMustRemainActive:$id"
+        Require ($activeLoopIds -contains $id) "LegacyMigrationIsNotActive:$id"
+        Require ($goalByLoop.ContainsKey($id) -and [string] $goalByLoop[$id].goalStateCode -eq "Active") "LegacyMigrationGoalMustRemainActive:$id"
     }
     else {
         foreach ($field in @("designDocumentRef", "designRevision", "designHashSha256")) {
@@ -106,10 +109,18 @@ foreach ($loop in @($loops.items)) {
 }
 Require ($legacyCount -le 1) "LegacyMigrationCountInvalid"
 
-Require ($goalByLoop.ContainsKey($activeLoopId)) "ActiveGoalLoopUnknown"
-$activeUnit = @($units | Where-Object loopStableId -eq $activeLoopId)[0]
-$activePlanning = [string] $activeUnit.planningGate.statusCode
-Require ($activePlanning -eq "Approved" -or ($activePlanning -eq "LegacyActiveMigration" -and $activeLoopId -eq $legacyLoopId)) "ActiveGoalPlanningNotApproved:$activeLoopId"
+foreach ($activeId in $activeLoopIds) {
+    Require ($goalByLoop.ContainsKey($activeId)) "ActiveGoalLoopUnknown:$activeId"
+    $activeUnits = @($units | Where-Object loopStableId -eq $activeId)
+    Require ($activeUnits.Count -eq 1) "ActiveGoalPlayableUnitMissing:$activeId"
+    $status = [string] $activeUnits[0].planningGate.statusCode
+    Require ($status -eq "Approved" -or ($status -eq "LegacyActiveMigration" -and $activeId -eq $legacyLoopId)) "ActiveGoalPlanningNotApproved:$activeId"
+}
+$workReadiness = @(Test-ParallelDevelopmentWorkItems -Ledger $goals -Loops $loops -RepositoryRoot $repositoryRoot)
+foreach ($readiness in @($workReadiness | Where-Object { $_.statusCode -in @('Active','ReadyForIntegration') })) {
+    Require ([bool] $readiness.canExecute) "ActiveWorkItemPlanningNotApproved:$($readiness.workItemId):$(@($readiness.blockerCodes) -join ',')"
+}
+$activePlanning = (@($units | Where-Object loopStableId -eq $activeLoopId | ForEach-Object { $_.planningGate.statusCode }) -join ',')
 
 $nextGoal = @($goals.items | Where-Object goalStateCode -eq "Queued" | Sort-Object queueOrder | Select-Object -First 1)
 $nextText = if ($nextGoal.Count -eq 0) { "없음" } else {
@@ -126,7 +137,9 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine("- PlayableUnit: ``$($units.Count)``")
 [void] $builder.AppendLine("- 승인됨: ``$(@($units | Where-Object { $_.planningGate.statusCode -eq 'Approved' }).Count)``")
 [void] $builder.AppendLine("- 한시적 이전: ``$legacyCount``")
-[void] $builder.AppendLine("- 현재 Goal: ``$activeLoopId`` / ``$activePlanning``")
+[void] $builder.AppendLine("- 대표 표시 Goal: ``$activeLoopId`` / ``$activePlanning``")
+[void] $builder.AppendLine("- 활성 Goal 범위: ``$($activeLoopIds -join ', ')``")
+[void] $builder.AppendLine("- 병렬 작업: ``$($workItems.Count)`` / 실행 가능 ``$(@($workReadiness | Where-Object canExecute).Count)`` (고정 WIP 상한 없음)")
 [void] $builder.AppendLine("- 다음 대기 Goal: ``$nextText``")
 [void] $builder.AppendLine()
 [void] $builder.AppendLine("| 주제 | PlayableLoop | 기획 상태 | Goal | 현재 WI | Logic | Presentation | 통합 E | 다음 기획 책임 |")
