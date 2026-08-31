@@ -184,6 +184,18 @@ namespace Ssalddel.Unity.Cards
                     || string.IsNullOrWhiteSpace(value.KnowledgeSourceStableId)
                     || string.IsNullOrWhiteSpace(value.VisualKey)
                     || string.IsNullOrWhiteSpace(value.FallbackVisualKey)
+                    || (!string.Equals(value.VisualKey,
+                            처방기록PresentationCodes.OpenBookVisualKey,
+                            StringComparison.Ordinal)
+                        && !string.Equals(value.VisualKey,
+                            처방기록PresentationCodes.LoosePaperVisualKey,
+                            StringComparison.Ordinal)
+                        && !string.Equals(value.VisualKey,
+                            처방기록PresentationCodes.FallbackVisualKey,
+                            StringComparison.Ordinal))
+                    || !string.Equals(value.FallbackVisualKey,
+                        처방기록PresentationCodes.FallbackVisualKey,
+                        StringComparison.Ordinal)
                     || string.IsNullOrWhiteSpace(
                         value.CandidateRevisionOrFingerprint))
                 || values.Select(value => value.KnowledgeSourceStableId)

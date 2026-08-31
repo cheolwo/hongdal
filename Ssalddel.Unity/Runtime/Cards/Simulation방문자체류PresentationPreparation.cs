@@ -95,6 +95,55 @@ namespace Ssalddel.Unity.Cards
         Boundary = "E4 준비 계획은 실제 방문자 이동·Prefab·Scene·Collider·입력·Game View 또는 체류 Confirm 증거가 아니다.")]
     public sealed class 방문자체류PresentationPreparationProjector
     {
+        /// <summary>
+        /// Accepted 연구 r1/r2의 상태별 key/role/cue 대응을 확인한 뒤 기존 Project를 소비한다.
+        /// 제공되지 않은 상태 Binding의 명시적 primitive fallback은 유지한다. 문자열 일치는
+        /// 승인·파일/GUID·Rig/Clip 조회 또는 실제 동작/Scene/E5 성공의 증거가 아니다.
+        /// </summary>
+        public 방문자체류PresentationPreparation ProjectWithStateBindingValidation(
+            string worldStableId,
+            IEnumerable<Simulation공동체방문자응대CardSnapshot> cards,
+            IEnumerable<방문자체류VisualBinding> visualBindings)
+        {
+            if (string.IsNullOrWhiteSpace(worldStableId))
+                throw new InvalidOperationException("CommunityVisitorPresentationWorldInvalid");
+            if (cards == null) throw new ArgumentNullException(nameof(cards));
+            if (visualBindings == null) throw new ArgumentNullException(nameof(visualBindings));
+            var cardValues = cards.ToArray();
+            var bindingValues = visualBindings.ToArray();
+            ValidateCards(cardValues);
+            ValidateBindings(bindingValues);
+            foreach (var binding in bindingValues)
+            {
+                string visualKey;
+                string cue;
+                switch (binding.StatusCode)
+                {
+                    case Simulation공동체방문자체류Codes.결정대기:
+                        visualKey = 방문자체류PresentationCodes.WaitingVisualKey;
+                        cue = "Visitor.Waiting.Greet";
+                        break;
+                    case Simulation공동체방문자체류Codes.임시체류:
+                        visualKey = 방문자체류PresentationCodes.AcceptedVisualKey;
+                        cue = "Visitor.State.IdleOrDepart";
+                        break;
+                    case Simulation공동체방문자체류Codes.거절:
+                        visualKey = 방문자체류PresentationCodes.RejectedVisualKey;
+                        cue = "Visitor.State.IdleOrDepart";
+                        break;
+                    default:
+                        throw new InvalidOperationException("CommunityVisitorBindingStateUnsupported");
+                }
+                if (!string.Equals(binding.VisualKey, visualKey, StringComparison.Ordinal))
+                    throw new InvalidOperationException("CommunityVisitorBindingVisualKeyMismatch");
+                if (!string.Equals(binding.AnimationRoleCode, "VisitorArrival", StringComparison.Ordinal))
+                    throw new InvalidOperationException("CommunityVisitorBindingAnimationRoleMismatch");
+                if (!string.Equals(binding.ActionCueCode, cue, StringComparison.Ordinal))
+                    throw new InvalidOperationException("CommunityVisitorBindingActionCueMismatch");
+            }
+            return Project(worldStableId, cardValues, bindingValues);
+        }
+
         public 방문자체류PresentationPreparation Project(
             string worldStableId,
             IEnumerable<Simulation공동체방문자응대CardSnapshot> cards,

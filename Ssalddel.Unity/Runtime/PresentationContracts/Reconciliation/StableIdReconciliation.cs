@@ -160,6 +160,15 @@ namespace Ssalddel.Unity.PresentationContracts.Reconciliation
                         parameterName,
                         stableId);
                 }
+
+                // 최초 추가와 삭제 대상도 같은 판본 계약을 검사한다.
+                // 기존 동등성 함수만 사용하는 소비자에는 새 판본 필드를 요구하지 않는다.
+                if (policy.PresentationRevision != null
+                    && string.IsNullOrWhiteSpace(policy.PresentationRevision(item)))
+                {
+                    throw new StableIdReconciliationException(
+                        "PresentationRevisionMissing", parameterName, stableId);
+                }
             }
 
             return result;

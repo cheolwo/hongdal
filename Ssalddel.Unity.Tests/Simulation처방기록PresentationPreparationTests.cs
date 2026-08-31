@@ -103,6 +103,122 @@ public sealed class Simulation처방기록PresentationPreparationTests
         Assert.Equal("RecipeKnowledgeVisualBindingInvalid", error.Message);
     }
 
+    [Theory]
+    [InlineData(처방기록PresentationCodes.OpenBookVisualKey)]
+    [InlineData(처방기록PresentationCodes.LoosePaperVisualKey)]
+    [InlineData(처방기록PresentationCodes.FallbackVisualKey)]
+    public void 기존_세가지_주표현키와_임의형식의_판본값은_그대로_보존한다(
+        string visualKey)
+    {
+        var binding = Binding("source:a", visualKey);
+        binding.CandidateRevisionOrFingerprint = "opaque-candidate-reference";
+
+        var preparation = Project(Card(처방지식CardStateCodes.Readable,
+            "source:a"), binding);
+
+        var source = Assert.Single(preparation.Sources);
+        Assert.Equal(visualKey, source.VisualKey);
+        Assert.Equal(처방기록PresentationCodes.FallbackVisualKey,
+            source.FallbackVisualKey);
+        Assert.Equal(binding.CandidateRevisionOrFingerprint,
+            source.CandidateRevisionOrFingerprint);
+        Assert.Equal("recipe-knowledge-source-candidates.r1",
+            preparation.CandidateRevision);
+        Assert.True(preparation.PresentationOnly);
+        Assert.False(preparation.MutatesCanonicalState);
+        Assert.False(source.CanConfirmAuthority);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("Knowledge.Recipe.Record.Unapproved")]
+    [InlineData("knowledge.recipe.record.openbook")]
+    [InlineData("KNOWLEDGE.RECIPE.RECORD.OPENBOOK")]
+    [InlineData(" " + 처방기록PresentationCodes.OpenBookVisualKey)]
+    [InlineData(처방기록PresentationCodes.OpenBookVisualKey + " ")]
+    [InlineData("Knowledge.Recipe.Record.loosePaper")]
+    [InlineData("primitive.ReadableKnowledgeSourceMarker")]
+    [InlineData(처방기록PresentationCodes.FallbackVisualKey + "\t")]
+    public void 미허용_주표현키와_대소문자_공백변형은_정규화하지_않고_거부한다(
+        string? visualKey)
+    {
+        var binding = Binding("source:a", visualKey!);
+
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            Project(Card(처방지식CardStateCodes.Readable, "source:a"),
+                binding));
+
+        Assert.Equal("RecipeKnowledgeVisualBindingInvalid", error.Message);
+        Assert.Equal(visualKey, binding.VisualKey);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("Primitive.Unapproved")]
+    [InlineData(처방기록PresentationCodes.OpenBookVisualKey)]
+    [InlineData(처방기록PresentationCodes.LoosePaperVisualKey)]
+    [InlineData("primitive.readableknowledgesourcemarker")]
+    [InlineData(" " + 처방기록PresentationCodes.FallbackVisualKey)]
+    [InlineData(처방기록PresentationCodes.FallbackVisualKey + " ")]
+    public void 대체표현키는_기존_명시Primitive만_허용한다(string? fallbackKey)
+    {
+        var binding = Binding("source:a",
+            처방기록PresentationCodes.OpenBookVisualKey);
+        binding.FallbackVisualKey = fallbackKey!;
+
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            Project(Card(처방지식CardStateCodes.Readable, "source:a"),
+                binding));
+
+        Assert.Equal("RecipeKnowledgeVisualBindingInvalid", error.Message);
+        Assert.Equal(fallbackKey, binding.FallbackVisualKey);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void 잘못된_키의_실패는_기존결과와_입력을_변경하지_않는다(
+        bool fallbackInvalid)
+    {
+        var family = Family(
+            Card(처방지식CardStateCodes.Known, "source:z"),
+            Card(처방지식CardStateCodes.Readable, "source:a"));
+        var bindings = new[]
+        {
+            Binding("source:z", 처방기록PresentationCodes.LoosePaperVisualKey),
+            Binding("source:a", 처방기록PresentationCodes.OpenBookVisualKey),
+        };
+        var invalid = Binding("source:a", fallbackInvalid
+            ? 처방기록PresentationCodes.OpenBookVisualKey
+            : "Knowledge.Recipe.Record.Unknown");
+        if (fallbackInvalid)
+            invalid.FallbackVisualKey = "Primitive.Unapproved";
+        var projector = new 처방기록PresentationPreparationProjector();
+        var familyBefore = System.Text.Json.JsonSerializer.Serialize(family);
+        var bindingsBefore = System.Text.Json.JsonSerializer.Serialize(bindings);
+        var invalidBefore = System.Text.Json.JsonSerializer.Serialize(invalid);
+        var previous = projector.Project(family, bindings);
+        var previousBefore = System.Text.Json.JsonSerializer.Serialize(previous);
+
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            projector.Project(family, new[] { bindings[0], invalid }));
+        var after = projector.Project(family, bindings.Reverse());
+
+        Assert.Equal("RecipeKnowledgeVisualBindingInvalid", error.Message);
+        Assert.Equal(familyBefore, System.Text.Json.JsonSerializer.Serialize(family));
+        Assert.Equal(bindingsBefore, System.Text.Json.JsonSerializer.Serialize(bindings));
+        Assert.Equal(invalidBefore, System.Text.Json.JsonSerializer.Serialize(invalid));
+        Assert.Equal(previousBefore, System.Text.Json.JsonSerializer.Serialize(previous));
+        Assert.Equal(previousBefore, System.Text.Json.JsonSerializer.Serialize(after));
+        Assert.Equal(previous.PlanHashSha256, after.PlanHashSha256);
+        Assert.Equal(new[] { "source:a", "source:z" },
+            after.Sources.Select(value => value.KnowledgeSourceStableId));
+    }
+
     private static 처방기록PresentationPreparation Project(
         처방지식CardProjection card,
         params 처방기록VisualBinding[] bindings)

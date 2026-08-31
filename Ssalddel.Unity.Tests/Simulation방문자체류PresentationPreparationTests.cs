@@ -11,6 +11,133 @@ namespace Ssalddel.Unity.Tests;
     Boundary = "자동 시험은 실제 Synty Prefab·Scene·위치·Renderer·Collider·입력·Game View를 대신하지 않는다.")]
 public sealed class Simulation방문자체류PresentationPreparationTests
 {
+    [Theory]
+    [InlineData(Simulation공동체방문자체류Codes.결정대기, 방문자체류PresentationCodes.WaitingVisualKey,
+        "Visitor.Waiting.Greet", 방문자체류PresentationCodes.VisitorWaitingAnchor)]
+    [InlineData(Simulation공동체방문자체류Codes.임시체류, 방문자체류PresentationCodes.AcceptedVisualKey,
+        "Visitor.State.IdleOrDepart", 방문자체류PresentationCodes.GuestRestAnchor)]
+    [InlineData(Simulation공동체방문자체류Codes.거절, 방문자체류PresentationCodes.RejectedVisualKey,
+        "Visitor.State.IdleOrDepart", 방문자체류PresentationCodes.VisitorDepartureAnchor)]
+    public void 상태검사진입점은_세상태의_기존key_role_cue_기준점을_결속한다(
+        string status, string key, string cue, string anchor)
+    {
+        var card = Card("visitor:state", status);
+        var binding = StateBinding(status);
+        var result = new 방문자체류PresentationPreparationProjector().ProjectWithStateBindingValidation(
+            "world:fixture", new[] { card }, new[] { binding });
+        var visitor = Assert.Single(result.Visitors);
+        Assert.Equal(key, visitor.VisualKey);
+        Assert.Equal(cue, visitor.ActionCueCode);
+        Assert.Equal("VisitorArrival", visitor.AnimationRoleCode);
+        Assert.Equal(anchor, visitor.RequiredHCapability);
+        Assert.Equal(status == Simulation공동체방문자체류Codes.결정대기, visitor.CanRequestPreview);
+        Assert.False(visitor.UsesRootMotion);
+        Assert.False(visitor.CanConfirmAuthority);
+        Assert.True(visitor.PresentationOnly);
+        Assert.False(result.MutatesCanonicalState);
+    }
+
+    [Theory]
+    [InlineData("key", "CommunityVisitorBindingVisualKeyMismatch")]
+    [InlineData("role", "CommunityVisitorBindingAnimationRoleMismatch")]
+    [InlineData("cue", "CommunityVisitorBindingActionCueMismatch")]
+    [InlineData("unknown-state", "CommunityVisitorBindingStateUnsupported")]
+    [InlineData("case", "CommunityVisitorBindingVisualKeyMismatch")]
+    public void 제공Binding의_확인된불일치는_fallback으로_숨기지않는다(string fault, string expected)
+    {
+        var card = Card("visitor:waiting", Simulation공동체방문자체류Codes.결정대기);
+        var binding = StateBinding(card.StatusCode);
+        switch (fault)
+        {
+            case "key": binding.VisualKey = 방문자체류PresentationCodes.RejectedVisualKey; break;
+            case "role": binding.AnimationRoleCode = "DifferentRole"; break;
+            case "cue": binding.ActionCueCode = "Visitor.State.IdleOrDepart"; break;
+            case "unknown-state": binding.StatusCode = "UnknownState"; break;
+            case "case": binding.VisualKey = binding.VisualKey.ToLowerInvariant(); break;
+        }
+        var before = System.Text.Json.JsonSerializer.Serialize(new { card, binding });
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            new 방문자체류PresentationPreparationProjector().ProjectWithStateBindingValidation(
+                "world:fixture", new[] { card }, new[] { binding }));
+        Assert.Equal(expected, error.Message);
+        Assert.Equal(before, System.Text.Json.JsonSerializer.Serialize(new { card, binding }));
+    }
+
+    [Theory]
+    [InlineData(Simulation공동체방문자체류Codes.임시체류)]
+    [InlineData(Simulation공동체방문자체류Codes.거절)]
+    public void 완료상태의_대기Greet는_새검사에서만_거부되고_기존Project는_호환된다(string status)
+    {
+        var card = Card("visitor:completed", status);
+        var binding = StateBinding(status);
+        binding.ActionCueCode = "Visitor.Waiting.Greet";
+        var projector = new 방문자체류PresentationPreparationProjector();
+        Assert.Equal("Visitor.Waiting.Greet", Assert.Single(projector.Project(
+            "world:fixture", new[] { card }, new[] { binding }).Visitors).ActionCueCode);
+        var error = Assert.Throws<InvalidOperationException>(() => projector.ProjectWithStateBindingValidation(
+            "world:fixture", new[] { card }, new[] { binding }));
+        Assert.Equal("CommunityVisitorBindingActionCueMismatch", error.Message);
+    }
+
+    [Fact]
+    public void Binding미제공은_기존_명시적primitive_fallback을_유지한다()
+    {
+        var card = Card("visitor:missing", Simulation공동체방문자체류Codes.거절);
+        var projector = new 방문자체류PresentationPreparationProjector();
+        var previous = projector.Project("world:fixture", new[] { card }, Array.Empty<방문자체류VisualBinding>());
+        var result = projector.ProjectWithStateBindingValidation("world:fixture", new[] { card },
+            Array.Empty<방문자체류VisualBinding>());
+        Assert.Equal(previous.PlanHashSha256, result.PlanHashSha256);
+        var visitor = Assert.Single(result.Visitors);
+        Assert.Equal(방문자체류PresentationCodes.FallbackVisualKey, visitor.VisualKey);
+        Assert.Empty(visitor.PrimaryAssetCandidateRef);
+        Assert.Equal("Visitor.State.Static", visitor.ActionCueCode);
+    }
+
+    [Theory]
+    [InlineData("duplicate-binding", "CommunityVisitorVisualBindingInvalid")]
+    [InlineData("mixed-revision", "CommunityVisitorPresentationRevisionMixed")]
+    public void 새검사진입점도_기존중복과_혼합revision을_거부한다(string fault, string expected)
+    {
+        var first = Card("visitor:a", Simulation공동체방문자체류Codes.결정대기);
+        var second = Card("visitor:b", Simulation공동체방문자체류Codes.결정대기);
+        var binding = StateBinding(first.StatusCode);
+        if (fault == "mixed-revision") second.SourceWorldRevision++;
+        var bindings = fault == "duplicate-binding" ? new[] { binding, binding } : new[] { binding };
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            new 방문자체류PresentationPreparationProjector().ProjectWithStateBindingValidation(
+                "world:fixture", new[] { first, second }, bindings));
+        Assert.Equal(expected, error.Message);
+    }
+
+    [Fact]
+    public void 올바른입력은_기존결과와같고_입력순서와_입력을_보존한다()
+    {
+        var cards = new[] { Card("visitor:z", Simulation공동체방문자체류Codes.거절),
+            Card("visitor:a", Simulation공동체방문자체류Codes.결정대기) };
+        var bindings = new[] { StateBinding(cards[0].StatusCode), StateBinding(cards[1].StatusCode) };
+        var before = System.Text.Json.JsonSerializer.Serialize(new { cards, bindings });
+        var projector = new 방문자체류PresentationPreparationProjector();
+        var original = projector.Project("world:fixture", cards, bindings);
+        var first = projector.ProjectWithStateBindingValidation("world:fixture", cards, bindings);
+        var second = projector.ProjectWithStateBindingValidation("world:fixture", cards.Reverse(), bindings.Reverse());
+        Assert.Equal(System.Text.Json.JsonSerializer.Serialize(original), System.Text.Json.JsonSerializer.Serialize(first));
+        Assert.Equal(first.PlanHashSha256, second.PlanHashSha256);
+        Assert.Equal(new[] { "visitor:a", "visitor:z" }, first.Visitors.Select(x => x.VisitorStableId));
+        Assert.Equal(before, System.Text.Json.JsonSerializer.Serialize(new { cards, bindings }));
+    }
+
+    private static 방문자체류VisualBinding StateBinding(string status)
+    {
+        var key = status == Simulation공동체방문자체류Codes.결정대기 ? 방문자체류PresentationCodes.WaitingVisualKey
+            : status == Simulation공동체방문자체류Codes.임시체류 ? 방문자체류PresentationCodes.AcceptedVisualKey
+            : 방문자체류PresentationCodes.RejectedVisualKey;
+        var binding = Binding(status, key);
+        binding.ActionCueCode = status == Simulation공동체방문자체류Codes.결정대기
+            ? "Visitor.Waiting.Greet" : "Visitor.State.IdleOrDepart";
+        return binding;
+    }
+
     [Fact]
     public void 결정대기_방문자는_입구대기_기준점과_Preview에_결속된다()
     {
