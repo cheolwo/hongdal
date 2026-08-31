@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "game-data-research.d403.manifest.r1",
+  "packageRevision": "game-data-research.seasonal-food.d403.r1",
+  "files": [
+    {
+      "path": "docs/Research/GameData/D403/README.md",
+      "sha256": "481EA8A212E77D81E5E5A98C2562E2719266A1C49C4771D55B2406A0ED84CA1D",
+      "bytes": 12849
+    },
+    {
+      "path": "docs/Research/GameData/D403/evidence.r1.json",
+      "sha256": "C0B5E0EF10BC4CE533F8CBD60585A7EB5DF0EECF73F025B463D20A40336D8087",
+      "bytes": 55773
+    }
+  ],
+  "selfExcluded": true,
+  "lineEndings": "UTF-8 without BOM; LF; hashes describe submitted bytes"
+}

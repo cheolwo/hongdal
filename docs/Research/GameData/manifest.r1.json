@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "game-data-research.manifest.r1",
+  "packageRevision": "game-data-research.first-farm.r1",
+  "generatedAt": "2026-08-30T20:03:07.3615912+09:00",
+  "scope": "Research documents only; self excluded. Local originals are not delivery or commit targets.",
+  "files": [
+    {
+      "path": "docs/Research/GameData/baseline.r1.json",
+      "sha256": "6E0A2ABBC6B45F3C91B72E939E8649F91093324B79ADCDA0BB44196DA2FB8FCD",
+      "bytes": 13572
+    },
+    {
+      "path": "docs/Research/GameData/first-farm.r1.md",
+      "sha256": "14F3115B65EF0C1AD3810F11663A2B1722754903B49B929D0FAF75B9F84511CC",
+      "bytes": 8693
+    },
+    {
+      "path": "docs/Research/GameData/README.md",
+      "sha256": "438E1459AEA670EA42C9643A61C70BA480CE924B4C2C7157A557AA268A81B0C0",
+      "bytes": 1854
+    },
+    {
+      "path": "docs/Research/GameData/reuse-inventory.r1.md",
+      "sha256": "DCFF281EDDB411E78E5C40418F3E14D33C2AAFF24D7D56406E342347EFDF999E",
+      "bytes": 4777
+    },
+    {
+      "path": "docs/Research/GameData/sources.r1.json",
+      "sha256": "C8AEF2B84A06BDE5CF38804DE2719578A8CC7F70FFED7AB55D6AD916FF5D9789",
+      "bytes": 11150
+    },
+    {
+      "path": "docs/Research/GameData/trade-opportunity-next.r1.md",
+      "sha256": "A088B170BBC8497E69EDAA335333772246EEC2FB24DD5B1A22B745B79CEC88C7",
+      "bytes": 7053
+    }
+  ]
+}

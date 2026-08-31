@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "game-data-research.d413.manifest.r1",
+  "packageRevision": "game-data-research.spring-equinox.d413.r1",
+  "files": [
+    {
+      "path": "docs/Research/GameData/D413/README.md",
+      "sha256": "DC7A7E9D9413E1B64F08B4C595309658C1E8BE2E57B2A4DFB3B5FB20E10F6CF1",
+      "bytes": 11131
+    },
+    {
+      "path": "docs/Research/GameData/D413/evidence.r1.json",
+      "sha256": "23DF8BDA264C4D5DE5900C447375666424FD278C4901A44A68D560CA7462A3F5",
+      "bytes": 42985
+    }
+  ],
+  "selfExcluded": true,
+  "lineEndings": "UTF-8 without BOM; LF; hashes describe submitted bytes"
+}

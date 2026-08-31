@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "game-data-research.d371.manifest.r1",
+  "packageRevision": "game-data-research.market-insight.d371.r1",
+  "files": [
+    {
+      "path": "docs/Research/GameData/D371/evidence.r1.json",
+      "sha256": "BC2EC74D668EE4498F158FE0CDEDCC85351D1D82E43D122DAF39EA83D82B60A9",
+      "bytes": 11954
+    },
+    {
+      "path": "docs/Research/GameData/D371/README.md",
+      "sha256": "BB0BBAB396C76180AE6DEAE8C8F2BC00D5D8C73F92D346A486C1E89ACF40881B",
+      "bytes": 13467
+    }
+  ],
+  "selfExcluded": true,
+  "lineEndings": "UTF-8 without BOM; LF; hashes describe submitted bytes"
+}

@@ -1,0 +1,1415 @@
+{
+  "schemaVersion": "game-data-research.d403.evidence.r1",
+  "packageRevision": "game-data-research.seasonal-food.d403.r1",
+  "formatReuse": "D371 evidence/manifest shape and D366 sources provenance; research file only, not a runtime catalog",
+  "capturedAt": "2026-08-31T12:01:10.0926449+09:00",
+  "reviewedDate": "2026-08-31",
+  "timezone": "Asia/Seoul",
+  "researchOnly": true,
+  "notRuntimeCatalog": true,
+  "assignedWorktree": "C:/Users/user/.codex/worktrees/ea96/Hongdal",
+  "assignedHead": "b0c1c8469664ae6cce9e272f93650d6eba796804",
+  "sharedRoot": "C:/Users/user/source/repos/Hongdal",
+  "sharedHead": "712c4a08349bcda0b7c4b0489bfb8ad2a1e7087a",
+  "commitsBehindSharedHead": 617,
+  "initialState": "Detached HEAD; only untracked docs/Research; D403 directory absent before work; current instructions/code read from shared root",
+  "approvals": {
+    "initialFourHashChecks": "4/4 matched at intake",
+    "plan": "810C7C819B1CE508F6C7496900E5A2CE5A10EC61258FAA49253C11C1EC925CEB",
+    "inquiryContentR4": "5C49D0C86A8028760D3720534562153AAB8B12A773EE136AB23E6C42C4628EFA",
+    "commonStructure": "DD8457CDE70676CB4BE095DFF8A721D930D887BC8FC2EE98B9CD16A7B86A304B",
+    "decisionsAtD403Intake": "BF7A2BC60763F11DFC9F9919AEDFF9D64D3304CEF327F2A3FD0A2D6A4309635C",
+    "decisionsAfterD404": "348FC5156040AC78976BEF2A59D953A848AA4EC92AB7E82917F51D3CC7D8ED9F",
+    "workflowR2": "ACC94021FC67707E0315AB14009AE90D28614DA5A7333143A376940946399F1E",
+    "d404Scope": "Read full workflow r2 and D404 decision; no write-scope expansion",
+    "d405D406Followup": {
+      "notice": "Development notified later planning revisions; preserve already-read r4 baseline and finish unchanged D403 scope",
+      "observedAt": "2026-08-31T12:00:16.4869290+09:00",
+      "inquiryR5Sha256": "F711C7E70BD8FF4DDB24CD02B043A87A23A170C0F2C231F7FB6D0984D863B5BC",
+      "commonStructureSha256": "F30A4281CA7DA82E51DDE1AA34783DD91B7AFE6C7239848B1849BE904A036DD8",
+      "decisionsSha256": "64D6EDA57EA4EF957C805089A8C163BA9AA8F31798CBBC0D42476B0823542016",
+      "reviewScope": "Hash only for followup documents; not new approval or research baseline replacement. D403 plan and D404 workflow unchanged."
+    }
+  },
+  "sourceCount": 9,
+  "officialPageUrlsAttempted": 8,
+  "officialPagesDirectlyRead": 5,
+  "failedPageUrls": 3,
+  "newRawSamplesAcquired": 0,
+  "reusedRawSamples": 1,
+  "annualExactTimesAcquired": 0,
+  "dataOrPaidApiCalls": 0,
+  "registeredProductsOrWorkItems": 0,
+  "sources": [
+    {
+      "id": "D403-S01",
+      "institution": "한국천문연구원",
+      "officialUrl": "https://astro.kasi.re.kr/life/post/calendardata",
+      "title": "달력자료(월력요항) — 달력자료",
+      "publicationDate": null,
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "FetchFailed",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "Requested page; search-index snippet only",
+      "finding": "Open failed: 400 timeout. Search index describes data before official KASA publication and mixed year tables. No exact-year table admitted.",
+      "sourceVersion": null,
+      "rightsObserved": "Unverified; no raw saved",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": null,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S02",
+      "institution": "한국천문연구원",
+      "officialUrl": "https://astro.kasi.re.kr/life/post/almanac",
+      "title": "달력자료(월력요항) — 월력요항",
+      "publicationDate": null,
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "FetchFailed",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "Requested official-publication index; search-index snippet only",
+      "finding": "Open returned Internal Error. Search snippet identifies official gazette route, not a retrieved calendar.",
+      "sourceVersion": null,
+      "rightsObserved": "Unverified; no raw saved",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": null,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S03",
+      "institution": "우주항공청",
+      "officialUrl": "https://www.kasa.go.kr/prog/bbsArticle/BBSMSTR_000000000010/view.do?bbsId=BBSMSTR_000000000010&nttId=B000000001860Pe2zT3",
+      "title": "「2026년 월력요항」 발표",
+      "publicationDate": "2025-06-30",
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "DirectPublicReading",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "본문 발표문; 마지막 관보/KASA/KASI 안내; 붙임 2026년 월력요항; 공공저작물 자유이용 허락 표시",
+      "finding": "2026 official publication announced, with gazette/KASA/KASI access route and HWP/HWPX attachment labels. Exact 24 times and attachment bytes not acquired.",
+      "sourceVersion": null,
+      "rightsObserved": "Page explicitly displays KOGL type 2: attribution + noncommercial. Purpose-specific product use not approved.",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": false,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S04",
+      "institution": "한국천문연구원",
+      "officialUrl": "https://astro.kasi.re.kr/life/pageView/1",
+      "title": "월력요항 — 기존 안내 페이지",
+      "publicationDate": null,
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "FetchFailed",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "Requested legacy explanatory page; search-index table header only",
+      "finding": "Open failed: 400 timeout. Search header says 한국표준시 (날짜, 시각); current target-year timezone and precision remain unverified.",
+      "sourceVersion": null,
+      "rightsObserved": "Unverified; no raw saved",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": null,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S05",
+      "institution": "문화체육관광부; 페이지 출처표시 국립민속박물관",
+      "officialUrl": "https://www.mcst.go.kr/usr/child/cultureStory/season/custom.jsp?pTab=2",
+      "title": "세시풍속 — 24절기란 무엇인가요?",
+      "publicationDate": null,
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "DirectPublicReading",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "태양력 봄/여름/가을/겨울 24명칭 목록 및 각 명칭 설명",
+      "finding": "24 Korean names and 입춘-first cycle match D403. Cultural explanatory dates and fixed-15-day wording excluded from astronomical/calendar and actual farming evidence.",
+      "sourceVersion": null,
+      "rightsObserved": "No specific redistribution license established from reviewed body; names/order only summarized, no images or raw saved.",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": false,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S06",
+      "institution": "농촌진흥청 농사로",
+      "officialUrl": "https://www.nongsaro.go.kr/portal/ps/psr/psrb/monthFdLst.ps",
+      "title": "음식 — 이달의 식재료 / 8월의 식재료",
+      "publicationDate": null,
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "DirectPublicReading",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "8월의 식재료 목록: 고추/풋콩; footer 공공누리 표시",
+      "finding": "Selected 고추 and 풋콩 from the displayed August list. 고추 appears twice; no distinct product inferred. List provides no year/cultivar/region/planting/harvest or stable detail ID in reviewed extraction.",
+      "sourceVersion": null,
+      "rightsObserved": "Page explicitly displays KOGL type 2: attribution + noncommercial; no product redistribution authorization inferred.",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": false,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S07",
+      "institution": "농촌진흥청 농사로",
+      "officialUrl": "https://www.nongsaro.go.kr/portal/ps/psb/psbl/workScheduleDtl.ps?cntntsNo=30699&menuId=PS00087&sKidofcomdtySeCode=FC",
+      "title": "감자 — 농작업일정",
+      "publicationDate": null,
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "DirectPublicReading",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "주요 재배 형태 > 재배 형태/재배 지역/파종 시기/수확 시기 표; 수확과 저장 > 수확적기",
+      "finding": "Reconfirmed four cultivation-context sowing/harvest ranges as month-and-part-of-month labels, not exact dates. Existing GD-FARM-001 reused.",
+      "sourceVersion": null,
+      "rightsObserved": "Page explicitly displays KOGL type 2: attribution + noncommercial; raw table not copied, product use pending rights review.",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": false,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S08",
+      "institution": "해양수산부",
+      "officialUrl": "https://www.mof.go.kr/doc/ko/selectDoc.do?bbsSeq=10&docSeq=62991&menuSeq=971",
+      "title": "9월의 수산물, 어촌여행지, 해양생물, 등대, 무인도서 선정",
+      "publicationDate": "2025-08-29",
+      "publicationTime": null,
+      "accessedDate": "2026-08-31",
+      "accessedAt": null,
+      "accessTimePrecision": "date; per-page wall-clock time not separately captured",
+      "readingStatus": "DirectPublicReading",
+      "method": "web public-page open/find; no provider/API client execution",
+      "sourceLocation": "① 이달의 수산물 - 새우류, 한치; 선정 문장 및 다음 새우류 문단의 첫 문장",
+      "finding": "September 2025 selection is 새우류 and 한치. Same paragraph names 대하 and 흰다리새우 as autumn-season shrimp. No catch/landing/shipping dates or aquaculture/wild classification admitted.",
+      "sourceVersion": null,
+      "rightsObserved": "Specific reuse marking not found in text extraction; license remains unverified. No photos, attachments, or raw body saved.",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "webReadingKeyRequired": false,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D403-S09",
+      "institution": "농촌진흥청 / 국립식량과학원",
+      "officialUrl": "https://www.rda.go.kr/board/board.do?boardId=farmprmninfo&currPage=1&dataNo=100000807551&mode=updateCnt&prgId=day_farmprmninfoEntry&searchEDate=&searchKey=&searchOrgDeptKey=&searchOrgDeptVal=&searchSDate=&searchVal=",
+      "title": "봄재배 씨감자, 이렇게 관리하세요",
+      "publicationDate": "2026-02-09",
+      "publicationTime": null,
+      "accessedDate": "2026-08-30",
+      "accessedAt": "2026-08-30T19:58:37.6698006+09:00",
+      "accessTimePrecision": "original acquisition timestamp; local hash/content rechecked 2026-08-31",
+      "readingStatus": "ExistingSampleReused",
+      "method": "Local preserved HTML fragment and original acquisition metadata read only",
+      "sourceLocation": "기존 GD-FARM-003: 봄감자 생육기간 HTML p 요소 하나",
+      "finding": "Existing duration sample only: sowing-to-harvest 90–100 days, emergence-to-harvest 70–80 days; no calendar endpoints. Not fetched again.",
+      "sourceVersion": null,
+      "rightsObserved": "KOGL type 1 reported at original acquisition 2026-08-30; this turn checks original sample bytes, not a new independent license verification.",
+      "legalReview": false,
+      "commercialReuseApproved": false,
+      "photoOrLongTextRedistributionApproved": false,
+      "sourceFile": "artifacts/local/game-data-research/rda-100000807551-growth-duration.fragment.html",
+      "sourceFileSha256": "412AB3EE83AD834B48FE45508C8778363EA1BA4DA5DCEEC1E9A26CD1C4B4AC51",
+      "storedRawBytes": 1892,
+      "webReadingKeyRequired": false,
+      "authenticationRequirementConfirmed": false,
+      "apiRightsAndFees": "Not verified; public reading does not authorize API access",
+      "timezone": null,
+      "region": null,
+      "currency": null,
+      "refreshCadence": null,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    }
+  ],
+  "solarTerms": {
+    "count": 24,
+    "displayStart": "입춘",
+    "orderEvidence": "D403-S05",
+    "namesAndOrderStatus": "MatchedOfficialCulturalPage",
+    "astronomicalAuthorityCrossCheck": "Not completed: KASI table unavailable",
+    "gameYearStart": null,
+    "gameTermDuration": null,
+    "terms": [
+      {
+        "id": "D403-T01",
+        "displayOrder": 1,
+        "koreanName": "입춘",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T02",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T02",
+        "displayOrder": 2,
+        "koreanName": "우수",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T03",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T03",
+        "displayOrder": 3,
+        "koreanName": "경칩",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T04",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T04",
+        "displayOrder": 4,
+        "koreanName": "춘분",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T05",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T05",
+        "displayOrder": 5,
+        "koreanName": "청명",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T06",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T06",
+        "displayOrder": 6,
+        "koreanName": "곡우",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T07",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T07",
+        "displayOrder": 7,
+        "koreanName": "입하",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T08",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T08",
+        "displayOrder": 8,
+        "koreanName": "소만",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T09",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T09",
+        "displayOrder": 9,
+        "koreanName": "망종",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T10",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T10",
+        "displayOrder": 10,
+        "koreanName": "하지",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T11",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T11",
+        "displayOrder": 11,
+        "koreanName": "소서",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T12",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T12",
+        "displayOrder": 12,
+        "koreanName": "대서",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T13",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T13",
+        "displayOrder": 13,
+        "koreanName": "입추",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T14",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T14",
+        "displayOrder": 14,
+        "koreanName": "처서",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T15",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T15",
+        "displayOrder": 15,
+        "koreanName": "백로",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T16",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T16",
+        "displayOrder": 16,
+        "koreanName": "추분",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T17",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T17",
+        "displayOrder": 17,
+        "koreanName": "한로",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T18",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T18",
+        "displayOrder": 18,
+        "koreanName": "상강",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T19",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T19",
+        "displayOrder": 19,
+        "koreanName": "입동",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T20",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T20",
+        "displayOrder": 20,
+        "koreanName": "소설",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T21",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T21",
+        "displayOrder": 21,
+        "koreanName": "대설",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T22",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T22",
+        "displayOrder": 22,
+        "koreanName": "동지",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T23",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T23",
+        "displayOrder": 23,
+        "koreanName": "소한",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T24",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      },
+      {
+        "id": "D403-T24",
+        "displayOrder": 24,
+        "koreanName": "대한",
+        "sourceId": "D403-S05",
+        "nextId": "D403-T01",
+        "exactAnnualTime": null,
+        "registeredGameId": null
+      }
+    ]
+  },
+  "annualCalendar": {
+    "researchTargetYear": 2026,
+    "targetYearReason": "Current-year acquisition-path check only; not a selected game epoch",
+    "officialPublicationStatus": "KASA announcement confirmed, 2025-06-30",
+    "publicationSourceId": "D403-S03",
+    "officialAcquisitionRoute": [
+      "D403-S02",
+      "D403-S03"
+    ],
+    "preliminaryRoute": "D403-S01",
+    "preliminaryCaveat": "Search-index warning only; mixed-year snippets must not be assigned to 2026",
+    "historicalTimezoneClue": {
+      "sourceId": "D403-S04",
+      "value": "한국표준시",
+      "evidenceLevel": "SearchIndexOnly",
+      "acceptedForTargetYear": false
+    },
+    "confirmedTimezone": null,
+    "precision": null,
+    "exactTimes": null,
+    "sourceFile": null,
+    "sourceFileSha256": null,
+    "outcome": "NotAcquired",
+    "retryPolicy": "No repeated requests to failed URLs; no access-control workaround",
+    "monthToSolarTermConversion": "Not performed",
+    "derivedMappingCount": 0
+  },
+  "items": [
+    {
+      "id": "D403-I01",
+      "name": "감자",
+      "category": "Agricultural",
+      "sourceIds": [
+        "D403-S07",
+        "D403-S09"
+      ],
+      "canonicalProductStableId": "product:potato",
+      "officialSpeciesOrVarietyId": null,
+      "detailContentId": "30699",
+      "identityStatus": "ExistingCanonicalProduct; NongsaroOfficialCommodityCodeStillUnlinked",
+      "year": null,
+      "region": null,
+      "cultivar": null,
+      "cultivationMethod": null,
+      "aquacultureOrWild": null,
+      "originalPeriods": [
+        {
+          "meaning": "Sowing",
+          "originalLabel": "2월 상순~3월 하순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "전국 평난지대",
+          "cultivationMethod": "봄재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "Harvest",
+          "originalLabel": "5월 하순~6월 하순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "전국 평난지대",
+          "cultivationMethod": "봄재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "Sowing",
+          "originalLabel": "4월 중순~5월 중순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "고랭지대",
+          "cultivationMethod": "여름재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "Harvest",
+          "originalLabel": "8월 중순~9월 하순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "고랭지대",
+          "cultivationMethod": "여름재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "Sowing",
+          "originalLabel": "8월 중순~8월 하순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "제주도, 남부 해안지대",
+          "cultivationMethod": "가을재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "Harvest",
+          "originalLabel": "11월 상순~11월 하순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "제주도, 남부 해안지대",
+          "cultivationMethod": "가을재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "Sowing",
+          "originalLabel": "11월 하순~1월 중순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "남부, 제주도",
+          "cultivationMethod": "겨울재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "Harvest",
+          "originalLabel": "4월 중순~5월 중순",
+          "sourceId": "D403-S07",
+          "year": null,
+          "region": "남부, 제주도",
+          "cultivationMethod": "겨울재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month-and-part-of-month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month-and-part-of-month",
+          "currency": null
+        },
+        {
+          "meaning": "GrowthDuration",
+          "originalLabel": "파종~수확 90~100일; 출현~수확 70~80일",
+          "sourceId": "D403-S09",
+          "year": null,
+          "region": null,
+          "cultivationMethod": "봄재배",
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "days; distinct starting events",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "days; distinct starting events",
+          "currency": null
+        }
+      ],
+      "directSolarTermIds": null,
+      "reviewedSolarTermMapping": {
+        "status": "Unconfirmed",
+        "termIds": null,
+        "method": "d403-no-conversion.r1",
+        "reason": "Exact target-year calendar not acquired; source context insufficient",
+        "dateEndpoints": null,
+        "uncertainty": "Month/season/part-of-month labels do not establish precise solar-term boundaries"
+      },
+      "gameInterpretation": {
+        "status": "UnapprovedProposal",
+        "rule": null,
+        "proposal": "Read source period meaning and missing context before planning; do not infer permission, success, prices, or demand"
+      },
+      "relatedQuestions": [
+        "korean-24-solar-terms-planning",
+        "solar-term-seasonal-food-research",
+        "Q088",
+        "Q089",
+        "Q397",
+        "seasonal-sowing-outside-window"
+      ],
+      "relatedWorkItems": [
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04"
+      ],
+      "bindingStatus": "ResearchCandidateOnly",
+      "existingProfileStableId": "crop-requirement-profile:nongsaro.potato.1",
+      "workGroupCode": "210005",
+      "identityLimit": "210005 is 밭농사 work group, 30699 is content ID; neither is the official potato product code. KAMIS100/152 Confirmed; HS0701 and AMS Potatoes Candidate; not queried.",
+      "periodLimit": "Publication year is not cultivation year. Winter range crosses a year boundary but no absolute year, day endpoints, or sowing-harvest year binding is assigned. Generic table does not specify facility/cultivar. Yellowing leaves/stems is a source harvest-stage condition, not a game transition."
+    },
+    {
+      "id": "D403-I02",
+      "name": "고추",
+      "category": "Agricultural",
+      "sourceIds": [
+        "D403-S06"
+      ],
+      "canonicalProductStableId": null,
+      "officialSpeciesOrVarietyId": null,
+      "detailContentId": null,
+      "identityStatus": "UnlinkedResearchLabelOnly",
+      "year": null,
+      "region": null,
+      "cultivar": null,
+      "cultivationMethod": null,
+      "aquacultureOrWild": null,
+      "originalPeriods": [
+        {
+          "meaning": "MonthlyRecommendation",
+          "originalLabel": "8월의 식재료",
+          "sourceId": "D403-S06",
+          "year": null,
+          "region": null,
+          "cultivationMethod": null,
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month",
+          "currency": null
+        }
+      ],
+      "directSolarTermIds": null,
+      "reviewedSolarTermMapping": {
+        "status": "Unconfirmed",
+        "termIds": null,
+        "method": "d403-no-conversion.r1",
+        "reason": "Exact target-year calendar not acquired; source context insufficient",
+        "dateEndpoints": null,
+        "uncertainty": "Month/season/part-of-month labels do not establish precise solar-term boundaries"
+      },
+      "gameInterpretation": {
+        "status": "UnapprovedProposal",
+        "rule": null,
+        "proposal": "Read source period meaning and missing context before planning; do not infer permission, success, prices, or demand"
+      },
+      "relatedQuestions": [
+        "korean-24-solar-terms-planning",
+        "solar-term-seasonal-food-research"
+      ],
+      "relatedWorkItems": [],
+      "bindingStatus": "ResearchCandidateOnly",
+      "identityLimit": "List label only; no canonical ID assigned or registered. Individual detail/content/year ID not acquired. Repeated 고추 list labels are not separate products.",
+      "unacquiredPeriodMeanings": [
+        "Seasonality",
+        "Sowing",
+        "Harvest",
+        "Shipment"
+      ]
+    },
+    {
+      "id": "D403-I03",
+      "name": "풋콩",
+      "category": "Agricultural",
+      "sourceIds": [
+        "D403-S06"
+      ],
+      "canonicalProductStableId": null,
+      "officialSpeciesOrVarietyId": null,
+      "detailContentId": null,
+      "identityStatus": "UnlinkedResearchLabelOnly",
+      "year": null,
+      "region": null,
+      "cultivar": null,
+      "cultivationMethod": null,
+      "aquacultureOrWild": null,
+      "originalPeriods": [
+        {
+          "meaning": "MonthlyRecommendation",
+          "originalLabel": "8월의 식재료",
+          "sourceId": "D403-S06",
+          "year": null,
+          "region": null,
+          "cultivationMethod": null,
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month",
+          "currency": null
+        }
+      ],
+      "directSolarTermIds": null,
+      "reviewedSolarTermMapping": {
+        "status": "Unconfirmed",
+        "termIds": null,
+        "method": "d403-no-conversion.r1",
+        "reason": "Exact target-year calendar not acquired; source context insufficient",
+        "dateEndpoints": null,
+        "uncertainty": "Month/season/part-of-month labels do not establish precise solar-term boundaries"
+      },
+      "gameInterpretation": {
+        "status": "UnapprovedProposal",
+        "rule": null,
+        "proposal": "Read source period meaning and missing context before planning; do not infer permission, success, prices, or demand"
+      },
+      "relatedQuestions": [
+        "korean-24-solar-terms-planning",
+        "solar-term-seasonal-food-research"
+      ],
+      "relatedWorkItems": [],
+      "bindingStatus": "ResearchCandidateOnly",
+      "identityLimit": "List label only; no canonical ID assigned or registered. Individual detail/content/year ID not acquired. Repeated 고추 list labels are not separate products.",
+      "unacquiredPeriodMeanings": [
+        "Seasonality",
+        "Sowing",
+        "Harvest",
+        "Shipment"
+      ]
+    },
+    {
+      "id": "D403-I04",
+      "name": "대하",
+      "category": "Seafood",
+      "sourceIds": [
+        "D403-S08"
+      ],
+      "canonicalProductStableId": null,
+      "officialSpeciesOrVarietyId": null,
+      "detailContentId": null,
+      "identityStatus": "UnlinkedResearchLabelOnly",
+      "year": null,
+      "region": null,
+      "cultivar": null,
+      "cultivationMethod": null,
+      "aquacultureOrWild": null,
+      "originalPeriods": [
+        {
+          "meaning": "MonthlyRecommendation",
+          "originalLabel": "2025년 9월 이달의 수산물: 새우류",
+          "sourceId": "D403-S08",
+          "year": 2025,
+          "region": null,
+          "cultivationMethod": null,
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month",
+          "currency": null,
+          "sourceSelectionSubject": "새우류",
+          "subjectRelation": "Named example within selected shrimp group; not a separate species-specific monthly selection"
+        },
+        {
+          "meaning": "Seasonality",
+          "originalLabel": "가을이 제철",
+          "sourceId": "D403-S08",
+          "year": null,
+          "region": null,
+          "cultivationMethod": null,
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "season; no date endpoints",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "season; no date endpoints",
+          "currency": null
+        }
+      ],
+      "directSolarTermIds": null,
+      "reviewedSolarTermMapping": {
+        "status": "Unconfirmed",
+        "termIds": null,
+        "method": "d403-no-conversion.r1",
+        "reason": "Exact target-year calendar not acquired; source context insufficient",
+        "dateEndpoints": null,
+        "uncertainty": "Month/season/part-of-month labels do not establish precise solar-term boundaries"
+      },
+      "gameInterpretation": {
+        "status": "UnapprovedProposal",
+        "rule": null,
+        "proposal": "Read source period meaning and missing context before planning; do not infer permission, success, prices, or demand"
+      },
+      "relatedQuestions": [
+        "korean-24-solar-terms-planning",
+        "solar-term-seasonal-food-research"
+      ],
+      "relatedWorkItems": [],
+      "bindingStatus": "ResearchCandidateOnly",
+      "identityLimit": "Separate common-name record; never merge 대하 with 흰다리새우. Scientific species ID and official product mapping not verified.",
+      "unacquiredPeriodMeanings": [
+        "Catch",
+        "Harvest",
+        "Shipment"
+      ]
+    },
+    {
+      "id": "D403-I05",
+      "name": "흰다리새우",
+      "category": "Seafood",
+      "sourceIds": [
+        "D403-S08"
+      ],
+      "canonicalProductStableId": null,
+      "officialSpeciesOrVarietyId": null,
+      "detailContentId": null,
+      "identityStatus": "UnlinkedResearchLabelOnly",
+      "year": null,
+      "region": null,
+      "cultivar": null,
+      "cultivationMethod": null,
+      "aquacultureOrWild": null,
+      "originalPeriods": [
+        {
+          "meaning": "MonthlyRecommendation",
+          "originalLabel": "2025년 9월 이달의 수산물: 새우류",
+          "sourceId": "D403-S08",
+          "year": 2025,
+          "region": null,
+          "cultivationMethod": null,
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month",
+          "currency": null,
+          "sourceSelectionSubject": "새우류",
+          "subjectRelation": "Named example within selected shrimp group; not a separate species-specific monthly selection"
+        },
+        {
+          "meaning": "Seasonality",
+          "originalLabel": "가을이 제철",
+          "sourceId": "D403-S08",
+          "year": null,
+          "region": null,
+          "cultivationMethod": null,
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "season; no date endpoints",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "season; no date endpoints",
+          "currency": null
+        }
+      ],
+      "directSolarTermIds": null,
+      "reviewedSolarTermMapping": {
+        "status": "Unconfirmed",
+        "termIds": null,
+        "method": "d403-no-conversion.r1",
+        "reason": "Exact target-year calendar not acquired; source context insufficient",
+        "dateEndpoints": null,
+        "uncertainty": "Month/season/part-of-month labels do not establish precise solar-term boundaries"
+      },
+      "gameInterpretation": {
+        "status": "UnapprovedProposal",
+        "rule": null,
+        "proposal": "Read source period meaning and missing context before planning; do not infer permission, success, prices, or demand"
+      },
+      "relatedQuestions": [
+        "korean-24-solar-terms-planning",
+        "solar-term-seasonal-food-research"
+      ],
+      "relatedWorkItems": [],
+      "bindingStatus": "ResearchCandidateOnly",
+      "identityLimit": "Separate common-name record; never merge 대하 with 흰다리새우. Scientific species ID and official product mapping not verified.",
+      "unacquiredPeriodMeanings": [
+        "Catch",
+        "Harvest",
+        "Shipment"
+      ]
+    },
+    {
+      "id": "D403-I06",
+      "name": "한치",
+      "category": "Seafood",
+      "sourceIds": [
+        "D403-S08"
+      ],
+      "canonicalProductStableId": null,
+      "officialSpeciesOrVarietyId": null,
+      "detailContentId": null,
+      "identityStatus": "UnlinkedResearchLabelOnly",
+      "year": null,
+      "region": null,
+      "cultivar": null,
+      "cultivationMethod": null,
+      "aquacultureOrWild": null,
+      "originalPeriods": [
+        {
+          "meaning": "MonthlyRecommendation",
+          "originalLabel": "2025년 9월 이달의 수산물: 한치",
+          "sourceId": "D403-S08",
+          "year": 2025,
+          "region": null,
+          "cultivationMethod": null,
+          "cultivar": null,
+          "aquacultureOrWild": null,
+          "precision": "month",
+          "startDate": null,
+          "endDate": null,
+          "timezone": null,
+          "unit": "month",
+          "currency": null
+        }
+      ],
+      "directSolarTermIds": null,
+      "reviewedSolarTermMapping": {
+        "status": "Unconfirmed",
+        "termIds": null,
+        "method": "d403-no-conversion.r1",
+        "reason": "Exact target-year calendar not acquired; source context insufficient",
+        "dateEndpoints": null,
+        "uncertainty": "Month/season/part-of-month labels do not establish precise solar-term boundaries"
+      },
+      "gameInterpretation": {
+        "status": "UnapprovedProposal",
+        "rule": null,
+        "proposal": "Read source period meaning and missing context before planning; do not infer permission, success, prices, or demand"
+      },
+      "relatedQuestions": [
+        "korean-24-solar-terms-planning",
+        "solar-term-seasonal-food-research"
+      ],
+      "relatedWorkItems": [],
+      "bindingStatus": "ResearchCandidateOnly",
+      "identityLimit": "Common name only, scientific species and canonical product ID not established. No species inferred from colloquial name.",
+      "unacquiredPeriodMeanings": [
+        "Seasonality",
+        "Catch",
+        "Harvest",
+        "Shipment"
+      ]
+    }
+  ],
+  "accessNeeds": {
+    "workflow": "game-data-research.workflow.r2",
+    "confirmedLoginOrApplicationBlocks": [],
+    "userActionRequiredNow": false,
+    "failures": "KASI timeout/Internal Error are not authentication evidence",
+    "optionalApi": "Existing Nongsaro module indicates ApiKey need, but API is not required or invoked in this public-HTML scope. Official application terms/cost/approval not checked; no user credential request.",
+    "publicAlternative": "Read-only Nongsaro/MOF/KASA/MCST pages and existing permitted potato fragment",
+    "independentProgress": "Food source periods and name/order comparison completed without calendar/API access"
+  },
+  "technicalReuse": [
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/공통식품품목IdentityCatalog.cs",
+      "use": "Reuse product:potato; keep source-code relation status; no new product registration"
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/농사로감자생육요구ProfileQuery.cs",
+      "use": "Existing group210005/profile and PendingHumanReview/false publication; read only"
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro감자ProfileArchiveService.cs",
+      "use": "Existing content30699 guard and approval/provenance; never execute DB-writing collection here"
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro공공데이터Module.cs",
+      "use": "Existing monthly-food/monthFd/monthFdYearLst inventory; key/operation not invoked; no new collector"
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/Foundation/ExternalDataSourceCatalog.cs",
+      "use": "Reuse provenance/rights policy; RedistributionAllowed=false remains"
+    },
+    {
+      "path": "Ssalddel.Simulation.Application/SimulationRealityContextService.cs",
+      "use": "Approved context snapshot/freeze only; research JSON not loaded; Sky remains weather owner"
+    }
+  ],
+  "referenceSnapshotLimit": "references is a later file-inventory hash snapshot, not the full-text-reading baseline. It already contains the subsequent r5/common/DECISIONS hashes. Full D403 readings are identified by approvals initialFourHashChecks/plan/inquiryContentR4/commonStructure/decisionsAtD403Intake; full D404 reading by workflowR2 and decisionsAfterD404. Later planning was hash-checked only. Do not report 22 snapshot matches as 22 unchanged initial readings.",
+  "references": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "FDCDAB452741C2A6EFCFB29B72AE7C860D098A4D9362A3EC809651C9EAF9200E",
+      "bytes": 29554
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "CDEB154ACCEB4F1279088D4406BCB4173E9DDFA7A9BBD7B06AB535EB1768CF09",
+      "bytes": 1206
+    },
+    {
+      "path": "docs/Architecture/게임자료조사전문운영.md",
+      "sha256": "ACC94021FC67707E0315AB14009AE90D28614DA5A7333143A376940946399F1E",
+      "bytes": 5512
+    },
+    {
+      "path": "docs/AI/24절기-제철자료-조사와기획연결-2026-08-31.md",
+      "sha256": "810C7C819B1CE508F6C7496900E5A2CE5A10EC61258FAA49253C11C1EC925CEB",
+      "bytes": 8836
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/시간절기/seasonal-time-context.inquiry.r1.md",
+      "sha256": "F711C7E70BD8FF4DDB24CD02B043A87A23A170C0F2C231F7FB6D0984D863B5BC",
+      "bytes": 17564
+    },
+    {
+      "path": "docs/Architecture/플레이어중심게임개발업무구조.md",
+      "sha256": "F30A4281CA7DA82E51DDE1AA34783DD91B7AFE6C7239848B1849BE904A036DD8",
+      "bytes": 36537
+    },
+    {
+      "path": "docs/AI/DECISIONS.md",
+      "sha256": "64D6EDA57EA4EF957C805089A8C163BA9AA8F31798CBBC0D42476B0823542016",
+      "bytes": 589897
+    },
+    {
+      "path": "docs/ProjectOverview/GptProjectContext.md",
+      "sha256": "477B491F0361C4D3AFBA44BEC22606208E02CD10128EA7C834A4F2C8F5E18EE7",
+      "bytes": 16455
+    },
+    {
+      "path": "docs/AI/CURRENT_WORK.md",
+      "sha256": "63C3F482154A3B6C1F45559B993DD5FAA363BBD51058D21286FE3ED0BC67E7DA",
+      "bytes": 235179
+    },
+    {
+      "path": "docs/Architecture/ExternalPublicDataServerIngestionFoundation.md",
+      "sha256": "6ABEE85DCD26861038C54F6A5B34E7F036F8A715850C699690079F9BF11BBAD5",
+      "bytes": 11323
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/공통식품품목IdentityCatalog.cs",
+      "sha256": "B508BBFE4A9106DE50FEA3C69849D17F2480D58F27CCD6192D05869D1D37B22C",
+      "bytes": 9454
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/농사로감자생육요구ProfileQuery.cs",
+      "sha256": "95B83148356BA1699C5F412B7956AAF0E8BECCE4772D01CA660034B7649846CB",
+      "bytes": 9079
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro감자ProfileArchiveService.cs",
+      "sha256": "B17E24423842734D00C7772E4C6260B160042D93580C17C2C60A3EEA573E6EC2",
+      "bytes": 4820
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro공공데이터Module.cs",
+      "sha256": "2E3E84A2E2D1DAD2414AA5A11AE747F92CABB593F2563630C5F9B9E03535FCA0",
+      "bytes": 20126
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/Foundation/ExternalDataSourceCatalog.cs",
+      "sha256": "9D300B15E682CD33B049F064D353906B6D19736AD1427BEF9C9C9EC15FADA529",
+      "bytes": 5248
+    },
+    {
+      "path": "Ssalddel.Simulation.Application/SimulationRealityContextService.cs",
+      "sha256": "4559D85C66B8916D3C026EE8806C21419AE20F9986AEA4269CA8841ED08ADBE2",
+      "bytes": 28697
+    },
+    {
+      "path": "docs/Research/GameData/README.md",
+      "sha256": "438E1459AEA670EA42C9643A61C70BA480CE924B4C2C7157A557AA268A81B0C0",
+      "bytes": 1854
+    },
+    {
+      "path": "docs/Research/GameData/reuse-inventory.r1.md",
+      "sha256": "DCFF281EDDB411E78E5C40418F3E14D33C2AAFF24D7D56406E342347EFDF999E",
+      "bytes": 4777
+    },
+    {
+      "path": "docs/Research/GameData/sources.r1.json",
+      "sha256": "C8AEF2B84A06BDE5CF38804DE2719578A8CC7F70FFED7AB55D6AD916FF5D9789",
+      "bytes": 11150
+    },
+    {
+      "path": "docs/Research/GameData/first-farm.r1.md",
+      "sha256": "14F3115B65EF0C1AD3810F11663A2B1722754903B49B929D0FAF75B9F84511CC",
+      "bytes": 8693
+    },
+    {
+      "path": "docs/Research/GameData/D371/evidence.r1.json",
+      "sha256": "BC2EC74D668EE4498F158FE0CDEDCC85351D1D82E43D122DAF39EA83D82B60A9",
+      "bytes": 11954
+    },
+    {
+      "path": "docs/Research/GameData/D371/manifest.r1.json",
+      "sha256": "467AB6642B9203047BA4112CA50994E7096BB31A18A7424F7E25503BC46145A3",
+      "bytes": 596
+    }
+  ],
+  "preservedLocalFiles": [
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\baseline.r1.json",
+      "length": 13572,
+      "sha256": "6E0A2ABBC6B45F3C91B72E939E8649F91093324B79ADCDA0BB44196DA2FB8FCD"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\first-farm.r1.md",
+      "length": 8693,
+      "sha256": "14F3115B65EF0C1AD3810F11663A2B1722754903B49B929D0FAF75B9F84511CC"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\manifest.r1.json",
+      "length": 1383,
+      "sha256": "C9FF7003AF75AE4FB75B55FD706D94E11FC9F5684D59C9CC19A61E4DCCE10DFE"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\README.md",
+      "length": 1854,
+      "sha256": "438E1459AEA670EA42C9643A61C70BA480CE924B4C2C7157A557AA268A81B0C0"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\reuse-inventory.r1.md",
+      "length": 4777,
+      "sha256": "DCFF281EDDB411E78E5C40418F3E14D33C2AAFF24D7D56406E342347EFDF999E"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\sources.r1.json",
+      "length": 11150,
+      "sha256": "C8AEF2B84A06BDE5CF38804DE2719578A8CC7F70FFED7AB55D6AD916FF5D9789"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\trade-opportunity-next.r1.md",
+      "length": 7053,
+      "sha256": "A088B170BBC8497E69EDAA335333772246EEC2FB24DD5B1A22B745B79CEC88C7"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\D371\\evidence.r1.json",
+      "length": 11954,
+      "sha256": "BC2EC74D668EE4498F158FE0CDEDCC85351D1D82E43D122DAF39EA83D82B60A9"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\D371\\manifest.r1.json",
+      "length": 596,
+      "sha256": "467AB6642B9203047BA4112CA50994E7096BB31A18A7424F7E25503BC46145A3"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\docs\\Research\\GameData\\D371\\README.md",
+      "length": 13467,
+      "sha256": "BB0BBAB396C76180AE6DEAE8C8F2BC00D5D8C73F92D346A486C1E89ACF40881B"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal\\artifacts\\local\\game-data-research\\rda-100000807551-growth-duration.fragment.html",
+      "length": 1892,
+      "sha256": "412AB3EE83AD834B48FE45508C8778363EA1BA4DA5DCEEC1E9A26CD1C4B4AC51"
+    }
+  ],
+  "priorSharedComparison": [
+    {
+      "path": "docs\\Research\\GameData\\baseline.r1.json",
+      "localSha256": "6E0A2ABBC6B45F3C91B72E939E8649F91093324B79ADCDA0BB44196DA2FB8FCD",
+      "sharedSha256": "A3A521EBFCD8D95A49666C64CD40FC6D593B299A8BA84C345E56737CFBD975C8",
+      "sameBytes": false
+    },
+    {
+      "path": "docs\\Research\\GameData\\first-farm.r1.md",
+      "localSha256": "14F3115B65EF0C1AD3810F11663A2B1722754903B49B929D0FAF75B9F84511CC",
+      "sharedSha256": "14F3115B65EF0C1AD3810F11663A2B1722754903B49B929D0FAF75B9F84511CC",
+      "sameBytes": true
+    },
+    {
+      "path": "docs\\Research\\GameData\\manifest.r1.json",
+      "localSha256": "C9FF7003AF75AE4FB75B55FD706D94E11FC9F5684D59C9CC19A61E4DCCE10DFE",
+      "sharedSha256": "0B69BDB90CC20E3BB00CC2370561165E003A68FBAD8EF162F21E46248BC45A82",
+      "sameBytes": false
+    },
+    {
+      "path": "docs\\Research\\GameData\\README.md",
+      "localSha256": "438E1459AEA670EA42C9643A61C70BA480CE924B4C2C7157A557AA268A81B0C0",
+      "sharedSha256": "438E1459AEA670EA42C9643A61C70BA480CE924B4C2C7157A557AA268A81B0C0",
+      "sameBytes": true
+    },
+    {
+      "path": "docs\\Research\\GameData\\reuse-inventory.r1.md",
+      "localSha256": "DCFF281EDDB411E78E5C40418F3E14D33C2AAFF24D7D56406E342347EFDF999E",
+      "sharedSha256": "DCFF281EDDB411E78E5C40418F3E14D33C2AAFF24D7D56406E342347EFDF999E",
+      "sameBytes": true
+    },
+    {
+      "path": "docs\\Research\\GameData\\sources.r1.json",
+      "localSha256": "C8AEF2B84A06BDE5CF38804DE2719578A8CC7F70FFED7AB55D6AD916FF5D9789",
+      "sharedSha256": "C8AEF2B84A06BDE5CF38804DE2719578A8CC7F70FFED7AB55D6AD916FF5D9789",
+      "sameBytes": true
+    },
+    {
+      "path": "docs\\Research\\GameData\\trade-opportunity-next.r1.md",
+      "localSha256": "A088B170BBC8497E69EDAA335333772246EEC2FB24DD5B1A22B745B79CEC88C7",
+      "sharedSha256": "A088B170BBC8497E69EDAA335333772246EEC2FB24DD5B1A22B745B79CEC88C7",
+      "sameBytes": true
+    },
+    {
+      "path": "docs\\Research\\GameData\\D371\\evidence.r1.json",
+      "localSha256": "BC2EC74D668EE4498F158FE0CDEDCC85351D1D82E43D122DAF39EA83D82B60A9",
+      "sharedSha256": "BC2EC74D668EE4498F158FE0CDEDCC85351D1D82E43D122DAF39EA83D82B60A9",
+      "sameBytes": true
+    },
+    {
+      "path": "docs\\Research\\GameData\\D371\\manifest.r1.json",
+      "localSha256": "467AB6642B9203047BA4112CA50994E7096BB31A18A7424F7E25503BC46145A3",
+      "sharedSha256": "467AB6642B9203047BA4112CA50994E7096BB31A18A7424F7E25503BC46145A3",
+      "sameBytes": true
+    },
+    {
+      "path": "docs\\Research\\GameData\\D371\\README.md",
+      "localSha256": "BB0BBAB396C76180AE6DEAE8C8F2BC00D5D8C73F92D346A486C1E89ACF40881B",
+      "sharedSha256": "BB0BBAB396C76180AE6DEAE8C8F2BC00D5D8C73F92D346A486C1E89ACF40881B",
+      "sameBytes": true
+    }
+  ],
+  "existingSample": {
+    "sourceId": "D403-S09",
+    "path": "artifacts/local/game-data-research/rda-100000807551-growth-duration.fragment.html",
+    "sha256": "412AB3EE83AD834B48FE45508C8778363EA1BA4DA5DCEEC1E9A26CD1C4B4AC51",
+    "bytes": 1892,
+    "originalAcquiredAt": "2026-08-30T19:58:37.6698006+09:00",
+    "copied": false,
+    "edited": false,
+    "newAcquisition": false
+  },
+  "planningProposals": [
+    "Unapproved: show source period meaning and unknown context as optional planning reference; monthly recommendation is not a sowing/catch permit.",
+    "Keep Q089 context selection unresolved; choose region/cultivation/cultivar separately before any approved solar-term mapping.",
+    "Choose game calendar length and real-world synchronization separately; reality 90–100 days is not the Q397 10–15-minute experience target.",
+    "Keep harvest-ready-grace-window and seasonal-magic-protection-unattended Asked. Do not block D396 independent preparation."
+  ],
+  "developmentAcceptance": "Pending",
+  "simulationApplied": false,
+  "additionalBulkWorkAutomaticallyStarted": 0
+}

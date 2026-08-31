@@ -1,0 +1,1064 @@
+{
+  "schemaVersion": "game-data-research.d413.evidence.r1",
+  "packageRevision": "game-data-research.spring-equinox.d413.r1",
+  "formatReuse": "D403 source facts / reviewed correspondence / unapproved proposals; D371 evidence and self-excluding manifest shape",
+  "researchOnly": true,
+  "notRuntimeCatalog": true,
+  "capturedAt": "2026-08-31T15:00:33.9088415+09:00",
+  "sourceReviewWindow": {
+    "from": "2026-08-31T14:56:23.5421359+09:00",
+    "to": "2026-08-31T15:00:33.9090149+09:00",
+    "timezone": "Asia/Seoul",
+    "note": "Window covers this turn public text reads; exact per-page access instants not measured. Tool cache recency is not source publication time."
+  },
+  "assignedWorktree": "C:/Users/user/.codex/worktrees/ea96/Hongdal",
+  "sharedRoot": "C:/Users/user/source/repos/Hongdal",
+  "assignedHead": "b0c1c8469664ae6cce9e272f93650d6eba796804",
+  "sharedHead": "712c4a08349bcda0b7c4b0489bfb8ad2a1e7087a",
+  "commitsBehindSharedHead": 617,
+  "initialState": "Detached HEAD; only untracked docs/Research; D413 docs and artifacts directories absent at intake",
+  "approvals": {
+    "planR2": "5764EEDB7316524244127D7A54A63FB9313780942911C4D9CF01B0C8AD6A7AD1",
+    "firstPlayR8": "4AF026C29628BAFEB1A4084E074533C7206368799AF26F41644BC64654B9751F",
+    "decisionsAtIntake": "06735A7A341EAC422215B3BBB9E49CD592EBB68E672331D91DCDD329491A15DC",
+    "workflowR2": "ACC94021FC67707E0315AB14009AE90D28614DA5A7333143A376940946399F1E",
+    "reading": "Plan r2 including section6 and first-play r8 fully read; DECISIONS relevant D412/D413 sections read, whole file hashed; D404 workflow fully read",
+    "newScope": "Official small plant/crop research only; no landscape asset inspection or implementation"
+  },
+  "relatedMeaningIds": [
+    "spring-equinox-herb-crop-research",
+    "forest-farm-edge-reference-solar-term",
+    "forest-farm-edge-planning-focus",
+    "forest-farm-edge-landscape-asset-survey"
+  ],
+  "relatedExistingQuestions": [
+    "Q088",
+    "Q089",
+    "Q397"
+  ],
+  "candidateWorkItems": [
+    "WI-FARM-02",
+    "WI-FARM-03",
+    "WI-FARM-04"
+  ],
+  "bindingStatus": "ResearchReferenceOnly; no new registration or WI execution",
+  "sourceCount": 4,
+  "candidateCount": 3,
+  "wildPlantCandidateCount": 1,
+  "cropCandidateCount": 2,
+  "confirmedMedicinalCandidateCount": 0,
+  "claimCount": 15,
+  "sources": [
+    {
+      "id": "D413-S01",
+      "institution": "농촌진흥청",
+      "title": "그린매거진 — 알싸하고 상큼한 매력의 봄나물 달래",
+      "officialUrl": "https://rda.go.kr/webzine/2022/04/sub4-1.html",
+      "sourceRecordId": null,
+      "publicationDate": null,
+      "issueLabel": "2022/04 URL issue path; exact publication day not stated",
+      "sourceLocation": "제목/참고자료; 손질요령 첫 문장의 이른 봄·밭이랑·논둑 서식 설명만",
+      "rightsObserved": "Unverified",
+      "underlyingReferences": "농사로 농업기술포털 및 aT 우수 식재료 디렉토리; 원문 개별 기록은 추가 확인하지 않음",
+      "limitation": "통칭 달래의 계절 설명이며 학명·지역별 관측·채집 가능일·약용 분류 미확인. 건강/손질/채취/조리/섭취 문장은 사용하지 않음.",
+      "accessedDate": "2026-08-31",
+      "accessTimePrecision": "Recorded review window; exact per-page clock not captured",
+      "readingMethod": "web public-page open/find; extracted text may be cached, not a guaranteed fresh origin response",
+      "readingStatus": "DirectPublicTextReviewed",
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "publicReadingRequiredLogin": false,
+      "apiAccessChecked": false,
+      "costForApi": null,
+      "commercialUseApproved": false,
+      "redisplayApproved": false,
+      "photoDownload": 0,
+      "legalReview": false,
+      "sourceTimezone": null,
+      "refreshCadence": null
+    },
+    {
+      "id": "D413-S02",
+      "institution": "농촌진흥청 국가농작물병해충관리시스템(NCPMS)",
+      "title": "잡초 — 달래",
+      "officialUrl": "https://ncpms.rda.go.kr/npms/WeedsInfoSearchDtlR.np?wdCode=W00000056",
+      "sourceRecordId": "W00000056",
+      "publicationDate": null,
+      "issueLabel": null,
+      "sourceLocation": "기본정보 식물명/학명; 일반정보 유입종/형태/생태/서식지; 자료 하단 이용표시",
+      "rightsObserved": "KOGL-2: 출처표시 + 상업적 이용금지",
+      "underlyingReferences": "본문 문헌정보: 1996 원색한국기준식물도감 p.389, 1989 목야신일본식물도감 p.853; 책 원문 미열람",
+      "limitation": "공식 도감 게시 레코드의 학명 표기만 확인. 현재 국가표준분류·현장 동정·S01 통칭과의 동일 종은 확정하지 않음. 잡초 분류는 게임 제거대상/약초 분류가 아님.",
+      "accessedDate": "2026-08-31",
+      "accessTimePrecision": "Recorded review window; exact per-page clock not captured",
+      "readingMethod": "web public-page open/find; extracted text may be cached, not a guaranteed fresh origin response",
+      "readingStatus": "DirectPublicTextReviewed",
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "publicReadingRequiredLogin": false,
+      "apiAccessChecked": false,
+      "costForApi": null,
+      "commercialUseApproved": false,
+      "redisplayApproved": false,
+      "photoDownload": 0,
+      "legalReview": false,
+      "sourceTimezone": null,
+      "refreshCadence": null
+    },
+    {
+      "id": "D413-S03",
+      "institution": "농촌진흥청 농사로",
+      "title": "감자 — 농작업일정",
+      "officialUrl": "https://www.nongsaro.go.kr/portal/ps/psb/psbl/workScheduleDtl.ps?cntntsNo=30699&menuId=PS00087&sKidofcomdtySeCode=FC",
+      "sourceRecordId": "30699",
+      "publicationDate": null,
+      "issueLabel": null,
+      "sourceLocation": "주요 재배 형태의 지역/파종/수확 표; 재배환경의 온도/토양",
+      "rightsObserved": "KOGL-2: 출처표시 + 상업적 이용금지",
+      "underlyingReferences": "기존 GD-FARM-001 및 D403-S07/D403-I01을 재사용하고 공개 본문 재대조",
+      "limitation": "특정 연도·품종·고도 수치·노지/시설 미기재. 월별 작업 막대의 빈칸/열 위치로 정확 날짜를 추정하지 않음.",
+      "accessedDate": "2026-08-31",
+      "accessTimePrecision": "Recorded review window; exact per-page clock not captured",
+      "readingMethod": "web public-page open/find; extracted text may be cached, not a guaranteed fresh origin response",
+      "readingStatus": "DirectPublicTextReviewed",
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "publicReadingRequiredLogin": false,
+      "apiAccessChecked": false,
+      "costForApi": null,
+      "commercialUseApproved": false,
+      "redisplayApproved": false,
+      "photoDownload": 0,
+      "legalReview": false,
+      "sourceTimezone": null,
+      "refreshCadence": null
+    },
+    {
+      "id": "D413-S04",
+      "institution": "농촌진흥청 농사로",
+      "title": "채소 — 완두",
+      "officialUrl": "https://www.nongsaro.go.kr/portal/ps/psz/psza/contentSub.ps?cntntsNo=228670&menuId=PS03172&sSeCode=335001&totalSearchYn=Y",
+      "sourceRecordId": "228670",
+      "publicationDate": "2021-05-27",
+      "issueLabel": null,
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "rightsObserved": "KOGL-4: 출처표시 + 상업적 이용금지 + 변경금지",
+      "underlyingReferences": "출처: 도시농업 텃밭채소; 원책 미열람",
+      "limitation": "상단 목록에서 중부 아래 파종 두 줄/남부 아래 수확 두 줄로 추출되는 배열 불일치. 연속 설명문만 지역-시기 연결 근거로 사용, 그림/원문을 고치지 않음. 학명 P isum Sativum L. 표기를 자동 교정하지 않음.",
+      "accessedDate": "2026-08-31",
+      "accessTimePrecision": "Recorded review window; exact per-page clock not captured",
+      "readingMethod": "web public-page open/find; extracted text may be cached, not a guaranteed fresh origin response",
+      "readingStatus": "DirectPublicTextReviewed",
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "storedRawBytes": 0,
+      "publicReadingRequiredLogin": false,
+      "apiAccessChecked": false,
+      "costForApi": null,
+      "commercialUseApproved": false,
+      "redisplayApproved": false,
+      "photoDownload": 0,
+      "legalReview": false,
+      "sourceTimezone": null,
+      "refreshCadence": null
+    }
+  ],
+  "items": [
+    {
+      "id": "D413-I01",
+      "label": "달래",
+      "researchCategory": "WildPlantCandidate",
+      "sourceIds": [
+        "D413-S01",
+        "D413-S02"
+      ],
+      "canonicalProductStableId": null,
+      "scientificNameAsPublished": "Allium monanthum Maxim",
+      "scientificNameSourceId": "D413-S02",
+      "normalizedTaxonId": null,
+      "sourceRecordId": "W00000056",
+      "cultivar": null,
+      "medicinalClassification": null,
+      "identityLimit": "S02 도감의 국명/학명 표시는 확인, S01 통칭의 동일 종/유통 달래/산달래와의 관계는 미확정. record ID는 공통 상품·국가표준 종 ID가 아님.",
+      "equinoxAssessment": "MonthSeasonReferenceOnly",
+      "notEstablished": [
+        "춘분 당일 잎/새순/꽃 단계",
+        "S01 이른봄 설명과 S02 학명의 종 동등성",
+        "특정 지역·고도·기후",
+        "약용 분류",
+        "정확 채집기간",
+        "출하기간",
+        "식용/채취 안전"
+      ],
+      "proposal": "Unapproved: 밭이랑·논둑/경지주변의 낮은 식생 관찰 후보. D412 폭포·절벽·협곡으로 서식을 자동 확장하지 않음.",
+      "claimIds": [
+        "D413-C01",
+        "D413-C02",
+        "D413-C03",
+        "D413-C04"
+      ],
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "derivedMethod": null,
+      "gameRule": null,
+      "prefabSpeciesBinding": null,
+      "workItemBinding": null,
+      "researchOnly": true
+    },
+    {
+      "id": "D413-I02",
+      "label": "감자",
+      "researchCategory": "CropCandidate",
+      "sourceIds": [
+        "D413-S03"
+      ],
+      "canonicalProductStableId": "product:potato",
+      "scientificNameAsPublished": null,
+      "scientificNameSourceId": null,
+      "normalizedTaxonId": null,
+      "sourceRecordId": "30699",
+      "cultivar": null,
+      "medicinalClassification": null,
+      "identityLimit": "기존 감자 Profile/작업군210005/콘텐츠30699 재사용. 작업군은 상품 코드가 아니며 농사로 공식 품목 코드 Unlinked 유지.",
+      "equinoxAssessment": "MonthSeasonReferenceOnly",
+      "notEstablished": [
+        "춘분의 실제 파종/생육/수확 판정",
+        "첫 지역·고도 수치·품종·노지/시설",
+        "현재 출하/시장 공급"
+      ],
+      "proposal": "Unapproved: 평난지 봄 파종 검토와 고랭지의 다른 준비 시기를 대비. 실제 밭에 감자가 보이거나 수확된다는 결과는 만들지 않음.",
+      "claimIds": [
+        "D413-C05",
+        "D413-C06",
+        "D413-C07",
+        "D413-C08"
+      ],
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "derivedMethod": null,
+      "gameRule": null,
+      "prefabSpeciesBinding": null,
+      "workItemBinding": null,
+      "researchOnly": true
+    },
+    {
+      "id": "D413-I03",
+      "label": "완두",
+      "researchCategory": "CropCandidate",
+      "sourceIds": [
+        "D413-S04"
+      ],
+      "canonicalProductStableId": null,
+      "scientificNameAsPublished": "P isum Sativum L.",
+      "scientificNameSourceId": "D413-S04",
+      "normalizedTaxonId": null,
+      "sourceRecordId": "228670",
+      "cultivar": null,
+      "medicinalClassification": null,
+      "identityLimit": "학명 띄어쓰기/대문자 표기는 원문 관측값; Pisum 등의 정규 학명으로 자동 수정/등록하지 않음. 품종/통칭 완두콩/다른 풋콩 상품 대응 미확인.",
+      "equinoxAssessment": "MonthSeasonReferenceOnly",
+      "notEstablished": [
+        "추출목록 배열 불일치 해소",
+        "종 표준명/공식 상품 코드",
+        "춘분 정확 대응",
+        "남부 노지/시설",
+        "품종·지역별 현행 작기/출하"
+      ],
+      "proposal": "Unapproved: 중부 노지의 파종 검토와 이식/수확 단계 차이를 보여주는 참고 후보. 남부 작기를 중부와 합치지 않음.",
+      "claimIds": [
+        "D413-C09",
+        "D413-C10",
+        "D413-C11",
+        "D413-C12",
+        "D413-C13",
+        "D413-C14",
+        "D413-C15"
+      ],
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "derivedMethod": null,
+      "gameRule": null,
+      "prefabSpeciesBinding": null,
+      "workItemBinding": null,
+      "researchOnly": true
+    }
+  ],
+  "claims": [
+    {
+      "id": "D413-C01",
+      "itemId": "D413-I01",
+      "sourceId": "D413-S01",
+      "meaning": "SeasonalVegetation",
+      "statement": "통칭 달래가 이른 봄 밭이랑·논둑 주변에 무리지어 자란다는 계절 설명.",
+      "temporal": {
+        "originalLabel": "이른 봄",
+        "precision": "season",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "우리나라; 세부 지역 미기재",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "기사의 산야 생육 설명; 재배 방식 미기재",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "단계/부위 미특정"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "제목/참고자료; 손질요령 첫 문장의 이른 봄·밭이랑·논둑 서식 설명만",
+      "unit": "season",
+      "currency": null
+    },
+    {
+      "id": "D413-C02",
+      "itemId": "D413-I01",
+      "sourceId": "D413-S02",
+      "meaning": "TaxonAndHabitat",
+      "statement": "도감은 달래 / Allium monanthum Maxim을 자생 다년생 초본으로 표시하고 경지주변·밭·산야 서식을 설명한다.",
+      "temporal": {
+        "originalLabel": null,
+        "precision": "not-time-based",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "전국 분포라는 도감 설명; 전 지역 동시 생육 뜻 아님",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "자생종 표기",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": null
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "기본정보 식물명/학명; 일반정보 유입종/형태/생태/서식지; 자료 하단 이용표시",
+      "unit": "not-time-based",
+      "currency": null
+    },
+    {
+      "id": "D413-C03",
+      "itemId": "D413-I01",
+      "sourceId": "D413-S02",
+      "meaning": "Flowering",
+      "statement": "도감의 달래 개화 월 범위. 춘분에 꽃이 핀다는 근거로 채택하지 않음.",
+      "temporal": {
+        "originalLabel": "4~5월",
+        "precision": "month-range",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "전국 분포 일반 설명; 개화 관측 지역 미기재",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "자생종 표기",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "꽃"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "기본정보 식물명/학명; 일반정보 유입종/형태/생태/서식지; 자료 하단 이용표시",
+      "unit": "month-range",
+      "currency": null
+    },
+    {
+      "id": "D413-C04",
+      "itemId": "D413-I01",
+      "sourceId": "D413-S02",
+      "meaning": "Morphology",
+      "statement": "도감은 선형 잎 1~2개와 꽃대 끝의 흰색/연한 홍색 꽃 1~2개를 설명한다. 각 형태가 춘분에 모두 보인다는 뜻은 아님.",
+      "temporal": {
+        "originalLabel": null,
+        "precision": "not-time-based",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": null,
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "자생종 표기",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "잎/꽃"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "기본정보 식물명/학명; 일반정보 유입종/형태/생태/서식지; 자료 하단 이용표시",
+      "unit": "count/color/shape",
+      "currency": null
+    },
+    {
+      "id": "D413-C05",
+      "itemId": "D413-I02",
+      "sourceId": "D413-S03",
+      "meaning": "Sowing",
+      "statement": "평난지 봄재배의 파종 기간. 실제 현장/올해 적합성은 별도.",
+      "temporal": {
+        "originalLabel": "2월 상순~3월 하순",
+        "precision": "month-part",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "전국 평난지대",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "봄재배",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "씨감자"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "주요 재배 형태의 지역/파종/수확 표; 재배환경의 온도/토양",
+      "unit": "month-part",
+      "currency": null
+    },
+    {
+      "id": "D413-C06",
+      "itemId": "D413-I02",
+      "sourceId": "D413-S03",
+      "meaning": "Harvest",
+      "statement": "같은 봄재배 문맥의 수확 기간이며 파종 시기와 구분.",
+      "temporal": {
+        "originalLabel": "5월 하순~6월 하순",
+        "precision": "month-part",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "전국 평난지대",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "봄재배",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "감자; 부위 명칭은 수확표에 별도 미기재"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "주요 재배 형태의 지역/파종/수확 표; 재배환경의 온도/토양",
+      "unit": "month-part",
+      "currency": null
+    },
+    {
+      "id": "D413-C07",
+      "itemId": "D413-I02",
+      "sourceId": "D413-S03",
+      "meaning": "Sowing",
+      "statement": "고랭지 여름재배의 파종 기간은 평난지 봄재배와 다르다.",
+      "temporal": {
+        "originalLabel": "4월 중순~5월 중순",
+        "precision": "month-part",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "고랭지대",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "여름재배",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "씨감자"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "주요 재배 형태의 지역/파종/수확 표; 재배환경의 온도/토양",
+      "unit": "month-part",
+      "currency": null
+    },
+    {
+      "id": "D413-C08",
+      "itemId": "D413-I02",
+      "sourceId": "D413-S03",
+      "meaning": "GrowthEnvironment",
+      "statement": "생육 적온 14~23℃와 물 빠짐 좋은 모래참흙~참흙 설명. 현재 게임 지역의 관측값/임계값이 아님.",
+      "temporal": {
+        "originalLabel": null,
+        "precision": "not-time-based",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": null,
+        "elevationMeters": null,
+        "climate": "일반 생육 적온 14~23℃; 지역 기후/관측치 미확인",
+        "cultivationType": null,
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": null
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "주요 재배 형태의 지역/파종/수확 표; 재배환경의 온도/토양",
+      "unit": "degrees Celsius; soil description",
+      "currency": null
+    },
+    {
+      "id": "D413-C09",
+      "itemId": "D413-I03",
+      "sourceId": "D413-S04",
+      "meaning": "Sowing",
+      "statement": "연속 설명문에서 중부지방의 봄 파종을 연결한다.",
+      "temporal": {
+        "originalLabel": "3월 중·하순경",
+        "precision": "month-part",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "중부지방",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "중부 노지재배 제목 및 연속 설명문",
+        "openFieldOrFacility": "노지; 중부 제목에 명시",
+        "cultivar": null,
+        "plantPart": "종자"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "unit": "month-part",
+      "currency": null
+    },
+    {
+      "id": "D413-C10",
+      "itemId": "D413-I03",
+      "sourceId": "D413-S04",
+      "meaning": "Harvest",
+      "statement": "같은 연속 설명문에서 중부지방 수확을 연결한다. 3월 수확으로 바꾸지 않음.",
+      "temporal": {
+        "originalLabel": "7월",
+        "precision": "month",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "중부지방",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "중부 노지재배 제목 및 연속 설명문",
+        "openFieldOrFacility": "노지; 중부 제목에 명시",
+        "cultivar": null,
+        "plantPart": "원문 해당 문장에서는 부위 미특정"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "unit": "month",
+      "currency": null
+    },
+    {
+      "id": "D413-C11",
+      "itemId": "D413-I03",
+      "sourceId": "D413-S04",
+      "meaning": "Sowing",
+      "statement": "연속 설명문에서 남부지방 가을 파종을 연결한다.",
+      "temporal": {
+        "originalLabel": "10월 초순경",
+        "precision": "month-part",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "남부지방; 인접 제목은 남부지역(온난지)",
+        "elevationMeters": null,
+        "climate": "온난지라는 제목; 수치/고도 미기재",
+        "cultivationType": null,
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "종자"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "unit": "month-part",
+      "currency": null
+    },
+    {
+      "id": "D413-C12",
+      "itemId": "D413-I03",
+      "sourceId": "D413-S04",
+      "meaning": "Harvest",
+      "statement": "연속 설명문에서 남부 파종의 다음해 수확을 연결한다.",
+      "temporal": {
+        "originalLabel": "그 다음해 5월경",
+        "precision": "relative-year-month",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": "남부지방",
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": null,
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "원문 해당 문장에서는 부위 미특정"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "unit": "relative-year-month",
+      "currency": null
+    },
+    {
+      "id": "D413-C13",
+      "itemId": "D413-I03",
+      "sourceId": "D413-S04",
+      "meaning": "TransplantStage",
+      "statement": "직파와 모종 이식이 구분되고 이식 기준은 본잎 4~5장 및 발아 후 2주 정도로 서술된다.",
+      "temporal": {
+        "originalLabel": "발아 후 2주 후 정도",
+        "precision": "relative-duration",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": null,
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": "모 기르기/밭 이식",
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "모종/본잎"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "unit": "relative-duration",
+      "currency": null
+    },
+    {
+      "id": "D413-C14",
+      "itemId": "D413-I03",
+      "sourceId": "D413-S04",
+      "meaning": "HarvestStage",
+      "statement": "수확 후 관리법 첫 문장은 개화 후 30일과 익은 종실을 기준으로 설명한다. 절대 수확일·수확 보장 아님.",
+      "temporal": {
+        "originalLabel": "개화 후 30일",
+        "precision": "relative-duration",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": null,
+        "elevationMeters": null,
+        "climate": null,
+        "cultivationType": null,
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": "종실"
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "unit": "relative-duration",
+      "currency": null
+    },
+    {
+      "id": "D413-C15",
+      "itemId": "D413-I03",
+      "sourceId": "D413-S04",
+      "meaning": "GrowthEnvironment",
+      "statement": "생육 적온 12~16℃와 배수가 좋은 질참흙/참흙을 설명한다. 가상지역의 기후나 폭포 주변 서식 근거가 아님.",
+      "temporal": {
+        "originalLabel": null,
+        "precision": "not-time-based",
+        "year": null,
+        "startDate": null,
+        "endDate": null,
+        "timezone": null
+      },
+      "context": {
+        "regionAsPublished": null,
+        "elevationMeters": null,
+        "climate": "일반 생육 적온 12~16℃; 지역 관측 기후 미확인",
+        "cultivationType": null,
+        "openFieldOrFacility": null,
+        "cultivar": null,
+        "plantPart": null
+      },
+      "exactSpringEquinoxEvidence": false,
+      "directSolarTerm": null,
+      "derivedSolarTerm": null,
+      "gameInterpretationStatus": "Unapproved",
+      "sourceLocation": "학명; 1.재배특성; 2.재배작형 마지막 연속 설명문; 6.수확 후 관리법 첫 문장; 7.재배 Tip 모 기르기; 하단 이용표시",
+      "unit": "degrees Celsius; soil description",
+      "currency": null
+    }
+  ],
+  "correspondence": {
+    "status": "MonthSeasonReferenceOnly",
+    "directSolarTermClaims": 0,
+    "derivedSolarTermClaims": 0,
+    "exactAnnualCalendarAcquired": false,
+    "exactDateEndpointsCreated": 0,
+    "reason": "D403 exact annual times remain unacquired; this scope does not reopen KASI attempts. Spring/March/relative stages are not exact equinox observations."
+  },
+  "acquisition": {
+    "newRawFiles": [],
+    "newRawBytes": 0,
+    "newProviderPhotos": 0,
+    "sourceHashes": null,
+    "existingSample": "Earlier 1892-byte potato fragment preserved by hash, not copied or redownloaded; D413 uses D403 source metadata and current public table, not a new sample",
+    "existingSampleSha256": "412AB3EE83AD834B48FE45508C8778363EA1BA4DA5DCEEC1E9A26CD1C4B4AC51",
+    "meaning": "Authored evidence JSON is research metadata, not original source content"
+  },
+  "accessNeeds": {
+    "confirmedLoginOrApplicationRequirement": [],
+    "userActionRequiredNow": false,
+    "publicAlternatives": "All four selected HTML pages were readable without researcher login; no API required",
+    "ncpmsNotice": "Global login/auto-logout UI text exists but did not block body reading; not evidence of a required login",
+    "optionalApi": "Existing Nongsaro API key dependency remains out of scope; no key/account/fees inspection",
+    "d404": "If actual access need is later confirmed, report institution/official URL/material/evidence/reason/user action/cost/permission/public alternative/independent work to development before closure, without secrets"
+  },
+  "limitations": [
+    "No exact equinox/date mapping, field observation, specimen verification or current standard taxonomy audit.",
+    "Medicinal classification not substantiated in selected evidence; not a claim that no medicinal plants exist in spring.",
+    "Pea extract list grouping and scientific-name typography remain unresolved; continuous prose used with that warning.",
+    "Source licenses are observed notices only; purpose-specific commercial/derivative/photo/redisplay permission not established.",
+    "No health efficacy, prescription/dosage, ingestion or collection safety guidance.",
+    "No prefab species matching or D412 asset inspection; habitat note does not imply a waterfall/valley/rock face spawn.",
+    "New raw files zero; no whole-page, attachment, image or paid/mass downloads."
+  ],
+  "selectionLimit": "Three candidate labels selected for distinct evidence roles; not eight verified taxa. Search-only 냉이/other hits not admitted as evidence and not investigated further to fill quota.",
+  "technicalReuse": [
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/공통식품품목IdentityCatalog.cs",
+      "role": "product:potato and source relation statuses; no new plant/crop IDs"
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/농사로감자생육요구ProfileQuery.cs",
+      "role": "Profile crop-requirement-profile:nongsaro.potato.1; work group210005; PendingHumanReview; publication false"
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro감자ProfileArchiveService.cs",
+      "role": "Content30699 guard/provenance; DB-writing operation not invoked"
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro공공데이터Module.cs",
+      "role": "Existing catalog/client boundary; no new provider/collector or API invocation"
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/Foundation/ExternalDataSourceCatalog.cs",
+      "role": "RedistributionAllowed false remains; no source activation"
+    },
+    {
+      "path": "Ssalddel.Simulation.Application/SimulationRealityContextService.cs",
+      "role": "Explicit approved context/freeze only; research JSON not a runtime input"
+    }
+  ],
+  "reusedResearch": [
+    "docs/Research/GameData/D403/development-intake.r1.md",
+    "docs/Research/GameData/D403/evidence.r1.json",
+    "docs/Research/GameData/reuse-inventory.r1.md",
+    "docs/Research/GameData/trade-opportunity-next.r1.md"
+  ],
+  "references": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "FDCDAB452741C2A6EFCFB29B72AE7C860D098A4D9362A3EC809651C9EAF9200E",
+      "bytes": 29554
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "CDEB154ACCEB4F1279088D4406BCB4173E9DDFA7A9BBD7B06AB535EB1768CF09",
+      "bytes": 1206
+    },
+    {
+      "path": "docs/Architecture/게임자료조사전문운영.md",
+      "sha256": "ACC94021FC67707E0315AB14009AE90D28614DA5A7333143A376940946399F1E",
+      "bytes": 5512
+    },
+    {
+      "path": "docs/AI/24절기-제철자료-조사와기획연결-2026-08-31.md",
+      "sha256": "5764EEDB7316524244127D7A54A63FB9313780942911C4D9CF01B0C8AD6A7AD1",
+      "bytes": 16503
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/첫플레이체감/first-play-experience.inquiry.r1.md",
+      "sha256": "4AF026C29628BAFEB1A4084E074533C7206368799AF26F41644BC64654B9751F",
+      "bytes": 34404
+    },
+    {
+      "path": "docs/AI/DECISIONS.md",
+      "sha256": "06735A7A341EAC422215B3BBB9E49CD592EBB68E672331D91DCDD329491A15DC",
+      "bytes": 605599
+    },
+    {
+      "path": "docs/Research/GameData/D403/development-intake.r1.md",
+      "sha256": "05D39CC2D1D120EF945E0FE2F1B33DAD8030D96F5ADCFBA7947A374E28423D58",
+      "bytes": 4552
+    },
+    {
+      "path": "docs/Research/GameData/D403/evidence.r1.json",
+      "sha256": "C0B5E0EF10BC4CE533F8CBD60585A7EB5DF0EECF73F025B463D20A40336D8087",
+      "bytes": 55773
+    },
+    {
+      "path": "docs/Research/GameData/D403/manifest.r1.json",
+      "sha256": "AA058E97D288816D9B49CFE8DB69870AC4DABBAD796C805CBF16D84330AB3FB9",
+      "bytes": 595
+    },
+    {
+      "path": "docs/Research/GameData/reuse-inventory.r1.md",
+      "sha256": "DCFF281EDDB411E78E5C40418F3E14D33C2AAFF24D7D56406E342347EFDF999E",
+      "bytes": 4777
+    },
+    {
+      "path": "docs/Research/GameData/sources.r1.json",
+      "sha256": "C8AEF2B84A06BDE5CF38804DE2719578A8CC7F70FFED7AB55D6AD916FF5D9789",
+      "bytes": 11150
+    },
+    {
+      "path": "docs/Research/GameData/trade-opportunity-next.r1.md",
+      "sha256": "A088B170BBC8497E69EDAA335333772246EEC2FB24DD5B1A22B745B79CEC88C7",
+      "bytes": 7053
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/공통식품품목IdentityCatalog.cs",
+      "sha256": "B508BBFE4A9106DE50FEA3C69849D17F2480D58F27CCD6192D05869D1D37B22C",
+      "bytes": 9454
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/농사로감자생육요구ProfileQuery.cs",
+      "sha256": "95B83148356BA1699C5F412B7956AAF0E8BECCE4772D01CA660034B7649846CB",
+      "bytes": 9079
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro감자ProfileArchiveService.cs",
+      "sha256": "B17E24423842734D00C7772E4C6260B160042D93580C17C2C60A3EEA573E6EC2",
+      "bytes": 4820
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro공공데이터Module.cs",
+      "sha256": "2E3E84A2E2D1DAD2414AA5A11AE747F92CABB593F2563630C5F9B9E03535FCA0",
+      "bytes": 20126
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/Foundation/ExternalDataSourceCatalog.cs",
+      "sha256": "9D300B15E682CD33B049F064D353906B6D19736AD1427BEF9C9C9EC15FADA529",
+      "bytes": 5248
+    },
+    {
+      "path": "Ssalddel.Simulation.Application/SimulationRealityContextService.cs",
+      "sha256": "4559D85C66B8916D3C026EE8806C21419AE20F9986AEA4269CA8841ED08ADBE2",
+      "bytes": 28697
+    }
+  ],
+  "preservedFiles": [
+    {
+      "path": "docs/Research/GameData/baseline.r1.json",
+      "bytes": 13572,
+      "sha256": "6E0A2ABBC6B45F3C91B72E939E8649F91093324B79ADCDA0BB44196DA2FB8FCD"
+    },
+    {
+      "path": "docs/Research/GameData/first-farm.r1.md",
+      "bytes": 8693,
+      "sha256": "14F3115B65EF0C1AD3810F11663A2B1722754903B49B929D0FAF75B9F84511CC"
+    },
+    {
+      "path": "docs/Research/GameData/manifest.r1.json",
+      "bytes": 1383,
+      "sha256": "C9FF7003AF75AE4FB75B55FD706D94E11FC9F5684D59C9CC19A61E4DCCE10DFE"
+    },
+    {
+      "path": "docs/Research/GameData/README.md",
+      "bytes": 1854,
+      "sha256": "438E1459AEA670EA42C9643A61C70BA480CE924B4C2C7157A557AA268A81B0C0"
+    },
+    {
+      "path": "docs/Research/GameData/reuse-inventory.r1.md",
+      "bytes": 4777,
+      "sha256": "DCFF281EDDB411E78E5C40418F3E14D33C2AAFF24D7D56406E342347EFDF999E"
+    },
+    {
+      "path": "docs/Research/GameData/sources.r1.json",
+      "bytes": 11150,
+      "sha256": "C8AEF2B84A06BDE5CF38804DE2719578A8CC7F70FFED7AB55D6AD916FF5D9789"
+    },
+    {
+      "path": "docs/Research/GameData/trade-opportunity-next.r1.md",
+      "bytes": 7053,
+      "sha256": "A088B170BBC8497E69EDAA335333772246EEC2FB24DD5B1A22B745B79CEC88C7"
+    },
+    {
+      "path": "docs/Research/GameData/D371/evidence.r1.json",
+      "bytes": 11954,
+      "sha256": "BC2EC74D668EE4498F158FE0CDEDCC85351D1D82E43D122DAF39EA83D82B60A9"
+    },
+    {
+      "path": "docs/Research/GameData/D371/manifest.r1.json",
+      "bytes": 596,
+      "sha256": "467AB6642B9203047BA4112CA50994E7096BB31A18A7424F7E25503BC46145A3"
+    },
+    {
+      "path": "docs/Research/GameData/D371/README.md",
+      "bytes": 13467,
+      "sha256": "BB0BBAB396C76180AE6DEAE8C8F2BC00D5D8C73F92D346A486C1E89ACF40881B"
+    },
+    {
+      "path": "docs/Research/GameData/D403/evidence.r1.json",
+      "bytes": 55773,
+      "sha256": "C0B5E0EF10BC4CE533F8CBD60585A7EB5DF0EECF73F025B463D20A40336D8087"
+    },
+    {
+      "path": "docs/Research/GameData/D403/manifest.r1.json",
+      "bytes": 595,
+      "sha256": "AA058E97D288816D9B49CFE8DB69870AC4DABBAD796C805CBF16D84330AB3FB9"
+    },
+    {
+      "path": "docs/Research/GameData/D403/README.md",
+      "bytes": 12849,
+      "sha256": "481EA8A212E77D81E5E5A98C2562E2719266A1C49C4771D55B2406A0ED84CA1D"
+    },
+    {
+      "path": "artifacts/local/game-data-research/.gitignore",
+      "bytes": 75,
+      "sha256": "49874E344231042A63D5F1A28AC1CA4C884D9CFB58BD8672877BB588879ABEFD"
+    },
+    {
+      "path": "artifacts/local/game-data-research/acquisition.json",
+      "bytes": 1143,
+      "sha256": "78D718B3D82F88A54F14EDE1909A411ED6DEA4762EDD783674D062DE3D138B19"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d371-input.json",
+      "bytes": 7910,
+      "sha256": "DA5572E226690CE6B351B05F2B833C4E77B55B5D789E39919210FAE33DA7961E"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d371-validation.json",
+      "bytes": 618,
+      "sha256": "6550A17E2F3C8D01A847A6A71B30D4DBAD3C1557637CAF55BC770210C86E81B4"
+    },
+    {
+      "path": "artifacts/local/game-data-research/rda-100000807551-growth-duration.fragment.html",
+      "bytes": 1892,
+      "sha256": "412AB3EE83AD834B48FE45508C8778363EA1BA4DA5DCEEC1E9A26CD1C4B4AC51"
+    },
+    {
+      "path": "artifacts/local/game-data-research/reference-paths.json",
+      "bytes": 3036,
+      "sha256": "6D908F3C513D970870FB425BBCF2BBEA3D9F55EF2FC239491C4B67E3302BF351"
+    },
+    {
+      "path": "artifacts/local/game-data-research/validate-research.ps1",
+      "bytes": 4045,
+      "sha256": "D32B6292257D8DB792B3C82B21538EDCD67F4CCAFEB3629121EFADCAA54C59BE"
+    },
+    {
+      "path": "artifacts/local/game-data-research/validation.json",
+      "bytes": 890,
+      "sha256": "839625EEC678573284CE0554F3C0C2F03315647DB3E877C2363032E1DBF568B1"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d403-first-sample-r1/acquisition-summary.r1.json",
+      "bytes": 699,
+      "sha256": "AD1A41C179B3747FED7D285499BEAADCD0BA1B52B2AAD36DBD342B3A415B2E8E"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d403-first-sample-r1/build-evidence.ps1",
+      "bytes": 20856,
+      "sha256": "9760A41C51AA6AA3730694B98AB89DFD5E59E05C7175CB791EFCFAE0FF59CB3B"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d403-first-sample-r1/preservation-before.r1.json",
+      "bytes": 2477,
+      "sha256": "BAB55CC74AEC3AA4C736A04EC04E8166CE6D9549BAB71A17FCCBA5A6A4DDD240"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d403-first-sample-r1/prior-shared-comparison.r1.json",
+      "bytes": 2665,
+      "sha256": "DA81BE05302518F9553252BC5AFFB204268CA866E164C97F15C4F31CA46148DB"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d403-first-sample-r1/references-before.r1.json",
+      "bytes": 3952,
+      "sha256": "A18EE36C939B0A9C81E1C39A3074375CD0DB1586AA84C61028FF38E5239F0DA9"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d403-first-sample-r1/validate.ps1",
+      "bytes": 9978,
+      "sha256": "70B003F5F4A7D9302FC63AD3488616EA193C811368D3AB7C51E6AE87D459563A"
+    },
+    {
+      "path": "artifacts/local/game-data-research/d403-first-sample-r1/validation.r1.json",
+      "bytes": 10009,
+      "sha256": "D289B594E8875E1D6CB0D2792D1A9CEDD767C7D5DFF213768F167470E18CCD6F"
+    }
+  ],
+  "developmentAcceptance": "Pending",
+  "simulationApplied": false,
+  "dataApiCalls": 0,
+  "operationalDbAccess": 0,
+  "registeredProductsWorkItemsOrSpaces": 0,
+  "commitOrPush": false,
+  "automaticFurtherWork": 0
+}

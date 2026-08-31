@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "game-data-research.baseline.r1",
+  "capturedAt": "2026-08-30T20:01:35.2745125+09:00",
+  "sharedRoot": "C:/Users/user/source/repos/Hongdal",
+  "assignedWorktree": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal",
+  "assignedHead": "b0c1c8469664ae6cce9e272f93650d6eba796804",
+  "sharedHeadAtStart": "712c4a08349bcda0b7c4b0489bfb8ad2a1e7087a",
+  "sharedHeadAtCapture": "712c4a08349bcda0b7c4b0489bfb8ad2a1e7087a",
+  "commitsFromAssignedHeadToStartSharedHead": 617,
+  "assignedInitialStatus": "Clean detached HEAD; AGENTS.md and docs/AGENTS.md absent",
+  "sharedInitialStatus": "Dirty; concurrent modifications and untracked D366 workflow observed; no shared writes by this research",
+  "hashTiming": "Reference hashes captured after inspection; mutable shared files are not an atomic snapshot. Recheck before integration.",
+  "references": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "F6081AB2FE9553D627F430BEB57EC59B7214298077DDBC6335379FC527334754",
+      "bytes": 29466,
+      "lastWriteTimeUtc": "2026-08-30T06:10:20.1739227Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "CDEB154ACCEB4F1279088D4406BCB4173E9DDFA7A9BBD7B06AB535EB1768CF09",
+      "bytes": 1206,
+      "lastWriteTimeUtc": "2026-08-11T22:42:41.4535337Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/ProjectOverview/GptProjectContext.md",
+      "sha256": "908E5B394F5960713DE45F801AB95F62F4B140D2B639D5B87E0D6E90C24E8A4F",
+      "bytes": 15956,
+      "lastWriteTimeUtc": "2026-08-23T05:34:19.3938173Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/AI/DECISIONS.md",
+      "sha256": "042F31559928E6C2A3A4EA2A2243CAAF34EA5148CB22E865A111ACB38E934DE5",
+      "bytes": 542538,
+      "lastWriteTimeUtc": "2026-08-30T10:58:05.3995522Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/AI/CURRENT_WORK.md",
+      "sha256": "93AE4FC469EA77835DAA1B8D0D7840BFEC746D5ACB7364F0415EACADE19843B3",
+      "bytes": 187670,
+      "lastWriteTimeUtc": "2026-08-30T11:00:00.1713491Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/AI/generated/codex-playable-loop-goals.md",
+      "sha256": "148E9063B6ED258D2844DC5C15189C8AB1B0DBA0B7C0E9FD4282D9074E68FF7C",
+      "bytes": 9439,
+      "lastWriteTimeUtc": "2026-08-30T10:55:35.7841582Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/AI/UnityKoreanTerminologyGuide.md",
+      "sha256": "5F1B64BEA34F5F7D41DD9E9E9006CC063DF3EA689DD600DA701DA9158533B27D",
+      "bytes": 9685,
+      "lastWriteTimeUtc": "2026-08-11T22:35:37.7810732Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/게임자료조사전문운영.md",
+      "sha256": "43B85567920A8CDACA80A15A0B544D1863670340614AA5544286064DC5BC368C",
+      "bytes": 3685,
+      "lastWriteTimeUtc": "2026-08-30T10:53:36.1725917Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/ExternalPublicDataServerIngestionFoundation.md",
+      "sha256": "6ABEE85DCD26861038C54F6A5B34E7F036F8A715850C699690079F9BF11BBAD5",
+      "bytes": 11323,
+      "lastWriteTimeUtc": "2026-08-08T23:59:14.7097739Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/SkyEngine세계대기표현계층.md",
+      "sha256": "DFACF031A1A5C93B54C8A8BBD54CADD6AE70730BADB9FE44A0AB9CDACC81E70B",
+      "bytes": 9107,
+      "lastWriteTimeUtc": "2026-08-28T10:47:19.5549695Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+      "sha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+      "bytes": 13954,
+      "lastWriteTimeUtc": "2026-08-30T00:18:27.2482094Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/building-spatial-placement.inquiry.r1.md",
+      "sha256": "3902A03FC893C34BA241024251F85BEC9576E0019E3499DE1BA78E6DD5042750",
+      "bytes": 117391,
+      "lastWriteTimeUtc": "2026-08-30T06:56:35.2737821Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/첫플레이체감/first-play-experience.inquiry.r1.md",
+      "sha256": "D0F929F5B29A78C3AABF00706FF036EFFD041B716BB1E1378BE9CD17B2D1D96D",
+      "bytes": 5020,
+      "lastWriteTimeUtc": "2026-08-30T10:48:08.1199054Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "sha256": "82EE8665E8B189F1FA6BDD9D545C4A576752D47C43B5A97B498417883A5D9C93",
+      "bytes": 9203,
+      "lastWriteTimeUtc": "2026-08-30T10:58:05.3939513Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "docs/Architecture/KamisAmsCoreAnalysisAndMigration.md",
+      "sha256": "3F179B921DF0CC076A5803BB4D817059B049D82B1160F4A3287265270A131294",
+      "bytes": 9861,
+      "lastWriteTimeUtc": "2026-07-30T09:25:19.7175601Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "sha256": "D8DDCE4EA84F0CE7846207DDE50B81EAE4DB5BA980BF92D1022BDB4A7502A42D",
+      "bytes": 20945,
+      "lastWriteTimeUtc": "2026-08-30T10:55:14.0057064Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "eng/work-areas/regional-culture-public-data.json",
+      "sha256": "BDB3DD8C264DE5CF5656C8A2102390DE4FF3576D8340A50786DA8ED32FBA921A",
+      "bytes": 821,
+      "lastWriteTimeUtc": "2026-07-25T12:33:16.7162664Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/PublicDataApiMetadataCatalog.cs",
+      "sha256": "D969D9D519B33936BEC331DC3E7E2738354DD190CF8C36E6AD20052556C0FB5B",
+      "bytes": 40039,
+      "lastWriteTimeUtc": "2026-08-03T08:09:15.4148526Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/Foundation/ExternalDataSourceCatalog.cs",
+      "sha256": "9D300B15E682CD33B049F064D353906B6D19736AD1427BEF9C9C9EC15FADA529",
+      "bytes": 5248,
+      "lastWriteTimeUtc": "2026-08-08T13:27:59.3111154Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/Foundation/ExternalDataIngestionRuntime.cs",
+      "sha256": "A57B9D6EA3B7B0F4908CDA118AFDD276A53329CA283E935A1C957F93B0BB34AF",
+      "bytes": 18304,
+      "lastWriteTimeUtc": "2026-08-08T13:40:51.4655281Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/Agriculture/FarmRealityDataSources.cs",
+      "sha256": "53E28567A677BA2592887F9119CB44763599C9BB67738A75D6774C7E2ED8C707",
+      "bytes": 3471,
+      "lastWriteTimeUtc": "2026-08-21T00:11:32.9046859Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/External/PublicData/FoodPriceCrosswalkCatalog.cs",
+      "sha256": "54C8E557B007D08FD58E2DD7453CFA72D5E49823B99F59CBF8A6E0076DF507BD",
+      "bytes": 11057,
+      "lastWriteTimeUtc": "2026-08-02T10:33:34.3864573Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro공공데이터Module.cs",
+      "sha256": "2E3E84A2E2D1DAD2414AA5A11AE747F92CABB593F2563630C5F9B9E03535FCA0",
+      "bytes": 20126,
+      "lastWriteTimeUtc": "2026-08-21T00:34:48.2284077Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/농사로감자생육요구ProfileQuery.cs",
+      "sha256": "95B83148356BA1699C5F412B7956AAF0E8BECCE4772D01CA660034B7649846CB",
+      "bytes": 9079,
+      "lastWriteTimeUtc": "2026-08-21T00:09:42.0574914Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Nongsaro감자ProfileArchiveService.cs",
+      "sha256": "B17E24423842734D00C7772E4C6260B160042D93580C17C2C60A3EEA573E6EC2",
+      "bytes": 4820,
+      "lastWriteTimeUtc": "2026-08-21T00:39:47.6219265Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/공통식품품목IdentityCatalog.cs",
+      "sha256": "B508BBFE4A9106DE50FEA3C69849D17F2480D58F27CCD6192D05869D1D37B22C",
+      "bytes": 9454,
+      "lastWriteTimeUtc": "2026-08-10T05:42:15.3277177Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/KamisJsonClient.cs",
+      "sha256": "712A2443E7DF46824D10A12C2774351B717C2BFEAA7304396D148E130DB1D01E",
+      "bytes": 3336,
+      "lastWriteTimeUtc": "2026-07-19T15:10:28.4042888Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/KamisPriceArchiveService.cs",
+      "sha256": "F0BB0724B14F47DD2C1D65B882C517E24FE92D1332414296CF43F936078F87AE",
+      "bytes": 9603,
+      "lastWriteTimeUtc": "2026-08-01T03:16:47.8892200Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/KamisPriceUnitProvenance.cs",
+      "sha256": "6FE6E93FED0BD8746AAF2ED8FA85382CB2605BA6EA02618ECBE6521BA3CBF2CC",
+      "bytes": 1292,
+      "lastWriteTimeUtc": "2026-08-01T03:16:47.8862200Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/UsdaAmsMarketNewsClient.cs",
+      "sha256": "62A3C724673387D7D1E87E21888F0FF99D55E60197861563ED7889095017E8D1",
+      "bytes": 11986,
+      "lastWriteTimeUtc": "2026-07-29T06:29:29.4128239Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/UsdaAms시장가격ArchiveService.cs",
+      "sha256": "C8FEDD5C6CBD84FB51B7533C027CDB736A59EAD55B84644D67BAFF228F0E36B6",
+      "bytes": 25103,
+      "lastWriteTimeUtc": "2026-07-30T09:17:28.8694423Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Kamis중심UsdaAms품목MappingCatalog.cs",
+      "sha256": "2B6C1E2F2D785BFD26566A64F4E22CF8926F4D3B3156C0DC86941FF185E0C64C",
+      "bytes": 10002,
+      "lastWriteTimeUtc": "2026-07-29T06:47:19.0312517Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/Kamis중심UsdaAms가격비교QueryService.cs",
+      "sha256": "D1F153BE35A9F63A16691EB9657C178424EB1B82F7F33251FF54A3C8F01F05AD",
+      "bytes": 48250,
+      "lastWriteTimeUtc": "2026-08-01T03:18:10.9923718Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel/Services/AgriculturalFisheries/Information/기상청Asos일관측Client.cs",
+      "sha256": "86F862465104713C993FB1F6DBA59C97A8BEB5F850C9EAE231591E5F1CC57DBA",
+      "bytes": 10659,
+      "lastWriteTimeUtc": "2026-08-11T09:43:08.0740182Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel.Simulation.Persistence/SimulationSharedPublicDataPersistence.cs",
+      "sha256": "6DBEF97B077E56D276FA88C232C580F416FDBA226E7A6A260046DB9B45C317C5",
+      "bytes": 5472,
+      "lastWriteTimeUtc": "2026-08-13T05:10:44.1778332Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel.Simulation.Application/SimulationRealityContextService.cs",
+      "sha256": "4559D85C66B8916D3C026EE8806C21419AE20F9986AEA4269CA8841ED08ADBE2",
+      "bytes": 28697,
+      "lastWriteTimeUtc": "2026-08-23T12:42:13.1013978Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel.Simulation.Application/SimulationFarmRealityEvidenceService.cs",
+      "sha256": "586F439CCF791EEEEB18A836910A9F8D293BD81D751933EF20C9DAE84C359697",
+      "bytes": 13076,
+      "lastWriteTimeUtc": "2026-08-23T12:42:13.0878348Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel.Contracts/Common/AgriculturalFisheries/Kamis중심UsdaAms가격비교Dtos.cs",
+      "sha256": "86D3D15F5867864A20048A156F36FBFD2FF090C2B827532C8668FDDD0A9D6FC8",
+      "bytes": 5699,
+      "lastWriteTimeUtc": "2026-08-01T03:17:16.6944547Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel.Domain/AgriculturalFisheries/UsdaAms시장가격Archive.cs",
+      "sha256": "2465078204068ED69DE59F7A55D533926AB6D72A9B4E0D1D710C3C8A02F312C0",
+      "bytes": 4663,
+      "lastWriteTimeUtc": "2026-07-29T07:43:10.3652328Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel.Domain/AgriculturalFisheries/KamisPriceArchive.cs",
+      "sha256": "766A0CA8E8CC8D4404861AA56AC6B59A7471691F389F652E52AA0055FE5CBA25",
+      "bytes": 3823,
+      "lastWriteTimeUtc": "2026-08-01T03:16:47.8872209Z",
+      "existsInAssignedWorktree": false
+    },
+    {
+      "path": "Ssalddel.Tests/Services/AgriculturalFisheries/Nongsaro감자생육요구ProfileTests.cs",
+      "sha256": "47578BB95EACC87F4F79BFDDC73113FB50909BA7886B5C99FD4A92C6F62E2D13",
+      "bytes": 6539,
+      "lastWriteTimeUtc": "2026-08-11T09:30:43.6275930Z",
+      "existsInAssignedWorktree": false
+    }
+  ]
+}

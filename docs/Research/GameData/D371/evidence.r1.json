@@ -1,0 +1,266 @@
+{
+  "schemaVersion": "game-data-research.d371.evidence.r1",
+  "packageRevision": "game-data-research.market-insight.d371.r1",
+  "capturedAt": "2026-08-30T20:21:03.0822799+09:00",
+  "sharedRoot": "C:/Users/user/source/repos/Hongdal",
+  "assignedWorktree": "C:\\Users\\user\\.codex\\worktrees\\ea96\\Hongdal",
+  "assignedHead": "b0c1c8469664ae6cce9e272f93650d6eba796804",
+  "sharedHead": "712c4a08349bcda0b7c4b0489bfb8ad2a1e7087a",
+  "planningExpectedSha256": "4E04E897DF469C795BE55B7EC1C87F4C6771AE96DCF4EC56978608FAE264D419",
+  "previousPackageManifestSha256": "C9FF7003AF75AE4FB75B55FD706D94E11FC9F5684D59C9CC19A61E4DCCE10DFE",
+  "sourceCount": 3,
+  "productPairsVerified": 0,
+  "dataOrPaidApiCalls": 0,
+  "rawSamplesAcquired": 0,
+  "researchOnly": true,
+  "sources": [
+    {
+      "id": "D371-S01",
+      "provider": "Amazon",
+      "title": "SP-API Registration Overview",
+      "officialUrl": "https://developer-docs.amazon/sp-api/docs/sp-api-registration-overview",
+      "requestedUrl": "https://developer-docs.amazon.com/sp-api/docs/sp-api-registration-overview",
+      "version": "Live documentation; explicit publication date not verified",
+      "method": "web open; redirected to developer-docs.amazon",
+      "sections": [
+        "Registration requirements",
+        "Private seller applications",
+        "Public seller and vendor applications",
+        "Registration resources"
+      ],
+      "finding": "Developer/app registration and authorization are required; public app OAuth/Appstore and private seller Professional account requirements; AUP/DPP/agreement review required.",
+      "retention": "Not established",
+      "redisplay": "Not established",
+      "dataAccess": "Authorized API; no anonymous/free product dataset entitlement established",
+      "reviewedDate": "2026-08-30",
+      "timezone": "Asia/Seoul",
+      "region": "Platform/service policy scope; not country-level market observation",
+      "currency": "Not applicable: no price observations",
+      "units": "Not applicable: policy guidance",
+      "referenceTime": "Policy effective date where stated; access date is not product observation date",
+      "refreshCadence": "Not verified; recheck applicable revision before any activation",
+      "relatedQuestions": [
+        "Q399",
+        "Q402"
+      ],
+      "relatedDecision": "D371",
+      "workItemBinding": null,
+      "webReadingKeyRequired": false,
+      "apiKeyOrAuthorization": "Required for Amazon SP-API; Alibaba official data access unverified",
+      "fee": "Guidance publicly readable; API/service fees not checked and not assumed free",
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "productSampleCount": 0,
+      "storedRawBytes": 0,
+      "summaryTransformed": true,
+      "legalReview": false,
+      "acquisitionApproved": false,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D371-S02",
+      "provider": "Amazon",
+      "title": "Announcement for Policy Update",
+      "officialUrl": "https://developer.amazonservices.com/policy-update-for-sp-api",
+      "version": "Effective 2026-08-25; announcement publication date not reliably distinguished from page navigation metadata",
+      "method": "web open",
+      "sections": [
+        "What is changing",
+        "What you need to do"
+      ],
+      "finding": "Update summary mentions storage encryption, deletion within 30 days when required and expanded throttling-circumvention prohibition; continued API use after effective date accepts updated policies.",
+      "retention": "Conditional deletion summary only; not a universal 30-day storage entitlement; full governing text not reviewed",
+      "redisplay": "Not established; full AUP/DPP and purpose-specific authorization remain unresolved",
+      "dataAccess": "No API invocation/acceptance/account inspection performed",
+      "reviewedDate": "2026-08-30",
+      "timezone": "Asia/Seoul",
+      "region": "Platform/service policy scope; not country-level market observation",
+      "currency": "Not applicable: no price observations",
+      "units": "Not applicable: policy guidance",
+      "referenceTime": "Policy effective date where stated; access date is not product observation date",
+      "refreshCadence": "Not verified; recheck applicable revision before any activation",
+      "relatedQuestions": [
+        "Q399",
+        "Q402"
+      ],
+      "relatedDecision": "D371",
+      "workItemBinding": null,
+      "webReadingKeyRequired": false,
+      "apiKeyOrAuthorization": "Required for Amazon SP-API; Alibaba official data access unverified",
+      "fee": "Guidance publicly readable; API/service fees not checked and not assumed free",
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "productSampleCount": 0,
+      "storedRawBytes": 0,
+      "summaryTransformed": true,
+      "legalReview": false,
+      "acquisitionApproved": false,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    },
+    {
+      "id": "D371-S03",
+      "provider": "Alibaba.com",
+      "title": "Terms of Use",
+      "officialUrl": "https://rule.alibaba.com/rule/detail/2041.htm",
+      "resolvedUrl": "https://rulechannel.alibaba.com/icbu?type=detail&ruleId=2041&cId=1307#/rule/detail?cId=1307&ruleId=2041",
+      "version": "Part A updated 2026-03-11, effective 2026-03-17; page also displays 2024-06-17 14:41 and Part B old version",
+      "method": "web open initially body unavailable; in-app browser rendered #rule-detail-body and Part A reviewed without login/consent",
+      "sections": [
+        "Part A version header",
+        "3.2",
+        "7.4"
+      ],
+      "finding": "Site-content copying/download/republication/commercial exploitation restricted; systematic retrieval including manual compilation requires written permission; transaction terms are separately agreed by parties.",
+      "retention": "No product-content storage allowance or retention term established",
+      "redisplay": "Hold; specific permission not obtained",
+      "dataAccess": "No official product API/license scope verified; no product pages/data retrieved",
+      "reviewedDate": "2026-08-30",
+      "timezone": "Asia/Seoul",
+      "region": "Platform/service policy scope; not country-level market observation",
+      "currency": "Not applicable: no price observations",
+      "units": "Not applicable: policy guidance",
+      "referenceTime": "Policy effective date where stated; access date is not product observation date",
+      "refreshCadence": "Not verified; recheck applicable revision before any activation",
+      "relatedQuestions": [
+        "Q399",
+        "Q402"
+      ],
+      "relatedDecision": "D371",
+      "workItemBinding": null,
+      "webReadingKeyRequired": false,
+      "apiKeyOrAuthorization": "Required for Amazon SP-API; Alibaba official data access unverified",
+      "fee": "Guidance publicly readable; API/service fees not checked and not assumed free",
+      "sourceFile": null,
+      "sourceFileSha256": null,
+      "productSampleCount": 0,
+      "storedRawBytes": 0,
+      "summaryTransformed": true,
+      "legalReview": false,
+      "acquisitionApproved": false,
+      "developmentAcceptance": "Pending",
+      "simulationApplied": false
+    }
+  ],
+  "references": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "F6081AB2FE9553D627F430BEB57EC59B7214298077DDBC6335379FC527334754",
+      "bytes": 29466
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "sha256": "CDEB154ACCEB4F1279088D4406BCB4173E9DDFA7A9BBD7B06AB535EB1768CF09",
+      "bytes": 1206
+    },
+    {
+      "path": "docs/Architecture/게임자료조사전문운영.md",
+      "sha256": "43B85567920A8CDACA80A15A0B544D1863670340614AA5544286064DC5BC368C",
+      "bytes": 3685
+    },
+    {
+      "path": "docs/AI/DECISIONS.md",
+      "sha256": "A7FF9FC2EFFF9BFDF0BBC7E7C5DD6422AF9F5501F1D330A2C14383EDDC0240DC",
+      "bytes": 548238
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "sha256": "AA25AF041E0F9E0DA2A67C79E4F5598F48D7CDEDB803539FBA7E5C5725727FFF",
+      "bytes": 19889
+    },
+    {
+      "path": "docs/Architecture/AmazonExportReadiness.md",
+      "sha256": "308067D69853810E99934148240CB69B63E85C7B2A06FA1F95885D28C99D752B",
+      "bytes": 5468
+    },
+    {
+      "path": "docs/Architecture/ApifyAmazonProductResearch.md",
+      "sha256": "5EB964F2A5CEBFDD9C03CFE008F0EB241EAC6726F26D072C46A206708A1E2EBA",
+      "bytes": 4860
+    },
+    {
+      "path": "Ssalddel.Contracts/Common/Sales/AmazonExportReadinessPlanner.cs",
+      "sha256": "C6D2155D258735DBB70D501996506936CC02230A4E6CC3A47DD510A68E75DA67",
+      "bytes": 19793
+    },
+    {
+      "path": "SsalddelApp/Services/Commerce/Amazon/AmazonSpApiProductPayloadBuilder.cs",
+      "sha256": "0E28D02B15602B4A826EB5CCD0722E3FD7CE9D845F3DFC91660144E1C72611F3",
+      "bytes": 1159
+    },
+    {
+      "path": "Ssalddel.Contracts/Common/Content/AmazonProductResearchDtos.cs",
+      "sha256": "D538233A16D14CAF3700B18CF226360D277F4898A62C826717D47D0AC76F6FE1",
+      "bytes": 1500
+    },
+    {
+      "path": "Ssalddel/Services/Content/Amazon상품참고자료Service.cs",
+      "sha256": "B081C939649D3BAF8DDE755464D466D9518DCE7094A3BC8CA2DA33FC7009EF16",
+      "bytes": 3424
+    },
+    {
+      "path": "Ssalddel/Services/Content/AmazonProductUrlPolicy.cs",
+      "sha256": "84E0253C1A0A15BAB8371498D83C377E3619CB9D661012C0C25B11CAFCDA962C",
+      "bytes": 3477
+    },
+    {
+      "path": "Ssalddel/Services/External/Apify/ApifyAmazonProductClient.cs",
+      "sha256": "637B650BE3F062B9EA742E4E05C2AAA29AB71A1043FE01FE1BD1E0D432A1A1FD",
+      "bytes": 10280
+    },
+    {
+      "path": "Ssalddel/Controllers/Admin/07_콘텐츠/Amazon상품참고자료Controller.cs",
+      "sha256": "5F9FD30DDBC6B1CED1C62DFE2746D2ACD10EB50FFF7BF9FF6B42EB0F4F38642D",
+      "bytes": 957
+    },
+    {
+      "path": "Ssalddel/Services/External/Apify/ApifyInteriorProductObservation.cs",
+      "sha256": "231EAA13659BF8A655092041A64226F1F1EE5670BA220ADC3700EF0B09E5EEC8",
+      "bytes": 13100
+    },
+    {
+      "path": "Ssalddel/Services/Options/ApifyInteriorProductsOptions.cs",
+      "sha256": "CE06F1C104AB0EE902756ED492C7283135C0301844120765CD0447E78EF21ECA",
+      "bytes": 1286
+    },
+    {
+      "path": "Ssalddel.Domain/판매/상품식별코드맵.cs",
+      "sha256": "E252425C5700D0501BDA09F868A4216D254C6B2BAFB63A1FA45FF63F682B4BF7",
+      "bytes": 934
+    },
+    {
+      "path": "Ssalddel.Domain/판매/채널출품.cs",
+      "sha256": "287567BA20AC47C8E30717E60AFD22E8EDD656F7BEA6D293B43C2B3ECC06CB73",
+      "bytes": 1103
+    },
+    {
+      "path": "Ssalddel/Services/Sales/SalesChannelService.cs",
+      "sha256": "57704F64305C0D94B074062F639AA08973F810D7AA5F91B3A5AE271649FB2418",
+      "bytes": 26150
+    },
+    {
+      "path": "Ssalddel/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncService.cs",
+      "sha256": "C7EC40DC08B934BEEFD40DC8D55B888C15B50070A6747B089D8465935DB3E8A0",
+      "bytes": 13471
+    },
+    {
+      "path": "Ssalddel.Contracts/Common/Sales/ProductPageDtos.cs",
+      "sha256": "A0C93E01B97E0D0E854C271EC368EEEA52918D39DB099DADBD6BBA7DDBD8E650",
+      "bytes": 5489
+    },
+    {
+      "path": "Ssalddel/Services/Sales/판매페이지Service.cs",
+      "sha256": "1B1294B541A67E65EB3443C5B0FAC791588FFF8653CBE2EFAE7190B828ADBBD8",
+      "bytes": 18114
+    },
+    {
+      "path": "Ssalddel/Services/Content/AmazonAssociatesLinkBuilder.cs",
+      "sha256": "3411E1C924FE0081232C6F0B3995D244DE23E31A867E848741C2F4FD88B063AC",
+      "bytes": 2821
+    }
+  ],
+  "hashTiming": "File hashes after read-only inspection; mutable shared worktree is not an atomic snapshot",
+  "planningInitialVerification": "r6 expected hash matched at start; shared planning advanced during research",
+  "planningAtReferenceCapture": "r8 / D372-D373; reread at finish; AA25AF041E0F9E0DA2A67C79E4F5598F48D7CDEDB803539FBA7E5C5725727FFF"
+}
