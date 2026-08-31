@@ -15,6 +15,98 @@ namespace Ssalddel.Simulation.Tests;
 public sealed class LocalSimulationRuntimeTests
 {
     [Fact]
+    public async Task Nature표현관측은_읽기와반환사본수정으로_권위와저장을바꾸지않는다()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "nature-observation-" + Guid.NewGuid().ToString("N"));
+        using var runtime = CreateRuntime(new FileSimulationLocalSaveSlotStore(root));
+        var created = await runtime.Sessions.CreateAsync(CreateRequest());
+        var first = await runtime.GetNature표현관측Async(created.SessionStableId);
+        var before = System.Text.Json.JsonSerializer.Serialize(first);
+        Assert.Equal(created.Revision, first.Session.Revision);
+        Assert.Equal(created.CurrentTick, first.Session.CurrentTick);
+        Assert.Equal(first.Session.NatureSurvival.PlayerStableId, first.Nature.PlayerStableId);
+        first.Session.Revision = 999;
+        first.Nature.ResourceNodes[0].StateCode = "changed-by-reader";
+        first.BuildingProgression.AreaCode = "changed-by-reader";
+        var again = await runtime.GetNature표현관측Async(created.SessionStableId);
+        Assert.Equal(before, System.Text.Json.JsonSerializer.Serialize(again));
+        Assert.False(Directory.Exists(root) && Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories).Any());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Nature표현관측은_완료와취소를_같은상태의실제행위기록으로구분한다(bool cancel)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "nature-observation-terminal-" + Guid.NewGuid().ToString("N"));
+        using var runtime = CreateRuntime(new FileSimulationLocalSaveSlotStore(root));
+        var created = await runtime.Sessions.CreateAsync(CreateRequest());
+        var axe = await runtime.Nature.ConfirmAsync(created.SessionStableId, new SimulationNatureSurvivalCommandRequest
+        {
+            CommandId = "observation:axe", ExpectedRevision = created.Revision, PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.AcquireAxe,
+            TargetStableId = SimulationNatureSurvivalCodes.AxePickupStableId,
+        });
+        var started = await runtime.Nature.ConfirmAsync(created.SessionStableId, new SimulationNatureSurvivalCommandRequest
+        {
+            CommandId = "observation:harvest", ExpectedRevision = axe.Revision, PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.BeginHarvest, TargetStableId = "resource:nature-tree:01",
+        });
+        var working = await runtime.GetNature표현관측Async(created.SessionStableId);
+        Assert.Equal("observation:harvest", working.Nature.ActiveWork!.OriginCommandId);
+        Assert.DoesNotContain(working.ActionLedger!.TailRecords, r => r.PrimaryOutcomeCode == "HarvestCompleted");
+        var terminal = cancel
+            ? await runtime.Nature.ConfirmAsync(created.SessionStableId, new SimulationNatureSurvivalCommandRequest
+            {
+                CommandId = "observation:cancel", ExpectedRevision = started.Revision, PlayerStableId = "player:solo",
+                ActionCode = SimulationNatureSurvivalCodes.CancelActiveWork, TargetStableId = "resource:nature-tree:01",
+            })
+            : await runtime.Nature.AdvanceRealtimeAsync(created.SessionStableId, new SimulationNatureSurvivalClockAdvanceRequest
+            {
+                CommandId = "observation:clock", ExpectedRevision = started.Revision,
+                ElapsedRealtimeSeconds = NatureSurvivalRules.HarvestWorkSeconds, WorkInputHeld = true,
+            });
+        var observed = await runtime.GetNature표현관측Async(created.SessionStableId);
+        Assert.Equal(terminal.Revision, observed.Session.Revision);
+        Assert.Null(observed.Nature.ActiveWork);
+        Assert.Null(observed.Session.NatureSurvival.ActiveWork);
+        var completed = observed.ActionLedger!.TailRecords.Where(r => r.PrimaryOutcomeCode == "HarvestCompleted").ToArray();
+        if (cancel) Assert.Empty(completed);
+        else
+        {
+            var record = Assert.Single(completed);
+            Assert.Equal("observation:harvest:completed", record.CommandId);
+            Assert.Equal(created.SessionStableId, record.SessionStableId);
+            Assert.Equal(observed.Nature.PlayerStableId, record.ActorStableId);
+            Assert.Equal("resource:nature-tree:01", Assert.Single(record.TargetStableIds));
+            Assert.Equal(terminal.Revision, record.AfterWorldRevision);
+            Assert.Equal(SimulationNatureSurvivalCodes.Stump, observed.Nature.ResourceNodes[0].StateCode);
+            var recordHash = record.기록HashSha256;
+            record.TargetStableIds[0] = "changed-by-reader";
+            record.ActorStableId = "changed-by-reader";
+            var repeated = await runtime.GetNature표현관측Async(created.SessionStableId);
+            var original = Assert.Single(repeated.ActionLedger!.TailRecords, r => r.PrimaryOutcomeCode == "HarvestCompleted");
+            Assert.Equal("player:solo", original.ActorStableId);
+            Assert.Equal("resource:nature-tree:01", original.TargetStableIds[0]);
+            Assert.Equal(recordHash, original.기록HashSha256);
+            Assert.Equal(terminal.Revision, repeated.Session.Revision);
+        }
+        Assert.False(Directory.Exists(root) && Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories).Any());
+    }
+
+    [Fact]
+    public async Task Nature표현관측은_취소된조회와없는Session을_대체상태로숨기지않는다()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "nature-observation-reject-" + Guid.NewGuid().ToString("N"));
+        using var runtime = CreateRuntime(new FileSimulationLocalSaveSlotStore(root));
+        var created = await runtime.Sessions.CreateAsync(CreateRequest());
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => runtime.GetNature표현관측Async(
+            created.SessionStableId, new System.Threading.CancellationToken(true)).AsTask());
+        await Assert.ThrowsAsync<SimulationNotFoundException>(() => runtime.GetNature표현관측Async("missing-session").AsTask());
+        Assert.Equal(created.Revision, (await runtime.Sessions.GetAsync(created.SessionStableId)).Revision);
+    }
+
+    [Fact]
     public void LocalRuntime_WI포트를_같은권위인스턴스로노출한다()
     {
         var savesRoot = Path.Combine(Path.GetTempPath(),
