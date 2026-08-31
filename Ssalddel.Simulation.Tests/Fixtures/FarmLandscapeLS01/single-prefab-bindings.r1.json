@@ -1,0 +1,50 @@
+[
+  {
+    "VisualKey": "candidate:ls01:asset:SM_Env_Bush_01",
+    "CompositionKey": "candidate:ls01:single-prefab:7c35a3f284a3b7e4289e64020f72746d",
+    "PrefabGuid": "7c35a3f284a3b7e4289e64020f72746d",
+    "PrefabHashSha256": "3002849C9EF1C1762D3A5901CFE3E9EA81D9801F1C6D706CA78D0B3C0109EED0",
+    "MetaHashSha256": "2BD6774AE3BE26506ABD0424CF1108CF58F697AECA1FE50B8B3977F71B37254B",
+    "SourceObjectCount": 1
+  },
+  {
+    "VisualKey": "candidate:ls01:asset:SM_Env_Tree_Large_01",
+    "CompositionKey": "candidate:ls01:single-prefab:a8d49857a659bcb409bc5dbbbba90cca",
+    "PrefabGuid": "a8d49857a659bcb409bc5dbbbba90cca",
+    "PrefabHashSha256": "CA694A4D4998E5FFFDD17C28F3DF0D72C71FD00B193D55F8980A5903CFBA73F8",
+    "MetaHashSha256": "028E9C91FC58E28CA1C357853055DE8659011BFE2037F584B2CAC86E0E7156EE",
+    "SourceObjectCount": 1
+  },
+  {
+    "VisualKey": "candidate:ls01:asset:SM_Generic_Grass_Patch_02",
+    "CompositionKey": "candidate:ls01:single-prefab:d68c69e2093d0df439a8aabd018a2b85",
+    "PrefabGuid": "d68c69e2093d0df439a8aabd018a2b85",
+    "PrefabHashSha256": "A4CAE582EAB2D38BDD8D92022D13EEEE5A4147D67F12C2805FA3FA347C2CABCE",
+    "MetaHashSha256": "1FF20683DEAF43AE858BC8FCB2A675DF8A1F68FE1D57C8B0A8BD7ED894A0BD0E",
+    "SourceObjectCount": 1
+  },
+  {
+    "VisualKey": "candidate:ls01:asset:SM_Generic_Small_Rocks_01",
+    "CompositionKey": "candidate:ls01:single-prefab:e2237f9c45037b34da96772393062ed0",
+    "PrefabGuid": "e2237f9c45037b34da96772393062ed0",
+    "PrefabHashSha256": "B66360B72075E7FC5CF8CC371BCC24C554009E260AB7B8F5F07CAAE3FC89FB04",
+    "MetaHashSha256": "3F954139B7429F05A9127B3754957360B8C2806878AB8DF630F3F424B8021984",
+    "SourceObjectCount": 1
+  },
+  {
+    "VisualKey": "candidate:ls01:asset:SM_Generic_Tree_01",
+    "CompositionKey": "candidate:ls01:single-prefab:7a49ca0e5bf43fa45b5159d6d6265a09",
+    "PrefabGuid": "7a49ca0e5bf43fa45b5159d6d6265a09",
+    "PrefabHashSha256": "A13D8B454154012F8F3E688165CCC37F5C03ADE46AEF1E70C22E4C6A9908C511",
+    "MetaHashSha256": "E6F51FEA80AD32FD73AAE1FC755C088C5C86CE95B76CFA249FE10A198CE69203",
+    "SourceObjectCount": 1
+  },
+  {
+    "VisualKey": "candidate:ls01:asset:SM_Tree_Birch_01",
+    "CompositionKey": "candidate:ls01:single-prefab:1ea71f643417d124d91e53eae7c666a6",
+    "PrefabGuid": "1ea71f643417d124d91e53eae7c666a6",
+    "PrefabHashSha256": "78AFFC39F7CE1453DB6ADAAA07CD023A47CF673BED393991B18068686F1166E1",
+    "MetaHashSha256": "563546459236EB360925E3BA377FBF30FEF8CA8D0A234BDA05C3B7E3B6569EB1",
+    "SourceObjectCount": 1
+  }
+]

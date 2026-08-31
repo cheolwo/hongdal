@@ -334,7 +334,10 @@ public sealed class SimulationWorldLandscapeGrammarManifestReader(string manifes
             return false;
         }
 
-        var json = File.ReadAllText(resolvedPath, Encoding.UTF8);
+        var sourceBytes = File.ReadAllBytes(resolvedPath);
+        using var sourceStream = new MemoryStream(sourceBytes, writable: false);
+        using var sourceReader = new StreamReader(sourceStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+        var json = sourceReader.ReadToEnd();
         if (json.Contains("Assets/", StringComparison.OrdinalIgnoreCase)
             || json.Contains(".prefab", StringComparison.OrdinalIgnoreCase)
             || json.Contains("\"guid\"", StringComparison.OrdinalIgnoreCase))
@@ -362,6 +365,7 @@ public sealed class SimulationWorldLandscapeGrammarManifestReader(string manifes
             SchemaVersion = document.SchemaVersion,
             CatalogRevision = document.CatalogRevision,
             CatalogHashSha256 = document.CatalogHashSha256,
+            SourceDocumentHashSha256 = Convert.ToHexString(SHA256.HashData(sourceBytes)),
             PresentationOnly = document.PresentationOnly,
             Entries = document.Entries.Select(item => new SimulationWorldLandscapeGrammarEntry
             {
@@ -372,6 +376,16 @@ public sealed class SimulationWorldLandscapeGrammarManifestReader(string manifes
                 TopologyCode = item.TopologyCode,
                 FootprintX = item.FootprintX,
                 FootprintY = item.FootprintY,
+                MinimumSlopeDegrees = item.MinimumSlopeDegrees,
+                MaximumSlopeDegrees = item.MaximumSlopeDegrees,
+                EdgeProfiles = item.EdgeProfiles?.Select(value => new SimulationWorldLandscapeGrammarEdge
+                {
+                    DirectionCode = value.DirectionCode,
+                    ProfileCode = value.ProfileCode,
+                    Required = value.Required,
+                }).ToArray(),
+                AllowedNeighborTopologyCodes = item.AllowedNeighborTopologyCodes,
+                ForbiddenNeighborTopologyCodes = item.ForbiddenNeighborTopologyCodes,
                 MaxConsecutive = item.MaxConsecutive,
                 RecentWindowSize = item.RecentWindowSize,
                 MirrorAllowed = item.MirrorAllowed,
@@ -431,8 +445,8 @@ public sealed class SimulationWorldLandscapeGrammarManifestReader(string manifes
                 .Append(entry.AssemblyScaleCode).Append('|')
                 .Append(entry.FootprintX.ToString("R", System.Globalization.CultureInfo.InvariantCulture)).Append('|')
                 .Append(entry.FootprintY.ToString("R", System.Globalization.CultureInfo.InvariantCulture)).Append('|')
-                .Append(entry.MinimumSlopeDegrees.ToString("R", System.Globalization.CultureInfo.InvariantCulture)).Append('|')
-                .Append(entry.MaximumSlopeDegrees.ToString("R", System.Globalization.CultureInfo.InvariantCulture)).Append('|')
+                .Append(entry.MinimumSlopeDegrees.GetValueOrDefault().ToString("R", System.Globalization.CultureInfo.InvariantCulture)).Append('|')
+                .Append(entry.MaximumSlopeDegrees.GetValueOrDefault().ToString("R", System.Globalization.CultureInfo.InvariantCulture)).Append('|')
                 .Append(string.Join(",", entry.EdgeProfiles
                     .OrderBy(item => item.DirectionCode, StringComparer.Ordinal)
                     .Select(item => item.DirectionCode + ":" + item.ProfileCode + ":"
@@ -470,9 +484,11 @@ public sealed class SimulationWorldLandscapeGrammarManifestReader(string manifes
         public string AssemblyScaleCode { get; set; } = string.Empty;
         public float FootprintX { get; set; }
         public float FootprintY { get; set; }
-        public float MinimumSlopeDegrees { get; set; }
-        public float MaximumSlopeDegrees { get; set; }
+        public float? MinimumSlopeDegrees { get; set; }
+        public float? MaximumSlopeDegrees { get; set; }
         public ManifestEdge[] EdgeProfiles { get; set; } = Array.Empty<ManifestEdge>();
+        public string[]? AllowedNeighborTopologyCodes { get; set; }
+        public string[]? ForbiddenNeighborTopologyCodes { get; set; }
         public int MaxConsecutive { get; set; }
         public int RecentWindowSize { get; set; }
         public bool MirrorAllowed { get; set; }

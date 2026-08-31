@@ -8,6 +8,7 @@ using System.Text.Json;
 using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
+using static Ssalddel.Simulation.Application.Simulation배치적합성검사;
 
 namespace Ssalddel.Simulation.Application
 {
@@ -23,6 +24,10 @@ namespace Ssalddel.Simulation.Application
 
         public SimulationFarmH2PlacementResult Convert(SimulationFarmH2PlacementRequest request,
             ISimulationFarmH2SurfaceReader surface)
+            => ConvertWithObservations(request, surface, null, out _);
+
+        internal SimulationFarmH2PlacementResult ConvertWithObservations(SimulationFarmH2PlacementRequest request,
+            ISimulationFarmH2SurfaceReader surface, 표면관찰Session? session, out Dictionary<string, Box> envelopes)
         {
             if (request == null || surface == null) throw Error("InputMissing");
             ValidateContext(request, surface);
@@ -54,22 +59,11 @@ namespace Ssalddel.Simulation.Application
                 throw Error("BindingCoverageInvalid");
             var sourceIds = new HashSet<string>(sourceObjects.Select(x => S(x, "StableId")), StringComparer.Ordinal);
             if (bindings.Keys.Any(x => !sourceIds.Contains(x))) throw Error("UnknownPlacementBinding");
-            var observations = new SortedDictionary<string, string>(StringComparer.Ordinal);
-            SimulationFarmH2SurfaceSample Read(double x, double z)
-            {
-                var wx = request.CellWorldOriginXMeters + x;
-                var wz = request.CellWorldOriginZMeters + z;
-                var s = surface.Read(wx, wz);
-                if (s == null || !s.Supported || !s.PlacementAllowed) throw Error("SurfaceSupportMissingOrDenied");
-                if (!Finite(s.HeightMeters) || !Finite(s.SlopeDegrees) || s.SlopeDegrees < 0 || s.SlopeDegrees > 90) throw Error("SurfaceSampleInvalid");
-                var key = F(wx) + "," + F(wz);
-                var value = F(s.HeightMeters) + "," + F(s.SlopeDegrees);
-                if (observations.TryGetValue(key, out var old) && old != value) throw Error("SurfaceChangedDuringConversion");
-                observations[key] = value;
-                return s;
-            }
+            session ??= new 표면관찰Session(request, surface);
+            var observations = session.Observations;
+            SimulationFarmH2SurfaceSample Read(double x, double z) => session.Read(x, z);
             var placements = new List<Simulation세계자산PlacementSnapshot>();
-            var envelopes = new Dictionary<string, Box>(StringComparer.Ordinal);
+            envelopes = new Dictionary<string, Box>(StringComparer.Ordinal);
             foreach (var source in sourceObjects.OrderBy(x => S(x, "StableId"), StringComparer.Ordinal))
             {
                 var id = S(source, "StableId");
@@ -84,20 +78,10 @@ namespace Ssalddel.Simulation.Application
                 var size = RotatedSize(m.SizeX * scale, m.SizeZ * scale, yaw);
                 var actual = new Box(center.X - size.X / 2, center.Z - size.Z / 2, center.X + size.X / 2, center.Z + size.Z / 2);
                 var reserved = Transform(sourceBox, request);
-                if (!reserved.Contains(actual, request.Policy.BottomToleranceMeters)) throw Error("MeasuredEnvelopeExceedsCandidate:" + id);
+                ValidateReserved(reserved, actual, request.Policy.BottomToleranceMeters, id);
                 CellContains(actual, request);
                 var bottom = request.LocalOriginYMeters + D(source, "Bottom") * request.UniformScale;
-                var heightSamples = new List<double>();
-                foreach (var p in actual.Samples())
-                {
-                    var s = Read(p.X, p.Z);
-                    if (s.SlopeDegrees > request.Policy.MaximumSlopeDegrees) throw Error("SlopeTooSteep:" + id);
-                    heightSamples.Add(s.HeightMeters - request.CellWorldOriginYMeters);
-                }
-                if (heightSamples.Max() - heightSamples.Min() > request.Policy.MaximumHeightSpreadMeters) throw Error("HeightSpreadExceeded:" + id);
-                var clearanceError = bottom - heightSamples.Max() - request.Policy.GroundClearanceMeters;
-                if (clearanceError < -request.Policy.BottomToleranceMeters) throw Error("BuriedBottom:" + id);
-                if (clearanceError > request.Policy.BottomToleranceMeters) throw Error("FloatingBottom:" + id);
+                ValidateSupport(actual, bottom, id, request, Read);
                 envelopes.Add(id, actual);
                 placements.Add(new Simulation세계자산PlacementSnapshot
                 {
@@ -114,19 +98,18 @@ namespace Ssalddel.Simulation.Application
                 });
             }
             var boxes = envelopes.Values.ToArray();
-            for (var a = 0; a < boxes.Length; a++) for (var b = a + 1; b < boxes.Length; b++)
-                if (boxes[a].Touches(boxes[b]) || boxes[a].Distance(boxes[b]) < request.Policy.MinimumSpacingMeters) throw Error("ObjectOverlapOrSpacing");
+            ValidateSpacing(boxes, request.Policy.MinimumSpacingMeters);
             var areas = root.GetProperty("PreservedAreas").EnumerateArray().Select(a =>
             {
                 var box = Transform(Box.From(a.GetProperty("Bounds")), request);
                 CellContains(box, request);
-                if (boxes.Any(box.Touches)) throw Error("PreservedAreaIntrusion");
+                ValidatePreserved(box, boxes);
                 return new SimulationFarmH2ReservedAreaSnapshot { SourceStableId = S(a, "StableId"), RoleCode = S(a, "Role"), MinX = box.MinX, MinZ = box.MinZ, MaxX = box.MaxX, MaxZ = box.MaxZ };
             }).OrderBy(x => x.SourceStableId, StringComparer.Ordinal).ToArray();
             foreach (var obstacle in input.GetProperty("Obstacles").EnumerateArray())
             {
                 var box = Transform(Box.From(obstacle), request);
-                if (boxes.Any(b => b.Touches(box) || b.Distance(box) < request.Policy.MinimumSpacingMeters)) throw Error("ExistingObjectConflict");
+                ValidateObstacle(box, boxes, request.Policy.MinimumSpacingMeters);
             }
             var anchors = root.GetProperty("Anchors").EnumerateArray().Select(a =>
             {
@@ -140,7 +123,7 @@ namespace Ssalddel.Simulation.Application
             var routes = root.GetProperty("Routes").EnumerateArray().Select(r => new SimulationFarmH2RouteSnapshot
             { SourceRouteStableId = S(r, "StableId"), FromSourceAnchorStableId = S(r, "From"), ToSourceAnchorStableId = S(r, "To"), WidthMeters = D(r, "Width") * request.UniformScale }).OrderBy(x => x.SourceRouteStableId, StringComparer.Ordinal).ToArray();
             ValidateRoutes(anchors, routes, areas, placements, envelopes, bindings, input, request, Read);
-            if (surface.Revision != request.SurfaceRevision || surface.HashSha256 != request.SurfaceHashSha256) throw Error("SurfaceChangedDuringConversion");
+            session.ValidateRevision();
             var inputHash = RequestHash(request);
             var plan = new Simulation세계자산배치Plan
             {
@@ -244,29 +227,8 @@ namespace Ssalddel.Simulation.Application
             foreach (var route in routes)
             {
                 if (!nodes.TryGetValue(route.FromSourceAnchorStableId, out var a) || !nodes.TryGetValue(route.ToSourceAnchorStableId, out var b)) throw Error("RouteEndpointMissing");
-                var dx = b.LocalXMeters - a.LocalXMeters; var dz = b.LocalZMeters - a.LocalZMeters;
-                var length = Math.Sqrt(dx * dx + dz * dz);
-                if (!Finite(route.WidthMeters) || route.WidthMeters < r.Policy.MinimumRouteWidthMeters || length <= 0
-                    || (Math.Abs(dx) > 1e-8 && Math.Abs(dz) > 1e-8)) throw Error("RouteGeometryInvalid");
-                var corridor = Math.Abs(dx) < 1e-8 ? new Box(a.LocalXMeters - route.WidthMeters / 2, Math.Min(a.LocalZMeters, b.LocalZMeters), a.LocalXMeters + route.WidthMeters / 2, Math.Max(a.LocalZMeters, b.LocalZMeters))
-                    : new Box(Math.Min(a.LocalXMeters, b.LocalXMeters), a.LocalZMeters - route.WidthMeters / 2, Math.Max(a.LocalXMeters, b.LocalXMeters), a.LocalZMeters + route.WidthMeters / 2);
-                CellContains(corridor, r);
-                foreach (var binding in bindings.Values)
-                    if (binding.PlacementStableId != a.OwnerPlacementStableId && binding.PlacementStableId != b.OwnerPlacementStableId
-                        && corridor.Touches(envelopes[binding.SourcePlacementStableId])) throw Error("ProtectedRouteIntrusion");
-                if (areas.Any(x => x.RoleCode != "WorkYard" && corridor.Touches(new Box(x.MinX, x.MinZ, x.MaxX, x.MaxZ)))) throw Error("RoutePreservedAreaIntrusion");
-                if (input.GetProperty("Obstacles").EnumerateArray().Any(x => corridor.Touches(Transform(Box.From(x), r)))) throw Error("RouteObstacle");
-                var count = (int)Math.Ceiling(length / r.Policy.RouteSampleStepMeters);
-                if (count > 100000) throw Error("RouteSampleBudgetExceeded");
-                var previous = new double?[3];
-                for (var i = 0; i <= count; i++) for (var side = 0; side < 3; side++)
-                {
-                    var offset = (side - 1) * route.WidthMeters / 2;
-                    var sample = read(a.LocalXMeters + dx * i / count - dz / length * offset, a.LocalZMeters + dz * i / count + dx / length * offset);
-                    if (sample.SlopeDegrees > r.Policy.MaximumRouteSlopeDegrees) throw Error("RouteSlopeTooSteep");
-                    if (previous[side].HasValue && Math.Abs(sample.HeightMeters - previous[side]!.Value) > r.Policy.MaximumRouteStepMeters) throw Error("RouteStepExceeded");
-                    previous[side] = sample.HeightMeters;
-                }
+                ValidateRouteSegment(a, b, route, bindings.Values.Select(binding => (binding.PlacementStableId, envelopes[binding.SourcePlacementStableId])),
+                    areas, input.GetProperty("Obstacles").EnumerateArray().Select(x => Transform(Box.From(x), r)), r, read);
                 graph[a.SourceAnchorStableId].Add(b.SourceAnchorStableId); graph[b.SourceAnchorStableId].Add(a.SourceAnchorStableId);
             }
             var skeleton = new[] { "ExternalEntry", "BarnWorkYard", "InternalWorkPath", "ExternalExit" };
@@ -320,37 +282,11 @@ namespace Ssalddel.Simulation.Application
         private static bool Finite(double d) => !double.IsNaN(d) && !double.IsInfinity(d);
         private static string F(double d) => d.ToString("R", CultureInfo.InvariantCulture);
         private static ArgumentException Error(string code) => new ArgumentException("FarmH2:" + code);
-        private static double Normalize(double d) => (d % 360 + 360) % 360;
-        private static (double X, double Z) Rotate(double x, double z, double degrees)
-        {
-            var angle = Normalize(degrees);
-            if (angle == 0) return (x, z); if (angle == 90) return (z, -x); if (angle == 180) return (-x, -z); if (angle == 270) return (-z, x);
-            var rad = angle * Math.PI / 180; return (x * Math.Cos(rad) + z * Math.Sin(rad), -x * Math.Sin(rad) + z * Math.Cos(rad));
-        }
-        private static (double X, double Z) RotatedSize(double x, double z, double yaw)
-        { var a = Rotate(x, z, yaw); var b = Rotate(x, -z, yaw); return (Math.Max(Math.Abs(a.X), Math.Abs(b.X)), Math.Max(Math.Abs(a.Z), Math.Abs(b.Z))); }
-        private static (double X, double Z) Transform(double x, double z, SimulationFarmH2PlacementRequest r)
-        { var p = Rotate(x * r.UniformScale, z * r.UniformScale, r.RotationDegrees); return (p.X + r.LocalOriginXMeters, p.Z + r.LocalOriginZMeters); }
-        private static Box Transform(Box b, SimulationFarmH2PlacementRequest r)
-        { var pts = b.Samples().Select(p => Transform(p.X, p.Z, r)).ToArray(); return new Box(pts.Min(p => p.X), pts.Min(p => p.Z), pts.Max(p => p.X), pts.Max(p => p.Z)); }
         private static string RotateFacing(string facing, double degrees)
         {
             if (facing.Length == 0) return "";
             var values = new[] { "North", "East", "South", "West" }; var index = Array.IndexOf(values, facing);
             if (index < 0) throw Error("FacingInvalid"); return values[(index + (int)(degrees / 90)) % 4];
-        }
-        private static void CellContains(Box b, SimulationFarmH2PlacementRequest r)
-        { if (!new Box(-r.CellSizeMeters / 2, -r.CellSizeMeters / 2, r.CellSizeMeters / 2, r.CellSizeMeters / 2).Contains(b, 0)) throw Error("OutsideOwnerCell"); }
-        private sealed class Box
-        {
-            public double MinX, MinZ, MaxX, MaxZ;
-            public Box(double minX, double minZ, double maxX, double maxZ)
-            { if (!new[] { minX, minZ, maxX, maxZ }.All(Finite) || minX >= maxX || minZ >= maxZ) throw Error("BoundsInvalid"); MinX = minX; MinZ = minZ; MaxX = maxX; MaxZ = maxZ; }
-            public static Box From(JsonElement e) => new Box(D(e, "MinX"), D(e, "MinZ"), D(e, "MaxX"), D(e, "MaxZ"));
-            public bool Contains(Box b, double tolerance) => b.MinX >= MinX - tolerance && b.MaxX <= MaxX + tolerance && b.MinZ >= MinZ - tolerance && b.MaxZ <= MaxZ + tolerance;
-            public bool Touches(Box b) => MinX <= b.MaxX && MaxX >= b.MinX && MinZ <= b.MaxZ && MaxZ >= b.MinZ;
-            public double Distance(Box b) { var x = Math.Max(0, Math.Max(MinX - b.MaxX, b.MinX - MaxX)); var z = Math.Max(0, Math.Max(MinZ - b.MaxZ, b.MinZ - MaxZ)); return Math.Sqrt(x * x + z * z); }
-            public IEnumerable<(double X, double Z)> Samples() { for (var x = 0; x < 3; x++) for (var z = 0; z < 3; z++) yield return (MinX + (MaxX - MinX) * x / 2, MinZ + (MaxZ - MinZ) * z / 2); }
         }
     }
 }

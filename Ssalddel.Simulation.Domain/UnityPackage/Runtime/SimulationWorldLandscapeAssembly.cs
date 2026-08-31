@@ -22,6 +22,8 @@ namespace Ssalddel.Simulation.Domain
         public int SchemaVersion { get; set; }
         public string CatalogRevision { get; set; } = string.Empty;
         public string CatalogHashSha256 { get; set; } = string.Empty;
+        // D442: 구형 catalog hash가 포함하지 않는 선언도 원파일 바이트로 결속한다.
+        public string SourceDocumentHashSha256 { get; set; } = string.Empty;
         public bool PresentationOnly { get; set; }
         public IReadOnlyList<SimulationWorldLandscapeGrammarEntry> Entries { get; set; } =
             Array.Empty<SimulationWorldLandscapeGrammarEntry>();
@@ -63,6 +65,13 @@ namespace Ssalddel.Simulation.Domain
         public string TopologyCode { get; set; } = string.Empty;
         public double FootprintX { get; set; }
         public double FootprintY { get; set; }
+        // D442 검토 입력. null은 구형/미관측이며 0 경사나 제약 없음으로 해석하지 않는다.
+        // 구형 Assemble/HashCanonical은 이 필드를 소비하지 않는다.
+        public double? MinimumSlopeDegrees { get; set; }
+        public double? MaximumSlopeDegrees { get; set; }
+        public IReadOnlyList<SimulationWorldLandscapeGrammarEdge>? EdgeProfiles { get; set; }
+        public IReadOnlyList<string>? AllowedNeighborTopologyCodes { get; set; }
+        public IReadOnlyList<string>? ForbiddenNeighborTopologyCodes { get; set; }
         public int MaxConsecutive { get; set; }
         public int RecentWindowSize { get; set; }
         public bool MirrorAllowed { get; set; }
@@ -70,6 +79,13 @@ namespace Ssalddel.Simulation.Domain
         public IReadOnlyList<SimulationWorldLandscapeGrammarConnector> Connectors { get; set; } =
             Array.Empty<SimulationWorldLandscapeGrammarConnector>();
         public bool PresentationOnly { get; set; }
+    }
+
+    public sealed class SimulationWorldLandscapeGrammarEdge
+    {
+        public string DirectionCode { get; set; } = string.Empty;
+        public string ProfileCode { get; set; } = string.Empty;
+        public bool Required { get; set; }
     }
 
     public sealed class SimulationWorldLandscapeGrammarConnector

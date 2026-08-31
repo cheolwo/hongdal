@@ -1,0 +1,2479 @@
+{
+  "utc": "2026-08-30T09:54:16.6209303Z",
+  "output": "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z",
+  "unity": "6000.5.6f1",
+  "kind": "ActualEditorOwnedAssetPreviewOnly",
+  "units": "Unity units; X right Y up Z forward; native authored scale, no Scene or GameView evidence",
+  "statePreserved": true,
+  "changedDependencies": [],
+  "checks": [
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Tree_Large_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonNature/Prefabs/Trees/SM_Tree_Birch_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Prefabs/SM_Env_Bush_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_02.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Small_Rocks_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Dirt_Straight_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_GrassEdge_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_Dirt_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Crate_01.prefab",
+      "statePreserved": true
+    },
+    {
+      "path": "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_Lamp_01.prefab",
+      "statePreserved": true
+    }
+  ],
+  "records": [
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_01.prefab",
+      "guid": "7a49ca0e5bf43fa45b5159d6d6265a09",
+      "prefabHash": "A13D8B454154012F8F3E688165CCC37F5C03ADE46AEF1E70C22E4C6A9908C511",
+      "metaHash": "E6F51FEA80AD32FD73AAE1FC755C088C5C86CE95B76CFA249FE10A198CE69203",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        0.0595291257,
+        1.51688778,
+        0.0483053923
+      ],
+      "boundsSize": [
+        1.81182122,
+        3.295694,
+        1.70456207
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Generic_Tree_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Generic_Tree_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            0.0595291257,
+            1.51688778,
+            0.0483053923
+          ],
+          "localSize": [
+            1.81182122,
+            3.295694,
+            1.70456207
+          ],
+          "worldCenter": [
+            0.0595291257,
+            1.51688778,
+            0.0483053923
+          ],
+          "worldSize": [
+            1.81182122,
+            3.295694,
+            1.70456207
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Generic_Tree_01",
+          "mesh": "SM_Generic_Tree_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Generic_Tree_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 1598,
+          "center": [
+            0.0595291257,
+            1.51688778,
+            0.0483053923
+          ],
+          "size": [
+            1.81182122,
+            3.295694,
+            1.70456207
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Generic_Tree_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            0.0429122448,
+            1.50319684,
+            0.0591822863
+          ],
+          "size": [
+            1.83090019,
+            3.21510243,
+            1.77862859
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Tree_01_Convex.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43931990860459370,\"guid\":\"9edb1a26e6397fb4b81f3454818dcce4\",\"type\":2}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Tree_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Tree_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Tree_Large_01.prefab",
+      "guid": "a8d49857a659bcb409bc5dbbbba90cca",
+      "prefabHash": "CA694A4D4998E5FFFDD17C28F3DF0D72C71FD00B193D55F8980A5903CFBA73F8",
+      "metaHash": "028E9C91FC58E28CA1C357853055DE8659011BFE2037F584B2CAC86E0E7156EE",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        -1.59367657,
+        5.76980829,
+        -1.49350357
+      ],
+      "boundsSize": [
+        14.3116016,
+        12.8375883,
+        10.48768
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Env_Tree_Large_01",
+        "SM_Env_Tree_Large_01/SM_Env_Tree_Large_Swing_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -1.59367681,
+            5.76980829,
+            -1.49350345
+          ],
+          "localSize": [
+            14.3116016,
+            12.8375883,
+            10.48768
+          ],
+          "worldCenter": [
+            -1.59367681,
+            5.76980829,
+            -1.49350345
+          ],
+          "worldSize": [
+            14.3116016,
+            12.8375883,
+            10.48768
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "path": "SM_Env_Tree_Large_01/SM_Env_Tree_Large_Swing_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            0.02688782,
+            -2.32592082,
+            0.00147216767
+          ],
+          "localSize": [
+            0.8583325,
+            4.50653124,
+            0.36262697
+          ],
+          "worldCenter": [
+            -2.52233386,
+            2.775305,
+            -0.238354474
+          ],
+          "worldSize": [
+            0.8583325,
+            4.50653124,
+            0.36262697
+          ],
+          "localPosition": [
+            -2.54922175,
+            5.101226,
+            -0.239826649
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "mesh": "SM_Env_Tree_Large_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Tree_Large_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 11121,
+          "center": [
+            -1.59367681,
+            5.76980829,
+            -1.49350345
+          ],
+          "size": [
+            14.3116016,
+            12.8375883,
+            10.48768
+          ]
+        },
+        {
+          "path": "SM_Env_Tree_Large_01/SM_Env_Tree_Large_Swing_01",
+          "mesh": "SM_Env_Tree_Large_Swing_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Tree_Large_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 469,
+          "center": [
+            0.02688782,
+            -2.32592082,
+            0.00147216767
+          ],
+          "size": [
+            0.8583325,
+            4.50653124,
+            0.36262697
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -0.110270619,
+            1.09453237,
+            -0.131392032
+          ],
+          "size": [
+            2.18543172,
+            3.436456,
+            2.23109674
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43980688626588002,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -0.790991664,
+            10.2869282,
+            1.17290211
+          ],
+          "size": [
+            8.849585,
+            3.73557663,
+            3.77078152
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43375202043579646,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            1.36896718,
+            3.30166531,
+            0.8502724
+          ],
+          "size": [
+            3.90263057,
+            1.18725777,
+            3.04327154
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43178898337026398,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -2.4091363,
+            8.732422,
+            -2.23795557
+          ],
+          "size": [
+            7.3290596,
+            0.6894493,
+            7.24467564
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43007670292920072,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -4.98615265,
+            5.396432,
+            0.315535069
+          ],
+          "size": [
+            5.510067,
+            1.110383,
+            4.770316
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43789933630156700,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -1.09807682,
+            10.3728323,
+            -2.972758
+          ],
+          "size": [
+            7.60985947,
+            2.59041023,
+            4.52017641
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43446983941655276,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -5.46548367,
+            7.18571329,
+            -0.847425461
+          ],
+          "size": [
+            6.47203827,
+            2.46769619,
+            6.51751041
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43399759196920776,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            1.47942543,
+            7.01364136,
+            0.274518251
+          ],
+          "size": [
+            7.421089,
+            2.86429024,
+            3.70127583
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43590005952815350,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            1.32591248,
+            6.6927824,
+            -4.065468
+          ],
+          "size": [
+            7.11406326,
+            3.45216179,
+            5.279867
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43596392060854894,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        },
+        {
+          "path": "SM_Env_Tree_Large_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            1.42769718,
+            4.738427,
+            0.5662036
+          ],
+          "size": [
+            8.13473,
+            1.68580723,
+            5.710002
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43335583397665690,\"guid\":\"a0df708b3d0313e48a9ff9f220d0e829\",\"type\":2}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Tree_Large_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Tree_Large_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonNature/Prefabs/Trees/SM_Tree_Birch_01.prefab",
+      "guid": "1ea71f643417d124d91e53eae7c666a6",
+      "prefabHash": "78AFFC39F7CE1453DB6ADAAA07CD023A47CF673BED393991B18068686F1166E1",
+      "metaHash": "563546459236EB360925E3BA377FBF30FEF8CA8D0A234BDA05C3B7E3B6569EB1",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        -0.01556778,
+        2.27330565,
+        0.016638279
+      ],
+      "boundsSize": [
+        2.453926,
+        4.54661131,
+        2.289298
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Tree_Birch_01",
+        "SM_Tree_Birch_01/SM_Tree_Birch_01",
+        "SM_Tree_Birch_01/SM_Tree_Birch_01_LOD_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Tree_Birch_01/SM_Tree_Birch_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.01556778,
+            2.27330565,
+            0.01663822
+          ],
+          "localSize": [
+            2.453926,
+            4.54661131,
+            2.289298
+          ],
+          "worldCenter": [
+            -0.01556778,
+            2.27330565,
+            0.01663822
+          ],
+          "worldSize": [
+            2.453926,
+            4.54661131,
+            2.289298
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "Birch_Trunk_01",
+              "path": "Assets/Synty/PolygonNature/Materials/Misc/Birch_Trunk_01.mat",
+              "shader": "Synty/SyntyStudios_Trees",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0
+              }
+            },
+            {
+              "slot": 1,
+              "name": "Leaves_01_Base",
+              "path": "Assets/Synty/PolygonNature/Materials/Leaves/Leaves_01_Base.mat",
+              "shader": "Synty/SyntyStudios_Trees",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0
+              }
+            }
+          ]
+        },
+        {
+          "path": "SM_Tree_Birch_01/SM_Tree_Birch_01_LOD_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.01556778,
+            2.27330565,
+            0.01663822
+          ],
+          "localSize": [
+            2.453926,
+            4.54661131,
+            2.289298
+          ],
+          "worldCenter": [
+            -0.01556778,
+            2.27330565,
+            0.01663822
+          ],
+          "worldSize": [
+            2.453926,
+            4.54661131,
+            2.289298
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "Leaves_Base_LOD_01",
+              "path": "Assets/Synty/PolygonNature/Materials/LODS/Leaves_Base_LOD_01.mat",
+              "shader": "Synty/SyntyStudios_LOD",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_GLOSSYREFLECTIONS_OFF",
+                "_SPECULARHIGHLIGHTS_OFF"
+              ],
+              "properties": {}
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Tree_Birch_01/SM_Tree_Birch_01",
+          "mesh": "SM_Tree_Birch_01",
+          "assetPath": "Assets/Synty/PolygonNature/Models/SM_Tree_Birch_01.fbx",
+          "submeshCount": 2,
+          "vertexCount": 991,
+          "center": [
+            -0.01556778,
+            2.27330565,
+            0.01663822
+          ],
+          "size": [
+            2.453926,
+            4.54661131,
+            2.289298
+          ]
+        },
+        {
+          "path": "SM_Tree_Birch_01/SM_Tree_Birch_01_LOD_01",
+          "mesh": "SM_Tree_Birch_01_LOD_01",
+          "assetPath": "Assets/Synty/PolygonNature/Models/LODS/SM_Tree_Birch_01_LOD_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 991,
+          "center": [
+            -0.01556778,
+            2.27330565,
+            0.01663822
+          ],
+          "size": [
+            2.453926,
+            4.54661131,
+            2.289298
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Tree_Birch_01",
+          "type": "CapsuleCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            0.0,
+            1.64597654,
+            0.129693747
+          ],
+          "size": [
+            0.4099974,
+            3.90766954,
+            0.409997
+          ],
+          "meshNull": null,
+          "meshPath": null,
+          "convex": null,
+          "serialized": "{\"CapsuleCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"2\",\"m_Radius\":0.20499849319458009,\"m_Height\":3.9076690673828127,\"m_Direction\":1,\"m_Center\":{\"x\":0.0,\"y\":1.6459765434265137,\"z\":0.12969374656677247}}}"
+        }
+      ],
+      "lods": [
+        {
+          "path": "SM_Tree_Birch_01",
+          "size": 4.54661131,
+          "referencePoint": [
+            -0.01556778,
+            2.27330565,
+            0.016638279
+          ],
+          "fadeMode": "None",
+          "animateCrossFading": false,
+          "levels": [
+            {
+              "level": 0,
+              "screenRelativeTransitionHeight": 0.185624,
+              "fadeTransitionWidth": 0.0,
+              "renderers": [
+                "SM_Tree_Birch_01/SM_Tree_Birch_01"
+              ]
+            },
+            {
+              "level": 1,
+              "screenRelativeTransitionHeight": 0.0265559983,
+              "fadeTransitionWidth": 0.0,
+              "renderers": [
+                "SM_Tree_Birch_01/SM_Tree_Birch_01_LOD_01"
+              ]
+            }
+          ]
+        }
+      ],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Tree_Birch_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Tree_Birch_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Prefabs/SM_Env_Bush_01.prefab",
+      "guid": "7c35a3f284a3b7e4289e64020f72746d",
+      "prefabHash": "3002849C9EF1C1762D3A5901CFE3E9EA81D9801F1C6D706CA78D0B3C0109EED0",
+      "metaHash": "2BD6774AE3BE26506ABD0424CF1108CF58F697AECA1FE50B8B3977F71B37254B",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        -0.164441943,
+        0.491102755,
+        -0.219265938
+      ],
+      "boundsSize": [
+        2.78866482,
+        1.27639389,
+        2.67868376
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Env_Bush_01",
+        "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD0",
+        "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD1",
+        "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD0",
+        "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD1"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD0",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.0534132123,
+            0.414442241,
+            -0.128147751
+          ],
+          "localSize": [
+            1.87319088,
+            1.12307286,
+            1.68840122
+          ],
+          "worldCenter": [
+            -0.0534132123,
+            0.414442241,
+            -0.128147751
+          ],
+          "worldSize": [
+            1.87319088,
+            1.12307286,
+            1.68840122
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "Branches_01",
+              "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Branches_01.mat",
+              "shader": "Synty/Foliage",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.25
+              }
+            }
+          ]
+        },
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD1",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.00082975626,
+            0.343628645,
+            -0.138500422
+          ],
+          "localSize": [
+            1.429602,
+            0.7985009,
+            1.29542041
+          ],
+          "worldCenter": [
+            -0.00082975626,
+            0.343628645,
+            -0.138500422
+          ],
+          "worldSize": [
+            1.429602,
+            0.7985009,
+            1.29542041
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "Branches_01",
+              "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Branches_01.mat",
+              "shader": "Synty/Foliage",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.25
+              }
+            }
+          ]
+        },
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD0",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.164441943,
+            0.528369069,
+            -0.219265878
+          ],
+          "localSize": [
+            2.78866482,
+            1.20186114,
+            2.67868376
+          ],
+          "worldCenter": [
+            -0.164441943,
+            0.528369069,
+            -0.219265878
+          ],
+          "worldSize": [
+            2.78866482,
+            1.20186114,
+            2.67868376
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "Alpine_Bush_01",
+              "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Alpine_Bush_01.mat",
+              "shader": "Synty/Foliage",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_BUILTIN_ALPHATEST_ON",
+                "_BUILTIN_AlphaClip",
+                "LOD_FADE_CROSSFADE",
+                "_ALPHABLEND_ON",
+                "_EMISSION",
+                "_NORMALMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.25
+              }
+            }
+          ]
+        },
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD1",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.18584311,
+            0.5172394,
+            -0.219265878
+          ],
+          "localSize": [
+            2.74586248,
+            1.17834866,
+            2.67868376
+          ],
+          "worldCenter": [
+            -0.18584311,
+            0.5172394,
+            -0.219265878
+          ],
+          "worldSize": [
+            2.74586248,
+            1.17834866,
+            2.67868376
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "Alpine_Bush_01",
+              "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Alpine_Bush_01.mat",
+              "shader": "Synty/Foliage",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_BUILTIN_ALPHATEST_ON",
+                "_BUILTIN_AlphaClip",
+                "LOD_FADE_CROSSFADE",
+                "_ALPHABLEND_ON",
+                "_EMISSION",
+                "_NORMALMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.25
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD0",
+          "mesh": "SM_Env_Bush_01_Branches_LOD0",
+          "assetPath": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Models/SM_Env_Bush_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 42,
+          "center": [
+            -0.0534132123,
+            0.414442241,
+            -0.128147751
+          ],
+          "size": [
+            1.87319088,
+            1.12307286,
+            1.68840122
+          ]
+        },
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD1",
+          "mesh": "SM_Env_Bush_01_Branches_LOD1",
+          "assetPath": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Models/SM_Env_Bush_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 21,
+          "center": [
+            -0.00082975626,
+            0.343628645,
+            -0.138500422
+          ],
+          "size": [
+            1.429602,
+            0.7985009,
+            1.29542041
+          ]
+        },
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD0",
+          "mesh": "SM_Env_Bush_01_Leaves_LOD0",
+          "assetPath": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Models/SM_Env_Bush_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 3704,
+          "center": [
+            -0.164441943,
+            0.528369069,
+            -0.219265878
+          ],
+          "size": [
+            2.78866482,
+            1.20186114,
+            2.67868376
+          ]
+        },
+        {
+          "path": "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD1",
+          "mesh": "SM_Env_Bush_01_Leaves_LOD1",
+          "assetPath": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Models/SM_Env_Bush_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 1620,
+          "center": [
+            -0.18584311,
+            0.5172394,
+            -0.219265878
+          ],
+          "size": [
+            2.74586248,
+            1.17834866,
+            2.67868376
+          ]
+        }
+      ],
+      "colliders": [],
+      "lods": [
+        {
+          "path": "SM_Env_Bush_01",
+          "size": 2.78866482,
+          "referencePoint": [
+            -0.164441943,
+            0.491102725,
+            -0.219265938
+          ],
+          "fadeMode": "None",
+          "animateCrossFading": false,
+          "levels": [
+            {
+              "level": 0,
+              "screenRelativeTransitionHeight": 0.25475353,
+              "fadeTransitionWidth": 0.1,
+              "renderers": [
+                "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD0",
+                "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD0"
+              ]
+            },
+            {
+              "level": 1,
+              "screenRelativeTransitionHeight": 0.01,
+              "fadeTransitionWidth": 0.1,
+              "renderers": [
+                "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD1",
+                "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD1"
+              ]
+            }
+          ]
+        }
+      ],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Bush_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Bush_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_02.prefab",
+      "guid": "d68c69e2093d0df439a8aabd018a2b85",
+      "prefabHash": "A4CAE582EAB2D38BDD8D92022D13EEEE5A4147D67F12C2805FA3FA347C2CABCE",
+      "metaHash": "1FF20683DEAF43AE858BC8FCB2A675DF8A1F68FE1D57C8B0A8BD7ED894A0BD0E",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        0.0,
+        0.4600145,
+        0.0
+      ],
+      "boundsSize": [
+        2.80530262,
+        0.920029,
+        2.16306639
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Generic_Grass_Patch_02"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Generic_Grass_Patch_02",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            0.0,
+            0.4600145,
+            0.0
+          ],
+          "localSize": [
+            2.80530262,
+            0.920029,
+            2.16306639
+          ],
+          "worldCenter": [
+            0.0,
+            0.4600145,
+            0.0
+          ],
+          "worldSize": [
+            2.80530262,
+            0.920029,
+            2.16306639
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Generic_Grass_Patch_02",
+          "mesh": "SM_Gerneric_Grass_Patch_02",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Generic_Grass_Patch_02.fbx",
+          "submeshCount": 1,
+          "vertexCount": 1560,
+          "center": [
+            0.0,
+            0.4600145,
+            0.0
+          ],
+          "size": [
+            2.80530262,
+            0.920029,
+            2.16306639
+          ]
+        }
+      ],
+      "colliders": [],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Grass_Patch_02-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Grass_Patch_02-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Small_Rocks_01.prefab",
+      "guid": "e2237f9c45037b34da96772393062ed0",
+      "prefabHash": "B66360B72075E7FC5CF8CC371BCC24C554009E260AB7B8F5F07CAAE3FC89FB04",
+      "metaHash": "3F954139B7429F05A9127B3754957360B8C2806878AB8DF630F3F424B8021984",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        -0.169853285,
+        0.02242434,
+        0.00175580382
+      ],
+      "boundsSize": [
+        1.30575168,
+        0.09495559,
+        1.63177133
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Generic_Small_Rocks_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Generic_Small_Rocks_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.169853285,
+            0.02242434,
+            0.00175580382
+          ],
+          "localSize": [
+            1.30575168,
+            0.09495559,
+            1.63177133
+          ],
+          "worldCenter": [
+            -0.169853285,
+            0.02242434,
+            0.00175580382
+          ],
+          "worldSize": [
+            1.30575168,
+            0.09495559,
+            1.63177133
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Generic_Small_Rocks_01",
+          "mesh": "SM_Generic_Small_Rocks_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Generic_Small_Rocks_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 490,
+          "center": [
+            -0.169853285,
+            0.02242434,
+            0.00175580382
+          ],
+          "size": [
+            1.30575168,
+            0.09495559,
+            1.63177133
+          ]
+        }
+      ],
+      "colliders": [],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Small_Rocks_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Small_Rocks_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Dirt_Straight_01.prefab",
+      "guid": "20f6bd523ebdaf04fa332e6ce565fc03",
+      "prefabHash": "C2D1F81F6BD17DC929DE1255AD8C01C2A4CBE37087D86094525190D4808F1C51",
+      "metaHash": "FEC238C497AF37AA4A994F31D7C00B6FB90A047FDA25536618434BF7A4915B2A",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        -0.0277273655,
+        0.136674672,
+        0.0
+      ],
+      "boundsSize": [
+        7.10180664,
+        0.273349345,
+        11.910614
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Env_Road_Dirt_Straight_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Env_Road_Dirt_Straight_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.0277273655,
+            0.136674672,
+            0.0
+          ],
+          "localSize": [
+            7.10180664,
+            0.273349345,
+            11.910614
+          ],
+          "worldCenter": [
+            -0.0277273655,
+            0.136674672,
+            0.0
+          ],
+          "worldSize": [
+            7.10180664,
+            0.273349345,
+            11.910614
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Env_Road_Dirt_Straight_01",
+          "mesh": "SM_Env_Road_Dirt_Straight_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Road_Dirt_Straight_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 401,
+          "center": [
+            -0.0277273655,
+            0.136674672,
+            0.0
+          ],
+          "size": [
+            7.10180664,
+            0.273349345,
+            11.910614
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Env_Road_Dirt_Straight_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -0.0277273655,
+            0.136674672,
+            0.0
+          ],
+          "size": [
+            7.10180664,
+            0.273349345,
+            11.910614
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Road_Dirt_Straight_01.fbx",
+          "convex": false,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":false,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":4300000,\"guid\":\"82b68593932961049b55634cf00f0b3c\",\"type\":3}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Road_Dirt_Straight_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Road_Dirt_Straight_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_GrassEdge_01.prefab",
+      "guid": "ee7d4667b729aa248830ab7727bf2698",
+      "prefabHash": "7199A66A0787B59698EE9D7DF645BE76ED89E7F295FF53455E916ED4D458DA97",
+      "metaHash": "159E5745703B2EED4EC63B1F8D7A040259CF34BBA2D0140D77AD5F6B7C0F3050",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        -0.07873654,
+        0.248840481,
+        0.0
+      ],
+      "boundsSize": [
+        4.43114,
+        0.497680962,
+        14.5165081
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Env_Road_GrassEdge_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Env_Road_GrassEdge_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -0.07873654,
+            0.248840481,
+            0.0
+          ],
+          "localSize": [
+            4.43114,
+            0.497680962,
+            14.5165081
+          ],
+          "worldCenter": [
+            -0.07873654,
+            0.248840481,
+            0.0
+          ],
+          "worldSize": [
+            4.43114,
+            0.497680962,
+            14.5165081
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Env_Road_GrassEdge_01",
+          "mesh": "SM_Env_Road_GrassEdge_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Road_GrassEdge_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 143,
+          "center": [
+            -0.07873654,
+            0.248840481,
+            0.0
+          ],
+          "size": [
+            4.43114,
+            0.497680962,
+            14.5165081
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Env_Road_GrassEdge_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -0.07873654,
+            0.248840481,
+            0.0
+          ],
+          "size": [
+            4.43114,
+            0.497680962,
+            14.5165081
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Road_GrassEdge_01.fbx",
+          "convex": false,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":false,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":4300000,\"guid\":\"229b669fe22119b4984ed9d969e814cd\",\"type\":3}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Road_GrassEdge_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Road_GrassEdge_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_01.prefab",
+      "guid": "d7fd0f034fb608643a24ead27702c3a3",
+      "prefabHash": "335496BAD0BD0D1339D7E927FAAC0509805C7C4FC964D83D1CF7BC22286E3F5A",
+      "metaHash": "758A32E05BB31613BD85D58A5426A584B35F71845D4C92BA12CE208BCC1BCA8A",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        -2.5,
+        0.06600127,
+        2.5
+      ],
+      "boundsSize": [
+        5.0,
+        0.132002577,
+        5.0
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Env_Dirt_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Env_Dirt_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            -2.5,
+            0.06600127,
+            2.5
+          ],
+          "localSize": [
+            5.0,
+            0.132002577,
+            5.0
+          ],
+          "worldCenter": [
+            -2.5,
+            0.06600127,
+            2.5
+          ],
+          "worldSize": [
+            5.0,
+            0.132002577,
+            5.0
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Env_Dirt_01",
+          "mesh": "SM_Env_Dirt_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Dirt_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 552,
+          "center": [
+            -2.5,
+            0.06600127,
+            2.5
+          ],
+          "size": [
+            5.0,
+            0.132002577,
+            5.0
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Env_Dirt_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            -2.50011253,
+            0.07936506,
+            2.500136
+          ],
+          "size": [
+            5.07913971,
+            0.238095254,
+            5.07809925
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Dirt_01_Convex.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43204642838645992,\"guid\":\"2ca00a7e0c04965408f4b472f11a9a7b\",\"type\":2}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Dirt_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Env_Dirt_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_Dirt_01.prefab",
+      "guid": "3d3589220aff2704b9215dbbd2d8e9d0",
+      "prefabHash": "F7C5E1FA7E71D7EF1EDDA7BF438C845EBD245A78BED14F479E3D009B311B22E6",
+      "metaHash": "A1BF710200B56ACC3D14B5918AA64EC9985693F879B70960F9B1B87F73D55F30",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        0.0,
+        0.128767148,
+        -1.1920929E-07
+      ],
+      "boundsSize": [
+        5.5260253,
+        0.2575343,
+        5.67713547
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Generic_Ground_Dirt_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Generic_Ground_Dirt_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            0.0,
+            0.128767148,
+            -1.1920929E-07
+          ],
+          "localSize": [
+            5.5260253,
+            0.2575343,
+            5.67713547
+          ],
+          "worldCenter": [
+            0.0,
+            0.128767148,
+            -1.1920929E-07
+          ],
+          "worldSize": [
+            5.5260253,
+            0.2575343,
+            5.67713547
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Generic_Ground_Dirt_01",
+          "mesh": "SM_Generic_Ground_Dirt_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Generic_Ground_Dirt_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 341,
+          "center": [
+            0.0,
+            0.128767148,
+            -1.1920929E-07
+          ],
+          "size": [
+            5.5260253,
+            0.2575343,
+            5.67713547
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Generic_Ground_Dirt_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            0.0,
+            0.128767148,
+            0.0
+          ],
+          "size": [
+            5.5260253,
+            0.2575343,
+            5.67713547
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/SM_Generic_Ground_Dirt_01.fbx",
+          "convex": false,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":false,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":4300000,\"guid\":\"b27badcb1cb76a04792139d749e5c4eb\",\"type\":3}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Ground_Dirt_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Generic_Ground_Dirt_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Crate_01.prefab",
+      "guid": "17f62eefbfea0bf44a08d7be65339372",
+      "prefabHash": "106B090BFF9D2570430168B81D342F453FAD52D4A7BBF4A5329AE24720E924B0",
+      "metaHash": "346786387160612402670A73E20DAF822709A2889C23172F801AB81E9CC9656F",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        0.0,
+        0.436684638,
+        2.98023224E-08
+      ],
+      "boundsSize": [
+        0.8270465,
+        0.8733693,
+        0.8146546
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Prop_Crate_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Prop_Crate_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            0.0,
+            0.436684638,
+            2.98023224E-08
+          ],
+          "localSize": [
+            0.8270465,
+            0.8733693,
+            0.8146546
+          ],
+          "worldCenter": [
+            0.0,
+            0.436684638,
+            2.98023224E-08
+          ],
+          "worldSize": [
+            0.8270465,
+            0.8733693,
+            0.8146546
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonFarm_01_A",
+              "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_EMISSION",
+                "_METALLICGLOSSMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Prop_Crate_01",
+          "mesh": "SM_Prop_Crate_01",
+          "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Crate_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 368,
+          "center": [
+            0.0,
+            0.436684638,
+            2.98023224E-08
+          ],
+          "size": [
+            0.8270465,
+            0.8733693,
+            0.8146546
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Prop_Crate_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            5.77569E-05,
+            0.43494457,
+            5.96046448E-08
+          ],
+          "size": [
+            0.826931,
+            0.8689649,
+            0.8146546
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Crate_01_Convex.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43655601705514994,\"guid\":\"dfb98c4279d81d44a8f0bb1f556df54c\",\"type\":2}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Prop_Crate_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Prop_Crate_01-65.png"
+      ]
+    },
+    {
+      "path": "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_Lamp_01.prefab",
+      "guid": "d75df63a95f35384ab17add13dd7e3f0",
+      "prefabHash": "FB0D652758306D05E80F36548242B5A78F11E1EC9C47346A02C0833829063FDE",
+      "metaHash": "EF5657F8902ACA7CC86D153D6AEAD7F6767B8D36A9BE350B949A139817A976F5",
+      "rootPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootRotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rootScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "boundsCenter": [
+        0.0,
+        0.242648348,
+        0.0
+      ],
+      "boundsSize": [
+        0.298852533,
+        0.4852967,
+        0.345083
+      ],
+      "boundsMeaning": "Union of all Renderer world Bounds including all LOD levels at authored native root TRS in isolated preview; not active-LOD-only footprint",
+      "children": [
+        "SM_Prop_Lamp_01"
+      ],
+      "renderers": [
+        {
+          "path": "SM_Prop_Lamp_01",
+          "type": "MeshRenderer",
+          "enabled": true,
+          "active": true,
+          "localCenter": [
+            0.0,
+            0.242648348,
+            0.0
+          ],
+          "localSize": [
+            0.298852533,
+            0.4852967,
+            0.345083
+          ],
+          "worldCenter": [
+            0.0,
+            0.242648348,
+            0.0
+          ],
+          "worldSize": [
+            0.298852533,
+            0.4852967,
+            0.345083
+          ],
+          "localPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "localScale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "materials": [
+            {
+              "slot": 0,
+              "name": "PolygonTown_01_A",
+              "path": "Assets/Synty/PolygonTown/Materials/Alts/PolygonTown_01_A.mat",
+              "shader": "Synty/Generic_Basic",
+              "shaderSupported": true,
+              "renderQueue": 2450,
+              "keywords": [
+                "_ALPHATEST_ON",
+                "_DETAIL_MULX2",
+                "_METALLICGLOSSMAP",
+                "_NORMALMAP"
+              ],
+              "properties": {
+                "_Surface": 0.0,
+                "_AlphaClip": 1.0,
+                "_ZWrite": 1.0,
+                "_Alpha_Clip_Threshold": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "meshes": [
+        {
+          "path": "SM_Prop_Lamp_01",
+          "mesh": "SM_Prop_Lamp_01",
+          "assetPath": "Assets/Synty/PolygonTown/Models/Props/SM_Prop_Lamp_01.fbx",
+          "submeshCount": 1,
+          "vertexCount": 402,
+          "center": [
+            0.0,
+            0.242648348,
+            0.0
+          ],
+          "size": [
+            0.298852533,
+            0.4852967,
+            0.345083
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "path": "SM_Prop_Lamp_01",
+          "type": "MeshCollider",
+          "enabled": true,
+          "isTrigger": false,
+          "active": true,
+          "center": [
+            0.000784605742,
+            0.2446918,
+            -0.00584922731
+          ],
+          "size": [
+            0.3081249,
+            0.462810963,
+            0.341087669
+          ],
+          "meshNull": false,
+          "meshPath": "Assets/Synty/PolygonTown/Models/Collision/Convex/SM_Prop_Lamp_01_Convex.asset",
+          "convex": true,
+          "serialized": "{\"MeshCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"5\",\"m_Convex\":true,\"m_CookingOptions\":30,\"m_Mesh\":{\"fileID\":43972967965853728,\"guid\":\"08fe80c51fbaf31499609356ea621741\",\"type\":2}}}"
+        }
+      ],
+      "lods": [],
+      "lights": [],
+      "images": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Prop_Lamp_01-25.png",
+        "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/20260830T095406600Z/SM_Prop_Lamp_01-65.png"
+      ]
+    }
+  ],
+  "dependencies": {
+    "Assets/Synty/PNB_Core/Shaders/Foliage.shadergraph": "2335C7796ADAFB46234559915E8365756BD7415950244EE0286BDFE45B9299C0",
+    "Assets/Synty/PNB_Core/Shaders/Foliage.shadergraph.meta": "3B07F2B9EE982B673CA35BC7053EDC5A685282C74125DB1DF2AF1B933B8F44CE",
+    "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat": "703EE30D5A7EB78DAE50C340D9C8C17674052A6BDE2E2D9281444E1B402E21FF",
+    "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat.meta": "922DFC9F68470211294C2F926601A5112714654212A047F8499B3DB43B348056",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Dirt_01_Convex.asset": "96DF12EC9045B93EFC43D9E9980B8394C0643B5DB5F64C7C473A8E5920212BF4",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Dirt_01_Convex.asset.meta": "3FCAD010F1A81EE536A772B4EE1A28930C57E811D9DAB6384B4C29CE8B2FE2FC",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset": "2C66EDEB789BEC402DBAC9E1F735750174094D5614E742E9F97E37564AD511EA",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Env_Tree_Large_01_Convex 4.asset.meta": "5E7282A2D3D0975AF7312124B5B27FBF84059959C00953C96A447B810A8D9898",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Tree_01_Convex.asset": "0D14FFBE0B9FF7D65274234B78509E4BCD8C9F4F862B3D06A8CED2674444A269",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Generic_Tree_01_Convex.asset.meta": "61D7713433E9E3FC9D58EF08A37C67ABDBC9E201EE86450555A871D98E4A8A4E",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Crate_01_Convex.asset": "EB6C8BB79A5933A864E0A451FD71876BCF0EE31644E1447EBD820325B12ABDE7",
+    "Assets/Synty/PolygonFarm/Models/Collision/Convex/SM_Prop_Crate_01_Convex.asset.meta": "30271BDEAB2A9072B0BF082A3BADD38F5E574E9F9468BCB5137CB2E4D2BBBC00",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Dirt_01.fbx": "C060F7E5030D2C19845E5F5E6AF4972E4E11E2ED4007A49E6D86E8BB59A9FA52",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Dirt_01.fbx.meta": "F34899E377F8BB73D1C8D253681AA29F6FE69451E647546F00B0D1C3AAFE5179",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Road_Dirt_Straight_01.fbx": "07202BE3C2C24259B4B3C0A0CAAD6324A927600A2A34EBB8807095836919A653",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Road_Dirt_Straight_01.fbx.meta": "0FC7F3098F0DFAD32B907497FA182742B5B552338F119646806979257C75EF2E",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Road_GrassEdge_01.fbx": "F45F926AA1813AC7CF7CF6132E721824FF4569F290EC16FA62761AA36EAF8409",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Road_GrassEdge_01.fbx.meta": "41ECA3DB88F90303F8950B3529D5A338F97626E236080B71441331F361B7C172",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Tree_Large_01.fbx": "C09D0818244EE55F084491D46A1AB780D7B8CB47261551B989B5C218D721F6D6",
+    "Assets/Synty/PolygonFarm/Models/SM_Env_Tree_Large_01.fbx.meta": "A24DBEC900A5DF5051386163A60045BA13860EBBF533427EDDB9AD98E9993BE0",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Grass_Patch_02.fbx": "9593FD39ED99C6DAA2EC9F44C36599A972F547069136D1CA896841EBFA3B37A4",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Grass_Patch_02.fbx.meta": "841BB6FF4E0FC37CDBFFC30E4DB2C5C6338AB39E4F5C61EEC6E0E0D2D60B8AD3",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Ground_Dirt_01.fbx": "B3FC3BA150FC7357407A280A463F57527F0D0324F5F9BFC4D2AFA6B7931C4E42",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Ground_Dirt_01.fbx.meta": "2702BF0D2AE637C948B192E2C2E8062CA0952B58921D45A4864177FA2346D7F1",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Small_Rocks_01.fbx": "79F2C6F7537FD95F2E9D3B126D5ADF3115095B6AC68E040EC8422ADA4D4B354D",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Small_Rocks_01.fbx.meta": "6F37E2D867184463BC67C8226B1CB2313AFAC244980F74EF2C1DD9C77988DFE8",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Tree_01.fbx": "13391B23FD761560288F91143BCAB3962ABFB875891BB8F55A482E9B511351C2",
+    "Assets/Synty/PolygonFarm/Models/SM_Generic_Tree_01.fbx.meta": "AC21D55041A19FF761F2D89FB5DEC07E795FD1684481310BFE36FA74AEE3B1D4",
+    "Assets/Synty/PolygonFarm/Models/SM_Prop_Crate_01.fbx": "23266BED82E89847E85BC0DC0C8F05B9205B4EB9410D97F822647D0B3185286A",
+    "Assets/Synty/PolygonFarm/Models/SM_Prop_Crate_01.fbx.meta": "B95BC90282DC8C33C30CE92F7A89B84A88F3132E2C0044A42475D5EA48851242",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_01.prefab": "335496BAD0BD0D1339D7E927FAAC0509805C7C4FC964D83D1CF7BC22286E3F5A",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_01.prefab.meta": "758A32E05BB31613BD85D58A5426A584B35F71845D4C92BA12CE208BCC1BCA8A",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Dirt_Straight_01.prefab": "C2D1F81F6BD17DC929DE1255AD8C01C2A4CBE37087D86094525190D4808F1C51",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_Dirt_Straight_01.prefab.meta": "FEC238C497AF37AA4A994F31D7C00B6FB90A047FDA25536618434BF7A4915B2A",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_GrassEdge_01.prefab": "7199A66A0787B59698EE9D7DF645BE76ED89E7F295FF53455E916ED4D458DA97",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Road_GrassEdge_01.prefab.meta": "159E5745703B2EED4EC63B1F8D7A040259CF34BBA2D0140D77AD5F6B7C0F3050",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Tree_Large_01.prefab": "CA694A4D4998E5FFFDD17C28F3DF0D72C71FD00B193D55F8980A5903CFBA73F8",
+    "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Tree_Large_01.prefab.meta": "028E9C91FC58E28CA1C357853055DE8659011BFE2037F584B2CAC86E0E7156EE",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_02.prefab": "A4CAE582EAB2D38BDD8D92022D13EEEE5A4147D67F12C2805FA3FA347C2CABCE",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_02.prefab.meta": "1FF20683DEAF43AE858BC8FCB2A675DF8A1F68FE1D57C8B0A8BD7ED894A0BD0E",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_Dirt_01.prefab": "F7C5E1FA7E71D7EF1EDDA7BF438C845EBD245A78BED14F479E3D009B311B22E6",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Ground_Dirt_01.prefab.meta": "A1BF710200B56ACC3D14B5918AA64EC9985693F879B70960F9B1B87F73D55F30",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Small_Rocks_01.prefab": "B66360B72075E7FC5CF8CC371BCC24C554009E260AB7B8F5F07CAAE3FC89FB04",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Small_Rocks_01.prefab.meta": "3F954139B7429F05A9127B3754957360B8C2806878AB8DF630F3F424B8021984",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_01.prefab": "A13D8B454154012F8F3E688165CCC37F5C03ADE46AEF1E70C22E4C6A9908C511",
+    "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_01.prefab.meta": "E6F51FEA80AD32FD73AAE1FC755C088C5C86CE95B76CFA249FE10A198CE69203",
+    "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Crate_01.prefab": "106B090BFF9D2570430168B81D342F453FAD52D4A7BBF4A5329AE24720E924B0",
+    "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Crate_01.prefab.meta": "346786387160612402670A73E20DAF822709A2889C23172F801AB81E9CC9656F",
+    "Assets/Synty/PolygonFarm/Textures/PolygonFarm_01_A.png": "AE59540EFAD76DE089C17059762D627CAFF3A74BC30B64DC497F0A5D855322DD",
+    "Assets/Synty/PolygonFarm/Textures/PolygonFarm_01_A.png.meta": "7CF5BBFEDC5C8FAF13BA7A52EF294DC2529D8D4A5D2169AB35D54BC6BFD2C850",
+    "Assets/Synty/PolygonGeneric/Shaders/Generic_Basic.shadergraph": "43330CDD0B0074AB148F5785DBB3512D176864816C1AD08D2485521A1EAB0182",
+    "Assets/Synty/PolygonGeneric/Shaders/Generic_Basic.shadergraph.meta": "725F61C0FF5DA996D097268F89CD8CACDDEA950A720BBAA455D56EA826693E06",
+    "Assets/Synty/PolygonNature/Materials/Leaves/Leaves_01_Base.mat": "771F1A454CB493E575C601E0A491B9C84031B392B45FA4A3CFC6DF145EADDF64",
+    "Assets/Synty/PolygonNature/Materials/Leaves/Leaves_01_Base.mat.meta": "8A0129DE6135FA56A5CAAA1A921D73C699BE687AE943468524898E11A81C5D5D",
+    "Assets/Synty/PolygonNature/Materials/LODS/Leaves_Base_LOD_01.mat": "C64C115017C5BEA63611C1BD50FBDED97CEB23581F769CF6942B08693DEFDABA",
+    "Assets/Synty/PolygonNature/Materials/LODS/Leaves_Base_LOD_01.mat.meta": "4E4EA60935CA4C173DD947BEB8520EC707EFFB666CDBDF508042C99C50A67EF2",
+    "Assets/Synty/PolygonNature/Materials/Misc/Birch_Trunk_01.mat": "BBB81E3B113E43604A0250121A4F84A2FA1759655D262813747C667BE30A0678",
+    "Assets/Synty/PolygonNature/Materials/Misc/Birch_Trunk_01.mat.meta": "CDC70A626EFA8B7F4FB86FF2FE9EF150040D2BFC00BAC1A89F146C063BAA8C28",
+    "Assets/Synty/PolygonNature/Models/LODS/SM_Tree_Birch_01_LOD_01.fbx": "6E1FC03007D9B5F464A418778B9952E2DD419C63600ECA7D7061CD2AA890BF8F",
+    "Assets/Synty/PolygonNature/Models/LODS/SM_Tree_Birch_01_LOD_01.fbx.meta": "BF484DE182B871B5A15D8285D448862030A83F76CBDEAE47D21A492DCBE54F10",
+    "Assets/Synty/PolygonNature/Models/Materials/Leave.mat": "4A64DF3C78C3C41EE138E9D48A42D671238C124990F2C46DDFB5D9B31071E518",
+    "Assets/Synty/PolygonNature/Models/Materials/Leave.mat.meta": "7B9649DA82BDC1C012C9D84600CCCF55562C08D3A917B9E5D614A002CC064539",
+    "Assets/Synty/PolygonNature/Models/Materials/Trunk.mat": "9D1330446CD024EB4401075689FB91938E647EB61475DFBB2BE0E79B720CA778",
+    "Assets/Synty/PolygonNature/Models/Materials/Trunk.mat.meta": "A3DB1871BD66F03E9943EDDAD3189F97F6D1817B396C50F5236031DFF89D26AA",
+    "Assets/Synty/PolygonNature/Models/SM_Tree_Birch_01.fbx": "08E2A431BDA58C368C770B0613CEEA8DDDAE73B32B0E84DC3E8EE695F64B77E0",
+    "Assets/Synty/PolygonNature/Models/SM_Tree_Birch_01.fbx.meta": "AB96ABDA0AA0EED3E1411F865DA1FD618BF872D8AEC5798FF5DF0A3870902A47",
+    "Assets/Synty/PolygonNature/Prefabs/Trees/SM_Tree_Birch_01.prefab": "78AFFC39F7CE1453DB6ADAAA07CD023A47CF673BED393991B18068686F1166E1",
+    "Assets/Synty/PolygonNature/Prefabs/Trees/SM_Tree_Birch_01.prefab.meta": "563546459236EB360925E3BA377FBF30FEF8CA8D0A234BDA05C3B7E3B6569EB1",
+    "Assets/Synty/PolygonNature/Shaders/SyntyStudios_LOD.shadergraph": "5B75DB3BF701D1651E7DF6831F246B9D6A123501CFD5A3C3EC1F1A5068D851DC",
+    "Assets/Synty/PolygonNature/Shaders/SyntyStudios_LOD.shadergraph.meta": "8DA6230D57476D5B87E6F1BFC9BC8D62C525611F176CD184EAE796D743967A92",
+    "Assets/Synty/PolygonNature/Shaders/SyntyStudios_Trees.shadergraph": "B07246055F087C407CDF2AAD429A64A5DB81E4C2EFB45A32B59AA703A5FAC1C5",
+    "Assets/Synty/PolygonNature/Shaders/SyntyStudios_Trees.shadergraph.meta": "C8888188354BEB4E3E437003922FDDCD2D43DEDB256721724696FA63668A8810",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Birch_Trunk_01.png": "F2B00BC72A058CEDAE1937DD7ADCED975C347C67AD42DAAE981A4DBD6E579783",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Birch_Trunk_01.png.meta": "41937DC0A1DDC3701F9D840D42A776AA25D192BC57E5CA5D1FC4E2DF4B5EDA4A",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Leaves_Generic_01.png": "CA533EB252BCD210A1BECF5B014BEBB92BE503F1C24F0DC1770BCA35324335C1",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Leaves_Generic_01.png.meta": "7B1D9E31A305B9F41DBA2CF5E97DDBF214ED6D8CC3C516E361218957200FD55B",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Leaves_Generic_01_Emissive.png": "AFB94C08F64C56486EA6CA57A59F224D6F1C579C44B778DE37F09018132621AC",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Leaves_Generic_01_Emissive.png.meta": "101FB289B180C35E418BD9FC3AE3945C2C9556D0DE6D1A6342C4708F7B8639DA",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Leaves_Generic_01_Mask.png": "DA2DE2803BC208A3963C3C686E74237203F62F6FC29EB326733BDFA1BFA16302",
+    "Assets/Synty/PolygonNature/Textures/Leaves/Leaves_Generic_01_Mask.png.meta": "0AD0349800253313E7171017F5CEA5B2C3AE3254037316137660DB39BBDA829B",
+    "Assets/Synty/PolygonNature/Textures/Misc/Noise_Big_01.tga": "D40846A791D8C62F82FB9C5E38CEEF8C24EB92C5E73B12649F27017D1B8E3332",
+    "Assets/Synty/PolygonNature/Textures/Misc/Noise_Big_01.tga.meta": "B54768F5C10991247D5F1F291ADA4753FCF1EC43DBEDEDA04CB849325E928FCD",
+    "Assets/Synty/PolygonNature/Textures/Misc/Noise_Small_01.png": "0EC003F391F56DBE7C1402809CBC2CC403320A7A040142F6C452C485FA269675",
+    "Assets/Synty/PolygonNature/Textures/Misc/Noise_Small_01.png.meta": "65658D28B7BB633201D45EE28FCCCAE92A3242F65491E163735B08B30378FAD9",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Alpine_Bush_01.mat": "57958A1F123BA9FA2E34BF4F9C1F27B581B86D4BE3359D859BB191E2B292406E",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Alpine_Bush_01.mat.meta": "F9384FF0343040E4CF638DDA2463757A3F0DAB4A8D16A1F17440FF12A5A3ED1A",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/AlpineTree_Mat_02_Vibrant.mat": "1F070C9FE7EB34BCFF8A8FA6AEC2C14A01946B6BAB30E00590DC36115085FD00",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/AlpineTree_Mat_02_Vibrant.mat.meta": "61E4DE4AFA73907050F0CDE1028BC1363A0F46AE7AC29FB181E0EA69F283370F",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Branches_01.mat": "7D6055EB2B2B6C6D9D8437FE4F5783E38B8229E0DB97C82D55DE563C4C7B6344",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Branches_01.mat.meta": "9778D1C70D4ED173284F6C99C9FDB098F2E563CE755E6F34F2E4C0EA827B763A",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Models/SM_Env_Bush_01.fbx": "660BD43955085948D0A74F8110A95056F00FCBA376D535E8FF5585E90A13B774",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Models/SM_Env_Bush_01.fbx.meta": "2E2EB4D05261D652A0D88BB6A29414C4B8A5F709A8624A8F2C830556534AFC1E",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Prefabs/SM_Env_Bush_01.prefab": "3002849C9EF1C1762D3A5901CFE3E9EA81D9801F1C6D706CA78D0B3C0109EED0",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Prefabs/SM_Env_Bush_01.prefab.meta": "2BD6774AE3BE26506ABD0424CF1108CF58F697AECA1FE50B8B3977F71B37254B",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Alpine_Bush_01.tga": "D1761555A4E1D188782697E0AD9423D6C875C3F0059A1B22A16D225318B43D76",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Alpine_Bush_01.tga.meta": "6EBD208CC92475282FA2E845EFEFB3BA31B9879C2EB5D400028D68A55219F9EB",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Alpine_Bush_01_normals.png": "DE51577D39690137404B49B1B8030123136B3688C271ED2437695D7849890053",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Alpine_Bush_01_normals.png.meta": "ADDE54D9574106E50B2C08EC677C84133C596A56DCF002FE3709588E25398DD2",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Branches_01.tga": "E57FDABB1EA6406FD61E19E699A51B47AC1A35353B9D324C34CF0DDBA59187D9",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Branches_01.tga.meta": "E2FD0F2212A149CC598F3AB3D63E6BF9BBB8C44BEECBF1CE2493A57DDCE950DA",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Pine_02_Normal.png": "6F8B3053B26F2E66DB07CDA624C685C5034A67365D19A7BF9A3E7718BA4C028D",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Pine_02_Normal.png.meta": "02D42D8657E84B1BBA6EC46F68CDAEC190F1587C240B21BC683077C8F07B1A65",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Pine_02_Vibrant.tga": "A7AC77B0003AB57598990FC280E8DECD5C2AC4F2609BE4F3440158E1EE4288B2",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/Pine_02_Vibrant.tga.meta": "17E6566F95FD453E515EB8725F3162D8D9C3A657A93A74765EB804F32CCB89FD",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/PolygonNatureBiomesS2_Alpine_Texture_01.png": "95DBACF1423C0B6DA373E57A7424DA1B3994380B9C18B7B2B25A52AF7C5FF555",
+    "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Textures/PolygonNatureBiomesS2_Alpine_Texture_01.png.meta": "6C906A93ABE7EBABBA2C60D711FC31BB7EA0B6C7127C9931A238DE884478C969",
+    "Assets/Synty/PolygonTown/Materials/Alts/PolygonTown_01_A.mat": "FB455CB94E82E88E6CCB02EACBEB29C42DD287A5CA6EC39DAA4F628A2809E4C0",
+    "Assets/Synty/PolygonTown/Materials/Alts/PolygonTown_01_A.mat.meta": "4F9BD362C5F3769C4EF836448B5BA56BA7AB7D0F92B2CCF4569467E6E432320E",
+    "Assets/Synty/PolygonTown/Models/Collision/Convex/SM_Prop_Lamp_01_Convex.asset": "34C053ED5EA329CD9644C0199000D912F152071E2CB8A05412953C00AB5F3FD9",
+    "Assets/Synty/PolygonTown/Models/Collision/Convex/SM_Prop_Lamp_01_Convex.asset.meta": "75A78A1BEE623F6A36AF2F78359D6B73293C43C9F54ACCEDA7D2DAA5E1B32BB7",
+    "Assets/Synty/PolygonTown/Models/Props/SM_Prop_Lamp_01.fbx": "6221EFEC6ACFACFC1C88D901C3125704BF99C4B63162BC590BA1400AD16B0843",
+    "Assets/Synty/PolygonTown/Models/Props/SM_Prop_Lamp_01.fbx.meta": "EA0AE086082F86AC2290A16266CD467902079A3E5874AD6CDE99B765F2385D4C",
+    "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_Lamp_01.prefab": "FB0D652758306D05E80F36548242B5A78F11E1EC9C47346A02C0833829063FDE",
+    "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_Lamp_01.prefab.meta": "EF5657F8902ACA7CC86D153D6AEAD7F6767B8D36A9BE350B949A139817A976F5",
+    "Assets/Synty/PolygonTown/Textures/Alts/PolygonTown_01_A.png": "141B1AD20BDC9DDA0B187378FB9F55B1C00939358283D47A8E6EDDD0BD07B07C",
+    "Assets/Synty/PolygonTown/Textures/Alts/PolygonTown_01_A.png.meta": "821D2F5346BF62CB7F1EAFCCC1FCCCC4D611489ECF4178C84605453BFD080DEA",
+    "Assets/Synty/PolygonTown/Textures/Misc/PolygonTown_01_Emissive.png": "A4A2CE4BF43F085B3D48E02C0971245C7C9AC540DDA2CB8B22A2529BD6DF0BDE",
+    "Assets/Synty/PolygonTown/Textures/Misc/PolygonTown_01_Emissive.png.meta": "E8B5D98CAF017261CA389EAAC6CCF55B4A36AED77DA2CA68DFADC63C9BBFED38",
+    "Packages/com.unity.render-pipelines.universal/Editor/AssetVersion.cs": "96ED27E15286CDA1FDADA6923E804887B6447A905B38360E0F5561F79CD0344C",
+    "Packages/com.unity.render-pipelines.universal/Editor/AssetVersion.cs.meta": "E7EC88783B56AE3A5ADBE60D3AB71FD3B6FE269932AF20218D4CC00EB3879868",
+    "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/UniversalMetadata.cs": "88083201BA4B354BDE926DECEDD11354A32B41A69E49EFCD08EABE095CB15A5A",
+    "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/UniversalMetadata.cs.meta": "665C03A7A47EB649A052B5FCE4B70FC20CDE2177E6FBD7026F67E9A888A3B5D4",
+    "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Lit.mat": "A79F6EE52F6C31FC482ABF73B04F915EA3DFF0CBFE8EE7351E4F5A57AA94E8F1",
+    "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Lit.mat.meta": "A96F8B5C6B76D1FEFE7B4CD7D75120B07CB97338810776D2161D291EB2886EA8",
+    "Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader": "D012FADD60A3E5C19A57D501A3E010AD0EE6067465FEE135A421AFEA08B4DA45",
+    "Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader.meta": "F0DB005307FFE5480C40A402CA5BFB0B3726259031A86E255E49626228CEB008",
+    "Packages/com.unity.shadergraph/Editor/Generation/Targets/BuiltIn/Editor/AssetVersion.cs": "EE787C6EF844C6D4732FB1E914E43CFD11F1E8E49125B5DEB98652CDA85E8E06",
+    "Packages/com.unity.shadergraph/Editor/Generation/Targets/BuiltIn/Editor/AssetVersion.cs.meta": "47DF80C771E6A4097BE3B7E755BA51D266900327FE261FFE8210BCA7C794E470",
+    "Packages/com.unity.shadergraph/Editor/Generation/Targets/BuiltIn/Editor/ShaderGraph/BuiltInMetadata.cs": "8D0C765CE2D02DAF1A6D9C4F475C57A4E7CA62AE5C319350C784BC8BFDB9BAF2",
+    "Packages/com.unity.shadergraph/Editor/Generation/Targets/BuiltIn/Editor/ShaderGraph/BuiltInMetadata.cs.meta": "F06197F0B2412A26B4400A4853820A318B77B597269E39031D3A970FDCEEAC12",
+    "Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphImporter.cs": "4E4B9D5808FAB134E1D25B096439238D00C65D81B514EBEF3420A37976476B6C",
+    "Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphImporter.cs.meta": "73774735365002E56ECAA55327A951B262672984C5041E493087B9A2FA1A448A",
+    "Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphIndexedData.cs": "2D2D607D8C1FA5A76E50B1CD13DDE3B703891B4EAE7E8E63ACEA9D376143A130",
+    "Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphIndexedData.cs.meta": "329EB4DEC32E44218FC2215B883D82734B46157A2F4A5EBE5376E19E596C88C5",
+    "Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphMetadata.cs": "C86716F1ECC1257883B2C67DDCB00D612D7B302E215E8BBAEB8E919F16202385",
+    "Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphMetadata.cs.meta": "1D971D0D921DD2ABACD6FC997B2B7B787B69F5F2A67988217324ADEA16B8CF64"
+  }
+}

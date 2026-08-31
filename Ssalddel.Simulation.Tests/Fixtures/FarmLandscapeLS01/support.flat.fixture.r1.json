@@ -1,0 +1,14 @@
+{
+  "revision": "ls01-explicit-synthetic-flat-support.r1",
+  "evidenceKind": "SyntheticFixture",
+  "unit": "Meters",
+  "minX": -62.5,
+  "minZ": -62.5,
+  "maxX": 62.5,
+  "maxZ": 62.5,
+  "height": 0,
+  "slope": 0,
+  "supported": true,
+  "placementAllowed": true,
+  "sampling": "Explicit constant analytic fixture over the stated cell domain; not actual terrain"
+}

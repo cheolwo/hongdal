@@ -238,6 +238,12 @@ public sealed class SimulationWorldAreaSetLandscapeGraphJobShell
     Boundary = "AreaSet·Graph·배치·통행은 조건부 입력이며 그 자체로 E4·E5를 완료하지 않는다.")]
 public sealed class SimulationWorldAreaSetLandscapeGraphService
 {
+    // D442 비저장 검토 진입. JobShell/AreaSet 원장/실제 World를 호출하지 않는다.
+    public static Simulation경관조합검토Result ReviewCandidate(
+        SimulationWorldLandscapeGrammarCatalog catalog, Simulation경관조합검토Input input,
+        ISimulationFarmH2SurfaceReader? surface) =>
+        new Simulation경관조합검토Service().Review(catalog, input, surface);
+
     private readonly ISimulationWorldAreaSetDefinitionReader _definitionReader;
     private readonly ISimulationWorldAreaSetGraphStore _store;
 
@@ -355,7 +361,7 @@ public static class SimulationWorldLandscapeGraphRelationValidator
         graph.StatusCode is SimulationWorldLandscapeCompositionCodes.Available
             or SimulationWorldLandscapeCompositionCodes.PartialUnresolved;
 
-    private static string? ValidatePair(
+    internal static string? ValidatePair(
         SimulationWorldLandscapeGraphRelationResponse relation,
         SimulationWorldLandscapeExternalConnectorResponse? from,
         SimulationWorldLandscapeExternalConnectorResponse? to)

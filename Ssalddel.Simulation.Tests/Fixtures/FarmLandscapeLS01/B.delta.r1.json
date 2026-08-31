@@ -1,0 +1,1716 @@
+{
+  "schema": "ls01-decorative-delta-envelope.r1",
+  "inputHash": "e8c00fb8e51b70ad9a178889c7b09733bbb42483bb8c29663c77424b10afa0de",
+  "outputHash": "63a08b079c947b9370a32f8d45af0044e4fab16abbd80df683aa723ffe2eb704",
+  "canonicalInput": {
+    "intent": {
+      "schema": "ls01-decoration-intent.r1",
+      "revision": "farm-landscape-ls01.flat-ab.r1",
+      "seed": "farm-flat-297/ls01-authored.r1",
+      "algorithm": "AuthoredPointsNoPRNG; stable-id ordinal ordering",
+      "units": "Unity unit; X-right Y-up Z-forward; candidate local coordinates, not runtime world",
+      "numericalStatus": "Adjustable trial composition, not player rules",
+      "items": [
+        {
+          "id": "forest-birch",
+          "asset": "SM_Tree_Birch_01.prefab",
+          "x": -16,
+          "z": 21,
+          "yaw": 15,
+          "questions": "Q389",
+          "intent": "SparseTransition"
+        },
+        {
+          "id": "forest-large",
+          "asset": "SM_Env_Tree_Large_01.prefab",
+          "x": -15,
+          "z": 32,
+          "yaw": 0,
+          "questions": "Q387/Q389",
+          "intent": "ForestLandward"
+        },
+        {
+          "id": "forest-small",
+          "asset": "SM_Generic_Tree_01.prefab",
+          "x": -18,
+          "z": 5,
+          "yaw": 30,
+          "questions": "Q389",
+          "intent": "SparseTransition"
+        },
+        {
+          "id": "path-grass",
+          "asset": "SM_Generic_Grass_Patch_02.prefab",
+          "x": 4.5,
+          "z": 34,
+          "yaw": 0,
+          "questions": "Q391",
+          "intent": "SparsePathEdge"
+        },
+        {
+          "id": "path-rocks",
+          "asset": "SM_Generic_Small_Rocks_01.prefab",
+          "x": 3.5,
+          "z": 29,
+          "yaw": 20,
+          "questions": "Q391",
+          "intent": "SparsePathEdge"
+        },
+        {
+          "id": "river-grass",
+          "asset": "SM_Generic_Grass_Patch_02.prefab",
+          "x": -20,
+          "z": 10,
+          "yaw": 10,
+          "questions": "Q388",
+          "intent": "LandwardOutsideBuffer"
+        },
+        {
+          "id": "river-rocks",
+          "asset": "SM_Generic_Small_Rocks_01.prefab",
+          "x": -22,
+          "z": 17,
+          "yaw": 0,
+          "questions": "Q388",
+          "intent": "LandwardOutsideBuffer"
+        },
+        {
+          "id": "transition-bush",
+          "asset": "SM_Env_Bush_01.prefab",
+          "x": -16,
+          "z": 16,
+          "yaw": 25,
+          "questions": "Q389",
+          "intent": "ShrubTransition"
+        }
+      ],
+      "deferred": [
+        {
+          "id": "road-surface",
+          "asset": "SM_Env_Road_Dirt_Straight_01.prefab",
+          "x": 0,
+          "z": 27,
+          "yaw": 0,
+          "reason": "Q391: native width exceeds 3m route; collider/support overlay contract missing"
+        },
+        {
+          "id": "yard-surface",
+          "asset": "SM_Env_Dirt_01.prefab",
+          "x": 0,
+          "z": -12,
+          "yaw": 0,
+          "reason": "Q392: WorkYard/route overlap; second collidable support surface and z-fighting unresolved"
+        }
+      ]
+    },
+    "lineage": {
+      "sourceCandidateFileSha256": "027CAABCF45A1BA013833476B741093857325004BE519764FB84FECDEB5E1578",
+      "sourceCandidateResultHash": "2d9a5c43075d6f96075fca0d67ac60ef5d8d74595d0a55e1506d1023bde7a720",
+      "sourceInputHash": "006370857707996d5b54d69bb3744d2154de0bba901893594b4213fe31b79bd4",
+      "sourceSurfaceHash": "369b0d239a84b9751ea606bb6d6ec8690929dd3532346b7d2d46ca8238a33838",
+      "measurementSha256": "63150068BB9B76E84565F4427EA442AD208A72F051E8E73C8D2DEECE52323C90",
+      "measurementManifestSha256": "EA073E1C0A214073780AA72E13406F1106C04464DAE17937ADDF4340C269E4A6",
+      "studySha256": "90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F",
+      "workOrderSha256": "49D94C42498679DC0587633766039255E93C15487F6507CDBE764148F8533C3E",
+      "oldMeasurementHash": "99F8B557D4DC8C2E6044D7D7D688B043CBF502F86C5370418F44D6EE09BE9CC8",
+      "playerEvidence": {
+        "Revision": "farm-riverside-h2.measured-expansion.r2",
+        "ParentCandidateHashSha256": "7c3e72b8e937b7a2987b34e4aa8456e889b060340f4e5bc19cf3f1b9aff43bf3",
+        "ParentInputHashSha256": "52856c505bdc6f752c67e8b5d894d6f498df15f8a8ee8d197f926b8f6108f731",
+        "StudyHashSha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+        "MeasurementSourceHashSha256": "99F8B557D4DC8C2E6044D7D7D688B043CBF502F86C5370418F44D6EE09BE9CC8",
+        "Player": {
+          "EvidenceRef": "Fixtures/FarmH2ExpandedR2/player-readonly-evidence.json",
+          "EvidenceHashSha256": "6465de347fa14eeb73b360239063d9b7bbf4194a7850b8f9624744109dd22776",
+          "EvidenceKindCode": "ReadOnlyOpenDirtyEditor",
+          "RadiusMeters": 0.3400000035762787,
+          "SkinWidthMeters": 0.07999999821186066,
+          "ClickStopDistanceMeters": 0.18000000715255737,
+          "HeightMeters": 1.7799999713897705,
+          "StepOffsetMeters": 0.2800000011920929,
+          "SlopeLimitDegrees": 42,
+          "UniformScale": 1
+        },
+        "BarnCode": "Barn01",
+        "BarnSolidBounds": {
+          "MinX": -6.74741936,
+          "MinZ": -7.07891273,
+          "MaxX": 6.747425,
+          "MaxZ": 7.078911
+        },
+        "BarnSolidMeasurementHashSha256": "c6ba517c4e24c45bdca9f6a1b0e2c2d7da6d3e63980159b89721464d8811ed9f",
+        "PlayerCenterClearanceMeters": 0.6000000089406967,
+        "AccessLaneWidthMeters": 3,
+        "MinimumSpacingMeters": 0.55,
+        "ProductionAreaSquareMeters": 100,
+        "InteriorDisposition": "NotApplicable",
+        "SourceSurfaceRevision": "explicit-synthetic-analytic-ground.r2",
+        "SurfaceHashSha256": "c37b43c9f58ee839775236fbdf7d1dc54ae5cb41965160753679b754ca5a1a1e",
+        "Measurements": [
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/barn",
+            "AssetFingerprintSha256": "43e124930635ba7aa213268e278a243f1800c240af554b3b500f9174d0ae5ed6",
+            "MeasurementHashSha256": "351e3021342ac7871f4e36b7413d28db11ec5dd77a4e101e1cb0386992df6c77"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/decor:0",
+            "AssetFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+            "MeasurementHashSha256": "32a290b38f9f8cb78b4d5c36b7bfb41cf99096af65616a686e54dabc87f88681"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/decor:1",
+            "AssetFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+            "MeasurementHashSha256": "32a290b38f9f8cb78b4d5c36b7bfb41cf99096af65616a686e54dabc87f88681"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/field",
+            "AssetFingerprintSha256": "f37d1fa4ee5ed756145d21f8b4507b548ed0d4ccf7629fb0ae112d919f874668",
+            "MeasurementHashSha256": "b03bd5f7eccccc8d91f3da2fd39eaf235a95462cc42f68155381dfed3988f5dc"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/well",
+            "AssetFingerprintSha256": "858f4d786ee9776a8f3284a6b8cfa40e019ae6fbf1f3b0047dda6c2245eb1777",
+            "MeasurementHashSha256": "7d3068f8210d5a412bfe1f2f014953a067fb2fefc1fefbbbc8a4a3c1c8b8c4e7"
+          }
+        ]
+      },
+      "intentSha256": "FFE5F051177FF7BB1BDCD4EB99E5951D06BA86B5B16F313AD609BB344F90D35F"
+    }
+  },
+  "canonicalization": "Ordinal property keys; entity arrays pre-sorted by stableId; vectors preserve coordinate order; SHA256 UTF8",
+  "candidate": {
+    "status": "UnapprovedCandidate",
+    "coreConsumable": false,
+    "revision": "farm-landscape-ls01.flat-ab.r1",
+    "seed": "farm-flat-297/ls01-authored.r1",
+    "algorithm": "AuthoredPointsNoPRNG; stable-id ordinal ordering",
+    "lineage": {
+      "sourceCandidateFileSha256": "027CAABCF45A1BA013833476B741093857325004BE519764FB84FECDEB5E1578",
+      "sourceCandidateResultHash": "2d9a5c43075d6f96075fca0d67ac60ef5d8d74595d0a55e1506d1023bde7a720",
+      "sourceInputHash": "006370857707996d5b54d69bb3744d2154de0bba901893594b4213fe31b79bd4",
+      "sourceSurfaceHash": "369b0d239a84b9751ea606bb6d6ec8690929dd3532346b7d2d46ca8238a33838",
+      "measurementSha256": "63150068BB9B76E84565F4427EA442AD208A72F051E8E73C8D2DEECE52323C90",
+      "measurementManifestSha256": "EA073E1C0A214073780AA72E13406F1106C04464DAE17937ADDF4340C269E4A6",
+      "studySha256": "90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F",
+      "workOrderSha256": "49D94C42498679DC0587633766039255E93C15487F6507CDBE764148F8533C3E",
+      "oldMeasurementHash": "99F8B557D4DC8C2E6044D7D7D688B043CBF502F86C5370418F44D6EE09BE9CC8",
+      "playerEvidence": {
+        "Revision": "farm-riverside-h2.measured-expansion.r2",
+        "ParentCandidateHashSha256": "7c3e72b8e937b7a2987b34e4aa8456e889b060340f4e5bc19cf3f1b9aff43bf3",
+        "ParentInputHashSha256": "52856c505bdc6f752c67e8b5d894d6f498df15f8a8ee8d197f926b8f6108f731",
+        "StudyHashSha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+        "MeasurementSourceHashSha256": "99F8B557D4DC8C2E6044D7D7D688B043CBF502F86C5370418F44D6EE09BE9CC8",
+        "Player": {
+          "EvidenceRef": "Fixtures/FarmH2ExpandedR2/player-readonly-evidence.json",
+          "EvidenceHashSha256": "6465de347fa14eeb73b360239063d9b7bbf4194a7850b8f9624744109dd22776",
+          "EvidenceKindCode": "ReadOnlyOpenDirtyEditor",
+          "RadiusMeters": 0.3400000035762787,
+          "SkinWidthMeters": 0.07999999821186066,
+          "ClickStopDistanceMeters": 0.18000000715255737,
+          "HeightMeters": 1.7799999713897705,
+          "StepOffsetMeters": 0.2800000011920929,
+          "SlopeLimitDegrees": 42,
+          "UniformScale": 1
+        },
+        "BarnCode": "Barn01",
+        "BarnSolidBounds": {
+          "MinX": -6.74741936,
+          "MinZ": -7.07891273,
+          "MaxX": 6.747425,
+          "MaxZ": 7.078911
+        },
+        "BarnSolidMeasurementHashSha256": "c6ba517c4e24c45bdca9f6a1b0e2c2d7da6d3e63980159b89721464d8811ed9f",
+        "PlayerCenterClearanceMeters": 0.6000000089406967,
+        "AccessLaneWidthMeters": 3,
+        "MinimumSpacingMeters": 0.55,
+        "ProductionAreaSquareMeters": 100,
+        "InteriorDisposition": "NotApplicable",
+        "SourceSurfaceRevision": "explicit-synthetic-analytic-ground.r2",
+        "SurfaceHashSha256": "c37b43c9f58ee839775236fbdf7d1dc54ae5cb41965160753679b754ca5a1a1e",
+        "Measurements": [
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/barn",
+            "AssetFingerprintSha256": "43e124930635ba7aa213268e278a243f1800c240af554b3b500f9174d0ae5ed6",
+            "MeasurementHashSha256": "351e3021342ac7871f4e36b7413d28db11ec5dd77a4e101e1cb0386992df6c77"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/decor:0",
+            "AssetFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+            "MeasurementHashSha256": "32a290b38f9f8cb78b4d5c36b7bfb41cf99096af65616a686e54dabc87f88681"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/decor:1",
+            "AssetFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+            "MeasurementHashSha256": "32a290b38f9f8cb78b4d5c36b7bfb41cf99096af65616a686e54dabc87f88681"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/field",
+            "AssetFingerprintSha256": "f37d1fa4ee5ed756145d21f8b4507b548ed0d4ccf7629fb0ae112d919f874668",
+            "MeasurementHashSha256": "b03bd5f7eccccc8d91f3da2fd39eaf235a95462cc42f68155381dfed3988f5dc"
+          },
+          {
+            "SourcePlacementStableId": "fixture:farm-h2:01-flat/well",
+            "AssetFingerprintSha256": "858f4d786ee9776a8f3284a6b8cfa40e019ae6fbf1f3b0047dda6c2245eb1777",
+            "MeasurementHashSha256": "7d3068f8210d5a412bfe1f2f014953a067fb2fefc1fefbbbc8a4a3c1c8b8c4e7"
+          }
+        ]
+      },
+      "intentSha256": "FFE5F051177FF7BB1BDCD4EB99E5951D06BA86B5B16F313AD609BB344F90D35F"
+    },
+    "fixedA": {
+      "input": {
+        "InstanceStableId": "fixture:farm-h2:01-flat",
+        "Seed": "farm-flat-297",
+        "PatternRevision": "farm-riverside-h2.measured-expansion.r2",
+        "SourceWorldRevision": 0,
+        "SourceContext": "ExplicitSyntheticFixture;NoAuthorityWI;Q297-Q339",
+        "Terrain": {
+          "StableId": "terrain:01-flat",
+          "Revision": "terrain-fixture.r1",
+          "Mode": "Flat",
+          "BaseHeight": 0,
+          "Amplitude": 0,
+          "SlopeX": 0,
+          "StepHeight": 0,
+          "Patches": []
+        },
+        "Policy": {
+          "MaximumSlope": 5,
+          "MaximumHeightSpread": 0.15,
+          "GroundClearance": 0.03,
+          "BottomTolerance": 0.015,
+          "MinimumSpacing": 0.55,
+          "RouteWidth": 3,
+          "RouteSampleStep": 0.5,
+          "MaximumRouteSlope": 12,
+          "MaximumRouteStep": 0.12
+        },
+        "Obstacles": [],
+        "Expansion": {
+          "Revision": "farm-riverside-h2.measured-expansion.r2",
+          "ParentCandidateHashSha256": "7c3e72b8e937b7a2987b34e4aa8456e889b060340f4e5bc19cf3f1b9aff43bf3",
+          "ParentInputHashSha256": "52856c505bdc6f752c67e8b5d894d6f498df15f8a8ee8d197f926b8f6108f731",
+          "StudyHashSha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+          "MeasurementSourceHashSha256": "99F8B557D4DC8C2E6044D7D7D688B043CBF502F86C5370418F44D6EE09BE9CC8",
+          "Player": {
+            "EvidenceRef": "Fixtures/FarmH2ExpandedR2/player-readonly-evidence.json",
+            "EvidenceHashSha256": "6465de347fa14eeb73b360239063d9b7bbf4194a7850b8f9624744109dd22776",
+            "EvidenceKindCode": "ReadOnlyOpenDirtyEditor",
+            "RadiusMeters": 0.3400000035762787,
+            "SkinWidthMeters": 0.07999999821186066,
+            "ClickStopDistanceMeters": 0.18000000715255737,
+            "HeightMeters": 1.7799999713897705,
+            "StepOffsetMeters": 0.2800000011920929,
+            "SlopeLimitDegrees": 42,
+            "UniformScale": 1
+          },
+          "BarnCode": "Barn01",
+          "BarnSolidBounds": {
+            "MinX": -6.74741936,
+            "MinZ": -7.07891273,
+            "MaxX": 6.747425,
+            "MaxZ": 7.078911
+          },
+          "BarnSolidMeasurementHashSha256": "c6ba517c4e24c45bdca9f6a1b0e2c2d7da6d3e63980159b89721464d8811ed9f",
+          "PlayerCenterClearanceMeters": 0.6000000089406967,
+          "AccessLaneWidthMeters": 3,
+          "MinimumSpacingMeters": 0.55,
+          "ProductionAreaSquareMeters": 100,
+          "InteriorDisposition": "NotApplicable",
+          "SourceSurfaceRevision": "explicit-synthetic-analytic-ground.r2",
+          "SurfaceHashSha256": "c37b43c9f58ee839775236fbdf7d1dc54ae5cb41965160753679b754ca5a1a1e",
+          "Measurements": [
+            {
+              "SourcePlacementStableId": "fixture:farm-h2:01-flat/barn",
+              "AssetFingerprintSha256": "43e124930635ba7aa213268e278a243f1800c240af554b3b500f9174d0ae5ed6",
+              "MeasurementHashSha256": "351e3021342ac7871f4e36b7413d28db11ec5dd77a4e101e1cb0386992df6c77"
+            },
+            {
+              "SourcePlacementStableId": "fixture:farm-h2:01-flat/decor:0",
+              "AssetFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+              "MeasurementHashSha256": "32a290b38f9f8cb78b4d5c36b7bfb41cf99096af65616a686e54dabc87f88681"
+            },
+            {
+              "SourcePlacementStableId": "fixture:farm-h2:01-flat/decor:1",
+              "AssetFingerprintSha256": "c9121286c87136c812d66b17be3aa32357922fb9c2c79540029d9165b2ae4eda",
+              "MeasurementHashSha256": "32a290b38f9f8cb78b4d5c36b7bfb41cf99096af65616a686e54dabc87f88681"
+            },
+            {
+              "SourcePlacementStableId": "fixture:farm-h2:01-flat/field",
+              "AssetFingerprintSha256": "f37d1fa4ee5ed756145d21f8b4507b548ed0d4ccf7629fb0ae112d919f874668",
+              "MeasurementHashSha256": "b03bd5f7eccccc8d91f3da2fd39eaf235a95462cc42f68155381dfed3988f5dc"
+            },
+            {
+              "SourcePlacementStableId": "fixture:farm-h2:01-flat/well",
+              "AssetFingerprintSha256": "858f4d786ee9776a8f3284a6b8cfa40e019ae6fbf1f3b0047dda6c2245eb1777",
+              "MeasurementHashSha256": "7d3068f8210d5a412bfe1f2f014953a067fb2fefc1fefbbbc8a4a3c1c8b8c4e7"
+            }
+          ]
+        }
+      },
+      "placements": [
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn",
+          "H1StableId": "fixture:farm-h2:01-flat/h1:BarnWorkYard",
+          "Role": "BarnWorkYard",
+          "VisualKey": "candidate:farm.red-barn",
+          "AssetFamilyId": "synty:polygon-farm:buildings:barn",
+          "Bounds": {
+            "MinX": -23.59484523162842,
+            "MinZ": -22.628911953674315,
+            "MaxX": -3,
+            "MaxZ": -1.371088046325685,
+            "Valid": true
+          },
+          "Bottom": 0.03,
+          "Yaw": 0,
+          "Blocking": true,
+          "DimensionEvidence": "MeasuredRendererColliderNativeScale1\u002BPlayerAccessBand;D320;r2"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/field",
+          "H1StableId": "fixture:farm-h2:01-flat/h1:ProductionPlot",
+          "Role": "ProductionPlot",
+          "VisualKey": "candidate:farm.crop-plot",
+          "AssetFamilyId": "synty:polygon-farm:environment:dirt-rows",
+          "Bounds": {
+            "MinX": 9,
+            "MinZ": 3,
+            "MaxX": 25,
+            "MaxZ": 23,
+            "Valid": true
+          },
+          "Bottom": 0.03,
+          "Yaw": 0,
+          "Blocking": true,
+          "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/well",
+          "H1StableId": "fixture:farm-h2:01-flat/h1:WaterAccess",
+          "Role": "WaterAccess",
+          "VisualKey": "candidate:farm.water-access",
+          "AssetFamilyId": "synty:polygon-farm:props:well",
+          "Bounds": {
+            "MinX": -12,
+            "MinZ": 10,
+            "MaxX": -8,
+            "MaxZ": 14,
+            "Valid": true
+          },
+          "Bottom": 0.03,
+          "Yaw": 0,
+          "Blocking": true,
+          "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/decor:0",
+          "H1StableId": "fixture:farm-h2:01-flat/h1:NaturalAccent",
+          "Role": "NaturalAccent",
+          "VisualKey": "candidate:farm.grass-accent",
+          "AssetFamilyId": "synty:polygon-farm:generic:grass",
+          "Bounds": {
+            "MinX": -9.990867475394825,
+            "MinZ": 23.228389410238805,
+            "MaxX": -8.990867475394825,
+            "MaxZ": 24.228389410238805,
+            "Valid": true
+          },
+          "Bottom": 0.03,
+          "Yaw": 354.22659647516593,
+          "Blocking": true,
+          "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/decor:1",
+          "H1StableId": "fixture:farm-h2:01-flat/h1:NaturalAccent",
+          "Role": "NaturalAccent",
+          "VisualKey": "candidate:farm.grass-accent",
+          "AssetFamilyId": "synty:polygon-farm:generic:grass",
+          "Bounds": {
+            "MinX": 26.80656900892653,
+            "MinZ": 28.39546044098573,
+            "MaxX": 27.80656900892653,
+            "MaxZ": 29.39546044098573,
+            "Valid": true
+          },
+          "Bottom": 0.03,
+          "Yaw": 63.2327763790341,
+          "Blocking": true,
+          "DimensionEvidence": "TrialEnvelopeNotMeasuredPrefab"
+        }
+      ],
+      "anchors": [
+        {
+          "StableId": "fixture:farm-h2:01-flat/entry",
+          "Role": "ExternalEntry",
+          "Position": {
+            "X": 0,
+            "Z": -40
+          },
+          "OwnerStableId": "",
+          "Facing": "South"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/yard",
+          "Role": "BarnWorkYard",
+          "Position": {
+            "X": 0,
+            "Z": -12
+          },
+          "OwnerStableId": "",
+          "Facing": ""
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/work-path",
+          "Role": "InternalWorkPath",
+          "Position": {
+            "X": 0,
+            "Z": 12
+          },
+          "OwnerStableId": "",
+          "Facing": ""
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/exit",
+          "Role": "ExternalExit",
+          "Position": {
+            "X": 0,
+            "Z": 40
+          },
+          "OwnerStableId": "",
+          "Facing": "North"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn-door",
+          "Role": "H1Entrance",
+          "Position": {
+            "X": -4.5,
+            "Z": -12
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/barn",
+          "Facing": "East"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/field-access",
+          "Role": "H1Entrance",
+          "Position": {
+            "X": 9,
+            "Z": 12
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/field",
+          "Facing": "West"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/well-access",
+          "Role": "H1Entrance",
+          "Position": {
+            "X": -8,
+            "Z": 12
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/well",
+          "Facing": "East"
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-ne",
+          "Role": "BarnExteriorAccess",
+          "Position": {
+            "X": -4.5,
+            "Z": -2.871088046325685
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/barn",
+          "Facing": ""
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-nw",
+          "Role": "BarnExteriorAccess",
+          "Position": {
+            "X": -22.09484523162842,
+            "Z": -2.871088046325685
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/barn",
+          "Facing": ""
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-west",
+          "Role": "BarnExteriorAccess",
+          "Position": {
+            "X": -22.09484523162842,
+            "Z": -12
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/barn",
+          "Facing": ""
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-sw",
+          "Role": "BarnExteriorAccess",
+          "Position": {
+            "X": -22.09484523162842,
+            "Z": -21.128911953674315
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/barn",
+          "Facing": ""
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-se",
+          "Role": "BarnExteriorAccess",
+          "Position": {
+            "X": -4.5,
+            "Z": -21.128911953674315
+          },
+          "OwnerStableId": "fixture:farm-h2:01-flat/barn",
+          "Facing": ""
+        }
+      ],
+      "routes": [
+        {
+          "StableId": "fixture:farm-h2:01-flat/entry-\u003Eyard",
+          "From": "fixture:farm-h2:01-flat/entry",
+          "To": "fixture:farm-h2:01-flat/yard",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/yard-\u003Ework-path",
+          "From": "fixture:farm-h2:01-flat/yard",
+          "To": "fixture:farm-h2:01-flat/work-path",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/work-path-\u003Eexit",
+          "From": "fixture:farm-h2:01-flat/work-path",
+          "To": "fixture:farm-h2:01-flat/exit",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/yard-\u003Ebarn-door",
+          "From": "fixture:farm-h2:01-flat/yard",
+          "To": "fixture:farm-h2:01-flat/barn-door",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/work-path-\u003Efield-access",
+          "From": "fixture:farm-h2:01-flat/work-path",
+          "To": "fixture:farm-h2:01-flat/field-access",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/work-path-\u003Ewell-access",
+          "From": "fixture:farm-h2:01-flat/work-path",
+          "To": "fixture:farm-h2:01-flat/well-access",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn-door-\u003Efixture:farm-h2:01-flat/barn/access-ne",
+          "From": "fixture:farm-h2:01-flat/barn-door",
+          "To": "fixture:farm-h2:01-flat/barn/access-ne",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-ne-\u003Efixture:farm-h2:01-flat/barn/access-nw",
+          "From": "fixture:farm-h2:01-flat/barn/access-ne",
+          "To": "fixture:farm-h2:01-flat/barn/access-nw",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-nw-\u003Efixture:farm-h2:01-flat/barn/access-west",
+          "From": "fixture:farm-h2:01-flat/barn/access-nw",
+          "To": "fixture:farm-h2:01-flat/barn/access-west",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-west-\u003Efixture:farm-h2:01-flat/barn/access-sw",
+          "From": "fixture:farm-h2:01-flat/barn/access-west",
+          "To": "fixture:farm-h2:01-flat/barn/access-sw",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-sw-\u003Efixture:farm-h2:01-flat/barn/access-se",
+          "From": "fixture:farm-h2:01-flat/barn/access-sw",
+          "To": "fixture:farm-h2:01-flat/barn/access-se",
+          "Width": 3
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/barn/access-se-\u003Efixture:farm-h2:01-flat/barn-door",
+          "From": "fixture:farm-h2:01-flat/barn/access-se",
+          "To": "fixture:farm-h2:01-flat/barn-door",
+          "Width": 3
+        }
+      ],
+      "preservedAreas": [
+        {
+          "StableId": "fixture:farm-h2:01-flat/river",
+          "Role": "MainRiver",
+          "Bounds": {
+            "MinX": -40,
+            "MinZ": -40,
+            "MaxX": -28,
+            "MaxZ": 40,
+            "Valid": true
+          }
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/river-buffer",
+          "Role": "NaturalBuffer",
+          "Bounds": {
+            "MinX": -28,
+            "MinZ": -40,
+            "MaxX": -24,
+            "MaxZ": 40,
+            "Valid": true
+          }
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/east-buffer",
+          "Role": "NaturalBuffer",
+          "Bounds": {
+            "MinX": 30,
+            "MinZ": -40,
+            "MaxX": 40,
+            "MaxZ": 40,
+            "Valid": true
+          }
+        },
+        {
+          "StableId": "fixture:farm-h2:01-flat/yard-reservation",
+          "Role": "WorkYard",
+          "Bounds": {
+            "MinX": -3,
+            "MinZ": -22.628911953674315,
+            "MaxX": 3,
+            "MaxZ": -1.371088046325685,
+            "Valid": true
+          }
+        }
+      ]
+    },
+    "units": "Unity unit; X-right Y-up Z-forward; candidate local coordinates, not runtime world",
+    "items": [
+      {
+        "stableId": "candidate:ls01:flat:forest-birch",
+        "visualKey": "candidate:ls01:asset:SM_Tree_Birch_01",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "forest-birch",
+          "asset": "SM_Tree_Birch_01.prefab",
+          "x": -16,
+          "z": 21,
+          "yaw": 15,
+          "questions": "Q389",
+          "intent": "SparseTransition"
+        },
+        "assetFamily": "synty:PolygonNature",
+        "prefabPath": "Assets/Synty/PolygonNature/Prefabs/Trees/SM_Tree_Birch_01.prefab",
+        "prefabGuid": "1ea71f643417d124d91e53eae7c666a6",
+        "prefabSha256": "78AFFC39F7CE1453DB6ADAAA07CD023A47CF673BED393991B18068686F1166E1",
+        "metaSha256": "563546459236EB360925E3BA377FBF30FEF8CA8D0A234BDA05C3B7E3B6569EB1",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          -15.989268982722942,
+          0.03000000499999997,
+          20.97989941865493
+        ],
+        "yawDegrees": 15,
+        "rendererCenterLocal": [
+          -0.01556778,
+          2.27330565,
+          0.016638279
+        ],
+        "rendererSize": [
+          2.453926,
+          4.54661131,
+          2.289298
+        ],
+        "allLodRendererFootprint": {
+          "MinX": -17.481412210758666,
+          "MinZ": 19.57679257682792,
+          "MaxX": -14.518587789241328,
+          "MaxZ": 22.42320742317208
+        },
+        "colliderFootprints": [
+          {
+            "MinX": -16.206772825671766,
+            "MinZ": 20.85410304510865,
+            "MaxX": -15.7046307162655,
+            "MaxZ": 21.35624487167221
+          }
+        ],
+        "conservativeFootprint": {
+          "MinX": -17.481412210758666,
+          "MinZ": 19.57679257682792,
+          "MaxX": -14.518587789241328,
+          "MaxZ": 22.42320742317208
+        },
+        "potentialLodFootprints": [
+          {
+            "level": 0,
+            "footprint": {
+              "MinX": -17.48141222602899,
+              "MinZ": 19.576792519838296,
+              "MaxX": -14.51858780451165,
+              "MaxZ": 22.423207366182456
+            },
+            "selection": "Potential LOD geometry only, active camera LOD NotRun"
+          },
+          {
+            "level": 1,
+            "footprint": {
+              "MinX": -17.48141222602899,
+              "MinZ": 19.576792519838296,
+              "MaxX": -14.51858780451165,
+              "MaxZ": 22.423207366182456
+            },
+            "selection": "Potential LOD geometry only, active camera LOD NotRun"
+          }
+        ],
+        "activeLodFootprintStatus": "NotRun: requires actual camera/LOD selection",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Tree_Birch_01/SM_Tree_Birch_01",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "Birch_Trunk_01",
+                "path": "Assets/Synty/PolygonNature/Materials/Misc/Birch_Trunk_01.mat",
+                "shader": "Synty/SyntyStudios_Trees",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0
+                }
+              },
+              {
+                "slot": 1,
+                "name": "Leaves_01_Base",
+                "path": "Assets/Synty/PolygonNature/Materials/Leaves/Leaves_01_Base.mat",
+                "shader": "Synty/SyntyStudios_Trees",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0
+                }
+              }
+            ]
+          },
+          {
+            "renderer": "SM_Tree_Birch_01/SM_Tree_Birch_01_LOD_01",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "Leaves_Base_LOD_01",
+                "path": "Assets/Synty/PolygonNature/Materials/LODS/Leaves_Base_LOD_01.mat",
+                "shader": "Synty/SyntyStudios_LOD",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_GLOSSYREFLECTIONS_OFF",
+                  "_SPECULARHIGHLIGHTS_OFF"
+                ],
+                "properties": {}
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "stableId": "candidate:ls01:flat:forest-large",
+        "visualKey": "candidate:ls01:asset:SM_Env_Tree_Large_01",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "forest-large",
+          "asset": "SM_Env_Tree_Large_01.prefab",
+          "x": -15,
+          "z": 32,
+          "yaw": 0,
+          "questions": "Q387/Q389",
+          "intent": "ForestLandward"
+        },
+        "assetFamily": "synty:PolygonFarm",
+        "prefabPath": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Tree_Large_01.prefab",
+        "prefabGuid": "a8d49857a659bcb409bc5dbbbba90cca",
+        "prefabSha256": "CA694A4D4998E5FFFDD17C28F3DF0D72C71FD00B193D55F8980A5903CFBA73F8",
+        "metaSha256": "028E9C91FC58E28CA1C357853055DE8659011BFE2037F584B2CAC86E0E7156EE",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          -13.40632343,
+          0.6789858599999998,
+          33.49350357
+        ],
+        "yawDegrees": 0,
+        "rendererCenterLocal": [
+          -1.59367657,
+          5.76980829,
+          -1.49350357
+        ],
+        "rendererSize": [
+          14.3116016,
+          12.8375883,
+          10.48768
+        ],
+        "allLodRendererFootprint": {
+          "MinX": -22.1558008,
+          "MinZ": 26.75616,
+          "MaxX": -7.8441992,
+          "MaxZ": 37.24384
+        },
+        "colliderFootprints": [
+          {
+            "MinX": -14.609309909,
+            "MinZ": 32.246563168,
+            "MaxX": -12.423878189,
+            "MaxZ": 34.477659908
+          },
+          {
+            "MinX": -18.622107594,
+            "MinZ": 32.781014920000004,
+            "MaxX": -9.772522594000002,
+            "MaxZ": 36.551796440000004
+          },
+          {
+            "MinX": -13.988671535,
+            "MinZ": 32.8221402,
+            "MaxX": -10.086040965,
+            "MaxZ": 35.865411740000006
+          },
+          {
+            "MinX": -19.47998953,
+            "MinZ": 27.633210180000003,
+            "MaxX": -12.15092993,
+            "MaxZ": 34.87788582
+          },
+          {
+            "MinX": -21.14750958,
+            "MinZ": 31.423880639,
+            "MaxX": -15.637442580000002,
+            "MaxZ": 36.194196639
+          },
+          {
+            "MinX": -18.309329984999998,
+            "MinZ": 28.260657365000004,
+            "MaxX": -10.699470515,
+            "MaxZ": 32.780833775000005
+          },
+          {
+            "MinX": -22.107826235,
+            "MinZ": 29.387322904,
+            "MaxX": -15.635787965000002,
+            "MaxZ": 35.904833314
+          },
+          {
+            "MinX": -15.637442500000002,
+            "MinZ": 31.917383906000005,
+            "MaxX": -8.2163535,
+            "MaxZ": 35.618659736000005
+          },
+          {
+            "MinX": -15.637442580000002,
+            "MinZ": 26.78810207,
+            "MaxX": -8.52337932,
+            "MaxZ": 32.067969070000004
+          },
+          {
+            "MinX": -16.04599125,
+            "MinZ": 31.20470617,
+            "MaxX": -7.911261250000002,
+            "MaxZ": 36.914708170000004
+          }
+        ],
+        "conservativeFootprint": {
+          "MinX": -22.1558008,
+          "MinZ": 26.75616,
+          "MaxX": -7.8441992,
+          "MaxZ": 37.24384
+        },
+        "potentialLodFootprints": [],
+        "activeLodFootprintStatus": "NoLODGroup; all measured Renderers",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Env_Tree_Large_01",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "PolygonFarm_01_A",
+                "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+                "shader": "Synty/Generic_Basic",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION",
+                  "_METALLICGLOSSMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.5
+                }
+              }
+            ]
+          },
+          {
+            "renderer": "SM_Env_Tree_Large_01/SM_Env_Tree_Large_Swing_01",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "PolygonFarm_01_A",
+                "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+                "shader": "Synty/Generic_Basic",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION",
+                  "_METALLICGLOSSMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.5
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "stableId": "candidate:ls01:flat:forest-small",
+        "visualKey": "candidate:ls01:asset:SM_Generic_Tree_01",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "forest-small",
+          "asset": "SM_Generic_Tree_01.prefab",
+          "x": -18,
+          "z": 5,
+          "yaw": 30,
+          "questions": "Q389",
+          "intent": "SparseTransition"
+        },
+        "assetFamily": "synty:PolygonFarm",
+        "prefabPath": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Tree_01.prefab",
+        "prefabGuid": "7a49ca0e5bf43fa45b5159d6d6265a09",
+        "prefabSha256": "A13D8B454154012F8F3E688165CCC37F5C03ADE46AEF1E70C22E4C6A9908C511",
+        "metaSha256": "E6F51FEA80AD32FD73AAE1FC755C088C5C86CE95B76CFA249FE10A198CE69203",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          -18.07570643127128,
+          0.16095922000000004,
+          4.987930865978427
+        ],
+        "yawDegrees": 30,
+        "rendererCenterLocal": [
+          0.0595291257,
+          1.51688778,
+          0.0483053923
+        ],
+        "rendererSize": [
+          1.81182122,
+          3.295694,
+          1.70456207
+        ],
+        "allLodRendererFootprint": {
+          "MinX": -19.21068211931786,
+          "MinZ": 3.8089476675263065,
+          "MaxX": -16.78931788068214,
+          "MaxZ": 6.191052332473696
+        },
+        "colliderFootprints": [
+          {
+            "MinX": -19.246412379657936,
+            "MinZ": 3.7898342880496223,
+            "MaxX": -16.771492008324184,
+            "MaxZ": 6.245621925886919
+          }
+        ],
+        "conservativeFootprint": {
+          "MinX": -19.246412379657936,
+          "MinZ": 3.7898342880496223,
+          "MaxX": -16.771492008324184,
+          "MaxZ": 6.245621925886919
+        },
+        "potentialLodFootprints": [],
+        "activeLodFootprintStatus": "NoLODGroup; all measured Renderers",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Generic_Tree_01",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "PolygonFarm_01_A",
+                "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+                "shader": "Synty/Generic_Basic",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION",
+                  "_METALLICGLOSSMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.5
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "stableId": "candidate:ls01:flat:path-grass",
+        "visualKey": "candidate:ls01:asset:SM_Generic_Grass_Patch_02",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "path-grass",
+          "asset": "SM_Generic_Grass_Patch_02.prefab",
+          "x": 4.5,
+          "z": 34,
+          "yaw": 0,
+          "questions": "Q391",
+          "intent": "SparsePathEdge"
+        },
+        "assetFamily": "synty:PolygonFarm",
+        "prefabPath": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_02.prefab",
+        "prefabGuid": "d68c69e2093d0df439a8aabd018a2b85",
+        "prefabSha256": "A4CAE582EAB2D38BDD8D92022D13EEEE5A4147D67F12C2805FA3FA347C2CABCE",
+        "metaSha256": "1FF20683DEAF43AE858BC8FCB2A675DF8A1F68FE1D57C8B0A8BD7ED894A0BD0E",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          4.5,
+          0.03,
+          34
+        ],
+        "yawDegrees": 0,
+        "rendererCenterLocal": [
+          0,
+          0.4600145,
+          0
+        ],
+        "rendererSize": [
+          2.80530262,
+          0.920029,
+          2.16306639
+        ],
+        "allLodRendererFootprint": {
+          "MinX": 3.09734869,
+          "MinZ": 32.918466805,
+          "MaxX": 5.9026513099999995,
+          "MaxZ": 35.081533195
+        },
+        "colliderFootprints": [],
+        "conservativeFootprint": {
+          "MinX": 3.09734869,
+          "MinZ": 32.918466805,
+          "MaxX": 5.9026513099999995,
+          "MaxZ": 35.081533195
+        },
+        "potentialLodFootprints": [],
+        "activeLodFootprintStatus": "NoLODGroup; all measured Renderers",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Generic_Grass_Patch_02",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "PolygonFarm_01_A",
+                "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+                "shader": "Synty/Generic_Basic",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION",
+                  "_METALLICGLOSSMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.5
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "stableId": "candidate:ls01:flat:path-rocks",
+        "visualKey": "candidate:ls01:asset:SM_Generic_Small_Rocks_01",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "path-rocks",
+          "asset": "SM_Generic_Small_Rocks_01.prefab",
+          "x": 3.5,
+          "z": 29,
+          "yaw": 20,
+          "questions": "Q391",
+          "intent": "SparsePathEdge"
+        },
+        "assetFamily": "synty:PolygonFarm",
+        "prefabPath": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Small_Rocks_01.prefab",
+        "prefabGuid": "e2237f9c45037b34da96772393062ed0",
+        "prefabSha256": "B66360B72075E7FC5CF8CC371BCC24C554009E260AB7B8F5F07CAAE3FC89FB04",
+        "metaSha256": "3F954139B7429F05A9127B3754957360B8C2806878AB8DF630F3F424B8021984",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          3.6590093582565775,
+          0.055053455,
+          28.940256839226763
+        ],
+        "yawDegrees": 20,
+        "rendererCenterLocal": [
+          -0.169853285,
+          0.02242434,
+          0.00175580382
+        ],
+        "rendererSize": [
+          1.30575168,
+          0.09495559,
+          1.63177133
+        ],
+        "allLodRendererFootprint": {
+          "MinX": 2.60744805878194,
+          "MinZ": 28.010021572823828,
+          "MaxX": 4.39255194121806,
+          "MaxZ": 29.989978427176165
+        },
+        "colliderFootprints": [],
+        "conservativeFootprint": {
+          "MinX": 2.60744805878194,
+          "MinZ": 28.010021572823828,
+          "MaxX": 4.39255194121806,
+          "MaxZ": 29.989978427176165
+        },
+        "potentialLodFootprints": [],
+        "activeLodFootprintStatus": "NoLODGroup; all measured Renderers",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Generic_Small_Rocks_01",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "PolygonFarm_01_A",
+                "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+                "shader": "Synty/Generic_Basic",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION",
+                  "_METALLICGLOSSMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.5
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "stableId": "candidate:ls01:flat:river-grass",
+        "visualKey": "candidate:ls01:asset:SM_Generic_Grass_Patch_02",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "river-grass",
+          "asset": "SM_Generic_Grass_Patch_02.prefab",
+          "x": -20,
+          "z": 10,
+          "yaw": 10,
+          "questions": "Q388",
+          "intent": "LandwardOutsideBuffer"
+        },
+        "assetFamily": "synty:PolygonFarm",
+        "prefabPath": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Grass_Patch_02.prefab",
+        "prefabGuid": "d68c69e2093d0df439a8aabd018a2b85",
+        "prefabSha256": "A4CAE582EAB2D38BDD8D92022D13EEEE5A4147D67F12C2805FA3FA347C2CABCE",
+        "metaSha256": "1FF20683DEAF43AE858BC8FCB2A675DF8A1F68FE1D57C8B0A8BD7ED894A0BD0E",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          -20,
+          0.03,
+          10
+        ],
+        "yawDegrees": 10,
+        "rendererCenterLocal": [
+          0,
+          0.4600145,
+          0
+        ],
+        "rendererSize": [
+          2.80530262,
+          0.920029,
+          2.16306639
+        ],
+        "allLodRendererFootprint": {
+          "MinX": -21.569148153258773,
+          "MinZ": 8.691329880540303,
+          "MaxX": -18.430851846741227,
+          "MaxZ": 11.308670119459697
+        },
+        "colliderFootprints": [],
+        "conservativeFootprint": {
+          "MinX": -21.569148153258773,
+          "MinZ": 8.691329880540303,
+          "MaxX": -18.430851846741227,
+          "MaxZ": 11.308670119459697
+        },
+        "potentialLodFootprints": [],
+        "activeLodFootprintStatus": "NoLODGroup; all measured Renderers",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Generic_Grass_Patch_02",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "PolygonFarm_01_A",
+                "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+                "shader": "Synty/Generic_Basic",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION",
+                  "_METALLICGLOSSMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.5
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "stableId": "candidate:ls01:flat:river-rocks",
+        "visualKey": "candidate:ls01:asset:SM_Generic_Small_Rocks_01",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "river-rocks",
+          "asset": "SM_Generic_Small_Rocks_01.prefab",
+          "x": -22,
+          "z": 17,
+          "yaw": 0,
+          "questions": "Q388",
+          "intent": "LandwardOutsideBuffer"
+        },
+        "assetFamily": "synty:PolygonFarm",
+        "prefabPath": "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Small_Rocks_01.prefab",
+        "prefabGuid": "e2237f9c45037b34da96772393062ed0",
+        "prefabSha256": "B66360B72075E7FC5CF8CC371BCC24C554009E260AB7B8F5F07CAAE3FC89FB04",
+        "metaSha256": "3F954139B7429F05A9127B3754957360B8C2806878AB8DF630F3F424B8021984",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          -21.830146715,
+          0.055053455,
+          16.99824419618
+        ],
+        "yawDegrees": 0,
+        "rendererCenterLocal": [
+          -0.169853285,
+          0.02242434,
+          0.00175580382
+        ],
+        "rendererSize": [
+          1.30575168,
+          0.09495559,
+          1.63177133
+        ],
+        "allLodRendererFootprint": {
+          "MinX": -22.65287584,
+          "MinZ": 16.184114335,
+          "MaxX": -21.34712416,
+          "MaxZ": 17.815885665
+        },
+        "colliderFootprints": [],
+        "conservativeFootprint": {
+          "MinX": -22.65287584,
+          "MinZ": 16.184114335,
+          "MaxX": -21.34712416,
+          "MaxZ": 17.815885665
+        },
+        "potentialLodFootprints": [],
+        "activeLodFootprintStatus": "NoLODGroup; all measured Renderers",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Generic_Small_Rocks_01",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "PolygonFarm_01_A",
+                "path": "Assets/Synty/PolygonFarm/Materials/PolygonFarm_01_A.mat",
+                "shader": "Synty/Generic_Basic",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION",
+                  "_METALLICGLOSSMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.5
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "stableId": "candidate:ls01:flat:transition-bush",
+        "visualKey": "candidate:ls01:asset:SM_Env_Bush_01",
+        "compositionKey": null,
+        "ownerH1StableId": null,
+        "status": "UnapprovedCandidate",
+        "intent": {
+          "id": "transition-bush",
+          "asset": "SM_Env_Bush_01.prefab",
+          "x": -16,
+          "z": 16,
+          "yaw": 25,
+          "questions": "Q389",
+          "intent": "ShrubTransition"
+        },
+        "assetFamily": "synty:PolygonNatureBiomes",
+        "prefabPath": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Prefabs/SM_Env_Bush_01.prefab",
+        "prefabGuid": "7c35a3f284a3b7e4289e64020f72746d",
+        "prefabSha256": "3002849C9EF1C1762D3A5901CFE3E9EA81D9801F1C6D706CA78D0B3C0109EED0",
+        "metaSha256": "2BD6774AE3BE26506ABD0424CF1108CF58F697AECA1FE50B8B3977F71B37254B",
+        "nativePosition": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeRotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "nativeScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pivotLocal": [
+          -15.758299196967158,
+          0.17709419,
+          16.12922625893337
+        ],
+        "yawDegrees": 25,
+        "rendererCenterLocal": [
+          -0.164441943,
+          0.491102755,
+          -0.219265938
+        ],
+        "rendererSize": [
+          2.78866482,
+          1.27639389,
+          2.67868376
+        ],
+        "allLodRendererFootprint": {
+          "MinX": -17.8297246581027,
+          "MinZ": 14.196873685248773,
+          "MaxX": -14.170275341897298,
+          "MaxZ": 17.803126314751225
+        },
+        "colliderFootprints": [],
+        "conservativeFootprint": {
+          "MinX": -17.8297246581027,
+          "MinZ": 14.196873685248773,
+          "MaxX": -14.170275341897298,
+          "MaxZ": 17.803126314751225
+        },
+        "potentialLodFootprints": [
+          {
+            "level": 0,
+            "footprint": {
+              "MinX": -17.829724632745602,
+              "MinZ": 14.196873739627241,
+              "MaxX": -14.170275316540202,
+              "MaxZ": 17.803126369129693
+            },
+            "selection": "Potential LOD geometry only, active camera LOD NotRun"
+          },
+          {
+            "level": 1,
+            "footprint": {
+              "MinX": -17.82972463002668,
+              "MinZ": 14.214962788888618,
+              "MaxX": -14.209067407866671,
+              "MaxZ": 17.803126367861836
+            },
+            "selection": "Potential LOD geometry only, active camera LOD NotRun"
+          }
+        ],
+        "activeLodFootprintStatus": "NotRun: requires actual camera/LOD selection",
+        "proposedRendererBottom": 0.03,
+        "supportStatus": "Blocked: actual B support/contact not sampled; min Renderer Y positioning is a trial",
+        "materialSlots": [
+          {
+            "renderer": "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD0",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "Branches_01",
+                "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Branches_01.mat",
+                "shader": "Synty/Foliage",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.25
+                }
+              }
+            ]
+          },
+          {
+            "renderer": "SM_Env_Bush_01/SM_Env_Bush_01_Branches_LOD1",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "Branches_01",
+                "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Branches_01.mat",
+                "shader": "Synty/Foliage",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_EMISSION"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.25
+                }
+              }
+            ]
+          },
+          {
+            "renderer": "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD0",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "Alpine_Bush_01",
+                "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Alpine_Bush_01.mat",
+                "shader": "Synty/Foliage",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_BUILTIN_ALPHATEST_ON",
+                  "_BUILTIN_AlphaClip",
+                  "LOD_FADE_CROSSFADE",
+                  "_ALPHABLEND_ON",
+                  "_EMISSION",
+                  "_NORMALMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.25
+                }
+              }
+            ]
+          },
+          {
+            "renderer": "SM_Env_Bush_01/SM_Env_Bush_01_Leaves_LOD1",
+            "materials": [
+              {
+                "slot": 0,
+                "name": "Alpine_Bush_01",
+                "path": "Assets/Synty/PolygonNatureBiomes/PNB_Alpine_Mountain/Materials/Plants/Alpine_Bush_01.mat",
+                "shader": "Synty/Foliage",
+                "shaderSupported": true,
+                "renderQueue": 2450,
+                "keywords": [
+                  "_ALPHATEST_ON",
+                  "_BUILTIN_ALPHATEST_ON",
+                  "_BUILTIN_AlphaClip",
+                  "LOD_FADE_CROSSFADE",
+                  "_ALPHABLEND_ON",
+                  "_EMISSION",
+                  "_NORMALMAP"
+                ],
+                "properties": {
+                  "_Surface": 0.0,
+                  "_AlphaClip": 1.0,
+                  "_ZWrite": 1.0,
+                  "_Alpha_Clip_Threshold": 0.25
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "HOwnership": "A unchanged. No new H1 inferred; B ownership and CompositionKey unresolved",
+    "gaps": [
+      "B VisualKey/CompositionKey registration",
+      "B H ownership binding",
+      "surface/contact and collider footprint contract",
+      "actual camera-dependent LOD selection",
+      "Q392 surface overlay/support replacement"
+    ],
+    "cameraSky": {
+      "status": "PlannedNotFrozen",
+      "sameTerrain": true,
+      "sameBarn": true,
+      "sameCameraProjectionResolutionExposure": true,
+      "sameSessionRevisionTickAtmosphere": true,
+      "note": "Compare day/night/rain in separate pairs; no actual camera or Sky state queried; free camera preserved"
+    }
+  }
+}
