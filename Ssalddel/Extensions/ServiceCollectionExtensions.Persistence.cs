@@ -28,6 +28,10 @@ public static partial class ServiceCollectionExtensions
         services.AddTraditionalMarketModule(connectionString);
         services.AddAgriculturalFisheriesPersistence(connectionString);
         services.AddPublicDataIngestionPersistence(connectionString);
+        services.AddDbContext<Ssalddel.Infrastructure.Persistence.WorldProjection.개체시각대응DbContext>(options =>
+            options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 4, 0))));
+        services.AddOptions<Ssalddel.Services.Content.개체시각자산Options>()
+            .Bind(configuration.GetSection(Ssalddel.Services.Content.개체시각자산Options.Section));
         services.AddSsalddelTransientState(configuration);
 
         var mongoOptions = configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();

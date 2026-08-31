@@ -61,6 +61,13 @@ public static partial class ServiceCollectionExtensions
 
         services.AddSsalddelInfrastructure();
         services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+        services.AddScoped<I개체시각대상Reader, 개체시각대상Reader>();
+        services.AddSingleton<I개체시각자산Catalog, 개체시각자산Catalog>();
+        services.AddScoped<개체시각대응UseCase>();
+        services.AddScoped<개체시각목록UseCase>();
+        services.AddScoped<게임객체시각구성UseCase>();
+        services.AddScoped<게임객체WI참여UseCase>();
+        services.AddScoped<보유시각자산목록UseCase>();
         services.AddScoped<I공급조직접근Accessor, 공급조직접근Accessor>();
         services.AddScoped<I플랫폼공급계약관리UseCase, 플랫폼공급계약관리UseCase>();
         services.AddScoped<I조직개별공급발주UseCase, 조직개별공급발주UseCase>();
