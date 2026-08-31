@@ -1,6 +1,8 @@
-# Ssalddel AI 공용 프로젝트 컨텍스트
+# Mirror (거울) AI 공용 프로젝트 컨텍스트
 
 > 이 문서는 GPT Chat과 Codex가 공통으로 사용하는 Ssalddel 프로젝트 컨텍스트다. 장기 정책의 원문을 복제하지 않고 현재 방향, 권위 경계, 구현 상태와 문서 탐색 순서를 요약한다. 세부 내용이 충돌하면 실제 route·contract·test·실행 설정과 아래의 기준 문서를 다시 확인한다.
+
+현재 프로젝트 표시명은 **Mirror(거울)**이며 Ssalddel/살뜰은 이전 이름이다. GitHub는 `cheolwo/mirror`로 변경했다. 이 문서 이하와 코드의 `Ssalddel`은 같은 프로젝트의 기존 내부 식별자를 가리키며, namespace·assembly·package·Save·로컬 폴더·별도 Unity 저장소는 이번에 이름을 바꾸지 않았다. 기준은 [D384](../AI/DECISIONS.md#d-384-프로젝트-표시명과-github-저장소를-mirror거울로-변경한다)다.
 
 ## 1. AI가 먼저 기억할 한 문장
 
