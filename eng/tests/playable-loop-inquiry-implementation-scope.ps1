@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param()
+param([switch] $AdditionalOnly)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -7,13 +7,121 @@ Set-StrictMode -Version Latest
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $managerPath = Join-Path $repositoryRoot 'eng/execution-ledgers/manage-playable-loop-inquiry-implementation-scope.ps1'
 $catalogPath = Join-Path $repositoryRoot 'eng/execution-ledgers/playable-loop-inquiry-implementation-scope.json'
-$generatedPath = Join-Path $repositoryRoot 'docs/AI/generated/playable-loop-inquiry-implementation-scope.md'
+$artifactRef = 'artifacts/local/validation/inquiry-world-e5-d377/tooling'
+$null = New-Item -ItemType Directory -Path (Join-Path $repositoryRoot $artifactRef) -Force
+$generatedRef = "$artifactRef/legacy.md"
+$generatedPath = Join-Path $repositoryRoot $generatedRef
 
-$result = & powershell -NoProfile -ExecutionPolicy Bypass -File $managerPath -Mode Write
+$result = & powershell -NoProfile -ExecutionPolicy Bypass -File $managerPath -Mode Write -OutputPath $generatedRef
 if ($LASTEXITCODE -ne 0) { throw 'PlayableLoopInquiryImplementationScopeManagerFailed' }
 if (($result -join "`n") -notmatch 'Questions=339') { throw 'QuestionCount339Missing' }
 
 $catalog = Get-Content -LiteralPath $catalogPath -Raw -Encoding UTF8 | ConvertFrom-Json
+function Test-AdditionalInquiryTracking {
+    $checks = 0
+    $utf8 = [Text.UTF8Encoding]::new($false)
+    $protectedRefs = @('eng/execution-ledgers/playable-loop-inquiry-implementation-scope.json', 'docs/AI/generated/playable-loop-inquiry-implementation-scope.md', 'eng/planning-inquiries/sources.json', 'docs/AI/generated/planning-inquiry-search.json')
+    $goalHashBefore = (Get-FileHash (Join-Path $repositoryRoot 'eng/execution-ledgers/codex-playable-loop-goals.json')).Hash
+    $protectedHashes = @{}
+    foreach ($ref in $protectedRefs) { $protectedHashes[$ref] = (Get-FileHash (Join-Path $repositoryRoot $ref)).Hash }
+    $legacy = $catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+    $legacy.PSObject.Properties.Remove('additionalInquiryTracking')
+    # P0의 병렬 Goal/Loop 갱신과 독립적으로 같은 승인 입력의 기존/확장 출력을 비교한다.
+    foreach ($field in @('codexGoalCatalogPath','playableLoopCatalogPath','worldInteractionCatalogPath','evidenceResponsibilityCodeMapPath')) {
+        $snapshotRef = "$artifactRef/$field.json"
+        [IO.File]::WriteAllText((Join-Path $repositoryRoot $snapshotRef), (Get-Content (Join-Path $repositoryRoot $legacy.$field) -Raw -Encoding UTF8), $utf8)
+        $legacy.$field = $snapshotRef
+    }
+    $fixtureRef = "$artifactRef/fixture.json"
+    $fixtureOutputRef = "$artifactRef/fixture.md"
+    function Save-AdditionalFixture([object] $Value) {
+        [IO.File]::WriteAllText((Join-Path $repositoryRoot $fixtureRef), ($Value | ConvertTo-Json -Depth 100), $utf8)
+    }
+    function Invoke-AdditionalFixture {
+        & $managerPath -Mode Write -CatalogPath $fixtureRef -OutputPath $fixtureOutputRef | Out-Null
+    }
+    Save-AdditionalFixture $legacy
+    Invoke-AdditionalFixture
+    $baseline = Get-Content (Join-Path $repositoryRoot $fixtureOutputRef) -Raw -Encoding UTF8
+    $index = Get-Content (Join-Path $repositoryRoot 'docs/AI/generated/planning-inquiry-search.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    $declaredSemanticIds = @($catalog.additionalInquiryTracking.coverage.semanticQuestionIds)
+    $declaredIds = @(@(340..403 | ForEach-Object { 'Q-{0:D3}' -f $_ }) + $declaredSemanticIds)
+    $extraQuestions = @($index.questions | Where-Object { $_.questionId -cin $declaredIds })
+    if ($extraQuestions.Count -ne $declaredIds.Count) { throw 'DeclaredAdditionalQuestionMissing' }
+    $outsideIds = @($index.questions | Where-Object { $_.kind -ne 'LegacyNumbered' -and $_.questionId -cnotin $declaredIds } | ForEach-Object questionId)
+    $sourceSnapshots = @($extraQuestions | ForEach-Object sourceRef | Sort-Object -Unique | ForEach-Object {
+        [pscustomobject]@{ sourceRef=$_; sourceRevision='fixture-source.r1'; sha256=(Get-FileHash (Join-Path $repositoryRoot $_)).Hash }
+    })
+    $extension = [pscustomobject]@{
+        schemaVersion='inquiry-implementation-extension.v1'
+        coverage=[pscustomobject]@{numberedRange=[pscustomobject]@{first=340;last=403};semanticQuestionIds=@($extraQuestions | Where-Object kind -eq SemanticFollowup | ForEach-Object questionId)}
+        sourceSnapshots=$sourceSnapshots
+        items=@($extraQuestions | ForEach-Object {
+            $question=$_; $snapshot=@($sourceSnapshots | Where-Object sourceRef -eq $question.sourceRef)[0]
+            [pscustomobject]@{questionId=$question.questionId;kind=$question.kind;topicCode=$question.topicCode;sourceRef=$question.sourceRef;sourceRevision=$snapshot.sourceRevision;sourceSha256=$snapshot.sha256;sourceRecordStatus=$question.recordStatus;sourceAnchor=$question.questionId;
+                links=[pscustomobject]@{worldInteractionRefs=@();playableLoopRefs=@();workOrderRefs=@()};e5GapCodes=@('FixtureNotAnImplementationDecision');nextActionKo='원문과 승인 범위를 검토한다.';assessmentClass='PlanningStudyBindingRequired'}
+        })
+    }
+    # 하나의 질문에 여러 WI/폐루프를 연결해도 기존 묶음/실행 후보를 변경하지 않는다.
+    $extension.items[0].links.worldInteractionRefs=@('WI-ACTOR-03','WI-FARM-01')
+    $extension.items[0].links.playableLoopRefs=@('playable-loop:nature-basic-herbal-recovery.v1','playable-loop:farm-crop-cycle.v1')
+    $fixture = $legacy | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+    $fixture | Add-Member -NotePropertyName additionalInquiryTracking -NotePropertyValue $extension
+    Save-AdditionalFixture $fixture
+    Invoke-AdditionalFixture
+    $extended = Get-Content (Join-Path $repositoryRoot $fixtureOutputRef) -Raw -Encoding UTF8
+    if (-not $extended.StartsWith($baseline, [StringComparison]::Ordinal)) { throw 'AdditionalLegacyProjectionChanged' }; $checks++
+    if (-not $extended.Contains(('LegacyNumbered=339; SupplementNumbered=64; SemanticFollowup={0}; Total={1}' -f $declaredSemanticIds.Count, (339 + $declaredIds.Count)))) { throw 'AdditionalCoverageOutputMissing' }; $checks++
+    if (@([regex]::Matches($extended.Substring($baseline.Length), '(?m)^\| `(?:Q-\d{3}|[a-z][a-z0-9-]+)` /')).Count -ne $declaredIds.Count) { throw 'AdditionalOutputRowCountInvalid' }; $checks++
+    foreach ($id in $outsideIds) {
+        if ($extended.Substring($baseline.Length).Contains(('| `{0}` /' -f $id))) { throw "OutsideDeclaredQuestionAutoRegistered:$id" }
+    }; $checks++
+    $firstHash=(Get-FileHash (Join-Path $repositoryRoot $fixtureOutputRef)).Hash
+    Invoke-AdditionalFixture
+    if ($firstHash -ne (Get-FileHash (Join-Path $repositoryRoot $fixtureOutputRef)).Hash) { throw 'AdditionalGenerationNotDeterministic' }; $checks++
+    & $managerPath -Mode Validate -CatalogPath $fixtureRef -OutputPath $fixtureOutputRef | Out-Null; $checks++
+    foreach ($status in @('Asked','Deferred','FutureExtension','ConfirmedDirection')) {
+        $copy=$fixture | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        $copy.additionalInquiryTracking.items[0].sourceRecordStatus=$status
+        Save-AdditionalFixture $copy; Invoke-AdditionalFixture
+        $content=Get-Content (Join-Path $repositoryRoot $fixtureOutputRef) -Raw -Encoding UTF8
+        if (-not $content.StartsWith($baseline,[StringComparison]::Ordinal) -or -not $content.Contains($status)) { throw "AdditionalDecisionAutoPromoted:$status" }; $checks++
+    }
+    $negativeCases=@(
+        @{code='AdditionalSchemaInvalid';change={param($e) $e.schemaVersion='invalid'}},
+        @{code='AdditionalNumberedRangeInvalid';change={param($e) $e.coverage.numberedRange.last=404}},
+        @{code='AdditionalSemanticCoverageInvalid';change={param($e) $e.coverage.semanticQuestionIds[0]=$e.coverage.semanticQuestionIds[1]}},
+        @{code='AdditionalSemanticIdInvalid';change={param($e) $e.coverage.semanticQuestionIds[0]='invented-followup'}},
+        @{code='AdditionalItemCountInvalid';change={param($e) $e.items=@($e.items | Select-Object -Skip 1)}},
+        @{code='AdditionalQuestionDuplicated';change={param($e) $e.items[1]=$e.items[0]}},
+        @{code='AdditionalQuestionUnknown';change={param($e) $e.items[0].questionId='Q-404'}},
+        @{code='AdditionalQuestionKindInvalid';change={param($e) $e.items[0].kind='SemanticFollowup'}},
+        @{code='AdditionalSourceHashMismatch';change={param($e) $e.sourceSnapshots[0].sha256=('0'*64)}},
+        @{code='AdditionalItemHashMismatch';change={param($e) $e.items[0].sourceSha256=('0'*64)}},
+        @{code='AdditionalItemRevisionMismatch';change={param($e) $e.items[0].sourceRevision='wrong.r1'}},
+        @{code='AdditionalAnchorInvalid';change={param($e) $e.items[0].sourceAnchor='#invented-anchor'}},
+        @{code='AdditionalWorldInteractionUnknown';change={param($e) $e.items[0].links.worldInteractionRefs=@('WI-UNKNOWN')}},
+        @{code='AdditionalPlayableLoopUnknown';change={param($e) $e.items[0].links.playableLoopRefs=@('playable-loop:unknown.v1')}},
+        @{code='AdditionalWorkOrderMissing';change={param($e) $e.items[0].links.workOrderRefs=@('eng/execution-ledgers/work-orders/nonexistent.json')}},
+        @{code='AdditionalExecutableApprovalMissing';change={param($e) $e.items[0].assessmentClass='ExecutableTechnicalFollowup';$e.items[0].sourceRecordStatus='Confirmed'}},
+        @{code='AdditionalDecisionNotExecutable';change={param($e) $e.items[0].assessmentClass='ExecutableTechnicalFollowup';$e.items[0].sourceRecordStatus='Asked'}}
+    )
+    foreach ($case in $negativeCases) {
+        $copy=$fixture | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        & $case.change $copy.additionalInquiryTracking
+        Save-AdditionalFixture $copy
+        $errorText=''
+        try { Invoke-AdditionalFixture } catch { $errorText=$_.Exception.Message }
+        if ($errorText -notlike "*:$($case.code)*") { throw "AdditionalNegativeFailed:$($case.code):$errorText" }; $checks++
+    }
+    foreach ($ref in $protectedRefs) { if ((Get-FileHash (Join-Path $repositoryRoot $ref)).Hash -ne $protectedHashes[$ref]) { throw "AdditionalSharedFileChanged:$ref" } }; $checks++
+    Save-AdditionalFixture $fixture; Invoke-AdditionalFixture
+    $goalChanged = $goalHashBefore -ne (Get-FileHash (Join-Path $repositoryRoot 'eng/execution-ledgers/codex-playable-loop-goals.json')).Hash
+    $report=[ordered]@{checks=$checks;status='Passed';legacyQuestions=339;additionalQuestions=$declaredIds.Count;outsideDeclaredSearchQuestions=$outsideIds.Count;sharedFilesUnchanged=$true;concurrentGoalChangeObserved=$goalChanged;selectionInputsFrozen=$true;powerShellVersion=$PSVersionTable.PSVersion.ToString();managerSha256=(Get-FileHash $managerPath).Hash}
+    [IO.File]::WriteAllText((Join-Path $repositoryRoot "$artifactRef/tooling-results.json"),($report | ConvertTo-Json),$utf8)
+    Write-Output "AdditionalInquiryTrackingTestsPassed:Checks=$checks;Legacy=339;Additional=$($declaredIds.Count);SharedFilesUnchanged=True"
+}
+if ($AdditionalOnly) { Test-AdditionalInquiryTracking; return }
 if ([int] $catalog.questionRange.last -ne 339) { throw 'QuestionRangeLastInvalid' }
 if ([string] $catalog.revision -notmatch '^playable-loop-inquiry-implementation-scope\.r[0-9]+$') { throw 'RevisionInvalid' }
 $goal = Get-Content (Join-Path $repositoryRoot 'eng/execution-ledgers/codex-playable-loop-goals.json') -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -429,3 +537,4 @@ foreach ($unboundRow in @($queueRows | Where-Object { $_ -match '`RegisteredWith
 }
 
 Write-Output 'PlayableLoopInquiryImplementationScopeTestsPassed:Questions=339;Q001=Partial;Q002=Partial;Q003=Partial;Q004=Partial;Q005=Partial;Q006=Partial;Q007=Partial;Q008=Partial;Q009=Partial;Q010=Partial;Q011=Partial;Q012=Partial;Q013=Partial;Q014=Partial;Q015=Partial;Q016=Partial;Q017=Partial;Q018=Partial;Q019=Partial;Q020=Partial;Q021=Partial;Q022=Partial;Q023=Partial;Q024=Partial;Q025=PartialParked;SourceRecovery=3;FarmPattern=43;Q338=Implemented'
+Test-AdditionalInquiryTracking

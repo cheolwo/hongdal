@@ -1,11 +1,14 @@
 {
-  "schemaVersion": "playable-loop-presentation-validation-modules.v1",
-  "revision": "playable-loop-presentation-validation-modules.r8",
+  "schemaVersion": "playable-loop-presentation-validation-modules.v2",
+  "revision": "playable-loop-presentation-validation-modules.r12",
   "trackCode": "Presentation",
   "appliesToLoopLevelCodes": [
     "PlayableUnit"
   ],
   "allowedEvidenceStageCodes": [
+    "E1",
+    "E2",
+    "E3",
     "E4",
     "E5",
     "E6",
@@ -50,6 +53,9 @@
     "commonOnlyKo": "공통만 적용"
   },
   "commonModuleCodes": [
+    "presentation-requirement-contract",
+    "presentation-projection-lifecycle",
+    "presentation-automated-regression",
     "presentation-binding",
     "visual-source-bounds",
     "player-scale-spacing",
@@ -69,6 +75,90 @@
   ],
   "modules": [
     {
+      "moduleCode": "presentation-requirement-contract",
+      "displayNameKo": "플레이어 표현 요구·오류·귀환 계약",
+      "evidenceStageCode": "E1",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": [
+        "승인된 플레이어 약속",
+        "표시할 권위 상태·오류·다음 선택"
+      ],
+      "outputs": [
+        "표현 계약과 제외 범위"
+      ],
+      "implementationRefs": [
+        "repo:docs/AI/Presentation단계별최소모듈-2026-08-31.md"
+      ],
+      "testRefs": [
+        "repo:eng/tests/playable-loop-presentation-validation.ps1"
+      ],
+      "failureReasonCodes": [
+        "presentation-requirement-contract:RequirementOrEvidenceMissing"
+      ]
+    },
+    {
+      "moduleCode": "presentation-projection-lifecycle",
+      "displayNameKo": "상태 투영·표현 연결·수명 코드",
+      "evidenceStageCode": "E2",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": [
+        "동일 Session 상태 사본",
+        "안정 ID·자료/표현 판본",
+        "기존 Synty 자산·동작 목록과 공통 Adapter의 가벼운 파일 선행 조회"
+      ],
+      "outputs": [
+        "불변 표현 준비상태",
+        "추가·변경·제거·거부 판정",
+        "잠정 후보·기존 구현 경로: 실제 적합성 확정이나 전체 팩 실측 선행조건 아님"
+      ],
+      "implementationRefs": [
+        "repo:Ssalddel.Unity/Runtime/PresentationContracts/Reconciliation/StableIdReconciliation.cs",
+        "repo:eng/execution-ledgers/playable-loop-synty-expression-modules.json",
+        "repo:docs/AI/Presentation단계별Synty자산조사-2026-08-31.md"
+      ],
+      "testRefs": [
+        "repo:Ssalddel.Unity.Tests/StableIdReconciliationTests.cs",
+        "repo:eng/tests/presentation-synty-survey.ps1"
+      ],
+      "failureReasonCodes": [
+        "presentation-projection-lifecycle:RequirementOrEvidenceMissing"
+      ]
+    },
+    {
+      "moduleCode": "presentation-automated-regression",
+      "displayNameKo": "표현 회귀·도구 건전성 검사",
+      "evidenceStageCode": "E3",
+      "applicabilityCode": "Common",
+      "requiredFeatureCodes": [],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Automated",
+      "reads": [
+        "표현 코드",
+        "시험 입력·표본",
+        "기준 판본"
+      ],
+      "outputs": [
+        "자동시험 결과",
+        "실패 원인·미실행/실제화면 구분"
+      ],
+      "implementationRefs": [
+        "repo:eng/common/presentation-module-bindings.ps1"
+      ],
+      "testRefs": [
+        "repo:eng/tests/playable-loop-presentation-validation.ps1",
+        "repo:Ssalddel.Unity.Tests/StableIdReconciliationTests.cs"
+      ],
+      "failureReasonCodes": [
+        "presentation-automated-regression:RequirementOrEvidenceMissing"
+      ]
+    },
+    {
       "moduleCode": "presentation-binding",
       "displayNameKo": "표현 상태·H 기준점·E5 준비 인계 검증",
       "evidenceStageCode": "E4",
@@ -85,7 +175,8 @@
         "배치 의도 또는 사유 있는 NotApplicable",
         "InteractionAnchor 의도",
         "후보 revision·fingerprint",
-        "E5 준비 상태"
+        "E5 준비 상태",
+        "대상 WI·역할별 Prefab/재질·Clip/Rig/Avatar 조사와 기존 동일 판본·사용 문맥 근거"
       ],
       "failureReasonCodes": [
         "PresentationStateBindingMissing",
@@ -94,6 +185,24 @@
         "PresentationFallbackMissing",
         "PresentationPlacementIntentMissing",
         "PresentationE5ReadinessMissing"
+      ],
+      "outputs": [
+        "presentationE4Preparation에 주·대체 후보와 외형·크기·pivot·Renderer/Collider·접촉/전환의 필요한 범위 및 미해결 사항 기록",
+        "그대로 재사용 / 연결·설정 보완 / 형상·리깅·동작 가공 필요 / 신규 제작 필요 / 미검사: 근거와 사용조건 확인을 분리",
+        "파일 확인·격리 미리보기·실제 대상 검증을 구별. 동일 자산/판본/문맥 근거 재사용·변경분만 재검증, 비자산 범위는 사유 있는 NotApplicable",
+        "D389 연결 사전검사 Ready/Conditional/Blocked 및 대상·후보/상태판본·근거·누락·담당·가장 이른 E. 결과 없음은 미검증, Ready도 적용/E5 완료 아님. 적용 직전 현재 판본으로 재검사"
+      ],
+      "implementationRefs": [
+        "repo:eng/execution-ledgers/manage-e7-vertical-work-order.ps1",
+        "repo:docs/Architecture/플레이폐루프Synty표현모듈체계.md",
+        "repo:docs/AI/Presentation단계별Synty자산조사-2026-08-31.md",
+        "repo:docs/AI/Presentation-E4-E5연결사전검사-2026-08-31.md",
+        "repo:Ssalddel.Unity/Runtime/PresentationContracts/표현연결Preflight.cs",
+        "repo:Ssalddel.Unity/Runtime/Farm/Farm수확표현연결Preflight.cs"
+      ],
+      "testRefs": [
+        "repo:eng/tests/presentation-synty-survey.ps1",
+        "repo:Ssalddel.Unity.Tests/표현연결PreflightTests.cs"
       ]
     },
     {
@@ -114,6 +223,19 @@
         "VisualSourceMissing",
         "VisibleRendererMissing",
         "VisibleBoundsInvalid"
+      ],
+      "outputs": [
+        "동결 후보의 권위 상태·World·실제 Prefab/대체 표현 결속 및 Renderer/Collider/Bounds 검증. 파일 존재·E4 조사만으로 E5 통과하지 않음",
+        "D389 사전검사는 기존 조회/표시/해제 관측만 읽는다. 건전성 미관측은 Conditional, 확인된 결손은 Blocked. 실제 WorldVisualCatalog 조회·소유 lease 적용/해제·지지/접근은 분야별 실행 증거로 별도 확인",
+        "D390: 전체 배치 기준을 소비하는 작은 대상/행동/결과 범위와 부모 폐루프 판정을 분리. 필수 상태·접근·통행·컴포넌트/간섭은 차단 유지, 영향 미확인은 미검증. 무영향 근거가 있는 독립 장식만 비선행이며 부분 증거≠부모 E5/모듈 전체 Passed. 기준 변경은 영향받는 소비자/근거만 재검토; E9는 E8 Core 둘 이상과 기존 조화 관문 유지"
+      ],
+      "implementationRefs": [
+        "unity:Assets/Ssalddel/Presentation/World/WorldVisualCatalog.cs",
+        "repo:Ssalddel.Unity/Runtime/PresentationContracts/표현연결Preflight.cs",
+        "repo:docs/AI/E5개별성립과전체배치책임분리-2026-08-31.md"
+      ],
+      "testRefs": [
+        "repo:Ssalddel.Unity.Tests/표현연결PreflightTests.cs"
       ]
     },
     {
@@ -132,7 +254,12 @@
       "failureReasonCodes": [
         "PlayerScaleRatioInvalid",
         "ObjectSpacingInvalid"
-      ]
+      ],
+      "outputs": [
+        "Player 대비 크기·간격 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "state-difference-readability",
@@ -149,7 +276,14 @@
       "failureReasonCodes": [
         "PresentationStateDifferenceMissing",
         "ResultFeedbackUnreadable"
-      ]
+      ],
+      "outputs": [
+        "상태별 표현 차이 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [
+        "repo:Ssalddel.Unity/Runtime/PresentationContracts/Reconciliation/StableIdReconciliation.cs"
+      ],
+      "testRefs": []
     },
     {
       "moduleCode": "actual-camera-input-result-return",
@@ -169,7 +303,12 @@
         "RuntimeExperienceFailure",
         "CameraTargetUnreadable",
         "ReturnChoiceUnavailable"
-      ]
+      ],
+      "outputs": [
+        "실제 카메라·입력·결과·귀환 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "surface-clearance",
@@ -190,7 +329,12 @@
         "VisibleBottomBelowSurface",
         "ObjectFloatingAboveSurface",
         "GroundSurfaceMissing"
-      ]
+      ],
+      "outputs": [
+        "배치 객체 표면 여유 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "building-foundation-entry",
@@ -212,7 +356,12 @@
         "FootprintSurfaceVariationTooHigh",
         "FoundationMissing",
         "BuildingEntranceBlocked"
-      ]
+      ],
+      "outputs": [
+        "건물 기초면·출입구 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "fence-continuity-entry-gap",
@@ -232,7 +381,12 @@
       "failureReasonCodes": [
         "FenceContinuityBroken",
         "EntranceGapMissing"
-      ]
+      ],
+      "outputs": [
+        "울타리 연속성과 출입구 간격 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "actor-grounding-identification",
@@ -253,7 +407,14 @@
         "ActorFootBelowSurface",
         "ActorFloating",
         "ActorUnreadable"
-      ]
+      ],
+      "outputs": [
+        "Actor 지면 정렬·식별 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [
+        "unity:Assets/Ssalddel/Presentation/World/공용AnimationAdapter.cs"
+      ],
+      "testRefs": []
     },
     {
       "moduleCode": "interior-clearance",
@@ -273,7 +434,12 @@
       "failureReasonCodes": [
         "FixtureIntersectsShell",
         "TraversalClearanceBlocked"
-      ]
+      ],
+      "outputs": [
+        "실내 소품·통로 여유 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "work-zone-readability",
@@ -293,7 +459,14 @@
       "failureReasonCodes": [
         "WorkZoneMissing",
         "WorkStateUnreadable"
-      ]
+      ],
+      "outputs": [
+        "작업 구역 상태 식별 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [
+        "unity:Assets/Ssalddel/Presentation/World/Farm표시범위Lease.cs"
+      ],
+      "testRefs": []
     },
     {
       "moduleCode": "camera-occlusion",
@@ -313,7 +486,12 @@
       "failureReasonCodes": [
         "CameraOcclusionUnresolved",
         "TargetClippedByFraming"
-      ]
+      ],
+      "outputs": [
+        "카메라 가림·절단 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "atmosphere-authority-binding",
@@ -335,7 +513,12 @@
         "AtmosphereProfileMissing",
         "AtmosphereClockSourceInvalid",
         "AtmosphereScopeInvalid"
-      ]
+      ],
+      "outputs": [
+        "세계 대기 상태·시간 원천 결속 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "weather-camera-audio-exposure",
@@ -358,7 +541,12 @@
         "PrecipitationExposureInvalid",
         "WeatherAudioMissing",
         "TimeOfDayCompatibilityBroken"
-      ]
+      ],
+      "outputs": [
+        "날씨·카메라·음향·차폐 표현 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     },
     {
       "moduleCode": "directional-light-surface-readability",
@@ -384,7 +572,12 @@
         "LitShaderUnsupported",
         "ShadowPolicyMismatch",
         "ShadowSideUnreadable"
-      ]
+      ],
+      "outputs": [
+        "방향광·표면 명암 판독 검증 결과와 미해결 사항"
+      ],
+      "implementationRefs": [],
+      "testRefs": []
     }
   ],
   "loopProfiles": [
@@ -474,7 +667,8 @@
             "배치"
           ]
         }
-      ]
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json"
     }
   ]
 }

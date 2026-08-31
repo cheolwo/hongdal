@@ -1,4 +1,20 @@
 {
+  "d396StateBindingPreparation": {
+    "approvalRef": "docs/AI/WI전체-E4문서코드자산준비-2026-08-31.md",
+    "approvalSha256": "7B94E8816E1C623533D14C52DFF0FDDBE8EF6E33CEF945308DA64CC05159942A",
+    "revision": "visitor-state-binding-preparation.r1",
+    "worldInteractionId": "WI-COMMUNITY-VISITOR-STAY",
+    "scope": "기존 Project/DTO/명시 fallback 호환을 보존하고 별도 ProjectWithStateBindingValidation 진입점에서 제공된 세 상태의 VisualKey/AnimationRole/ActionCue 대응을 검사한 뒤 기존 Project를 소비한다. 문자열 대응은 승인/자산조회/실제동작 인증이 아니다.",
+    "basis": "Approved 기획 r3와 Required Accepted 연구 r2가 재사용하는 E4 연구 r1의 세 VisualKey, VisitorArrival, 대기 Visitor.Waiting.Greet / 완료 Visitor.State.IdleOrDepart. 기존 코드/시험의 완료상태 Greet 허용은 이전 시험의 범위 한계로 보존한다.",
+    "writePaths": ["Ssalddel.Unity/Runtime/Cards/Simulation방문자체류PresentationPreparation.cs", "Ssalddel.Unity.Tests/Simulation방문자체류PresentationPreparationTests.cs"],
+    "validation": "세 상태/정확 key·cue·role·Anchor, 알려지지 않은 Binding 상태/불일치 거부, 미제공 fallback, 중복/혼합revision 거부, 입력불변·정렬결정성·기존 Project 호환. 순수 Fixture만.",
+    "currentResult": "StateBindingValidationAnd21FixtureTestsPassed_ProductUnlinked",
+    "focusedTests": { "total": 21, "newTests": 14, "failed": 0, "skipped": 0, "scope": "순수 Fixture; 기존 Project/7시험 호환과 상태별 key/role/cue 검증만" },
+    "reportRef": "docs/Reports/WI전체-E4-방문자상태대응-D396-2026-08-31.md",
+    "editorAllowed": false,
+    "logicChangesAllowed": false,
+    "automaticPromotionAllowed": false
+  },
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
   "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
@@ -36,6 +52,82 @@
     "authorityBoundary": "H 기준점과 표현 계획은 방문자 상태·수용 칸·마음 계보·WorldRevision을 변경하지 않는다."
   },
   "presentationE4Preparation": {
+    "assetSurvey": {
+      "approvalRef": "docs/AI/Logic선행기능-Presentation균형계획-2026-08-31.md",
+      "approvalSha256": "BD8532C58EE625B8563AAAD939450A80CB27BB003C7A691FA6160E831FE5C463",
+      "reportRef": "docs/Reports/Presentation최소모듈-D386기술통합-2026-08-31.md",
+      "method": "FileReadAndExistingEvidenceReuse",
+      "result": "FileSurveyPrepared_ProductUnlinked",
+      "runtimeVerified": false,
+      "automaticEvidencePromotionAllowed": false,
+      "scope": "WI-COMMUNITY-VISITOR-STAY 기존 Starter 남성/Avatar/Wrapper/3Clip 재사용; Logic E4/Presentation E4/E5Pending 유지.",
+      "studyRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E5표현연구.r2.md",
+      "studySha256": "847D2A57CA215CD9B3310B2AD70331CF3A8F2D7586492E1964621E98346C67E0",
+      "candidates": [
+        {
+          "role": "VisitorArrival / 3상태 Actor",
+          "assetPath": "Assets/Synty/PolygonStarter/Prefabs/Characters/SM_Chr_Male_01.prefab",
+          "guid": "f11fc98cf1e8d5547a9b2ec85cc9c664",
+          "fileSha256": "0CCA4FF0779B9D40A106B09F8038360C92BC25C4BEC39A6BE89CDB5C3C465BD1",
+          "metaSha256": "22CAFBC87F0CAAE6C7C01F11EB28744F6C78D8ECE73FE9FD2DDC223B417967BD",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        },
+        {
+          "role": "동일 대상 Avatar/fileID9000000",
+          "assetPath": "Assets/Synty/PolygonStarter/Models/Characters.fbx",
+          "guid": "2dc7b382d25903545b405802eb2198ab",
+          "fileSha256": "881819102B456130CB417EF69594B3479D8C7DD77E4D390A9F1B85DCE911A7C7",
+          "metaSha256": "9FD31E95AD8D79B46AE35255B44C937E11A79948955B1C6B521F607D2A47A59B",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        },
+        {
+          "role": "Idle/fileID1827226128182048838",
+          "assetPath": "Assets/Synty/AnimationBaseLocomotion/Animations/Polygon/Masculine/Idle/A_Idle_Standing_Masc.fbx",
+          "guid": "a4b8f2deec6a99945987cfc59b1b4e54",
+          "fileSha256": "76DC31C92FD3CA69F28E92F1F530EAC6F60EE71EA0F25D490A633F49D2088DD0",
+          "metaSha256": "28B56AAE249214D9D69E94E1C6E97DA77EF269E2E3C964B5763637F25FD94BF9",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        },
+        {
+          "role": "Walk/fileID2571081563578608591",
+          "assetPath": "Assets/Synty/AnimationBaseLocomotion/Animations/Polygon/Masculine/Locomotion/Walk/A_Walk_F_Masc.fbx",
+          "guid": "eead3eb07cb89cb4eb25b3550df5e84b",
+          "fileSha256": "B2081DF84B35040DD5105AAAE175E5E84AB0C8C97C1E9A5AEE1AB45C1E82E78D",
+          "metaSha256": "279D2E1AB641E36751F25B415A4C85DC790877F731E0DA16A43694AE66827EB2",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        },
+        {
+          "role": "선택 Greet/fileID7426856676078154831",
+          "assetPath": "Assets/Synty/AnimationEmotesAndTaunts/Animations/Polygon/Masculine/Greet/A_POLY_EMOT_Greet_Wave_Masc.fbx",
+          "guid": "93358076c2333114f95ea9ed86e831e8",
+          "fileSha256": "F5CF194EF3DBD0ED8EC0822071566702C02685296A4B4C9D939847021AB61B23",
+          "metaSha256": "B8D1CB54CF9686C4B705B32405A901584BED4EAC55A771326C4D7E249673BD4D",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        },
+        {
+          "role": "기존 Controller / Prefab 자동장착 아님",
+          "assetPath": "Assets/Ssalddel/Presentation/VisitorAnimation/방문자Wrapper.controller",
+          "guid": "e41e1adabad620b41828be1189ffd5c9",
+          "fileSha256": "9A117AEA041A54E9D36D39E333D5D02121BB98628846B63895289FFAAFC73073",
+          "metaSha256": "7667E8959EF89273F511DA786D7E1DD3051113F7C0727118ABEB8D256C494549",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        }
+      ],
+      "reusedEvidence": "기존 전용 산출물15/15·Actor/Avatar/3Clip 원본meta10/10 일치. 과거8/8은 NUnit 본문 직접 호출, PNG12는 BakeMesh/임시Unlit 포즈 표본이며 실제GameView 아님.",
+      "gaps": [
+        "Prefab controller0. 방문자AnimationAdapter의 조사 범위 소비는 Editor/Validation/Tests, 준비 VisualBinding의 제품 소비 미확인.",
+        "AwaitingDecision→1회 Greet/Idle, TemporaryStay→손님Slot 도착Idle, Rejected→이탈의 단일 이동 작성자·상태 진입/복원별 cue 중복 억제 결속 필요. 시험에서 같은Greet 문자열 사용은 세 상태 제품동작 증거가 아님.",
+        "Walk meta rigImportErrors 잔류; 과거 Library 평가≠fresh import. fallback BaseIdle의 원연구 SHA는61자리(끝BDF 누락); 파일 drift 판정 없이 보고의64자리 현재값과 구분.",
+        "실제 Session/Actor 권한·SessionRevision·SaveReplay, 안전host·지지면·통행·손님Slot 및 입력 미연결. 소품/대체Actor 존재는 배치 적합성 또는 자동대체 승인 아님."
+      ],
+      "nextOwner": "개발 Presentation E4 상태/cue/단일 이동/제품 소비 결속; Logic E5 전 Session/Save·권한 영향 검토. 공간/애니 실제 실행은 별도 승인."
+    },
     "applicabilityCode": "Required",
     "notApplicableReason": "",
     "playerReadableMoment": "플레이어가 방문자 카드에서 결정 대기·임시 체류·거절, 남은 수용 칸과 선택 가능 여부를 읽는 순간이다.",

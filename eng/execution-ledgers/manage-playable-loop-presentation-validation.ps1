@@ -10,11 +10,14 @@ param(
         "eng/execution-ledgers/playable-loops.json",
 
     [string] $OutputPath =
-        "docs/AI/generated/playable-loop-presentation-validation.md"
+        "docs/AI/generated/playable-loop-presentation-validation.md",
+    [string] $UnityProjectRoot = ''
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot '../common/presentation-module-bindings.ps1')
+. (Join-Path $PSScriptRoot '../common/deterministic-text-output.ps1')
 
 function Require([bool] $Condition, [string] $Code) {
     if (-not $Condition) { throw "PresentationValidationInvalid:$Code" }
@@ -37,8 +40,13 @@ $loops = Get-Content -LiteralPath $resolvedLoops -Raw -Encoding UTF8 |
     ConvertFrom-Json
 $documentText = $catalog.generatedDocumentText
 
-Require ([string] $catalog.schemaVersion -eq
-    "playable-loop-presentation-validation-modules.v1") "SchemaInvalid"
+Require ([string] $catalog.schemaVersion -in @(
+    "playable-loop-presentation-validation-modules.v1",
+    "playable-loop-presentation-validation-modules.v2")) "SchemaInvalid"
+$hasImplementationContract = $catalog.schemaVersion -eq 'playable-loop-presentation-validation-modules.v2'
+if ($hasImplementationContract) {
+    Require ((@($catalog.allowedEvidenceStageCodes) -join ',') -eq 'E1,E2,E3,E4,E5,E6,E7') "MinimumStagesInvalid"
+}
 Require ([string] $catalog.trackCode -eq "Presentation") "TrackInvalid"
 foreach ($propertyName in @(
     "titleKo", "sourceNoticeFormatKo", "catalogLabelKo",
@@ -80,6 +88,15 @@ foreach ($module in @($catalog.modules)) {
         [string] $module.automationLevelCode) "AutomationInvalid:$code"
     Require (@($module.reads).Count -gt 0) "ReadsMissing:$code"
     Require (@($module.failureReasonCodes).Count -gt 0) "FailureCodeMissing:$code"
+    if ($hasImplementationContract) {
+        foreach ($field in @('outputs','implementationRefs','testRefs')) {
+            Require ($null -ne $module.PSObject.Properties[$field]) "ModuleContractMissing:${code}:$field"
+        }
+        Require (@($module.outputs).Count -gt 0) "OutputsMissing:$code"
+        foreach ($reference in @($module.implementationRefs) + @($module.testRefs)) {
+            Resolve-PresentationModuleReference ([string] $reference) $repositoryRoot $UnityProjectRoot | Out-Null
+        }
+    }
     if ([string] $module.applicabilityCode -eq "Common") {
         Require (@($module.requiredFeatureCodes).Count -eq 0) `
             "CommonHasFeature:$code"
@@ -163,6 +180,8 @@ $builder = [Text.StringBuilder]::new()
 [void] $builder.AppendLine(([string] $documentText.sourceNoticeFormatKo -f
     $CatalogPath, $PlayableLoopPath))
 [void] $builder.AppendLine()
+[void] $builder.AppendLine('대장·연결 검증은 Unity 실행이나 E 승격이 아니다. 파일 참조는 구현 위치이며 실제 동작·시험 통과를 뜻하지 않는다. `unity:` 참조는 -UnityProjectRoot를 제공해야 파일 존재를 대조한다. 모듈별 Passed는 기존 EvidencePackage의 대상·단계·판본·파일 hash를 확인하며 실제 품질 평가는 별도다.')
+[void] $builder.AppendLine()
 [void] $builder.AppendLine(('- {0}: `{1}`' -f
     $documentText.catalogLabelKo, $catalog.revision))
 [void] $builder.AppendLine(('- {0}: `{1}`' -f
@@ -202,20 +221,67 @@ foreach ($loop in @($playableUnits | Sort-Object priority, loopStableId)) {
         (Escape-Cell (@($resolvedModules[$loopId]) -join ", "))))
 }
 
-$generated = $builder.ToString()
+if ($hasImplementationContract) {
+    [void] $builder.AppendLine()
+    [void] $builder.AppendLine('## 단계별 최소 구현 책임')
+    [void] $builder.AppendLine()
+    [void] $builder.AppendLine('| E / 모듈 | 입력 → 출력 | 재사용 구현 참조 | 시험 참조 |')
+    [void] $builder.AppendLine('| --- | --- | --- | --- |')
+    foreach ($module in @($catalog.modules | Sort-Object evidenceStageCode,moduleCode)) {
+        [void] $builder.AppendLine(('| {0} / `{1}` | {2} → {3} | {4} | {5} |' -f
+            $module.evidenceStageCode, $module.moduleCode,
+            (Escape-Cell (@($module.reads) -join ', ')), (Escape-Cell (@($module.outputs) -join ', ')),
+            (Escape-Cell (@($module.implementationRefs) -join '<br>')),
+            (Escape-Cell (@($module.testRefs) -join '<br>'))))
+    }
+}
+[void] $builder.AppendLine()
+[void] $builder.AppendLine('## 작업 명세의 구현·증거 연결')
+[void] $builder.AppendLine()
+[void] $builder.AppendLine('미연결 과거 명세는 Unverified이며, 기존 E를 변경하지 않는다. 이 표는 명세에 기록된 범위만 다루며 한 WI의 준비를 전체 폐루프 완료로 올리지 않는다.')
+foreach ($loop in @($playableUnits | Sort-Object priority,loopStableId)) {
+    $loopId = [string] $loop.loopStableId
+    $profile = if ($profileByLoopId.ContainsKey($loopId)) { $profileByLoopId[$loopId] } else { $null }
+    $referenceProperty = if ($null -ne $profile) { $profile.PSObject.Properties['workOrderRef'] } else { $null }
+    if ($null -eq $referenceProperty) {
+        [void] $builder.AppendLine()
+        [void] $builder.AppendLine(('`{0}`: Unverified — 모듈별 작업 명세 연결 없음. 기존 E 보존.' -f $loopId))
+        continue
+    }
+    $workOrderPath = Resolve-PresentationModuleReference ('repo:' + $referenceProperty.Value) $repositoryRoot '' $true
+    $workOrder = Get-Content -LiteralPath $workOrderPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    Require ($workOrder.playableUnitStableId -eq $loopId) "WorkOrderLoopMismatch:$loopId"
+    $bindingRows = @(Test-PresentationModuleBindings $workOrder $catalog $repositoryRoot $UnityProjectRoot)
+    [void] $builder.AppendLine()
+    [void] $builder.AppendLine(('### `{0}`' -f $loopId))
+    [void] $builder.AppendLine()
+    [void] $builder.AppendLine(('명세: `{0}`; 현재 Logic {1} / Presentation {2} / 통합 {3}. 자동 승격 없음.' -f
+        $referenceProperty.Value, $workOrder.trackPlans.logic.currentEvidenceStage,
+        $workOrder.trackPlans.presentation.currentEvidenceStage, $workOrder.currentEvidenceStage))
+    [void] $builder.AppendLine()
+    [void] $builder.AppendLine('| E / 필요 모듈 | 검증 상태 | 구현 / 시험 참조 | 증거 ID | 남은 문제·범위 |')
+    [void] $builder.AppendLine('| --- | --- | --- | --- | --- |')
+    foreach ($row in $bindingRows) {
+        [void] $builder.AppendLine(('| {0} / `{1}` | {2} | {3} | {4} | {5} |' -f
+            $row.evidenceStageCode, $row.moduleCode, $row.statusCode,
+            (Escape-Cell ((@($row.implementationRefs) + @($row.testRefs)) -join '<br>')),
+            (Escape-Cell (@($row.evidenceRefs) -join ', ')), (Escape-Cell $row.reason)))
+    }
+}
+
+$generated = ConvertTo-DeterministicText $builder.ToString()
 $resolvedOutput = Join-Path $repositoryRoot $OutputPath
 if ($Mode -eq "Write") {
     $directory = Split-Path -Parent $resolvedOutput
     if (-not (Test-Path -LiteralPath $directory)) {
         New-Item -ItemType Directory -Path $directory -Force | Out-Null
     }
-    [IO.File]::WriteAllText($resolvedOutput, $generated,
-        [Text.UTF8Encoding]::new($false))
+    Write-DeterministicTextIfChanged $resolvedOutput $generated | Out-Null
 }
 else {
     Require (Test-Path -LiteralPath $resolvedOutput) "GeneratedOutputMissing"
     $existing = Get-Content -LiteralPath $resolvedOutput -Raw -Encoding UTF8
-    Require ($existing -eq $generated) "GeneratedOutputOutOfDate"
+    Require ((ConvertTo-DeterministicText $existing) -ceq $generated) "GeneratedOutputOutOfDate"
 }
 
 Write-Output ("PlayableLoopPresentationValidationValid:Modules={0};Profiles={1};PlayableUnits={2}" -f

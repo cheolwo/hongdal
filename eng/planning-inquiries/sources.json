@@ -1,8 +1,49 @@
 {
   "schemaVersion": "planning-inquiry-sources.v1",
+  "spatialRelationsRef": "eng/planning-inquiries/spatial-relations.json",
   "scopeRef": "eng/execution-ledgers/playable-loop-inquiry-implementation-scope.json",
   "depthIndexRef": "docs/Architecture/PlayableLoops/PlanningSessions/Q001-Q198주제깊이색인.md",
   "extraSources": [
+    {
+      "path": "docs/AI/탐험과운영-시점역할과현실업무연결-2026-08-31.md",
+      "role": "TopicSource",
+      "topicCode": "perspective-roles"
+    },
+    {
+      "path": "docs/AI/다영역-선택형플레이와병행개발-2026-08-31.md",
+      "role": "TopicSource",
+      "topicCode": "multi-area-parallel-development"
+    },
+    {
+      "path": "docs/AI/북부춘분-굶주린농장발견-기획보완-2026-08-31.md",
+      "role": "TopicSource",
+      "topicCode": "first-play-experience"
+    },
+    {
+      "path": "docs/AI/24절기-제철자료-조사와기획연결-2026-08-31.md",
+      "role": "TopicSource",
+      "topicCode": "seasonal-time-context"
+    },
+    {
+      "path": "docs/AI/문답기반-발전군집과테크트리-2026-08-31.md",
+      "role": "TopicSource",
+      "topicCode": "inquiry-progression-clusters"
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/시간절기/seasonal-time-context.inquiry.r1.md",
+      "role": "TopicSource",
+      "topicCode": "seasonal-time-context"
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/harvest-ready-grace-window.inquiry.r1.md",
+      "role": "TopicSource",
+      "topicCode": "farm-building-spatial-placement"
+    },
+    {
+      "path": "docs/Architecture/PlayableLoops/PlanningSessions/첫플레이체감/first-play-experience.inquiry.r1.md",
+      "role": "TopicSource",
+      "topicCode": "first-play-experience"
+    },
     {
       "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
       "role": "TopicSource",
@@ -20,6 +61,55 @@
     }
   ],
   "supplements": [
+    {
+      "selector": "403",
+      "topicCode": "survival-economy",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "402",
+      "topicCode": "survival-economy",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D2"
+    },
+    {
+      "selector": "401",
+      "topicCode": "survival-economy",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D2"
+    },
+    {
+      "selector": "400",
+      "topicCode": "survival-economy",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "399",
+      "topicCode": "survival-economy",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/생존경제/survival-economy.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "398",
+      "topicCode": "player-mind-meditation",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md",
+      "recordStatus": "ConfirmedDirection",
+      "depthCode": "D3"
+    },
+    {
+      "selector": "397",
+      "topicCode": "first-play-experience",
+      "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/첫플레이체감/first-play-experience.inquiry.r1.md",
+      "recordStatus": "Confirmed",
+      "depthCode": "D3"
+    },
     {
       "selector": "387-396",
       "topicCode": "landscape-composition",

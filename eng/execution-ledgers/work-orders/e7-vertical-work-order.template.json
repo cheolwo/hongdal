@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-TEMPLATE",
   "title": "새 PlayableUnit 수직 구현 작업",
@@ -29,6 +29,80 @@
     "e5ReadinessCode": "Blocked",
     "openGapRefs": []
   },
+  "presentationModuleBindings": [
+    {
+      "moduleCode": "presentation-requirement-contract",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "presentation-projection-lifecycle",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "presentation-automated-regression",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "presentation-binding",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "visual-source-bounds",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "player-scale-spacing",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "state-difference-readability",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "actual-camera-input-result-return",
+      "statusCode": "Unverified",
+      "reason": "해당 모듈 구현·시험·후보·증거 연결 필요. 문서 생성으로 통과하지 않는다.",
+      "candidateRevisionOrFingerprint": "",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    }
+  ],
   "trackPlans": {
     "logic": {
       "trackCode": "Logic",
@@ -59,9 +133,9 @@
         { "code": "E7", "disposition": "Gap", "summary": "실제 입력·Game View·귀환 판독을 작성한다." },
         { "code": "E6", "disposition": "Gap", "summary": "크기·배치·카메라·피드백 정제를 작성한다." },
         { "code": "E5", "disposition": "Gap", "summary": "권위 상태 사본의 표현 자료를 작성한다." },
-        { "code": "E4", "disposition": "Gap", "summary": "H 기준점·조준·문맥 안내를 작성한다." },
-        { "code": "E3", "disposition": "Gap", "summary": "Prefab·표현 상태·입력 후보를 작성한다." },
-        { "code": "E2", "disposition": "Gap", "summary": "대상·위험·선택의 표현 언어를 작성한다." },
+        { "code": "E4", "disposition": "Gap", "summary": "presentationE4Preparation에 WI·역할별 Synty 주/대체 후보와 경로·GUID·판본, 필요한 외형/Clip·Rig 적합성, 그대로 재사용/연결·설정 보완/가공 필요/신규 제작 필요/미검사를 근거와 함께 기록한다. 동일 자산·판본·문맥 근거는 재사용하고 변경분만 확인한다. 비자산 범위는 사유 있는 NotApplicable이며 실제 조사 실행은 별도 승인 범위다." },
+        { "code": "E3", "disposition": "Gap", "summary": "상태 투영·중복/과거 판본·조립/해제·도구 오류/보존의 자동시험과 실제 화면 미검증 범위를 작성한다." },
+        { "code": "E2", "disposition": "Gap", "summary": "기존 자산·동작 목록/공통 Adapter를 가볍게 파일 조회하여 잠정 재사용 후보와 상태 투영·자산 조회·소유권의 구현 경로를 작성한다. 실제 적합성 확정은 E4이며 모든 팩 실측을 코드 작성의 선행조건으로 삼지 않는다(D387)." },
         { "code": "E1", "disposition": "Gap", "summary": "플레이어가 보아야 할 정보 계약을 작성한다." }
       ],
       "upwardValidation": [

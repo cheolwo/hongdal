@@ -108,8 +108,9 @@ Require ([string] $evidence.schemaVersion -eq "ssalddel-evidence-package-catalog
     "EvidencePackageSchemaInvalid"
 Require ([string] $evidence.evidenceModelRevision -eq "horizontal-dual-cycle-evidence.r3") `
     "EvidencePackageModelInvalid"
-Require ([string] $presentationValidation.schemaVersion -eq `
-    "playable-loop-presentation-validation-modules.v1") `
+Require ([string] $presentationValidation.schemaVersion -in @(
+    "playable-loop-presentation-validation-modules.v1",
+    "playable-loop-presentation-validation-modules.v2")) `
     "PresentationValidationSchemaInvalid"
 Require ([string] $loops.evidencePackageCatalogPath -eq $EvidencePackagePath) `
     "EvidencePackageCatalogPathMismatch"

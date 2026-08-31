@@ -87,6 +87,135 @@ function Get-LoopMaturity([object[]] $LoopRefs, [hashtable] $LoopsById) {
     return @{ logic = "E$logicStage"; presentation = "E$presentationStage"; integrated = "E$([Math]::Min($logicStage, $presentationStage))" }
 }
 
+# 기존 339개 실행 선택과 분리된 추가 문답 조회다. 이 함수는 원장/검색색인/승인 상태를 쓰지 않는다.
+function Add-AdditionalInquiryProjection([object] $Catalog, [string] $Root, [object] $Lines,
+    [hashtable] $WorldInteractions, [hashtable] $Loops, [object[]] $Readiness) {
+    if ($null -eq $Catalog.PSObject.Properties['additionalInquiryTracking']) { return }
+    $extension = $Catalog.additionalInquiryTracking
+    Require ([string] $extension.schemaVersion -eq 'inquiry-implementation-extension.v1') 'AdditionalSchemaInvalid'
+    Require ([int] $extension.coverage.numberedRange.first -eq 340 -and [int] $extension.coverage.numberedRange.last -eq 403) 'AdditionalNumberedRangeInvalid'
+    $semanticIds = @($extension.coverage.semanticQuestionIds)
+    Require ($semanticIds.Count -gt 0 -and @($semanticIds | Sort-Object -Unique).Count -eq $semanticIds.Count) 'AdditionalSemanticCoverageInvalid'
+    $config = Get-Content -LiteralPath (Join-Path $Root 'eng/planning-inquiries/sources.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    $expectedSources = @{}
+    foreach ($supplement in @($config.supplements)) {
+        foreach ($number in @(Expand-Selector ([string] $supplement.selector))) {
+            if ($number -ge 340 -and $number -le 403) { $expectedSources[('Q-{0:D3}' -f $number)] = [string] $supplement.sourceRef }
+        }
+    }
+    $sourceRefs = @(@($Catalog.topics | ForEach-Object sourceRef) + @($config.extraSources | ForEach-Object path) | Sort-Object -Unique)
+    $sourceTexts = @{}
+    foreach ($sourceRef in $sourceRefs) {
+        $text = Get-Content -LiteralPath (Join-Path $Root $sourceRef) -Raw -Encoding UTF8
+        $sourceTexts[$sourceRef] = $text
+        foreach ($match in [regex]::Matches($text, '질문 식별:\s*`([a-z][a-z0-9-]+)`')) {
+            $id = $match.Groups[1].Value
+            Require (-not $expectedSources.ContainsKey($id)) "AdditionalSourceQuestionDuplicated:$id"
+            $expectedSources[$id] = $sourceRef
+        }
+    }
+    foreach ($id in $semanticIds) {
+        Require ([string] $id -cmatch '^[a-z][a-z0-9-]+$' -and $expectedSources.ContainsKey([string] $id)) "AdditionalSemanticIdInvalid:$id"
+    }
+    # 명시 coverage의 정확 집합만 평가한다. 후속 원문 증가를 실행 평가행 자동등록으로 바꾸지 않는다.
+    $declaredIds = @(@(340..403 | ForEach-Object { 'Q-{0:D3}' -f $_ }) + $semanticIds)
+    $outsideDeclared = @($expectedSources.Keys | Where-Object { $_ -cnotin $declaredIds } | Sort-Object)
+    foreach ($id in $declaredIds) { Require ($expectedSources.ContainsKey($id)) "AdditionalSourceQuestionMissing:$id" }
+    foreach ($id in $outsideDeclared) { $expectedSources.Remove($id) }
+    $snapshots = @{}
+    foreach ($snapshot in @($extension.sourceSnapshots)) {
+        $ref = [string] $snapshot.sourceRef
+        Require ($sourceTexts.ContainsKey($ref)) "AdditionalSourceUnknown:$ref"
+        Require (-not $snapshots.ContainsKey($ref)) "AdditionalSourceSnapshotDuplicated:$ref"
+        Require (-not [string]::IsNullOrWhiteSpace([string] $snapshot.sourceRevision)) "AdditionalSourceRevisionMissing:$ref"
+        Require ([string] $snapshot.sha256 -match '^[a-fA-F0-9]{64}$') "AdditionalSourceHashInvalid:$ref"
+        Require ((Get-FileHash -LiteralPath (Join-Path $Root $ref) -Algorithm SHA256).Hash -eq [string] $snapshot.sha256) "AdditionalSourceHashMismatch:$ref"
+        $snapshots[$ref] = $snapshot
+    }
+    $items = @($extension.items)
+    Require ($items.Count -eq $declaredIds.Count) 'AdditionalItemCountInvalid'
+    $seen = @{}
+    $classes = @('ExecutableTechnicalFollowup', 'TechnicalDependency', 'PlanningStudyBindingRequired', 'Deferred', 'CommonOrSuperseded')
+    foreach ($item in $items) {
+        $id = [string] $item.questionId
+        Require (-not $seen.ContainsKey($id)) "AdditionalQuestionDuplicated:$id"
+        Require ($expectedSources.ContainsKey($id)) "AdditionalQuestionUnknown:$id"
+        $seen[$id] = $true
+        $expectedKind = if ($id -cmatch '^Q-\d{3}$') { 'SupplementNumbered' } else { 'SemanticFollowup' }
+        Require ([string] $item.kind -ceq $expectedKind) "AdditionalQuestionKindInvalid:$id"
+        Require ([string] $item.sourceRef -ceq $expectedSources[$id]) "AdditionalQuestionSourceMismatch:$id"
+        $ref = [string] $item.sourceRef
+        Require ($snapshots.ContainsKey($ref)) "AdditionalSourceSnapshotMissing:$id"
+        Require ([string] $item.sourceRevision -ceq [string] $snapshots[$ref].sourceRevision) "AdditionalItemRevisionMismatch:$id"
+        Require ([string] $item.sourceSha256 -eq [string] $snapshots[$ref].sha256) "AdditionalItemHashMismatch:$id"
+        Require (-not [string]::IsNullOrWhiteSpace([string] $item.topicCode)) "AdditionalTopicMissing:$id"
+        Require (-not [string]::IsNullOrWhiteSpace([string] $item.sourceRecordStatus)) "AdditionalDecisionMissing:$id"
+        Require ($classes -ccontains [string] $item.assessmentClass) "AdditionalAssessmentInvalid:$id"
+        Require (-not [string]::IsNullOrWhiteSpace([string] $item.nextActionKo)) "AdditionalNextActionMissing:$id"
+        Require ($null -ne $item.PSObject.Properties['e5GapCodes']) "AdditionalE5GapMissing:$id"
+        $anchor = [string] $item.sourceAnchor
+        Require (-not [string]::IsNullOrWhiteSpace($anchor)) "AdditionalAnchorMissing:$id"
+        $text = [string] $sourceTexts[$ref]
+        # 원문에 실제 존재하는 질문 식별/제목 또는 해당 Markdown 제목의 slug만 허용한다.
+        $anchorFound = $text.Contains($anchor)
+        if (-not $anchorFound -and $anchor.StartsWith('#')) {
+            foreach ($heading in [regex]::Matches($text, '(?m)^#{1,6}\s+(.+?)\r?$')) {
+                $slug = $heading.Groups[1].Value.Trim().ToLowerInvariant() -replace '[^\p{L}\p{Nd}\s_-]', '' -replace '\s', '-'
+                if ($anchor.Substring(1) -ceq $slug) { $anchorFound = $true; break }
+            }
+        }
+        Require ($anchorFound -and [regex]::IsMatch($text, '(?<![a-zA-Z0-9-])' + [regex]::Escape($id) + '(?![a-zA-Z0-9-])')) "AdditionalAnchorInvalid:$id"
+        $linkedOrders = @()
+        foreach ($link in @($item.links)) {
+            foreach ($array in @('worldInteractionRefs','playableLoopRefs','workOrderRefs')) {
+                Require ($null -ne $link.PSObject.Properties[$array]) "AdditionalLinkFieldMissing:${id}:$array"
+            }
+            foreach ($wi in @($link.worldInteractionRefs)) { Require ($WorldInteractions.ContainsKey([string] $wi)) "AdditionalWorldInteractionUnknown:${id}:$wi" }
+            foreach ($loop in @($link.playableLoopRefs)) { Require ($Loops.ContainsKey([string] $loop)) "AdditionalPlayableLoopUnknown:${id}:$loop" }
+            foreach ($orderRef in @($link.workOrderRefs)) {
+                $path = [IO.Path]::GetFullPath((Join-Path $Root ([string] $orderRef)))
+                Require ($path.StartsWith($Root.TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) "AdditionalWorkOrderOutsideRepository:$id"
+                Require (Test-Path -LiteralPath $path -PathType Leaf) "AdditionalWorkOrderMissing:${id}:$orderRef"
+                $order = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
+                Require ([string] $order.schemaVersion -eq 'simulation-e7-vertical-work-order.v2') "AdditionalWorkOrderSchemaInvalid:$id"
+                $linkedOrders += [string] $orderRef
+            }
+        }
+        if ([string] $item.assessmentClass -eq 'ExecutableTechnicalFollowup') {
+            Require ([string] $item.sourceRecordStatus -in @('Confirmed','Incorporated')) "AdditionalDecisionNotExecutable:$id"
+            $matching = @($Readiness | Where-Object {
+                $candidate = $_
+                $candidate.canExecute -and $null -ne $candidate.workOrder -and
+                $null -ne $candidate.workOrder.PSObject.Properties['approvedQuestionScope'] -and
+                @($candidate.workOrder.approvedQuestionScope) -ccontains $id -and
+                @($item.links | Where-Object { @($_.worldInteractionRefs) -contains [string] $candidate.worldInteractionId -and @($_.playableLoopRefs) -contains [string] $candidate.loopStableId }).Count -gt 0 -and
+                @($linkedOrders | Where-Object {
+                    $order = Get-Content -LiteralPath (Join-Path $Root $_) -Raw -Encoding UTF8 | ConvertFrom-Json
+                    $order.workOrderId -ceq $candidate.workOrder.workOrderId
+                }).Count -gt 0
+            })
+            Require ($matching.Count -gt 0) "AdditionalExecutableApprovalMissing:$id"
+        }
+    }
+    foreach ($id in $expectedSources.Keys) { Require ($seen.ContainsKey($id)) "AdditionalQuestionMissing:$id" }
+    $Lines.Add('')
+    $Lines.Add('## 추가 문답 E5 연결 조사 — 실행 권위 없음')
+    $Lines.Add('')
+    $Lines.Add('- coverage: `LegacyNumbered=339; SupplementNumbered=64; SemanticFollowup=' + $semanticIds.Count + '; Total=' + (339 + $declaredIds.Count) + '`')
+    $Lines.Add('- 위 수는 선언된 추가추적 범위이며 최신 검색 전체 수가 아니다. 원천의 질문 식별 선언 중 범위 밖 ' + $outsideDeclared.Count + '개는 평가행·실행 권한에 자동 추가하지 않았다: ' + ($outsideDeclared -join ', '))
+    $Lines.Add('- 아래 분류는 원문 판본에 대한 조회다. 기존 339개 실행 선택·승인·WIP·E를 변경하지 않는다. 연결 폐루프의 E는 이 질문의 달성 E가 아니다.')
+    $Lines.Add('- source hash 변경은 재조사가 필요하다. 구현 원장 변경 뒤 개발 담당이 기존 검색 색인을 재생성·검증해야 한다.')
+    $Lines.Add('')
+    $Lines.Add('| 질문 / 종류 | 원문 판본 / 결정 | 조회 분류 | 연결 WI / 폐루프 / 작업 명세 | E5 누락 / 다음 최소 작업 |')
+    $Lines.Add('| --- | --- | --- | --- | --- |')
+    foreach ($item in @($items | Sort-Object questionId)) {
+        $refs = @($item.links | ForEach-Object { @($_.worldInteractionRefs) + @($_.playableLoopRefs) + @($_.workOrderRefs) }) -join '<br>'
+        $source = [string] $item.sourceRef + ' / ' + [string] $item.sourceAnchor + '<br>' + [string] $item.sourceRevision + ' / ' + [string] $item.sourceSha256 + '<br>' + [string] $item.sourceRecordStatus
+        $gaps = (@($item.e5GapCodes) -join ', ') + '<br>' + [string] $item.nextActionKo
+        $Lines.Add("| ``$($item.questionId)`` / ``$($item.kind)`` | $(Escape-Cell $source) | ``$($item.assessmentClass)`` | $(Escape-Cell $refs) | $(Escape-Cell $gaps) |")
+    }
+}
+
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 . (Join-Path $PSScriptRoot 'world-interaction-registration-functions.ps1')
 $registration = Read-WorldInteractionRegistration $repositoryRoot 'eng/execution-ledgers/world-interaction-registration-relations.json' 'eng/execution-ledgers/world-interactions.json'
@@ -669,6 +798,7 @@ foreach ($item in $ordered) {
     $checkText = "$($labels.planningRecord):$($item.checks.planningRecord)<br>$($labels.designBinding):$($item.checks.designBinding)<br>$($labels.implementation):$($item.checks.implementation)<br>$($labels.automatedVerification):$($item.checks.automatedVerification)<br>$($labels.runtimeVerification):$($item.checks.runtimeVerification)<br>$($labels.evidenceBinding):$($item.checks.evidenceBinding)"
     $lines.Add("| ``$($item.questionId)`` | $(Escape-Cell $item.topicTitleKo)<br>``$($item.depthCode)`` | ``$($item.decisionStatusCode)`` | ``$($item.implementationKindCode)``<br>``$($item.implementationStatusCode)`` | $checkText | $(Escape-Cell $links) | ``$($item.logicStageCode)`` / ``$($item.presentationStageCode)`` / ``$($item.integratedStageCode)`` | ``$($item.nextTargetStageCode)`` | $(Escape-Cell $blockers)<br>$(Escape-Cell $item.evidenceRefs[0]) |")
 }
+Add-AdditionalInquiryProjection $catalog $repositoryRoot $lines $worldInteractionsById $loopsById $parallelReadiness
 $content = ($lines -join "`n") + "`n"
 $resolvedOutput = Join-Path $repositoryRoot $OutputPath
 if ($Mode -eq 'Write') {

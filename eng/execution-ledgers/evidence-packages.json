@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-evidence-package-catalog.v3",
-  "revision": "ssalddel-evidence-package-catalog.r41",
+  "revision": "ssalddel-evidence-package-catalog.r42",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
@@ -46,6 +46,121 @@
     "External"
   ],
   "packages": [
+    {
+      "evidenceId": "evidence:farm-presentation-minimum-preparation-d386-20260831",
+      "title": "Farm 한 재배 상태의 표현 준비 코드·독립 회귀(D386, 실제 UI 미연결)",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Presentation",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": [
+        "playable-loop:farm-crop-cycle.v1"
+      ],
+      "presentationModuleScope": {
+        "moduleCodes": [
+          "presentation-projection-lifecycle",
+          "presentation-automated-regression"
+        ],
+        "worldInteractionIds": [
+          "WI-FARM-04"
+        ],
+        "coverage": "한 재배 단위의 불변 준비상태·판본/누락 거부만 검증. 자산 조회·실제 표현 수명·도구 렌더 전체 검증 아님."
+      },
+      "evidenceStageCodes": [
+        "E2",
+        "E3"
+      ],
+      "sourceRevision": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "executedAt": "2026-08-31T07:35:11+09:00",
+      "environment": "Windows / .NET / netstandard2.1 C#9 Unity 공통 패키지·net10.0 시험. Unity Editor 미실행.",
+      "scope": "공통 최초 판본 누락 재현 후 신규42+기존8 집중50. 통합 담당 Task073511 전체587/587(집중50 포함), 빌드 경고0/오류0. 관리 연결42사례는 합성 근거로 별도 검증. 이는 전체 Presentation 모듈 Passed나 Farm E 승격이 아니다.",
+      "exclusions": [
+        "실제 Farm UI/권위 조회·Preview/Confirm·수확 행위 인증",
+        "자산 조회·실제 조립/해제·Actor·도구 렌더 품질",
+        "9밭 누락 컴포넌트 수리·Scene/Play Mode/Game View·Save 재진입",
+        "전체 관리 스크립트 성공: 기존 두 명세의 protocol r4 불일치가 별도 남음",
+        "Logic·Domain·Application·Save·공개 게임 API 변경"
+      ],
+      "artifactReferences": [
+        {
+          "locator": "Ssalddel.Unity/Runtime/PresentationContracts/Reconciliation/StableIdReconciliation.cs",
+          "sha256": "07CC6D1D3EB65A29E0DBA3C75E3CD9E6A3F1F278020AD4A0AC50ACA620CC67BF",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Unity/Runtime/Farm/Farm수확상태PresentationPreparation.cs",
+          "sha256": "E5587D94334B188B488CA7ED4AF6A759154176112B4F4EB09B82A03104DB0175",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Unity.Tests/Farm수확상태PresentationPreparationTests.cs",
+          "sha256": "22F3324B1DB216AEB807B4DDC25A6CF96FF014AEB21C8D095B35F2127F7BFCDE",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Unity.Tests/PresentationRevisionFirstApplyTests.cs",
+          "sha256": "C7D7DCFC215CE17F87A0F862773C572CEF50A2BE79E80A2EC019021A603D926A",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "Ssalddel.Unity.Tests/StableIdReconciliationTests.cs",
+          "sha256": "ADBCDEF3188FE2689A4338D679B85DDDDB41360E6C3B33574DFCA2F84FF8BAC0",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "eng/common/presentation-module-bindings.ps1",
+          "sha256": "38549380E53A75228A3A2EA0F20E4B6CFC443584D93A949605F138773BBE4833",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "eng/tests/playable-loop-presentation-validation.ps1",
+          "sha256": "59E2B115EA0C0841910DD2495D873B7EC0F0E9959640860C707FDB993413E597",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "docs/Reports/Presentation최소모듈-Farm소비-2026-08-31.md",
+          "sha256": "FCA73E01DE576A78C8C39C9E381313C78C8892B501447ADF3A41D4D79E833213",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "docs/AI/Presentation단계별최소모듈-2026-08-31.md",
+          "sha256": "602306949E897AFBD59B066A9547A76D611A8CD7001476B7564DC294FB1CEF53",
+          "locationKind": "RepositoryPath",
+          "retentionCode": "Tracked"
+        },
+        {
+          "locator": "artifacts/local/validation/20260831-073511/Ssalddel.Unity.Tests.trx",
+          "sha256": "A2BE1F3AC0668E1734EA0642D4267F36F005D410593BE62DB68BC206AA5905FC",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locator": "artifacts/local/validation/20260831-073511/build-01.log",
+          "sha256": "D11992CE9F2AB29176061A0D15B009E73880B35CDC24A7A4D0EB1A0C4A629277",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        },
+        {
+          "locator": "artifacts/local/validation/presentation-minimum-integration-d386/module-bindings.log",
+          "sha256": "1CF6BEBE54B486713219FF357CAECD533CF92BB98E825C664F3D970913D48C7F",
+          "locationKind": "LocalArtifact",
+          "retentionCode": "LocalOnly"
+        }
+      ],
+      "invalidationTriggers": [
+        "결속한 구현·시험·검증 도구 또는 입력 계약 변경",
+        "한 재배 상태·규칙·Session·표현 판본 의미 변경",
+        "근거 파일 누락·해시 변경·다른 후보 판본으로 전용"
+      ]
+    },
     {
       "evidenceId": "evidence:nature-resource-regeneration-logic-e3-20260830",
       "title": "세계 자원 재생 Logic E3",

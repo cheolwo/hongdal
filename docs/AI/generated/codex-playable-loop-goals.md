@@ -2,7 +2,7 @@
 
 > 이 문서는 `eng/execution-ledgers/codex-playable-loop-goals.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- Goal 원장 개정: `codex-playable-loop-goals.r60`
+- Goal 원장 개정: `codex-playable-loop-goals.r140`
 - Goal WIP: `5/상한 없음`
 - WI WIP: `6/상한 없음`
 - 담당별 강제 상한 없음. 승인·의존성·쓰기 소유권으로 실행 가능 여부를 판정한다.
@@ -59,17 +59,24 @@ E7 PlayClosed까지 닫는다.
 
 | 작업 | Goal / WI | 궤적 / 목표 | 담당 | 상태 | 실제 차단 |
 | --- | --- | --- | --- | --- | --- |
+| work:farm-crop-cycle:d396-visual-candidate-preparation | playable-loop:farm-crop-cycle.v1<br>WI-FARM-01 | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Integrated | IntegrationReceiptInvalid |
+| work:farm-crop-cycle:display-focus-repair | playable-loop:farm-crop-cycle.v1<br>WI-FARM-01 | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:farm-crop-cycle:e5-logic | playable-loop:farm-crop-cycle.v1<br>WI-FARM-01 | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:farm-crop-cycle:fb01-harvest-delegation | playable-loop:farm-crop-cycle.v1<br>WI-FARM-04 | Logic / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:farm-crop-cycle:landscape-binding-guard | playable-loop:farm-crop-cycle.v1<br>WI-FARM-01 | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:farm-crop-cycle:landscape-ls01-study | playable-loop:farm-crop-cycle.v1<br>WI-FARM-01 | Presentation / E4 | 01a04fb7-7c73-75a3-b7c2-a29c64766c26 | Active |  |
 | work:farm-crop-cycle:spatial-expansion-r2 | playable-loop:farm-crop-cycle.v1<br>WI-FARM-01 | Presentation / E4 | 01a04fb7-7c73-75a3-b7c2-a29c64766c26 | Active |  |
 | work:farm-crop-cycle:stamina-natural-recovery | playable-loop:farm-crop-cycle.v1<br>WI-FARM-01 | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
+| work:nature-basic-herbal-recovery:d416-visual-key-validation | playable-loop:nature-basic-herbal-recovery.v1<br>WI-ACTOR-03 | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Integrated |  |
 | work:nature-basic-herbal-recovery:e5-logic | playable-loop:nature-basic-herbal-recovery.v1<br>WI-ACTOR-03 | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:nature-basic-herbal-recovery:hb01-contents | playable-loop:nature-basic-herbal-recovery.v1<br>WI-ACTOR-03 | Logic / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
+| work:nature-basic-herbal-recovery:isolated-vessel-review | playable-loop:nature-basic-herbal-recovery.v1<br>WI-ACTOR-03 | Presentation / E4 | 01a04fb7-7c73-75a3-b7c2-a29c64766c26 | Active |  |
+| work:nature-camp-visitor-stay:d396-state-binding-preparation | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Integrated |  |
 | work:nature-camp-visitor-stay:e5-logic | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:nature-camp-visitor-stay:local-npc-dialogue | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Presentation / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | ReadyForIntegration |  |
 | work:nature-resource-regeneration:logic | playable-loop:nature-night-day2.v1<br>WI-WORLD-RESOURCE-REGENERATE | Logic / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
+| work:nature-shelter:locomotion-comparison-preparation | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a04676-8d10-7480-b851-707fbd655d46 | Active |  |
+| work:nature-shelter:locomotion-synchronous-render-preparation | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a04fb7-7c73-75a3-b7c2-a29c64766c26 | Active |  |
 | work:nature-shelter:woodcutting-animation-integration | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:nature-shelter:woodcutting-animation-production | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a04676-8d10-7480-b851-707fbd655d46 | Active |  |
 

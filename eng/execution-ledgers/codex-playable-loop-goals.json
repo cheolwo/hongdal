@@ -1,6 +1,6 @@
 {
   "schemaVersion": "codex-playable-loop-goals.v4",
-  "revision": "codex-playable-loop-goals.r60",
+  "revision": "codex-playable-loop-goals.r140",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "worldInteractionDeliveryPriorityPath": "eng/execution-ledgers/world-interaction-delivery-priorities.json",
   "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
@@ -103,6 +103,233 @@
   },
   "workItems": [
     {
+      "workItemId": "work:nature-basic-herbal-recovery:d416-visual-key-validation",
+      "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionId": "WI-ACTOR-03",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Integrated",
+      "integrationReceiptRef": "artifacts/local/validation/multi-area-parallel-development/recipe-receipt.json",
+      "integrationReceiptSha256": "61CCBA47676A6DC83D4446A29A44677124B7D89FACF79547C095D176A0161629",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Unity/Runtime/Cards/Simulation처방기록PresentationPreparation.cs",
+        "Ssalddel.Unity.Tests/Simulation처방기록PresentationPreparationTests.cs"
+      ],
+      "sharedContractKeys": ["recipe-record-visual-key-validation"],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        { "path": "docs/AI/다영역-선택형플레이와병행개발-2026-08-31.md", "sha256": "7EDD92B407A99E94D1ED4DCAC9D4EE8FC802EB443013B38915D6E2037C8B541A" },
+        { "path": "docs/AI/WI전체-E4문서코드자산준비-2026-08-31.md", "sha256": "7B94E8816E1C623533D14C52DFF0FDDBE8EF6E33CEF945308DA64CC05159942A" },
+        { "path": "docs/Architecture/PlayableLoops/Nature지식습득-E5공간배치연구.r1.md", "sha256": "5FA7B245C7B93189DA4B77A0C9E2E165EEDED0F2BEF1FEA89AD29822F85027A4" }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-basic-herbal-recovery.e7-work-order.json",
+      "workOrderSha256": "9B974AFE21BB8F5983B9F8A036187738A288B5E3B81451D50192F389F34A6F6F",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature기초약초회복.md",
+        "designRevision": "nature-basic-herbal-recovery.design.r5",
+        "designHashSha256": "9002C88BA873FC15237594E2EADE80846EB78EC02CD8D779EAF0D4803F021DF6",
+        "approvalEvidenceRef": "docs/AI/다영역-선택형플레이와병행개발-2026-08-31.md"
+      }
+    },
+    {
+      "workItemId": "work:nature-camp-visitor-stay:d396-state-binding-preparation",
+      "loopStableId": "playable-loop:nature-camp-visitor-stay.v1",
+      "worldInteractionId": "WI-COMMUNITY-VISITOR-STAY",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Integrated",
+      "integrationReceiptRef": "artifacts/local/validation/d396-integration/visitor-receipt.json",
+      "integrationReceiptSha256": "34236F16842674BE397DCD22E2C991D22238714F1F769C0F3E7FB8E2AE5F97A8",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": ["Ssalddel.Unity/Runtime/Cards/Simulation방문자체류PresentationPreparation.cs", "Ssalddel.Unity.Tests/Simulation방문자체류PresentationPreparationTests.cs"],
+      "sharedContractKeys": ["visitor-state-binding-preparation"],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {"path": "docs/AI/WI전체-E4문서코드자산준비-2026-08-31.md", "sha256": "7B94E8816E1C623533D14C52DFF0FDDBE8EF6E33CEF945308DA64CC05159942A"},
+        {"path": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류-E5표현연구.r2.md", "sha256": "847D2A57CA215CD9B3310B2AD70331CF3A8F2D7586492E1964621E98346C67E0"}
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-camp-visitor-stay.e7-work-order.json",
+      "workOrderSha256": "D32C405875A4D3663E9A71D600910DEFCF7512769F9E36CEAD6A7E1314F3C2B4",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md",
+        "designRevision": "nature-camp-visitor-stay.design.r3",
+        "designHashSha256": "87F6CF282753D70908BEC278441122F5B6DD094713C599F305BB91E504AEC920",
+        "approvalEvidenceRef": "docs/AI/WI전체-E4문서코드자산준비-2026-08-31.md"
+      }
+    },
+    {
+      "workItemId": "work:farm-crop-cycle:d396-visual-candidate-preparation",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-01",
+      "scopeNote": "기존 명세 active WI01/Pipeline을 보존한다. 실제 준비 산출물 대상은 명세 presentationModuleScope/d396VisualCandidatePreparation의 WI-FARM-04 지원이며 WI01 완료나 WI04 권위 실행이 아니다.",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Integrated",
+      "integrationReceiptRef": "artifacts/local/validation/d396-integration/farm-receipt.json",
+      "integrationReceiptSha256": "D5148D6747D6282E3FBE5F29B25D2A94FD64775658927170E9033085EF59B1CA",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Unity/Runtime/Farm/Farm수확시각후보Preparation.cs",
+        "Ssalddel.Unity/Runtime/Farm/Farm수확시각후보Preparation.cs.meta",
+        "Ssalddel.Unity.Tests/Farm수확시각후보PreparationTests.cs",
+        "Ssalddel.Unity.Tests/Farm수확시각후보PreparationTests.cs.meta",
+        "Ssalddel.Unity/Runtime/Farm/Farm수확표현연결Preflight.cs"
+      ],
+      "sharedContractKeys": ["farm-harvest-visual-candidate-preparation"],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {"path": "docs/AI/WI전체-E4문서코드자산준비-2026-08-31.md", "sha256": "7B94E8816E1C623533D14C52DFF0FDDBE8EF6E33CEF945308DA64CC05159942A"},
+        {"path": "docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md", "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0"}
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "workOrderSha256": "CEF233D99C8FCF6A588999BF85B9AA359CBEEF71C14D073830CAD423C886F6E7",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "designRevision": "farm-crop-cycle.design.r1",
+        "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+        "approvalEvidenceRef": "docs/AI/WI전체-E4문서코드자산준비-2026-08-31.md"
+      }
+    },
+    {
+      "workItemId": "work:nature-shelter:locomotion-synchronous-render-preparation",
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionId": "WI-NATURE-06",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "worktreePath": "C:/Users/user/ssalddel",
+      "writePaths": [
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/이동연속Capture.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-plan.json",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r111",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r112",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/이동연속Capture.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/capture-plan.json",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r113",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r114",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/이동연속Capture.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/capture-plan.json",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r115",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r116",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/viewer.html",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/serve-readonly.ps1",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/source-manifest.json",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/validation-r119",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121/이동연속Capture.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121/capture-plan.json",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r121",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r122"
+      ],
+      "sharedContractKeys": [
+        "locomotion-render-capture-d383"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/AI/애니메이션-동작성과중심운영-2026-08-31.md",
+          "sha256": "1DA448E35410780F0963A3981BBA8BB7C18E9F476764BEE361DB00673E7046D4"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
+      "workOrderSha256": "FEFB471028C5788E34C1DD5B0CC6D0FD7A7A16158A967A80997FCE63E8A72E7A",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+        "designRevision": "nature-woodcutting-animation.design.r1",
+        "designHashSha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642",
+        "approvalEvidenceRef": "docs/AI/애니메이션-동작성과중심운영-2026-08-31.md"
+      }
+    },
+    {
+      "workItemId": "work:nature-shelter:locomotion-comparison-preparation",
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionId": "WI-NATURE-06",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+      "worktreePath": "C:/Users/user/ssalddel",
+      "writePaths": [
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/이동후보비교Probe.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/비교계획.md",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/staging-handoff.json",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/이동후보비교CaptureProbe.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-probe-plan.md",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/이동후보비교CaptureProbe.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/capture-probe-plan.md",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/validation",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-review-r118/정지혼합비교계획.md",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121/이동후보비교CaptureProbe.cs",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121/capture-probe-plan.md"
+      ],
+      "sharedContractKeys": [
+        "locomotion-isolated-review-d383"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/AI/애니메이션-동작성과중심운영-2026-08-31.md",
+          "sha256": "1DA448E35410780F0963A3981BBA8BB7C18E9F476764BEE361DB00673E7046D4"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
+      "workOrderSha256": "FEFB471028C5788E34C1DD5B0CC6D0FD7A7A16158A967A80997FCE63E8A72E7A",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+        "designRevision": "nature-woodcutting-animation.design.r1",
+        "designHashSha256": "A4A7E942D025372EC4063E0C8152A6ABB31633E92D22DAFD336A40D4B1DF6642",
+        "approvalEvidenceRef": "docs/AI/애니메이션-동작성과중심운영-2026-08-31.md"
+      }
+    },
+    {
+      "workItemId": "work:farm-crop-cycle:display-focus-repair",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "worldInteractionId": "WI-FARM-01",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/ssalddel",
+      "writePaths": [
+        "Assets/Ssalddel/Presentation/World/SimulationWorldShellPresenter.cs",
+        "Assets/Ssalddel/Presentation/World/통합월드ModePresenter.cs",
+        "Assets/Ssalddel/Presentation/World/플레이어경관Controller.cs",
+        "Assets/Ssalddel/Presentation/World/단일PlayerViewController.cs",
+        "Assets/Ssalddel/Presentation/World/Farm표시범위Lease.cs",
+        "Assets/Ssalddel/Presentation/World/DioramaTopDownCameraRig.cs",
+        "Assets/Ssalddel/Presentation/World/농장경영시점Controller.cs",
+        "Assets/Ssalddel/Tests/EditMode/Farm표시결속Tests.cs"
+      ],
+      "sharedContractKeys": [
+        "farm-view-renderer-lease"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/AI/야간개발-분야별시각진척-2026-08-31.md",
+          "sha256": "2404EA5BD27DC12214E46824B3EEAE2ADCF80F3C2D96FA93D8AA3F7E9F03C2CB"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "workOrderSha256": "CEF233D99C8FCF6A588999BF85B9AA359CBEEF71C14D073830CAD423C886F6E7",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "designRevision": "farm-crop-cycle.design.r1",
+        "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+        "approvalEvidenceRef": "docs/AI/야간개발-분야별시각진척-2026-08-31.md"
+      }
+    },
+    {
       "workItemId": "work:farm-crop-cycle:landscape-binding-guard",
       "loopStableId": "playable-loop:farm-crop-cycle.v1",
       "worldInteractionId": "WI-FARM-01",
@@ -114,11 +341,18 @@
       "writePaths": [
         "Ssalddel.Simulation.Application/Simulation경관배치소비검증Service.cs",
         "Ssalddel.Simulation.Tests/Simulation경관배치소비검증Tests.cs",
+        "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
         "docs/Reports/Farm경관-LS01-배치소비경계-개발검토-2026-08-30.md"
       ],
-      "sharedContractKeys": ["landscape-placement-binding-validation"],
+      "sharedContractKeys": [
+        "landscape-placement-binding-validation"
+      ],
       "dependsOnWorkItemIds": [],
       "baselineFiles": [
+        {
+          "path": "docs/AI/Farm월드맵-배치계층경유-점진구성-2026-08-31.md",
+          "sha256": "C4672FB891BB699CFEE95DBB52AA1C85DA56AA3E7CC09E97852A313993BB966A"
+        },
         {
           "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
           "sha256": "ABF57E4907FAC5A152EA08CFC5AAEAF24C172C0731809B0B6AAF7785131731EC"
@@ -129,7 +363,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
-      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
+      "workOrderSha256": "CEF233D99C8FCF6A588999BF85B9AA359CBEEF71C14D073830CAD423C886F6E7",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
@@ -149,11 +383,25 @@
       "worktreePath": "C:/Users/user/source/repos/Hongdal",
       "writePaths": [
         "docs/Architecture/PlayableLoops/Farm경관-LS01-공간배치연구.md",
-        "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md"
+        "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarm경관고정배치Contracts.cs",
+        "Ssalddel.Simulation.Application/SimulationFarm경관고정배치Service.cs",
+        "Ssalddel.Simulation.Application/Simulation배치적합성검사.cs",
+        "Ssalddel.Simulation.Application/SimulationFarmH2PlacementAdapter.cs",
+        "Ssalddel.Simulation.Tests/SimulationFarm경관고정배치Tests.cs",
+        "Ssalddel.Simulation.Tests/Simulation배치적합성호환Tests.cs",
+        "Ssalddel.Simulation.Tests/Fixtures/FarmLandscapeLS01"
       ],
-      "sharedContractKeys": ["farm-landscape-ls01-study"],
+      "sharedContractKeys": [
+        "farm-landscape-ls01-study",
+        "farm-placement-surface-validation"
+      ],
       "dependsOnWorkItemIds": [],
       "baselineFiles": [
+        {
+          "path": "docs/AI/Farm월드맵-배치계층경유-점진구성-2026-08-31.md",
+          "sha256": "C4672FB891BB699CFEE95DBB52AA1C85DA56AA3E7CC09E97852A313993BB966A"
+        },
         {
           "path": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
           "sha256": "ABF57E4907FAC5A152EA08CFC5AAEAF24C172C0731809B0B6AAF7785131731EC"
@@ -164,7 +412,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
-      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
+      "workOrderSha256": "CEF233D99C8FCF6A588999BF85B9AA359CBEEF71C14D073830CAD423C886F6E7",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
@@ -188,7 +436,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
-      "workOrderSha256": "774CCA01E9C4725B013B7CFE75092ED520FFEF120DB94C44FE46D6A350BF92B1",
+      "workOrderSha256": "FEFB471028C5788E34C1DD5B0CC6D0FD7A7A16158A967A80997FCE63E8A72E7A",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
@@ -221,7 +469,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-woodcutting-animation.e7-work-order.json",
-      "workOrderSha256": "774CCA01E9C4725B013B7CFE75092ED520FFEF120DB94C44FE46D6A350BF92B1",
+      "workOrderSha256": "FEFB471028C5788E34C1DD5B0CC6D0FD7A7A16158A967A80997FCE63E8A72E7A",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
@@ -232,8 +480,11 @@
       "workItemId": "work:nature-shelter:woodcutting-animation-production",
       "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
       "writePaths": [
+        "docs/Reports/WI애니메이션-보유자산대조와제작우선순위-2026-08-30.md",
         "docs/Architecture/PlayableLoops/Nature벌목동작-애니메이션적용연구.md",
-        "docs/Reports/Nature벌목동작-D359-제작인계-2026-08-30.md"
+        "docs/Reports/Nature벌목동작-D359-제작인계-2026-08-30.md",
+        "docs/Architecture/PlayableLoops/Nature벌목타격음-나무넘어짐-적용연구.md",
+        "docs/Reports/Nature벌목타격음-나무넘어짐-D379-연구인계-2026-08-30.md"
       ],
       "sharedContractKeys": [
         "nature-woodcutting-art-source"
@@ -304,7 +555,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-herbal-hb01-contents.e7-work-order.json",
-      "workOrderSha256": "B159468E01B0814BDA88C2CAA5A66B69EA3296B35508AC2B56FEB8EDA2B3D639",
+      "workOrderSha256": "104B83293922CD8E3022FECA180723FAD2D6496E3032F60EE5B32ECCEB7412A1",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
@@ -462,7 +713,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-camp-visitor-stay.e7-work-order.json",
-      "workOrderSha256": "0EC55B54AFD3C53E552FDB0A074B3280BBE56DDF87733EAFD16635BEC5CB9BD9",
+      "workOrderSha256": "D32C405875A4D3663E9A71D600910DEFCF7512769F9E36CEAD6A7E1314F3C2B4",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature야영지방문자임시체류.md",
@@ -488,7 +739,6 @@
         "Ssalddel.Simulation.Application/RuntimeCore/세계상호작용E단계Modules.cs",
         "Ssalddel.Simulation.Tests/WorldInteractionDownwardModuleSkeletonTests.cs",
         "Ssalddel.Simulation.Tests/SimulationFarmH2PlacementAdapterTests.cs",
-        "Ssalddel.Simulation.Application/SimulationFarmH2PlacementAdapter.cs",
         "Ssalddel.Simulation.Tests/Ssalddel.Simulation.Tests.csproj",
         "Ssalddel.Simulation.Tests/Fixtures/FarmH2/01-flat.plan.json",
         "Ssalddel.Simulation.Tests/Fixtures/FarmH2/02-noise.plan.json",
@@ -515,7 +765,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
-      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
+      "workOrderSha256": "CEF233D99C8FCF6A588999BF85B9AA359CBEEF71C14D073830CAD423C886F6E7",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
@@ -593,13 +843,47 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
-      "workOrderSha256": "1D8E74DBC4F53CB6245AB2508BAF5251B9C2C29C21C84B1730E6D223B994ABD9",
+      "workOrderSha256": "CEF233D99C8FCF6A588999BF85B9AA359CBEEF71C14D073830CAD423C886F6E7",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
         "designRevision": "farm-crop-cycle.design.r1",
         "designHashSha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
         "approvalEvidenceRef": "docs/Reports/E5세계발현-개발승인인계-2026-08-30.md"
+      }
+    },
+    {
+      "workItemId": "work:nature-basic-herbal-recovery:isolated-vessel-review",
+      "loopStableId": "playable-loop:nature-basic-herbal-recovery.v1",
+      "worldInteractionId": "WI-ACTOR-03",
+      "trackCode": "Presentation",
+      "targetEvidenceStageCode": "E4",
+      "statusCode": "Active",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "worktreePath": "C:/Users/user/ssalddel",
+      "writePaths": [
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-vessel-review",
+        "artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385",
+        "docs/Architecture/PlayableLoops/Nature약초차-냄비표현교체-적용연구.md"
+      ],
+      "sharedContractKeys": [
+        "herbal-isolated-vessel-review-d382"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
+          "sha256": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-herbal-hb01-contents.e7-work-order.json",
+      "workOrderSha256": "104B83293922CD8E3022FECA180723FAD2D6496E3032F60EE5B32ECCEB7412A1",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature약초차-HB01개발승인보완.md",
+        "designRevision": "nature-herbal-tea.hb01-addendum.r1",
+        "designHashSha256": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6",
+        "approvalEvidenceRef": "docs/AI/야간개발-분야별시각진척-2026-08-31.md"
       }
     }
   ],

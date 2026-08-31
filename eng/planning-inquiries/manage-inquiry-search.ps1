@@ -5,6 +5,12 @@ param(
     [string] $IndexPath = 'docs/AI/generated/planning-inquiry-search.json',
     [string] $Id = '', [string] $Text = '', [string] $Topic = '', [string] $Depth = '',
     [switch] $OpenOnly,
+    [switch] $Spatial, [string] $HId = '',
+    [ValidateSet('','UnmappedRequirements','UnreviewedH','NoImage','ReviewRequired')] [string] $Gap = '',
+    [string] $SpatialMarkdownPath = '',
+    [switch] $Circulation, [switch] $Unreviewed,
+    [string] $CirculationMarkdownPath = '',
+    [switch] $Wi, [string] $WiMarkdownPath = '',
     [ValidateRange(1,1000)] [int] $Limit = 8
 )
 $ErrorActionPreference = 'Stop'
@@ -19,6 +25,7 @@ function Full([string] $Ref) {
 }
 function Read-Json([string] $Ref) { Get-Content -LiteralPath (Full $Ref) -Raw -Encoding UTF8 | ConvertFrom-Json }
 function Field($Object, [string] $Name, $Default) {
+    if ($Object -is [Collections.IDictionary] -and $Object.Contains($Name)) { return $Object[$Name] }
     if ($null -ne $Object -and $null -ne $Object.PSObject.Properties[$Name]) { return $Object.$Name }
     return $Default
 }
@@ -51,16 +58,20 @@ foreach ($extra in $config.extraSources) {
     $sourceMap[$extra.path] = [ordered]@{path=$extra.path; role=$extra.role; topics=@($extra.topicCode)}
 }
 $sections = [Collections.Generic.List[object]]::new()
+function Inline-Directions([string] $Body) {
+    # 같은 절의 주 질문 상태를 물려받지 않고 해당 행의 명시 상태만 읽는다.
+    [regex]::Matches($Body, '(?m)^- (?:조사·정리 방향|엔진 협력) 식별:[ \t]*`([a-z][a-z0-9-]+)`[ \t]*[—-][ \t]*`(Asked|Confirmed|ConfirmedDirection|Incorporated|Deferred|Open)`(?=[.\s]|$)')
+}
 function Add-Section([string] $Ref, [int] $Line, [string] $Heading, [string] $Body, [string] $DirectId) {
     if ([string]::IsNullOrWhiteSpace($Body)) { return }
-    $semantic = [regex]::Match($Body, '질문 식별:\s*`([a-z][a-z0-9-]+)`')
+    $semantic = [regex]::Match($Body, '(?:질문 식별:\s*|(?m:^- 의미 식별자:[ \t]*))`([a-z][a-z0-9-]+)`')
     if ($semantic.Success) { $DirectId = $semantic.Groups[1].Value }
     $depthMatch = [regex]::Match($Body, '(?:/\s*|\b)(D[1-5])(?:\s|[-/])')
     $sections.Add([ordered]@{
         sectionId="$Ref`:$Line"; sourceRef=$Ref; line=$Line; heading=$Heading
         sourceRole=$sourceMap[$Ref].role; topicCodes=@($sourceMap[$Ref].topics)
         directQuestionId=$DirectId
-        directQuestionIds=@($DirectId.Split(',', [StringSplitOptions]::RemoveEmptyEntries))
+        directQuestionIds=@($DirectId.Split(',', [StringSplitOptions]::RemoveEmptyEntries)) + @(Inline-Directions $Body | ForEach-Object { $_.Groups[1].Value })
         depthCode=$(if ($depthMatch.Success) {$depthMatch.Groups[1].Value} else {'Unclassified'})
         containsOpenMarker=[bool]($Body -match '미정|미답변|답변 없음|답변 대기|질문 후보|다음 질문|보류')
         text=$Body.Trim()
@@ -68,16 +79,22 @@ function Add-Section([string] $Ref, [int] $Line, [string] $Heading, [string] $Bo
 }
 foreach ($ref in @(Ordinal @($sourceMap.Keys))) {
     $lines = @(Get-Content -LiteralPath (Full $ref) -Encoding UTF8)
-    $heading = ''; $start = 1; $buffer = [Collections.Generic.List[string]]::new(); $direct = ''
+    $heading = ''; $start = 1; $buffer = [Collections.Generic.List[string]]::new(); $direct = ''; $semanticTable=$false
     for ($i=0; $i -lt $lines.Count; $i++) {
         $line = $lines[$i]
+        if ($line -match '^\|\s*의미 식별자\s*\|\s*상태\s*\|') { $semanticTable=$true }
+        elseif ($line -notmatch '^\|') { $semanticTable=$false }
         if ($line -match '^#{1,6}\s+(.+)$') {
             Add-Section $ref $start $heading ($buffer -join "`n") $direct
             $heading = $Matches[1]; $start=$i+1; $buffer.Clear(); $direct=''
             # Only a single numbered heading is a direct answer location, never a range.
             if ($heading -match '^(?:다음 질문\s*[—-]\s*)?(Q-\d{3})(?!\d|[~～])(?:\s|$)') { $direct=$Matches[1] }
         }
-        if ($line -match '^\|\s*(?:`?Q-[^|]+\|\s*)?`?(Q-\d{3})(?:~(?:Q-)?(\d{3}))?`?\s*\|') {
+        if ($semanticTable -and $line -match '^\|\s*`([a-z][a-z0-9-]+)`\s*\|') {
+            $semanticId=$Matches[1]
+            Need ($line -match '^\|\s*`[a-z][a-z0-9-]+`\s*\|\s*`(Asked|Confirmed|ConfirmedDirection|Incorporated|Deferred|Open)`(?:\s*/\s*`FutureExtension`)?\s*\|') "InvalidSemanticTableStatus:$ref`:$($i+1)"
+            Add-Section $ref ($i+1) $heading $line $semanticId
+        } elseif ($line -match '^\|\s*(?:`?Q-[^|]+\|\s*)?`?(Q-\d{3})(?:~(?:Q-)?(\d{3}))?`?\s*\|') {
             $rowId=$Matches[1]
             if ($Matches.ContainsKey(2) -and $Matches[2]) {
                 $end=[int]$Matches[2]; $begin=[int]$rowId.Substring(2)
@@ -136,8 +153,15 @@ foreach ($supplement in $config.supplements) {
 foreach ($section in $sections) {
     if ($section.directQuestionId -cmatch '^[a-z][a-z0-9-]+$') {
         $status = 'SeeSource'
-        if ($section.text -match '`Incorporated`') { $status='Incorporated' }
+        if ($section.text -match '(?m)^- 상태:\s*`(Asked|Confirmed|ConfirmedDirection|Incorporated|Deferred|Open)`') { $status=$Matches[1] }
+        elseif ($section.text -match '^\|\s*`[a-z][a-z0-9-]+`\s*\|\s*`(Asked|Confirmed|ConfirmedDirection|Incorporated|Deferred|Open)`(?:\s*/\s*`FutureExtension`)?\s*\|') { $status=$Matches[1] }
+        elseif ($section.text -match '(?m)^- (?:질문 식별|의미 식별자):[ \t]*`[a-z][a-z0-9-]+`[ \t]*[—-][ \t]*`(Asked|Confirmed|ConfirmedDirection|Incorporated|Deferred|Open)`(?=[.\s]|$)') { $status=$Matches[1] }
+        elseif ($section.heading -match '^사용자 방향\s*[—-]\s*ConfirmedDirection\s*/\s*D\d+$') { $status='ConfirmedDirection' }
+        elseif ($section.text -match '`Incorporated`') { $status='Incorporated' }
         Add-Question $section.directQuestionId $section.topicCodes[0] $section.sourceRef $status $section.depthCode 'SemanticFollowup'
+    }
+    foreach ($direction in @(Inline-Directions $section.text)) {
+        Add-Question $direction.Groups[1].Value $section.topicCodes[0] $section.sourceRef $direction.Groups[2].Value $section.depthCode 'SemanticFollowup'
     }
 }
 $inputRefs = @($SourcesPath, $config.scopeRef, $config.depthIndexRef, 'eng/planning-inquiries/manage-inquiry-search.ps1') + @($sourceMap.Keys)
@@ -151,6 +175,14 @@ $database=[ordered]@{
     questions=@(foreach ($qid in @(Ordinal @($ids.Keys))) { $questions | Where-Object { $_.questionId -ceq $qid } })
     sections=@($sections)
 }
+$relationsRef=Field $config 'spatialRelationsRef' ''
+if ($relationsRef) {
+    . (Join-Path $root 'eng/planning-inquiries/spatial-query.ps1')
+    $database['spatial']=Get-InquirySpatialIndex $database $relationsRef
+    $fingerprintMap=@{}
+    foreach($f in @($database.sources)+@($database.spatial.sources)) {$fingerprintMap[$f.path]=$f}
+    $database.sources=@(Ordinal @($fingerprintMap.Keys)|ForEach-Object {$fingerprintMap[$_]})
+}
 # PS5.1 uses HTML escaping by default; match it in PS7 and avoid version-dependent indentation.
 if ($PSVersionTable.PSVersion.Major -ge 6) {
     $serialized=$database | ConvertTo-Json -Depth 30 -Compress -EscapeHandling EscapeHtml
@@ -158,14 +190,30 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 $json=ConvertTo-DeterministicText ($serialized + "`n")
 if ($Mode -eq 'Write') {
     $null=Write-DeterministicTextIfChanged (Full $IndexPath) $json
-    Write-Output "Written: questions=$($questions.Count), sections=$($sections.Count), sources=$($fingerprints.Count)"
+    if($SpatialMarkdownPath){Need ([bool]$relationsRef) 'SpatialNotConfigured';$null=Write-DeterministicTextIfChanged (Full $SpatialMarkdownPath) (Get-InquirySpatialMarkdown $database.spatial)}
+    if($CirculationMarkdownPath){Need ([bool]$relationsRef) 'SpatialNotConfigured';$null=Write-DeterministicTextIfChanged (Full $CirculationMarkdownPath) (Get-InquiryCirculationMarkdown $database.spatial)}
+    if($WiMarkdownPath){Need ([bool]$relationsRef) 'SpatialNotConfigured';$null=Write-DeterministicTextIfChanged (Full $WiMarkdownPath) (Get-InquiryWiMarkdown $database.spatial)}
+    Write-Output "Written: questions=$($questions.Count), sections=$($sections.Count), sources=$($database.sources.Count)"
     return
 }
 Need (Test-Path -LiteralPath (Full $IndexPath)) 'MissingIndex:RunWrite'
 $existing=ConvertTo-DeterministicText ([IO.File]::ReadAllText((Full $IndexPath)))
 Need ($existing -ceq $json) 'StaleOrModifiedIndex:RunWriteThenValidate'
+if($SpatialMarkdownPath){Need ([bool]$relationsRef) 'SpatialNotConfigured';Need ((Test-Path -LiteralPath (Full $SpatialMarkdownPath)) -and (ConvertTo-DeterministicText ([IO.File]::ReadAllText((Full $SpatialMarkdownPath)))) -ceq (Get-InquirySpatialMarkdown $database.spatial)) 'SpatialMarkdownStale'}
+if($CirculationMarkdownPath){Need ([bool]$relationsRef) 'SpatialNotConfigured';Need ((Test-Path -LiteralPath (Full $CirculationMarkdownPath)) -and (ConvertTo-DeterministicText ([IO.File]::ReadAllText((Full $CirculationMarkdownPath)))) -ceq (Get-InquiryCirculationMarkdown $database.spatial)) 'CirculationMarkdownStale'}
+if($WiMarkdownPath){Need ([bool]$relationsRef) 'SpatialNotConfigured';Need ((Test-Path -LiteralPath (Full $WiMarkdownPath)) -and (ConvertTo-DeterministicText ([IO.File]::ReadAllText((Full $WiMarkdownPath)))) -ceq (Get-InquiryWiMarkdown $database.spatial)) 'WiMarkdownStale'}
 if ($Mode -eq 'Validate') { Write-Output "Valid: questions=$($questions.Count), sections=$($sections.Count)"; return }
 if ($Id -match '^Q-?(\d+)$') { $Id='Q-{0:D3}' -f [int]$Matches[1] }
+if($Wi){Need ([bool]$relationsRef) 'SpatialNotConfigured';Need (-not ($Circulation -or $Spatial -or $HId -or $Gap -or $Topic -or $Depth -or $OpenOnly -or $Unreviewed)) 'WiUseIdText';Search-InquiryWi $database.spatial $Id $Text -Limit $Limit|ConvertTo-Json -Depth 40;return}
+if($Circulation){Need ([bool]$relationsRef) 'SpatialNotConfigured';Need (-not ($Spatial -or $HId -or $Gap -or $Depth -or $OpenOnly)) 'CirculationUseIdTopicText';Search-InquiryCirculation $database.spatial $Id $Topic $Text -Unreviewed:$Unreviewed -Limit $Limit|ConvertTo-Json -Depth 30;return}
+Need (-not $Unreviewed) 'UnreviewedRequiresCirculation'
+if($Spatial -or $HId -or $Gap){
+    Need ([bool]$relationsRef) 'SpatialNotConfigured'
+    Need (-not ($Id -and $HId)) 'SpatialAmbiguousId'
+    Need (-not ($Topic -or $Depth -or $OpenOnly)) 'SpatialUseIdTextOrGap'
+    Search-InquirySpatial $database.spatial $(if($HId){$HId}else{$Id}) $Text $Gap $Limit | ConvertTo-Json -Depth 40
+    return
+}
 $terms=@($Text.Split(' ', [StringSplitOptions]::RemoveEmptyEntries))
 $hits=[Collections.Generic.List[object]]::new()
 foreach ($q in $database.questions) {

@@ -2,11 +2,13 @@
 param(
     [string] $InputPath = "eng/execution-ledgers/work-orders/e7-vertical-work-order.template.json",
     [string] $ProtocolPath = "eng/execution-ledgers/e7-vertical-implementation-protocol.json",
-    [string] $PlayableLoopPath = "eng/execution-ledgers/playable-loops.json"
+    [string] $PlayableLoopPath = "eng/execution-ledgers/playable-loops.json",
+    [string] $UnityProjectRoot = ''
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot '../common/presentation-module-bindings.ps1')
 
 function Require([bool] $Condition, [string] $Code) {
     if (-not $Condition) { throw "E7VerticalWorkOrderInvalid:$Code" }
@@ -118,6 +120,10 @@ Require ($presentationStageNumber -lt 5 -or $logicStageNumber -ge 5) `
     "PresentationE5RequiresLogicE5"
 
 $isTemplate = [string] $workOrder.workOrderId -eq "E7-WO-TEMPLATE"
+if ($null -ne $workOrder.PSObject.Properties['presentationModuleBindings']) {
+    $presentationModules = Get-Content -LiteralPath (Join-Path $repositoryRoot 'eng/execution-ledgers/playable-loop-presentation-validation-modules.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    Test-PresentationModuleBindings $workOrder $presentationModules $repositoryRoot $UnityProjectRoot | Out-Null
+}
 $preparationProperty = $workOrder.PSObject.Properties["presentationE4Preparation"]
 if ($isTemplate -or $null -ne $preparationProperty) {
     $preparation = $workOrder.presentationE4Preparation

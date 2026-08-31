@@ -9,6 +9,513 @@
   "targetEvidenceStage": "E7",
   "currentEvidenceStage": "E7",
   "promotionEligible": false,
+  "d383LocomotionReview": {
+    "statusCode": "AcceptedStudyExternalHarnessPreparation",
+    "directiveRef": "docs/AI/애니메이션-동작성과중심운영-2026-08-31.md",
+    "directiveSha256": "1DA448E35410780F0963A3981BBA8BB7C18E9F476764BEE361DB00673E7046D4",
+    "requiredStudyRef": "docs/Reports/WI애니메이션-보유자산대조와제작우선순위-2026-08-30.md",
+    "requiredStudySha256": "7002C6641E5D4767FBD4DE8C3FEA8193C010F717FBE35A74E02F478D729FF7ED",
+    "acceptedSection": "7~12 과거수용/원문보존. 13절 cubic 한 후보 비교준비 제한Accepted. 원Draft/선형/Clip 보존, 새 실행은 별도동결검토·슬롯 필요",
+    "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+    "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "captureOwnerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "purpose": "기존Farm남성의빈손대기→걷기→정지를 제자리 A공용절차형/B보유IdleWalk로 비교한다. 현재WI06복귀표현의독립재사용후보준비이며새WI/Goal/게임이동연결이아니다. 일반Farm/UI/카메라회귀는개발소유",
+    "currentPermission": "r122 단독Compile1/Run1 실행권한 소진·Editor반환. 원보고/PNG의 파일읽기 비교와 인계만 계속하며 자동재실행/다른곡선/제품채택0. Graph즉시실패 보존. 모든원본/과거자료·Assets/Scene/Save/Play/입력/새Clip 불변.",
+    "stopBlendResult": {
+      "revision": "d383-stop-blend-cubic-result.r123",
+      "executionSpecSha256": "0DCC7E91C66CEAE1AD3AB24D6C01253DE2695933D92BB680D6E3AC4238C9B28F",
+      "reportPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r121/r122-report.json",
+      "reportSha256": "91A79608F9F6D5826F86CA26111179723C906E3A2FAD7B0D7F1CAA5B7AD0A8B2",
+      "handoffSha256": "D1E4D3FB6D682C22A1ACA08EF703E9A03F50CE75DAC1EF278F96D307AB143CAE",
+      "manifestSha256": "B988921875F314CAFF8CC4A8145A64723FBB587AC33F80375C00420C663656D6",
+      "integrationManifestCheck": "개발400/400 파일길이·SHA256 직접대조 불일치0. 공간52장/애니40장/개발측면78·81·82 직접열람 범위구분",
+      "finalSha256": "A62684B3A27980E44248F5B56089D2CD6A21BBB4A8B44D82E342468B099CBBA3",
+      "compileInvocations": 1,
+      "runInvocations": 1,
+      "framesPerCandidate": 93,
+      "verifiedPngFiles": 372,
+      "collectionComplete": true,
+      "stopCurveVerified": true,
+      "baselineComparable": true,
+      "skinLifecycleVerified": true,
+      "comparisonIssues": [],
+      "reportPreservationConfirmed": false,
+      "reportStatus": "RejectedOrIncomplete",
+      "preservedFailure": "Finally:InvalidOperationException:GraphInventoryChanged. 직후 Graph0는 별도 결과이며 실패를 완화하지 않음",
+      "qualityDecision": "ComparisonOnly_NotAdopted. 애니가 원선형/신규 B정면·측면76~84/92 원PNG40장을 직접 비교. 초반첫감소·마지막한간격은 완화하지만 중간/초기후반으로 변화가 재분배되어 전반품질개선 채택 근거는 부족함. 372전수/실시간30fps 판독 아님",
+      "rootFileObservation": "오른발77→78 표본변위 선형0.106401/cubic0.090316, 78→79 선형0.095747/cubic0.105704. Unity좌표 관찰값이며 실제속도/접지/미끄럼 지표 아님. 83 도착Pose 동일",
+      "outerPreservation": "공간04:14:09 stopped/dirtyfalse/Graph0·4704(정식4701+기존조명3)/Preview신원·객체hash동일, 외부36/loader60/Assembly4·원1209행 보존, Console8791 신규0. 04:14:22 lease반환. 개발은 final/report/비교파일·handoff 전체 및 manifest400/400 직접읽기·대조",
+      "nextBoundary": "동일곡선 반복/고차곡선/Clip위상·IK·새Clip 자동착수0. 다음독립묶음은 D385 선정냄비의 기존열원/지지·접근계약과 정확소비입력 파일읽기이며 새Editor/가열규칙/권위주입 없음"
+    },
+    "stopBlendExecutionPlan": {
+      "revision": "d383-stop-blend-cubic-execution.r122",
+      "statusCode": "ApprovedSingleComparisonAfterFrozenReviewAndLease",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "scenario": "TwoWalkCycles",
+      "sourcePath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121/이동후보비교CaptureProbe.cs",
+      "sourceSha256": "569988F5F2B9BF56793CE8E1770A0049047ECC5724EC796C54D0405FD887D71F",
+      "planSha256": "D2D26EC350EBB0916A6B75BA52741EC5DBA97129C6A916F7496478E1FC5F847B",
+      "helperPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121/이동연속Capture.cs",
+      "helperSha256": "64B98BF55AD033E8384A30D56EBB277774A1B8D3955F46DDB61579910F112C65",
+      "helperPlanSha256": "7F521F7458F2B183F29282643374BB868EB3A6D4637697954F4540F299D28222",
+      "serializerPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/validation/안전관찰직렬화.cs",
+      "serializerSha256": "92F7ED1A6EDDFEE5101C94A57936F50C5AC6C588691787F8AF2942DC76169491",
+      "embeddedPreparationSpecHash": "F032E3ACEF71F46F48BDD7CD3D067B408B3AE23E0E4D02BA58416AEBD78B850B",
+      "studySha256": "7002C6641E5D4767FBD4DE8C3FEA8193C010F717FBE35A74E02F478D729FF7ED",
+      "writeRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r121",
+      "framesRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r121/frames",
+      "slotArtifactRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r122",
+      "loaderPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121/capture-loader.cs",
+      "additionalProtectedFiles": [
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r3-primary.ssalddel",
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r5-primary.ssalddel",
+        "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationAdapter.cs.meta",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs.meta"
+      ],
+      "preflight": "개발 Probe변경전체/계획·helper정확1곳변경·loader검토. 최종loader의실행hash치환/해시와원파일대조 후 명시공간시작통보. stopped/compilefalse/importfalse/canonicaldirtyfalse·Scopefalse/envnull/선택/기존Preview신원·Graph·4701+기존조명3 등 현재전체객체 읽기기준선. 수동Reset/원복없음. 새slot-r122/capture-r121 부재·경로조상reparse없음·여유1GiB. meta폴더만신규생성/frames는helper만생성.",
+      "compilation": "동결CaptureProbe+기존serializer+helper 순서합성, 메모리Compile1. 정확반환Assembly의14DTO/공개계약. 원Probe별도중복합성0/Assets·전체recompile0.",
+      "collection": "기존DTO11+촬영/skin비기본필드·nullable왕복 유지. 새Frame float linearWeight/string stopCurveCode·walkWeight 비기본왕복, 같은Assembly 순수Cubic메서드의끝점·원선형77~83입력exact식/유한0..1단조·invalid5거부 후만Run1. 수학시험은품질/Actor평가아님. 수집뒤CaptureEvidenceValidation/StopCurveComparison단계분리해후속실패가회수사실을덮지않음.",
+      "execution": "r122-once.claim CreateNew/Compile1/Run1 maximum, 재시도·추가시나리오0. 연구13 B77~83cubic1만/원float선형·.2초·93/시계·A/Root·phase·skin·lease·Graph·CapturePair불변. 첫오류/단색/불변실패에서추가촬영금지. 총60초협력중단/단일Render선점보장X.",
+      "comparison": "원r116보고hash8214A51B…8F14C8 동결. 안전투영을JSON parse로정규화후oldparse와framing/초기hash·phase·scale/모든시계·intent/common상태비교. A전체/B0~77·83~92 Pose·뼈동일, 새linearWeight는원walkWeight exact, B77~83walkWeight는계산식/A·나머지B원출력exact, fallback -1/NotApplicable. 불일치는baselineComparable=false/ComparisonNotEstablished, 부분원보고선저장/재평가·재촬영으로맞춤0. 신규stopCurveVerified와회수/시각/Graph보존 분리.",
+      "capture": "고정정면/측면768²·A93/B93·372PNG, native1/카메라·조명·시간불변. helper는경로만변경. PNG당4MiB/합512MiB/metadata128MiB중1MiB최종보존요약예약. 원PNG는가공0. 실제대표 및 B76~84/92 인접원본비교는공간→애니→개발, hash변화만품질통과X.",
+      "cleanup": "기존detach→GraphDestroy/unbound→exactlease→safeToRemove→자기skin원bool복원→container→PRU유지. 실패참조보존/외부Graph·Scene·Camera강제정리0. 즉시GraphInventoryChanged/preservationfalse는실패그대로/후속Graph0별도. callback/RT/texture정리·기존Scene전체객체/Preview신원·선택/파일/Console 전후대조.",
+      "frozenHistory": "원r112398/r114392/r116397/r11922 각manifest실제행의전후hash길이직접검사(중복은중복합산성과X). loader핵심32참조 보호는manifest하위전수대조대체X. 원r115 5파일/Draft/뷰어3 및oldreport·final·manifest보호. 실패시원자료보존/불일치범위반환.",
+      "artifactPolicy": "새slot-r122 내시작/종료·전체직렬/파일·Console·검증·인계/manifest 외부관찰만최대64MiB CreateNew. capture-r121는동결loader출력/frames만. source수정/PNG변환/다른폴더쓰기0. 스크립트API오류면읽기실패보존/loader자동수정재호출0.",
+      "resultCap": "원선형→cubic 후보의제자리동기이미지 비교만. 초반완화/중간집중/후반유지·악화/판독불가를분리, 새합격오차/제품채택/실시간30fps·게임이동·지면·발미끄럼·신규Clip/E승격 없음. 09시이후새묶음없음."
+    },
+    "stopBlendPreparation": {
+      "revision": "d383-stop-blend-cubic-preparation.r121",
+      "statusCode": "AcceptedSingleCandidateExternalPreparation",
+      "executionAllowed": false,
+      "studySha256": "7002C6641E5D4767FBD4DE8C3FEA8193C010F717FBE35A74E02F478D729FF7ED",
+      "draftSha256": "B59BE31D510C0257EC1CE086D3CA0151507CBFB2271782DB8AB66B946A3E60E3",
+      "basisProbeSha256": "630FBE1F1E4221A242E0A923807E271EA45A3905F3E468F6F60828D61F2DF405",
+      "basisHelperSha256": "E81490B14B7F47F77A71B44B0C3313A8C1AFFF55A624BF7E709600C1A06780A5",
+      "basisReportSha256": "8214A51B94CB687B574357E57BA62EB324D54249C989A1DC011F8ED4378F14C8",
+      "basisManifestSha256": "94D69ED3BC68848473BD77502D7ED9217045A0773CC617A512F1ABAECA3E5397",
+      "sourceRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-cubic-r121",
+      "futureFramesRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r121/frames",
+      "animationOwner": "01a04676-8d10-7480-b851-707fbd655d46",
+      "animationFiles": ["이동후보비교CaptureProbe.cs", "capture-probe-plan.md"],
+      "spaceOwner": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "spaceFiles": ["이동연속Capture.cs", "capture-plan.json"],
+      "integrationOwner": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "candidateContract": "TwoWalkCycles만허용. A불변/B77~83만cubic. 원float MoveTowards선형상태별도보존, double u=1.0-(double)linearWeight; float output=(float)(1.0-u*u*(3.0-2.0*u)); 유한0..1입력검사/clamp·epsilon없음. 77출력1/78첫감소/83출력0. 비선형출력을진행값으로재사용하지않음.",
+      "recordingContract": "Frame에 float linearWeight 및 string stopCurveCode 추가. 기존 walkWeight는실제출력, A/fallback의새linearWeight=-1·stopCurveCode=NotApplicable, B비정지구간Linear/77~83CubicStop. 새 public static float EvaluateCubicStopWeight(float linearWeight)는유한0..1검사/정확식만(게임/Unity상태쓰기0), loader합성자체검사호출용. 기존14DTO/기존필드형·Pose/수집관문 보존. 소스/계획에 정확diff·변경함수/불변대조 기록, 새diff파일불필요.",
+      "invariants": ".2f/Step1f30/이벤트·양Clip시계·A전체·B시작·93표본·평가횟수·Root·phase/scale·framing·skin·lease·Graph·첫오류중단·정리/retained참조 불변. helper는 /capture-r115/frames→/capture-r121/frames 한곳만 변경. 원r116 선형과 초기/설정/구간밖/시간 대조불일치는비교불성립, 강제맞춤없음.",
+      "executionCandidateCap": "후속단독 Compile1/Run1/A93B93/372PNG·60초/PNG4MiB합512MiB/보고128MiB. 지금 실행0/출력폴더생성0. 즉시GraphInventoryChanged/preservationfalse는실패그대로/후속Graph0소급불가. 원보고/원PNG/과거790이상자료보존.",
+      "excluded": "quintic구현/새Clip/bake/키프레임/위상리셋동결/Idle자세/IK/시간변경/게임이동·지면/품질합격값/E승격/Assets·Scene·Save/commitpush 금지. 기존수동뷰어재작성·서버재실행없음."
+    },
+    "pngComparisonResult": {
+      "revision": "d383-original-png-manual-review-result.r120",
+      "executionRevision": "r119",
+      "statusCode": "ManualUIValidatedWithObservationLimits",
+      "artifactRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/validation-r119",
+      "handoffSha256": "DDC7BCB62B9A01CF92DFAA290AF1CC0FE2FD8C94E639CA5D52C03817D2A426BE",
+      "manifestSha256": "387F6C44BEA8F60501A8F81F50D1C73BFA69881715757C08D14A4AA37C6DC7E3",
+      "verificationSha256": "FE9772425F7D4463FEEDF1FF0F3DB191A53183DABCEA87A3ADEEA5DA27AEEA17",
+      "integrationRead": "개발 인계전체/대표0·46·77 화면3장 직접열람, manifest22/22 파일길이·SHA256 직접대조 불일치0. 목록합782184bytes(자기manifest제외).",
+      "uiEvidence": "372/372 수신hash·크기·decode 관문 후 버튼클릭/범위UI fill로0·45·46·77·92 및빠른45→92→77 뒤4panel 동일index 확인. CUA좌표click1/End키1 무변화는별도이며 OS드래그 성공아님. 중간paint/겹친decode 전수관찰아님.",
+      "observationLimits": "Console 관측0. performance 요청목록 API 부재로 Network NotObserved/외부요청0 미입증. 캡처3개는 확장자png지만 실제JPEG1265x1708이며 변환0. pagehide 할당해제/GC 독립미계측. 원즉시GraphInventoryChanged/preservationfalse·전체품질/게임이동/지면 미검증 유지.",
+      "cleanupAndPreservation": "소유탭03:16:17 종료/탭0. 서버1회5분정상만료 exit0/stoppedtrue/379요청·거부3·내부375입력변경0·writes0. 03:19:29 포트57918 listener0. 공간외부403파일 hash길이정확mtime변경0; 개발 시작/종료403기록대조0차이. Unity접근/소스수정/추가렌더0.",
+      "resultCap": "원PNG 수동비교UI 검증만. 영상/30fps재생/실제게임동작/품질전체Pass/E승격 아님. 정지혼합계획B59BE31D…3E60E3 Draft 및 모든 과거실패 근거 보존."
+    },
+    "pngComparisonExecutionPlan": {
+      "revision": "d383-original-png-manual-review-execution.r119",
+      "statusCode": "ApprovedSingleLocalBrowserValidationAfterFrozenReview",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "studySha256": "53DBAA543B7175316759BB1B2489F157FE1D9E84AFE28636338FC5557CA3CAF8",
+      "sourceRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118",
+      "viewerSha256": "CEBF2EE8132C80258C5A86D27CC0BCAA9B5C74B6572CE4E358C58F3D157B2C42",
+      "serverSha256": "3462AD4823FF37DA5141B1A6591B7054ED9B4C0AB186CCFD4E2F18E33581396C",
+      "sourceManifestSha256": "88EF1DCD9BB95C0C79304578F43380F10E7CAD54374C3E71DE45411FF7F80B60",
+      "basisR116ManifestSha256": "94D69ED3BC68848473BD77502D7ED9217045A0773CC617A512F1ABAECA3E5397",
+      "animationDraftSha256": "B59BE31D510C0257EC1CE086D3CA0151507CBFB2271782DB8AB66B946A3E60E3",
+      "preflight": "개발3파일전체검토/hash일치·원372경로/길이/hash 직접대조0불일치. 공간은시작전현재3파일/명세/연구/r116manifest397재확인. 새validation폴더부재/조상reparse없음·port57918미점유 확인후once claim. 점유시다른포트자동선택/프로세스종료금지.",
+      "execution": "동결serve-readonly.ps1 -ExecutionApproved -Port 57918 -MaxMinutes 5를1회만실행. 기존ready출력후 http://127.0.0.1:57918/viewer.html 소유새탭1개. browser skill/공간기존연결 재사용. 외부라이브러리/설치/다운로드0. prepared executionAllowed=false는역사적준비상태이며이실행계획만한시적권한. 서버숨김프로세스또는도구소유세션, 재실행0.",
+      "browserChecks": "372fetch/hash/768decode완료후만조작. 이전/다음/slider 실제UI로0,45,46,77,92 및빠른여러요청뒤4panel data-index/표시번호일치·경계버튼·원본시각/상시라벨 확인. JS evaluate는DOM/로그읽기만, 앱함수/이벤트직접주입으로UI성공대체X. request/resource목록과Console를직접기록, 관측가능범위밖을외부요청0으로확대X.",
+      "serverChecks": "자기서버에대한GET/HEAD 정확경로·미허용경로404/POST405 읽기진단만허용. 실제파일쓰기요청없음. 서버권한/브라우저/API실패는원자료보존후중단; 유효화면/동기성은hash검사와구분.",
+      "artifactRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/validation-r119",
+      "artifactPolicy": "새폴더내claim·시작종료/브라우저DOM·network/Console·서버stdout/검증/인계/manifest만CreateNew, 총32MiB. 실제브라우저대표 screen-index-000.png/screen-index-046.png/screen-index-077.png 최대3장. screenshot의실제형식/viewport/축소를기록하고원768PNG와구분. 원PNG변환/비디오/기존산출물덮어쓰기0.",
+      "cleanup": "자기탭닫기/pagehide 참조정리와자기서버정상만료/도구소유중단후리스닝종료를각확인. 서버최종375입력검사+외부동결3파일/r116397 전후hash길이mtime대조. 강제다른프로세스종료/Unity조회/메모리초기화0. listener/전후검사실패는별도로기록하고미확인성공처리X.",
+      "resultCap": "원PNG수동비교UI/브라우저검증만, MP4/30fps재생/새동작품질/UnityGameView/E성공아님. 즉시GraphInventoryChanged 원보고유지. r118곡선계획은Draft그대로."
+    },
+    "postCapturePreparation": {
+      "revision": "d383-post-capture-preparation.r118",
+      "statusCode": "ApprovedExternalPreparationOnly",
+      "executionAllowed": false,
+      "studySha256": "53DBAA543B7175316759BB1B2489F157FE1D9E84AFE28636338FC5557CA3CAF8",
+      "sourceManifestSha256": "94D69ED3BC68848473BD77502D7ED9217045A0773CC617A512F1ABAECA3E5397",
+      "framesRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r115/frames",
+      "spaceOwnerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "spaceWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/viewer.html",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/serve-readonly.ps1",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/png-comparison-review-r118/source-manifest.json"
+      ],
+      "viewerContract": "연구12.1 수동전용4패널/sameindex0..92·index/30. 372원PNG 무복사/무변환. loopback서버 exactURL→고정file allowlist GET/HEAD만, 시작전원본hash/길이/768/reparse관문. 브라우저372fetch/hash/decode 순차검사후활성; bitmapclose/압축Blob32MiB/표시4+교체4만보유(엔진캐시총량보장X). 최신요청번호로4패널원자전환. 자동재생/외부요청/MP4없음. A0/B0·즉시Graph실패·격리라벨상시. 실행/검증출력경로는후속배분.",
+      "animationOwnerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+      "animationWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/stop-blend-review-r118/정지혼합비교계획.md"
+      ],
+      "animationContract": "연구12.2 Draft만. B선형기준과cubic/quintic최대2곡선 비교설계/위상/초중후속변화/미검증. .2초·즉시Idle·93·Root/Clip/lease/Graph기존조건보존. 후보채택/품질값/Probe코드/평가없음.",
+      "limits": "공간3파일·애니1파일외쓰기0. 원study1~11 prefix3DEFF6불변, 기존r116/모든실패자료변경0. 새Editor/브라우저/서버/런타임·영상인코딩·설치·다운로드·commit/push0. 준비결과후개발직접검토·새hash결속."
+    },
+    "skinningRefreshResult": {
+      "revision": "d383-skinning-refresh-result.r116",
+      "executionSpecSha256": "989FF7FB866D276C6F86B60938D024B311F3B884E8D4FDB25236EC91104C243D",
+      "statusCode": "PoseChangesVisible_ImmediateGraphPreservationFailed",
+      "compileCount": 1,
+      "runCount": 1,
+      "samplesA": 93,
+      "samplesB": 93,
+      "pngFiles": 372,
+      "pngBytes": 9929441,
+      "uniqueHashesByView": { "AFront": 93, "ASide": 93, "BFront": 73, "BSide": 70 },
+      "skinLifecycleVerified": true,
+      "skinObservation": "원본6skin false→false/setter0; 소유A/B각6 false→true→false. 각후보 BeforeView/AfterView 각각1116행true. 비활성형제skin포함이며6Actor가아님.",
+      "consoleNewErrors": 0,
+      "preservationConfirmed": false,
+      "immediateDiagnostic": "Finally:InvalidOperationException:GraphInventoryChanged",
+      "separateOuterPreservation": "후속Graph0/Preview1조명3+canonical4701=4704 객체0diff; 외부31/loader45파일·Assembly4불변. 즉시실패 소급통과X.",
+      "leaseReturnedAt": "2026-08-31T02:57:35+09:00",
+      "reportSha256": "8214A51B94CB687B574357E57BA62EB324D54249C989A1DC011F8ED4378F14C8",
+      "finalSha256": "8715262752F4499E70DFFC57C4FFF9CDFDF5283716B809EF2EEBD563F77B2898",
+      "handoffPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r116/handoff.md",
+      "handoffSha256": "C2E1316ECF3F461D824A34A864232A0129EE78754993ED1C1B9C5DC1DE627433",
+      "manifestSha256": "94D69ED3BC68848473BD77502D7ED9217045A0773CC617A512F1ABAECA3E5397",
+      "verificationSha256": "0FD429BF25C7982A76927A31A2F3F7DDFE1B62E93504706AEDB3E1DF613A5298",
+      "rootManifestRowsVerified": 397,
+      "rootManifestMismatches": 0,
+      "spaceHistoricalRowsVerified": 790,
+      "visualReview": "개발6장/공간17장/애니57장 직접판독, 중복합산X·372전수시각열람X. B교대보행과정지판독가능, A는팔위주/하체변화작음. B측면77~84 발회수후재배치가다음보완후보. A0/B0평가순서차이유지.",
+      "qualityVerdict": "전체품질/실시간30fps/실제이동/지면/접지/발미끄럼/반환순간시각연속성/GameView/E 미검증"
+    },
+    "postCaptureReadOnlyReview": {
+      "revision": "d383-post-capture-file-review.r117",
+      "statusCode": "ApprovedReadOnlyProposal_NoExecution",
+      "animationOwnerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+      "animationScope": "기존B Walk→Idle77~83의혼합/위상 읽기. .2초·즉시Idle·93표본·Root/Clip/lease보존 아래 곡선후보최대2개와한계만메시지반환. 적용/새품질합격값없음.",
+      "spaceOwnerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "spaceScope": "로컬ffmpeg/ffprobe는조사경로에서미발견. 설치/다운로드없이원372PNG 동일index 수동비교보기의소유파일/검증안만제안. 영상인코딩/새HTML/브라우저·서버/렌더실행없음.",
+      "writePaths": [],
+      "limits": "r116원본/과거실패/소스·연구hash불변. 새산출물은연구후속수용·명세와경로결속뒤별도배분. 일반Farm/UI시험은개발소유. 즉시Graph실패를완화하지않음."
+    },
+    "writePaths": [
+      "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/이동후보비교Probe.cs",
+      "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/비교계획.md",
+      "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/staging-handoff.json"
+    ],
+    "actorSource": "Assets/Synty/PolygonFarm/Prefabs/Characters/SM_Chr_Farmer_Male_01.prefab",
+    "assetBaseline": "연구7.1 Actor/Avatar/Idle/Walk 원본+meta8hash·GUID/fileID를그대로사용. 실제import/Avatar검증전과거관측을현재재생으로쓰지않음",
+    "ownership": "순차A/B각새동일Actor를비활성자기Previewcontainer에조립. 원본무변경,소유인스턴스rootMotionfalse/자동LateUpdate와수동Tick중복금지. exact공용poselease뒤BGraph생성,자기outputdetach→GraphDestroy→실제bound해제→commonRelease→자기Preview정리. 다른Graph/Controller/Avatar/Callback불확실시거부. Player/Nature/벌목Adapter부착없음",
+    "comparisonParameters": "기술비교값만: 동일ActorStableId와루트TRS,1/30초표본간격,Idle0.5초→Walk기존Clip2주기→Idle0.5초, B혼합0.2초. 중간정지/동일intent재적용/재걷기별도짧은시나리오는계획에정확시각명시후검토. 수치는게임시간·속도·접지합격기준이아니며위상/발·골반·팔관찰값을통과로왜곡하지않음",
+    "visualEvidence": "공간후속같은정면·측면/시각/표본조건연속프레임. 제자리격리자산비교라고표기,실제GameView/이동미끄럼/실지면접지/청취성공아님. 새로운Clip/리깅/Blender가공승인없음",
+    "impactBoundary": "Logic E1~E7 권위/Session/Save/보상/작업시간변경없음. Presentation E1~E4 후보평가만, 실제상태없는격리평가를E5이상으로승격금지. 기존D359/D379코드와연구미수정",
+    "automaticPromotionAllowed": false,
+    "captureExecutionPlan": {
+      "revision": "d383-synchronous-capture-execution.r112",
+      "statusCode": "ApprovedSingleCaptureAfterPreparationReviewAndLease",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "scenario": "TwoWalkCycles",
+      "sourcePath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/이동후보비교CaptureProbe.cs",
+      "sourceSha256": "A8AFECF26C9BDFAFB5243C1DA2FC1B62702F4999079AE4E24DAAEAD535296D15",
+      "planSha256": "A9C01ADB29CAAF995C8C845679C5434075C8BE3E725BB951C82A7A7E65F2F32D",
+      "helperPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/이동연속Capture.cs",
+      "helperSha256": "67140EF7D35958167FA9B1FD03CD4ED9D488ECA34FF78282DBA254EE35A88A26",
+      "helperPlanSha256": "65CDFD70F1D614B017B586409BBD12C83D1C8D8B466BFDEAFB8C412B702A7E29",
+      "serializerPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/validation/안전관찰직렬화.cs",
+      "serializerSha256": "92F7ED1A6EDDFEE5101C94A57936F50C5AC6C588691787F8AF2942DC76169491",
+      "embeddedPreparationSpecHash": "7E594944928E007D4098FCAA4904BB05AC219BFB89BD092CF1A90A0B6420F913",
+      "studySha256": "3176215705DE65039A75B5F70A27B0CD0B324F7FDB8732AE6E973E9192D8045F",
+      "writeRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r111",
+      "framesRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r111/frames",
+      "loaderPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-loader.cs",
+      "additionalProtectedFiles": [
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r3-primary.ssalddel",
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r5-primary.ssalddel",
+        "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationAdapter.cs.meta",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs.meta"
+      ],
+      "compilation": "Exact frozen CaptureProbe+existing serializer+helper concatenated in that order, one memory Assembly, Compile1. Only first file has top-level using; helper using is namespace-local. Original r110 Probe is protected input, not compiled duplicate enum.",
+      "collection": "Exact same-Assembly 12 CaptureProbe nested DTOs+helper CaptureImageResult=13. Original actual DTO11 self-tests plus added capture metadata/image all-fields roundtrip before Run; no PRU/Actor in self-test. Public-field projection only; collection count null when absent. Safe partial report saved before completeness assertions. UTF8 all loader metadata <=128MiB; PNG <=4MiB each/512MiB total. Root validates paths/hash/PNG/IHDR and 372 image set only if captureCompleted.",
+      "execution": "CreateNew r112 once claim, no auto retry. Own output folder capture-r111 may be created immediately before loader, frames must not exist and helper alone creates it. Single TwoWalkCycles Run at most1. Existing stopped/dirtyfalse/Scopefalse/envnull baseline, all valid Scene objects and independent canonical4701+existingPreview identities, Graph, protected files, Console. No ScopeReset/reload/SceneSave/Assets/import/Play/input.",
+      "capture": "Research9 and capturePreparation fixed algorithm/invariants unchanged. A/B fresh actors sequential; Sample then fixed front/side with no extra evaluation/yield. 60 seconds cooperative total including cleanup; single Render not preemptible. Planned372 is not acquired count. Initial framing/direction/crop checked directly from actual images after run; wrong or blank images do not count as quality success.",
+      "cleanup": "Original immediate GraphInventory guard remains; unclassified graph not claimed/destroyed by name. Ownership unsafe means exact references retained and no forced PRU close. Independent post-return Scene/Graph/Preview/files/Console read records later state separately, never modifies failed immediate report.",
+      "resultCap": "Isolated in-place manual evaluation and same-sample views only. No GameView/runtime gameplay/movement speed/ground/foot sliding/newClip/Blender/E claims. Actual PNG direct review and A/B motion interpretation required before visual outcome report.",
+      "frozenHistory": "r110 report DEBE10D0...FA2E605/Probe A74B...BD81 unchanged; immediate preservationfailed and later Graph0 remain separate. Preparation plans executionAllowed=false describe r111 preparation; this r112 explicit execution plan supersedes only that no-execution gate after final loader hash/start notice.",
+      "collectionReviewAmendment": "Before first metadata write: exact new empty approved folder, no frames/reparse ancestors, EditorGate. Metadata actual files budget127MiB reserves1MiB within128MiB for closeout. Finally independently inventories actual PNG/partial files even when image DTO was never returned. Explicit captured-view hash is checked against collected Trial.Frame.transforms, candidate actor ID continuity and graph observation frame/sequence reference. PNG signature/IHDR length/type/dimensions are verified; decoding and visual judgment remain separate.",
+      "slotArtifactRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r112"
+    },
+    "capturePreparation": {
+      "revision": "d383-synchronous-capture-preparation.r111",
+      "statusCode": "ApprovedExternalPreparationOnly",
+      "basisReportSha256": "DEBE10D0DC89E7B582AEC52A8E7A529576F082B1724F8ADEF80712B86FA2E605",
+      "basisProbeSha256": "A74BFB0A4D6A78C1384CAB46A8B6B78275A3C6E2AB8A730776504DD40B93BD81",
+      "basisStudySha256": "99068498D06F7C7E814B606BE2027834B4FA77AEB0DA2FC0C312FE06EBA767BB",
+      "animationWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/이동후보비교CaptureProbe.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-probe-plan.md"
+      ],
+      "spaceWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/이동연속Capture.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-plan.json"
+      ],
+      "api": "Same namespace Ssalddel.Unity.Editor.AnimationLocomotionReview. public sealed 이동연속Capture(string outputRoot,string candidate) owns one PRU; public Scene Scene {get;}; ConfigureFraming(Vector3 center,float orthoSize,float cameraDistance); CaptureImageResult CaptureView(int index,double seconds,string view,string poseSha256); CleanupOwnedPreview(). candidate A/B and view front/side only. Nested public CaptureImageResult uses explicit public data fields only (path/sha256/bytes/index/seconds/view/candidate/poseSha256 and camera values), no UnityObject/properties. No arbitrary delegate/automatic Dispose.",
+      "probeContract": "Separate public 이동후보비교CaptureProbe.Run(scenario,string[] protectedFiles,string outputRoot). Same A/B frame/event/pose/Graph/lease semantics; original r110 Probe unchanged. Renderer helper created before Actor, helper.Scene sole owned Scene. A actor pre-frame bounds computes shared fixed center/ortho diagonal*.75/distance diagonal*3; B reuses exact. CapturePair calls helper front then side immediately after stored Sample with invariant checks before/after each. No extra Evaluate/Tick/yield or actor move. Report adds captured-frame metadata with matching sample/pose fingerprint and separate render observations.",
+      "invariants": "Exact pose56/bones15 and root TRS; Animator identity/avatar/controller/enabled/rootMotion/updateMode/culling/bound; common intent/phase/weight/scale/token/diagnostic; ownedGraph/manual/playing/outputTarget/weights/clip times/speed and existing graph inventory identity; Renderer enabled/active/forceRenderingOff/mesh/material/rootBone/bones/blendshape weights/MPBfalse/localBounds/updateWhenOffscreen/quality; engine authority time/frame/Scope/env. isVisible/bounds/renderedFrameCount are separately observed render-sensitive values, not silently erased. If any supported invariant changes, fail without restorative evaluation.",
+      "cameraAndOutput": "Research9 fixed768x768/native1/front+Z/side+X/pitch0/neutral lighting; shared framing once. Plan372PNG=93frames*2views*2sequentialtrials. Default TwoWalkCycles only. OutputRoot exactly C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r111/frames. CreateNew, PNG4MiB/total512MiB/sidecars128MiB/free1GiB/startup;60sec cooperative deadline, no single-render preemption guarantee. No output until separate execution approval.",
+      "cleanup": "Actor/Graph/common owner remains Probe. Helper owns camera/lights/RT/PRU only. Existing detach/Destroy/unbound/exactrelease/safeToRemove then containerDestroy then helper.CleanupOwnedPreview; no direct ClosePreviewScene or unconditionalusing. Retain exact helper/owner references on unsafe cleanup and report, no global cleanup. Immediate GraphInventory failure preserved and separate post-return preservation check required; no retroactive success.",
+      "exclusions": "No Assets/import/SceneSave/Play/realinput/newClip/Blender/BakeMesh/pose-reconstruction substitutes or gameplay/ground/sliding/E claims. Current permission external preparation4files only. Loader/serialization/capture execution reserved for developer review/new binding."
+    },
+    "executionPlan": {
+      "attemptId": "r110-exact-numeric-roundtrip",
+      "r108Result": {
+        "specSha256": "D634ABA9B2F0680A55602D2BE72314839DCDB265BE6CBBD424FBC50E4AE65542",
+        "handoffSha256": "051022EE42D1B38D975AB7B18B9BF4D1D838DFC870CDAA4F161F9C63E4C08AF1",
+        "status": "Combined Compile1 success; self-test NestedRoundTripMismatch; Run0, counts null. No Actor/Rig quality conclusion. Source serializer D320A4CC preserved in r108-serializer-before-numeric-repair.cs.txt.",
+        "preservation": "02:06:08 direct4704/canonical4701+existingSceneLight3/hash unchanged; slot31/loader24 file hashes/mtime unchanged, Preview1/Graph0/Scopefalse/envnull/Console0. DedicatedAssembly remains.",
+        "repair": "Local Newtonsoft Single0.1->JSON->Double reproduces DeepEquals false with exact Single recovery. Self-test now compares all shapes/field names and original-precision Single/Double bits exactly, no epsilon; added changed numeric rejection. Local DTO/stub-only 11 checks passed with runtime-reference warnings, not Unity proof. Actual same-Assembly11 required before Run."
+      },
+      "r105Result": {
+        "specSha256": "E77F5683BC8E141A34AA2F92A81D91D687795209E11761AEE2D395C5212C9394",
+        "sourceSha256": "ECE7A4253050DDC2A739BF6F074107E6E0C7846F482079396FDFDEAE142A7898",
+        "handoffSha256": "F1C51A631DEA1E47A30A90DAC325A07C91005E77D7971033D0BA2316B402C0B5",
+        "status": "Compile1 diagnostics0/Run1, evaluationCompleted=true/preservationConfirmed=false. GraphInventoryChanged final1 vs later direct Graph0; no guard relaxation. JsonUtility omitted trials, loader NRE; final counts0 are uncollected defaults, not actual A/B counts. No pose quality or initial-pose field completeness claim.",
+        "preservation": "Same direct before/after4704 scene signature; canonical4701+existingPreview3. slot26/loader23 file hashes and mtimes unchanged, Preview1/Graph0/Scopefalse/envnull/Console0. DedicatedAssembly1 remains. Original report/final/claim preserved."
+      },
+      "recordingRepair": {
+        "serializerPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/validation/안전관찰직렬화.cs",
+        "serializerSha256": "92F7ED1A6EDDFEE5101C94A57936F50C5AC6C588691787F8AF2942DC76169491",
+        "combinedCompilation": "Frozen Probe and serializer compiled in the same exact memory Assembly once. InitialPoseHash uses all Pose public fields via this serializer; no empty-object equivalence. Existing pose values/tolerances/order unchanged.",
+        "selfTest": "Before Run, actual Pose[] direct projection checks one element, exact six fields/path, vector xyz and quaternion xyzw with nondefault values. Actual Report/Trial/Frame/Pose/Bone and populated GraphObservation/GraphDiagnostic/GraphOutputDiagnostic DTO roundtrip; exact original-precision numeric recovery and changed-number rejection, fallback, ulong.MaxValue, forbidden getter0, UnityObject/cycle/nonfinite/arbitrary enumerable rejection. Eleven checks, no Actor evaluation. Failure means Run0.",
+        "collection": "Public instance fields of eight exact returned-Assembly DTO types only; primitive/string/null, exact arrays/List, explicit Vector3/Quaternion. No properties/static fields/UnityObject/arbitrary IEnumerable/FromObject recursion. Depth32/nodes2000000/collection250000 limits, path diagnosis. Save safely projected partial report before completeness assertion; uncollected counts null. A/B93 indices0..92, bones15 and unique transform paths required only for completed comparison. Evaluation, collection, preservation and quality remain separate.",
+        "graphObservation": "Observe baseline, A cleanup, B create/bind, detach/destroy/release, fallback Tick, owned-container/Preview cleanup and before final Verify. Keep graph structs and Equals for baseline/ownedB/unclassified IDs; record frame/order/output target RawValue/bound/lease without modifying graphs. Observation errors do not skip existing cleanup/Verify. Existing GraphInventory guard/safeToRemove/sample loop unchanged. No yield/extra Evaluate/global cleanup.",
+        "runLimit": "r110 CreateNew once claim, combined Compile1/self-test gate/TwoWalkCycles Run at most1; no auto retry, no capture. Separate live baseline and final preservation/Console after space lease return."
+      },
+      "r104Result": {
+        "specSha256": "1DA1354FBD879E1F8BC398866F4D1D2D40D701EBE6CCF53CD3AC047EB0AD01D2",
+        "sourceSha256": "B4E06015C9A796C99F9D901C659412E5D5E73B2E098861E3A1821FDCFCB6EA31",
+        "status": "MemoryCompile1 CS0234 namespace5errors; Run0/A0/B0. Not an Actor/Rig/Clip failure.",
+        "preservation": "Same RawValue scene4704/hash unchanged, canonical4701+existingSceneViewLight3 independently observed. slot26/loader23 files hashmtime unchanged, Preview1/Graph0/Scopefalse/envnull/Console0.",
+        "handoffSha256": "C36BD1D534B73D9F4F0A0160B6526B82A7FC830F55DCEDE693F09B014F201E52"
+      },
+      "r105Repair": "Exactly five namespace qualifiers now global::Unity.Pipeline.PipelineUtils; no other Probe logic change. New r105-prefixed loader/claim/results, same protections and TwoWalkCycles1. Existing r102/r104 files preserved.",
+      "previousAttempt": {
+        "executionSpecSha256": "73B5FE2EC4B97DA3769B842E58E26BED1DD910CCB142EAD6915521871DCD55BC",
+        "sourceSha256": "D20E7C809B96BC2D1E0665CF8CF6F435931E195339721C776D93C3E6B863E65C",
+        "status": "r102 baseline eval CS0619 GetInstanceID, body/loader/ProbeCompile/Run0. Full live preservation baseline unavailable.",
+        "handoffSha256": "0C7BF76D07A823208F15CA0F3A383912F1BE9492B906D310850DD2BF49F5DB4A",
+        "loaderSha256": "7CD93355418D77D4AE063C9F5F05F888138ABBADB17A6ED41D231AB7D80C9E86"
+      },
+      "apiCompatibilityRepair": "Probe exact5 object-ID reads now PipelineUtils.GetObjectId(obj).RawValue, ulong numeric sorting/Invariant strings/no int truncation. Original files/failure/loader preserved. New r104-prefixed loader/results/once claim; same scenario and protections. Preparation baseline uses the same ID API.",
+      "statusCode": "ApprovedSingleIsolatedEvaluationAfterSpaceLeaseReturn",
+      "sourceSha256": "A74BFB0A4D6A78C1384CAB46A8B6B78275A3C6E2AB8A730776504DD40B93BD81",
+      "planSha256": "0B81CA91776D5DABD383E272F47FCEE17B24C06698141564ED166581B37B83DD",
+      "handoffSha256": "446353982E66E450C8DDAA3DBD21FF4FB473A45BE0AA69C95970193B04D537F2",
+      "embeddedSpecHashMeaning": "Probe.SpecHash 6A00719E…E18E6F는 외부초안의 r100 기준. 이번 실행추록의 새 명세hash와 별도로 기록하고 동결코드를 고치지 않는다.",
+      "review": "개발 기존Probe전체·Graph기록diff·initialPoseHash 정확1줄diff·serializer 전체검토. 다음 실행은 r110만, 과거r105/r108 결과/원본 보존. 수집 자체검사와 실제재생/품질 구분.",
+      "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+      "writeRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/validation",
+      "scenario": "TwoWalkCycles",
+      "expectedObservationCount": "A93/B93 계획, 실제표본수는 관문 통과 후 기록. 시험case수/품질Pass로 집계하지 않음.",
+      "additionalProtectedFiles": [
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r3-primary.ssalddel",
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r5-primary.ssalddel",
+        "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationAdapter.cs.meta",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs.meta"
+      ],
+      "loaderContract": [
+        "공간의 용기Preview lease 반환 후 시작승인. Editor stopped/compilefalse/importfalse·canonical dirtyfalse/Preview/Graph/Scopefalse/envnull 직접 기준선. 다른담당의 Scene·Preview·Graph는 그대로.",
+        "기존 Pipeline RoslynCompilationService.Compile(CompilationRequest{SourceCode=동결파일전체, AssemblyName=전용고유이름})를 사용한 메모리 DLL/API 호환검사만. eval_file 본문에 namespace전체를 직접삽입하지 않는다. Assets반입·dotnet/Unity전체 recompile/파일 DLL 출력/강제reload 없음.",
+        "컴파일 false면 diagnostics만 보존·평가0 반환. 성공하면 해당 Assembly에서 정확 타입/enum/Run reflection 조회 후 승인scenario1회만 실행. 자동생성 다른코드나 메뉴/기존PreviewBuilder 호출 없음.",
+        "protectedFiles는 위6개 정확목록. Probe가 추가하는8원본/meta·Common·Packages2·열린Scene과 합쳐 현행hash 비교. 외부초안3/승인연구/명세의 파일기준도 전후 기록.",
+        "Report는 recordingRepair의 정확DTO 필드전용 투영으로 보존한다. r105 JsonUtility 경로는 폐기하되 원결과는 보존. 실제Pose6필드/중첩배열11자체검사 성공 전 Run금지. 전체response에 큰Pose배열/AssemblyBytes·Save내용 출력 금지. 미수집은 null, 품질은NotJudged.",
+        "CLI eval timeout이 생겨도 중복평가하지 않고 전용결과파일·현재상태 확인으로 회수. 동기 Run중간임의취소/전역Destroy/ScopeReset 없음. 실패소유잔존은 경로/Graph/token진단 보존 후 개발반환.",
+        "끝에 Scene객체·파일hash/mtime·Graph/Preview/Scope/env·Console 직접 비교하고 lease반환. 성공 시에도 메모리 eval/compiled Assembly 추가는 도메인 reload 전 남을 수 있으므로 완전메모리불변/정식Runner시험통과로 표현하지 않는다."
+      ],
+      "captureBoundary": "이번은 Animator 수동평가/수치관찰만. 카메라·렌더·캡처0. 결과검토 뒤 공간의 별도 정면/측면 연속 화면 계획을 결속한다.",
+      "excludedScenarios": [
+        "EarlyStopAndRestart",
+        "MidStopAndRestart"
+      ],
+      "evidenceCap": "제자리 기존Clip의 실제평가 종료/실패·동일초기조건·정리기술근거까지만. 동작품질/실지면/이동속도/발미끄럼/게임통합/E상승 아님."
+    },
+    "captureExecutionResult": {
+      "revision": "d383-synchronous-capture-result.r112",
+      "executionSpecSha256": "38AF4B07BABF05AA4CE402114EFC5337CC68D412BCA3880B6224EB0D4B489FF9",
+      "statusCode": "VisualFailedUniformBackground",
+      "compileCount": 1,
+      "runCount": 1,
+      "samplesA": 93,
+      "samplesB": 93,
+      "pngFiles": 372,
+      "uniquePngHashes": 1,
+      "pngSha256": "1D9AF4225E5BDEE11EABA3A5B7304DEF96155B8786F2F327D4A54CC2781FF546",
+      "consoleNewErrors": 372,
+      "error": "URP.RenderSingleCameraInternal NullReferenceException",
+      "preservationConfirmed": false,
+      "immediateDiagnostic": "Finally:GraphInventoryChanged",
+      "separateOuterPreservation": "4704=canonical4701+existingPreviewLight3/object serial comparison0; protectedfiles and Assembly4 same; Graph0. No retroactive pass.",
+      "leaseReturnedAt": "2026-08-31T02:30:09+09:00",
+      "handoffPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r112/handoff.md",
+      "handoffSha256": "F81A5F86731FE25E048DD8E9BA9B91EEA0A7E464C32DA010B1847271AD3F3DD2",
+      "manifestSha256": "D94AF2D5BABCD8990546550979181A35324CF0FADD914B754E4EE55A8DF65B58",
+      "rootManifestRowsVerified": 398,
+      "rootManifestMismatches": 0,
+      "qualityVerdict": "NotEvaluable_ActorNotVisible"
+    },
+    "renderTargetRepairResult": {
+      "revision": "d383-render-target-repair-result.r114",
+      "executionSpecSha256": "0D0B1FE3CC15CC4F57ACE98A6AD4FF2004F176AAE3B4705A0199BD9E447A610D",
+      "statusCode": "ActorVisible_MotionFrozen",
+      "compileCount": 1,
+      "runCount": 1,
+      "samplesA": 93,
+      "samplesB": 93,
+      "pngFiles": 372,
+      "uniquePngHashes": 4,
+      "uniqueHashesPerCandidateView": 1,
+      "poseArraysA": 93,
+      "poseArraysB": 84,
+      "unityFrameCount": 40,
+      "consoleNewErrors": 0,
+      "preservationConfirmed": false,
+      "immediateDiagnostic": "Finally:GraphInventoryChanged",
+      "separateOuterPreservation": "Graph0; canonical4701+existingPreviewLight3=4704 exact0diff; outer25/loader36 files and Assembly4 unchanged. No retroactive pass.",
+      "leaseReturnedAt": "2026-08-31T02:41:17+09:00",
+      "reportSha256": "41F58D432FA5142090481A2F4FE2C77F29DE9060B2E7087D5F41210259F92FEF",
+      "handoffPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r114/handoff.md",
+      "handoffSha256": "0BED2ADA5696365A04048736E488E9F81EBA95F05D43BAC37930B0349F5A74B8",
+      "manifestSha256": "63BA5B20468DCE9DE8D9EEFB7340E71CE30F07E6C0819442B2CF95263CA1B49F",
+      "rootManifestRowsVerified": 392,
+      "rootManifestMismatches": 0,
+      "oldR112RowsVerified": 398,
+      "qualityVerdict": "NotEvaluable_FrozenSkinImages"
+    },
+    "skinningRefreshExecutionPlan": {
+      "revision": "d383-skinning-refresh-execution.r116",
+      "statusCode": "ApprovedSingleCaptureAfterPreparationReviewAndLease",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "scenario": "TwoWalkCycles",
+      "sourcePath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/이동후보비교CaptureProbe.cs",
+      "sourceSha256": "630FBE1F1E4221A242E0A923807E271EA45A3905F3E468F6F60828D61F2DF405",
+      "planSha256": "FE9E6350DDBC4963EAED9667BB851B0985D1B395EAF27D53BB6D2F215A16BAC1",
+      "helperPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/이동연속Capture.cs",
+      "helperSha256": "E81490B14B7F47F77A71B44B0C3313A8C1AFFF55A624BF7E709600C1A06780A5",
+      "helperPlanSha256": "8E9E4AC13C6DB57C5A950650F0D6B819A78B8E9A9026DF14BF784BF1C149F75B",
+      "serializerPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/validation/안전관찰직렬화.cs",
+      "serializerSha256": "92F7ED1A6EDDFEE5101C94A57936F50C5AC6C588691787F8AF2942DC76169491",
+      "embeddedPreparationSpecHash": "0B46F438B28F8D17EBD25786959AA03A14BE9E99E3DD52B2B1514E3E9F2644CC",
+      "studySha256": "3DEFF6A2359993816165904BDE74D679FC6E6C5ADF9320EC6F4DDE61E1F1CD19",
+      "writeRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r115",
+      "framesRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r115/frames",
+      "loaderPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/capture-loader.cs",
+      "additionalProtectedFiles": [
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r3-primary.ssalddel",
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r5-primary.ssalddel",
+        "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationAdapter.cs.meta",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs.meta"
+      ],
+      "compilation": "Exact frozen CaptureProbe+existing serializer+helper concatenated in that order, one memory Assembly, Compile1. Only first file has top-level using; helper using is namespace-local. Original r110 Probe is protected input, not compiled duplicate enum.",
+      "collection": "정확Assembly의 기존13DTO+SkinRefreshObservation1=14. 원DTO11자체검사+촬영필드왕복 유지, 신규19필드(문자열SceneHandle,nullable bool 포함) 비기본값4중첩경로/true,false,null 확인. 원본전후·자기준비/적용/각뷰/복원단계 exact identity/값 연결검사. 부분원보고 선저장, 기존PNG/IHDR/pose연결·총량·부분파일전수읽기 유지.",
+      "execution": "CreateNew r116 once claim; Compile1/TwoWalkCycles Run1 maximum after final loader hash review and explicit space start notice. New metadata capture-r115 directory only before approved run, frames absent/helper-created. Each view original target/error/uniform/invariant guard + exact skin property true/owner identity guard. No auto retry, extra Evaluate/Tick/Render or yield. Existing stopped/dirtyfalse/Scopefalse/envnull/4704 + canonical/Preview identity/files/Console baseline, no SceneSave/Assets/Play/input/ScopeReset.",
+      "capture": "연구11의 정확자기skin forceMatrixRecalculationPerRender만 첫Actor렌더/초기기준선전에true, 원본별도property읽기보호. 기존A/B평가/93표본/카메라/조명/60초/poseguard는불변. 각뷰true/정확신원 관찰+반환뒤동작 직접판독. helper는출력경로한곳만변경.",
+      "cleanup": "기존detach→GraphDestroy/unbound→exactposelease반환→safeToRemove 뒤 정확소유skin 원래bool복원/읽기확인→containerDestroy→PRU정리. 부분setter실패 writeAttempted포함, 소유불확실/복원실패면진단·참조보존/강제정리금지. 즉시GraphInventoryChanged guard불변, 나중Graph0으로소급통과금지.",
+      "resultCap": "Isolated in-place manual evaluation and same-sample views only. No GameView/runtime gameplay/movement speed/ground/foot sliding/newClip/Blender/E claims. Actual PNG direct review and A/B motion interpretation required before visual outcome report.",
+      "frozenHistory": "원r112398/r114392파일과소스/계획불변; loader핵심17파일 보호와 외부manifest790전수대조분리. r114Console0/Actor표시개선이나4그룹93개고정으로motionFailed. 원forceMatrix값미관측/가설확정X. 신규Probe SpecHash0B46/StudyHash3DEF는r115준비원문이력, 신규연구11/실행은현재명세와loader결속.",
+      "collectionReviewAmendment": "Before first metadata write: exact new empty approved folder, no frames/reparse ancestors, EditorGate. Metadata actual files budget127MiB reserves1MiB within128MiB for closeout. Finally independently inventories actual PNG/partial files even when image DTO was never returned. Explicit captured-view hash is checked against collected Trial.Frame.transforms, candidate actor ID continuity and graph observation frame/sequence reference. PNG signature/IHDR length/type/dimensions are verified; decoding and visual judgment remain separate.",
+      "slotArtifactRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r116",
+      "skinEvidenceSchema": "SkinRefreshObservation19필드,sceneHandle string/sampleIndex int/6bool/2nullablebool. SourceBefore/SourceAfter,OwnedBefore/Apply/Restore(실패RestoreBlocked),BeforeView/AfterView. 원본setter0; 원래true불필요setter0,apply/restoreConfirmed만true가능. AfterView/afterRender/Invariant독립finally 읽기. 완전촬영결과의계보검사는별도skinLifecycleVerified이며품질/즉시Graph보존과분리."
+    },
+    "skinningRefreshPreparation": {
+      "revision": "d383-skinning-refresh-preparation.r115",
+      "statusCode": "ApprovedExternalPreparationOnly",
+      "executionAllowed": false,
+      "basisStudySha256": "3DEFF6A2359993816165904BDE74D679FC6E6C5ADF9320EC6F4DDE61E1F1CD19",
+      "basisProbeSha256": "EAFE2E067587E06641E0D0049F81F46DE7FE83D41499DDB7C4B2C710A9353D69",
+      "basisHelperSha256": "46E75E8BC6C7F44B692DFBFFE745AF76B28A46C86CECD379AD7BD1ED720862B2",
+      "animationWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/이동후보비교CaptureProbe.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/capture-probe-plan.md"
+      ],
+      "spaceWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/이동연속Capture.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/capture-plan.json"
+      ],
+      "developmentWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/skinning-refresh-r115/capture-loader.cs"
+      ],
+      "futureOutputRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r115",
+      "scope": "연구11: 소유Actor skin정확참조/경로/RawValue/mesh/rootBone/Scene/persistent아님 확인; 원본property 별도읽기보호. 첫렌더/초기기준선전 oldbool기록→복사본 forceMatrixRecalculationPerRender=true→읽기확인. A/B동일; 매뷰bool/identity불변관찰. detach/GraphDestroy/unbound/exactrelease/safeToRemove뒤 자기renderer원래값복원/검증뒤container정리. 부분적용실패/소유불확실/복원실패는기록·참조보존, 강제정리없음.",
+      "helperScope": "기존r113 helper의 정확출력경로만 capture-r113→capture-r115 변경. Render/RT/log/pixelgate/카메라/총량/정리/API불변, renderer작성책임추가없음.",
+      "collection": "새관찰필드/필요DTO는정확Assembly public-field 허용목록+비기본값왕복·원본/복사본/각뷰/복원단계대조에결속. DTO형태최종교차검토뒤실행명세작성.",
+      "limits": "준비중Editor/Compile/Run/Render/출력폴더생성0. 원r112398/r114392및소스불변. Evaluate/Tick/Sample/93/시간/원Graphguard변경0, BakeMesh/yield/Animator추가평가/Renderer토글/shader변경0. API불가/실패자동대체없음. 실제PNG변화와직접동작판독전품질성공X."
+    },
+    "renderTargetRepairPreparation": {
+      "revision": "d383-render-target-repair-preparation.r113",
+      "statusCode": "ApprovedExternalPreparationOnly",
+      "executionAllowed": false,
+      "basisStudySha256": "D84B21EB0D5B08E017D4AE1B3619B2C83E2D03FCE78808A2BE0E05E8439F5CCF",
+      "basisHelperSha256": "67140EF7D35958167FA9B1FD03CD4ED9D488ECA34FF78282DBA254EE35A88A26",
+      "basisProbeSha256": "A8AFECF26C9BDFAFB5243C1DA2FC1B62702F4999079AE4E24DAAEAD535296D15",
+      "spaceWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/이동연속Capture.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/capture-plan.json"
+      ],
+      "developmentWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/이동후보비교CaptureProbe.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/capture-loader.cs"
+      ],
+      "futureOutputRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r113",
+      "scope": "Study10 exact: remove own camera target restore, preserve external active RT; preRender target guard/identity+size; bounded synchronous errors with finally unsubscribe/End pairing; exact uniform pixel gate except priming. Public API same plus3 helper result fields. Probe output path only change; source evaluator and guard unchanged.",
+      "limits": "No Editor/Compile/Run/Render/output directory creation until final hashes bound. Original consumed files and r112398-file manifest immutable. New loader keeps same13 DTO +3field selftest, actual partialfiles/budgets/Scene guard. No global cleanup/newActorRules/Clip/Scene/Save."
+    },
+    "renderTargetRepairExecutionPlan": {
+      "revision": "d383-render-target-repair-execution.r114",
+      "statusCode": "ApprovedSingleCaptureAfterPreparationReviewAndLease",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "scenario": "TwoWalkCycles",
+      "sourcePath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/이동후보비교CaptureProbe.cs",
+      "sourceSha256": "EAFE2E067587E06641E0D0049F81F46DE7FE83D41499DDB7C4B2C710A9353D69",
+      "planSha256": "A9C01ADB29CAAF995C8C845679C5434075C8BE3E725BB951C82A7A7E65F2F32D",
+      "helperPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/이동연속Capture.cs",
+      "helperSha256": "46E75E8BC6C7F44B692DFBFFE745AF76B28A46C86CECD379AD7BD1ED720862B2",
+      "helperPlanSha256": "B155EF41246B4DDCA20E71123B48E1A4EEA7773EE888F646FD267156A3645963",
+      "serializerPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/validation/안전관찰직렬화.cs",
+      "serializerSha256": "92F7ED1A6EDDFEE5101C94A57936F50C5AC6C588691787F8AF2942DC76169491",
+      "embeddedPreparationSpecHash": "7E594944928E007D4098FCAA4904BB05AC219BFB89BD092CF1A90A0B6420F913",
+      "studySha256": "D84B21EB0D5B08E017D4AE1B3619B2C83E2D03FCE78808A2BE0E05E8439F5CCF",
+      "writeRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r113",
+      "framesRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/capture-r113/frames",
+      "loaderPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/render-target-repair-r113/capture-loader.cs",
+      "additionalProtectedFiles": [
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r3-primary.ssalddel",
+        "C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel/Saves/solo-local-r5-primary.ssalddel",
+        "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationAdapter.cs.meta",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/공용AnimationContract.cs.meta"
+      ],
+      "compilation": "Exact frozen CaptureProbe+existing serializer+helper concatenated in that order, one memory Assembly, Compile1. Only first file has top-level using; helper using is namespace-local. Original r110 Probe is protected input, not compiled duplicate enum.",
+      "collection": "Exact same-Assembly 12 CaptureProbe nested DTOs+helper CaptureImageResult=13. Original actual DTO11 self-tests plus added capture metadata/image all-fields roundtrip before Run; no PRU/Actor in self-test. Public-field projection only; collection count null when absent. Safe partial report saved before completeness assertions. UTF8 all loader metadata <=128MiB; PNG <=4MiB each/512MiB total. Root validates paths/hash/PNG/IHDR and 372 image set only if captureCompleted. New helper renderTargetRawValue/Width/Height fields must exist exact types, all public image fields nondefault roundtrip; actual targetID parse/nonzero +768 size checked. Raw report old basis metadata distinct from current execution.",
+      "execution": "CreateNew r114 once claim; Compile1/TwoWalkCycles Run1 maximum after final loader hash review and explicit space start notice. New metadata capture-r113 directory only before approved run, frames absent/helper-created. Every view target/Console-error/uniform-pixel fail-fast before next; no extra Render/auto retry. Existing stopped/dirtyfalse/Scopefalse/envnull/4704 allvalidScene+separatecanonical/Preview IDs/Graph/files/Console baseline. No SceneSave/Assets/Play/input/ScopeReset.",
+      "capture": "Research10 own PRU target lifetime correction only, fixed synchronous Begin/Render/End bounded error observer/finally unsubscribe; RenderTarget nonnull768size identity collected, blank uniform pixels rejected except empty priming. Original pose/common/graph/renderer invariants and camera/framing/evaluation/sample93 unchanged. Any first view failure aborts no later views; ordinary logs remain Console. Total60sec and no single-Render forced preemption.",
+      "cleanup": "Original immediate GraphInventory guard remains; unclassified graph not claimed/destroyed by name. Ownership unsafe means exact references retained and no forced PRU close. Independent post-return Scene/Graph/Preview/files/Console read records later state separately, never modifies failed immediate report.",
+      "resultCap": "Isolated in-place manual evaluation and same-sample views only. No GameView/runtime gameplay/movement speed/ground/foot sliding/newClip/Blender/E claims. Actual PNG direct review and A/B motion interpretation required before visual outcome report.",
+      "frozenHistory": "r112 sources/loader/plan and398 manifest files unchanged. r112372 blank PNG and372URPerrors remain VisualFailed; r110/r112 immediateGraphInventoryChanged remains failed even when laterGraph0. Copied Probe changes output path only: embedded r111 SpecHash/StudyHash describe historical evaluation basis, current execution/study10 hash held by this plan+loader. Original capture-probe-plan A9C0 describes r111 preparation and old path, overridden only by this exact new output/lifetime plan.",
+      "collectionReviewAmendment": "Before first metadata write: exact new empty approved folder, no frames/reparse ancestors, EditorGate. Metadata actual files budget127MiB reserves1MiB within128MiB for closeout. Finally independently inventories actual PNG/partial files even when image DTO was never returned. Explicit captured-view hash is checked against collected Trial.Frame.transforms, candidate actor ID continuity and graph observation frame/sequence reference. PNG signature/IHDR length/type/dimensions are verified; decoding and visual judgment remain separate.",
+      "slotArtifactRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/animation-locomotion/visual-review/slot-r114"
+    }
+  },
   "deliveryCap": {
     "currentDispatchTargetStage": "E5",
     "promotionBeyondStageAllowed": false,
@@ -250,6 +757,100 @@
     }
   ],
   "supportImplementation": {
+    "overnightSliceSwitch": {
+      "decisionCode": "D-381",
+      "documentRef": "docs/AI/야간개발-플레이구간전환-2026-08-31.md",
+      "sha256": "3B8B5AB07DC62432B59AB9D46AB62EDD7295DBA78C5609BC78186C23A2941D5C",
+      "statusCode": "WoodcuttingCheckpointPreservedFarmCandidateSelected",
+      "selectedExistingLoopRef": "playable-loop:farm-crop-cycle.v1",
+      "selectionRecordRef": "docs/AI/CURRENT_WORK.md",
+      "subsequentPriority": {
+        "decisionCode": "D-382",
+        "documentRef": "docs/AI/야간개발-분야별시각진척-2026-08-31.md",
+        "sha256": "2404EA5BD27DC12214E46824B3EEAE2ADCF80F3C2D96FA93D8AA3F7E9F03C2CB",
+        "boundary": "이후 사용자 요청으로 한기능완주보다 분야별대표이미지가 우선이다. Farm첫실제관리화면·약초/NPC/방위/물품외상 비실행검토·기존세계/벌목화면을 증거종류별분류한다. 실제수확명령후보는저장상태의HarvestReady와수확능력에맞춰별도검토하며 미존재Untilled/능력은주입하지않는다. 벌목재시도/새제작 자동배분없음. 분야별실행소유는각기존명세·통합상태판에두며 이명세의새기능으로합치지 않는다."
+      },
+      "boundary": "r92 Pine4/4 안전마감 후 동일 Escape/F8 입력차단의 다음 Play 슬롯을 자동 반복하지 않는다. 실제 장착/진단/접근/Harvest시작과 진행0·완료/접촉/낙하/청취 미검증 및 r89 입력원인 미확정을 보존한다. 파일비교로 기존 Farm관리의 한밭/한작업 Preview·Confirm·같은Session결과를 다음후보로 선정했다. 기존Core작업경로가 있으나 실제토양/Actor/공간·UI연결은 남는다. HB01전송계산을 달임/섭취 성공으로전용하지 않는다. Farm 정확명세/소유 재결속 전 새 실행슬롯 없음; 이 벌목명세가 Farm실행을 소유하거나 새Goal을 만들지 않는다. 독립 애니 연구는 기존 승인만, 새 제작/Save/E/commit/push 확대 없음."
+    },
+    "impactTreeFallFollowup": {
+      "decisionCode": "D-379",
+      "approvalDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목타격음과나무넘어짐.md",
+      "approvalSha256": "A65E52225B18B7E358785320EA9ADC1AC29F2891EC9D4F5FDB38C12AEF444E24",
+      "requirementCode": "Required",
+      "statusCode": "AcceptedA1IsolatedFixtureVerifiedNotIntegrated",
+      "acceptedStudySha256": "AE8281263A085B09E55DD23577F996C224835DDB60ACE49D27CED55199EEEFFC",
+      "previousA1StudySha256": "D6A6785F72A78188DB74BEA51850001D213960211033C7BB425EA5F9CB44F92D",
+      "a2aReview": {
+        "reviewedDraftSha256": "67D9329F04F765A9548AB87305FFF27C9163D5415FF040BD58AF4B9BB2EAA962",
+        "statusCode": "AcceptedPineFixtureVerifiedRuntimeConnectionNotAssigned",
+        "pineFixturePreparation": {
+          "statusCode": "PersistentPineFixtureVerifiedRuntimeMarkerPending",
+          "stagingReview": "개발이2파일전체/hash직접확인: Tests FD0AAC7B893D1A6FC3CCA8DDD0A343C920A0013512000F3CB6598EC8FFA2115F / handoff A2ADEF3442D2449B3E6EBBA113FD599303B6732A263B9C03E29DEA0E1E4BC4E8. 예상4=자산계보1/identity·회전균일복사2/shear거부1. 원본Instantiate/LoadPrefabContents/설정수정없음, persistentAsset읽기와자기Preview의Transform-only비활성container복사만. 실제import fileID/RendererAPI/bounds검증은미실행.",
+          "importAndTestPlan": {
+            "statusCode": "NUnitCompatibilityRepairFourTestsVerified",
+            "retryIntake": {
+              "verifiedAt": "2026-08-31",
+              "testedWorkOrderSha256": "D7A865A80B557129A68023239B1651F4800BF38C546B2C795CCC512FAE70051A",
+              "xmlSha256": "23569523057C2773F75A5DB28A8D1B916A24DDA35FAC3AA360DE50E82A45709A",
+              "handoffSha256": "3A9A3B9870CD5FCACFD1115D0CC6DD36ACC0A2BA221B4A55D858E3329734D824",
+              "afterFilesSha256": "EBEF9C6C456B6AF92C083E3BD4E0C89302963A88B6E43B2CAE286BA24A2AB40F",
+              "result": "개발 XML직접파싱4/4 Passed·nonPassed0, 보호64/64 현행hash일치. 정상compile errors[], 00:26:05 Editor반환. persistent Pine자산계보1·비활성복사2·shear거부1만 검증.",
+              "limitations": "Scope180은 정상compile로해제되어 메모리보존이 아니다. 중간IsInitialized/집계hash변화·최종시작동일을 분리한다. Console error0/warn1(MaterialLocation.External obsolete), importer불변. Runner TestResults.xml자동출력은 별도부수효과, Save2불변. 실제marker/불투명override이력/지면/낙하/청취/Presenter연결/E승격은 미검증."
+            },
+            "firstAttempt": "r91 completed/failedtrue CS0117 Assert.Multiple 미지원, 정확4시험0/XML없음. 00:22:23 Editor반환/Scope180컴파일실패로잔류/envnull·dirtyfalse/root2/Preview1/Graph0/4701/보호62hash동일. 반입FD0AAC원본·실패증거유지, 정상meta GUID1690a48ee74c1e34fb88c1523cd77241/hash6056D8A9E3384633C2501275F4A51091B1C827B7862149860009C599E2771096.",
+            "retryRepair": "개발소유짧은쓰기: Assets의Pine시험1파일만 Assert.Multiple을각검사별예외수집+최종실패단언으로대체. 자기Preview닫기실패도수집한뒤원본직렬/mesh·material/각파일hash·각GUID·Preview수검사를모두수행, SetUp은기존첫실패중단유지. Factory/기대값/원본/외부staging/meta불변. 수정소스SHA4D1B053F9AC6ACCC7E41CEEFE1D0C362D5FF71EE100CF395D3EB851666C17D33. 별도retry-prefix증거로정상compile→Scopefalse→같은정확4만,추가실패원인그대로반환.",
+            "writePaths": [
+              "Assets/Ssalddel/Editor/NatureWoodcuttingValidation/Tests/벌목정적시각Pine호환Tests.cs",
+              "Assets/Ssalddel/Editor/NatureWoodcuttingValidation/Tests/벌목정적시각Pine호환Tests.cs.meta"
+            ],
+            "artifactPath": "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/impact-tree-fall-d379/a2a-pine-read/validation",
+            "scope": "공간r89 00:12:34정상Stop/lease반환후개발시작통보시애니단독Editor. 신규cs동일바이트반입/meta정상import만, 기존asmdef/Factory45Tests/Presenter2/Runtime코드변경없음. 정상compile후Scopefalse를확인하고정확class Ssalddel.Unity.Presentation.NatureWoodcutting.벌목정적시각Pine호환Tests 예상4만정식EditMode실행. Scope남으면수동Reset/Install없이반환. 첫실패결과/진단그대로반환, Ignore/거부검사완화/원본설정제거없음.",
+            "preservation": "현재SceneD1D31·Packages2·Save2·기존자동PNGCF59·개발소스/연구/기존asmdef/A1소스meta 및Pine직접6자산12파일hash기준선, canonical4701직렬/dirty/root/선택/비소유Preview1/Graph/Console를전후대조. 기존Scope메모리의정상compile해제는파일보존과별도. 원본Mesh/Material·Prefab직렬값은시험자체전후대조,새Preview만정리하며원본Unload/Destroy/SceneOpenSave/Play/전역Graph정리/재import없음. 전송timeout은완료status/XML과분리,반복재실행없음."
+          },
+          "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+          "writePaths": [
+            "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/impact-tree-fall-d379/a2a-pine-read/벌목정적시각Pine호환Tests.cs",
+            "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/impact-tree-fall-d379/a2a-pine-read/staging-handoff.md"
+          ],
+          "scope": "기존A1Factory를변경하지않는전용실물Pine읽기/합성소유복사시험초안만. 정확Prefab GUIDfc9f550802bde56499ac8b64cac565f0/파일hash1331E2EF3F3E7D98C7F124C876B976D48ACD75FF659A37B397FFE32011FC6E0E 및직접mesh/material의GUID/hash계보를검사할준비. 향후별도Editor슬롯에서AssetDatabase읽기와자기Preview의비활성callback없는container만사용,Prefab전체Instantiate/원본·import설정수정/SceneOpenSave없음. A1TryCreate의현재명시진단/계층·TRS·LOD참조재매핑·활성·mesh/material불변·자기정리만검증하고지원외입력은거부그대로반환. 실패기대완화/ForceLOD또는bounds강제원복금지.",
+          "boundary": "이번은위2파일외부staging작성만이며Assets/meta/Editor/compile/시험실행/Presenter연결은미배분. ForceLOD/진행fade/동일값worldBounds·외부LOD역참조의미확인을시험통과로해제하지않음. 실물자산현재설정복사와Runtime marker입력소유/지면/낙하·청취는별개,실제marker선행관문은남는다."
+        },
+        "scope": "개발이11절Draft전체와12절수용추록을읽고권위사전복사/owned낙하만A1연결·initialLocalRotation*localXdelta초기회전보존기준을수용·현행hash재결속. 기존pivot휴리스틱/84도/.9초/ClockPaused/완료단일소비유지, mainPresenter의도끼2/legacy·A1/asmdef보존. 정확코드경로/슬롯착수는아직미배분. 실물Pine읽기/실제marker입력소유관문필수, 지면·청취·B Blender별도미승인."
+      },
+      "acceptedScope": "연구10절A1 정적복사본 계층/LOD/TRS보존helper와격리시험기준만. 기존도끼helper·양쪽fall연결·pivot/방향/시간·지면·Audio·B Blender 미포함. 행렬직교dot1e-5/원소재구성상대1e-4 기준, 비유한/특이/음수/반사/shear·지원외Renderer·외부LOD참조·누락mesh거부. 원본/부모기존상태보존·성공비활성ownedwrapper만추가, 실패소유조각만정리.",
+      "stagingWritePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/impact-tree-fall-d379/a1-static-clone/벌목정적시각복사Factory.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/impact-tree-fall-d379/a1-static-clone/벌목정적시각복사Tests.cs",
+        "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/impact-tree-fall-d379/a1-static-clone/staging-handoff.md"
+      ],
+      "stagingBoundary": "애니가위3파일만작성, 아직Assets반입/Editor/컴파일/시험없음. API/본문검토후별도슬롯에서반입·집중시험. 실제Pine/낙하/청취품질성공아님, 새Clip/.blend/FBX/메시가공없음.",
+      "stagingReview": "개발이3파일전체와수정hash직접검토: FactoryE8C7503E5A27C07949743BE7B49D5527B4E1F422A2F5C824EB72F605BC6AEF66/TestsED12C5AB4D39519C59AE97C12686E427D9897D2DAA3026606943510AC85903BF/handoff2A6D9CE096A9578DF7FEE7D02BFDEE3EC5E63CC27E728DAA73426180BFD2A2D4. Application충돌2곳한정수정과개발소유비활성container·callback/외부writer부재호출자전제반영. 현재정적계층설정만; ForceLOD/진행crossfade/동일값worldBoundsoverride/외부LOD역참조검출및Runtime보존지원은미확인으로유지. 합성45예상/실행0, 실제Pine및낙하연결미승인.",
+      "isolatedImportPlan": {
+        "statusCode": "CodeAndSyntheticFixtureVerified",
+        "result": "23:57:10 lease반환/정상compileerrors0/정확합성45/45을개발XML직접파싱. XML1739504E518D4DFAC8A1DB8F3A730531437EC5A26A6275F8D0410D2951ADA0CD. 보호46/46현행hash·신규2cs/meta2hash일치. 신규cs는staging그대로, asmdef/Presenter/도끼·양fall불변. 4701/시작종료집계/Preview1Graph0·SceneSavePackages보존, Scope332컴파일해제·중간집계변화·도구응답지연은별도. Console새error/warn0. 실제Pine/낙하/Play/청취검증아님.",
+        "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+        "writePaths": [
+          "Assets/Ssalddel/Presentation/NatureWoodcutting/벌목정적시각복사Factory.cs",
+          "Assets/Ssalddel/Presentation/NatureWoodcutting/벌목정적시각복사Factory.cs.meta",
+          "Assets/Ssalddel/Editor/NatureWoodcuttingValidation/Tests/벌목정적시각복사Tests.cs",
+          "Assets/Ssalddel/Editor/NatureWoodcuttingValidation/Tests/벌목정적시각복사Tests.cs.meta"
+        ],
+        "verification": "공간r85정상Stop/보존/lease반환과개발시작통보전Assets쓰기/Editor호출없음. 반입시2cs동일내용·meta정상import, 기존asmdef수정없음. 정상컴파일/Scopefalse관문뒤정확class Ssalddel.Unity.Presentation.NatureWoodcutting.벌목정적시각복사Tests 예상45만정식EditMode. 합성Preview/triangle/임시material만, 원본Pine/실제낙하/도끼/Presenter연결/Play/SceneOpenSave/Scope수동Reset없음. 기존41보호파일+연구/asmdef/SceneSavePackagesPNG보존·Preview/Graph/전체객체전후대조, 부분실패는원인반환/guard완화없음. artifact는impact-tree-fall-d379/a1-static-clone/validation/만."
+      },
+      "receivedStudySha256": "400906C3112F5491089534FDBBF2F42E56F3F8AD1614F93226F481860F080726",
+      "receivedReportSha256": "829DF58E1EDAB2F418EEA71E5F37F9DC64C2DFD9545438AFA4D9D9C3917E7A85",
+      "intake": "두문서전체와21소스hash 개발직접대조일치. 기존impact/fall·최종접촉소비 존재, 소유낙하복사본 LOD/TRS보존·bounds밑동/지면·3D fallback/음량결속 공백을구분. 제한A복사본불변보완의별도방법·소유검토중이며아직Accepted/제작착수아님. 실제대상/청취·Blender가공미검증.",
+      "ownerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+      "studyStableId": "study:nature-woodcutting:impact-tree-fall.r1",
+      "reservedDocumentRef": "docs/Architecture/PlayableLoops/Nature벌목타격음-나무넘어짐-적용연구.md",
+      "writePaths": [
+        "docs/Architecture/PlayableLoops/Nature벌목타격음-나무넘어짐-적용연구.md",
+        "docs/Reports/Nature벌목타격음-나무넘어짐-D379-연구인계-2026-08-30.md",
+        "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/impact-tree-fall-d379"
+      ],
+      "scope": "현행impact.r1/fall.r1 및나무낙하/Prefab pivot·LOD·Collider·완료토큰소비 재고를파일로조사. 실제대상나무1 후보의기존표현재사용과Blender객체애니메이션/전용복사본 경로를비교해Draft기준선을제출. Editor/녹음/청취/새음원/Clip/Blender가공은아직배분하지않음. Accepted/hash후해당범위제작만재결속;기존Accepted5.1A·입력수정은독립유지.",
+      "limits": "새Cue·피해·통행봉쇄·자원·시간·Save변경없음. 공급사원본/기존연구hash불변. B키프레임/bake/AI자동가공권리미확인조건해제없음. 실제청취·접촉→기울기→넘어짐연속출력은별도공간슬롯, PNG는청취증거아님."
+    },
     "statusCode": "ExistingClipIntegrationInProgress",
     "reportedLoopStageIsInherited": true,
     "earliestUnverifiedEvidenceStage": "E4",
@@ -278,9 +879,12 @@
           "Assets/Ssalddel/Experiments - 연구/CityFarmWorldIntegration/Tests/Editor/공용AnimationOwnershipTests.cs",
           "Assets/Ssalddel/Experiments - 연구/CityFarmWorldIntegration/Tests/Editor/공용AnimationOwnershipTests.cs.meta",
           "Assets/Ssalddel/Presentation/World/Nature감각표현Presenter.cs",
-          "Assets/Ssalddel/Bootstrap/Nature감각표현AutoBootstrap.cs"
+          "Assets/Ssalddel/Bootstrap/Nature감각표현AutoBootstrap.cs",
+          "Assets/Ssalddel/Runtime/World/Nature생존Models.cs",
+          "Assets/Ssalddel/Infrastructure/Simulation/Nature생존CoreRuntimeAdapter.cs",
+          "Assets/Ssalddel/Tests/EditMode/Nature생존CoreRuntimeAdapterTests.cs"
         ],
-        "condition": "연구 Accepted 및 소스 hash 재대조 후 단일 뼈작성자/Task 읽기 연결만"
+        "condition": "연구 Accepted 및 소스 hash 재대조 후 단일 뼈작성자/Task 읽기 연결만. 기존 Core PlayerStableId/ActiveWork.ActorStableId/OriginCommandId를 비직렬화 조회 필드로 보존하고 실제 Core 회귀로 검증; 새 권위 식별자 생성/Save 형식 변경 금지"
       },
       {
         "repositoryRoot": "C:/Users/user/ssalddel",
@@ -291,6 +895,185 @@
         "condition": "동결 소스/Clip/Task 상태·입력 절차 전달 후 Editor 단일 점유; dirty/저장 소유 먼저 확인"
       }
     ]
+  },
+  "overnightDevelopment": {
+    "decisionCode": "D-375",
+    "directiveRef": "docs/AI/야간개발순환-2026-08-30.md",
+    "directiveSha256": "F853CC84D20A8435F5D04C5BB15D5A95BBCEB24747E87A007A2AB62A33A6A3FF",
+    "stopStartingNewBatchesAt": "2026-08-31T09:00:00+09:00",
+    "firstBatch": "전문은 기존 전용폴더에 실제 Task 식별자→관측세대/진행/완료/취소 Snapshot의 순수 Projector와 집중시험을 작성한다. 개발은 기존 Presenter/Bootstrap·공용lease·AudioFX 단일소비를 연결한다. Core 식별자12시험 기준선 및 전문20파일은 필요한 명시변경 외 보존한다.",
+    "animationOwnerThreadId": "01a04676-8d10-7480-b851-707fbd655d46",
+    "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "conditions": "전문과 개발은 API를 먼저 맞추고 Editor/자동컴파일 쓰기 슬롯을 조율한다. Session/Actor/OriginCommand/Target·명시복원세대·동일/회귀Revision·ActiveWork 종료의 확인된 완료를 검사하고 과거접촉 재발행을 막는다. WorkInputHeld 정지를 권위취소로 바꾸지 않는다. 신규 키프레임/bake/FBX/원본가공·권위/Save 변경은 제외한다.",
+    "evidenceBoundary": "실제 Task→Graph·AudioFX 접촉/중단/복귀 화면은 공간 담당이 동결입력 인계 후 실행한다. 연구5.1A 및 기존 E5상한 유지, 발고정/접촉 품질 실패는 별도 기록하고 완료로 승격하지 않는다."
+  },
+  "coreObservationBridge": {
+    "statusCode": "CodeAndFixtureVerified",
+    "verifiedResults": "LocalRuntime 단일 직렬화 읽기→Unity 비직렬화 완료근거 공급 구현. Fast20260830-210321 소비 빌드/집중160 통과, 정식 Unity EditMode14/14 및 정상 컴파일 통과. 실제 canonical Task→Projector/Graph/AudioFX와 GameView는 미검증이다.",
+    "verificationArtifactRef": "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/overnight-d375/completion-records/검증인계.md",
+    "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "reason": "현재 Unity Snapshot의 Session/Nature/건물 개별 조회와 별도 완료 추론을 같은 LocalRuntime 명령 직렬화 경계의 읽기 사본으로 대체한다. 기존 완료 행위 원장의 OriginCommandId+:completed/HarvestCompleted/Actor/Target/Revision을 재사용하며 기록을 새로 만들지 않는다.",
+    "sharedWritePaths": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNature표현관측Contracts.cs",
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNature표현관측Contracts.cs.meta",
+      "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs",
+      "Ssalddel.Simulation.Tests/LocalSimulationRuntimeTests.cs"
+    ],
+    "unityWritePaths": [
+      "Assets/Ssalddel/Runtime/World/Nature생존Models.cs",
+      "Assets/Ssalddel/Infrastructure/Simulation/Nature생존CoreRuntimeAdapter.cs",
+      "Assets/Ssalddel/Tests/EditMode/Nature생존CoreRuntimeAdapterTests.cs"
+    ],
+    "verification": "완료 사본과 명시 행위기록 동시 조회, 다른Actor/Origin/Target·중복·누락·복원 기준선, 반환 사본 변경의 Core 불변, revision/WorldTick/Save 무변경, Local 소비자 빌드/집중시험. Remote 포트/API 신규 구현이나 Hosted 검증으로 주장하지 않는다.",
+    "boundary": "읽기 전용 Solo 연결이며 새 WI/권위 전이/시간/Save 형식/기획·연구 hash/E 변경 없음. Unity가 보는 공유 Runtime/Contracts 쓰기도 Editor 슬롯 종료 후에만 실행한다. 완료기록 미확보는 표현 중단/진단으로 반환하고 Stump 단독으로 완료를 만들지 않는다."
+  },
+  "presenterIntegration": {
+    "statusCode": "CodeAndFixtureVerified",
+    "verifiedResults": "retry3 정상컴파일 및 정식169/169(선택41/연결19/회랑6/기존84/Core14/감각5), XML9 개발직접대조. 종료는 EditMode 본문명시검증이며 실제Play 생명주기/접촉/발고정 미검증. Collector36error 별도.",
+    "actualInputValidation": {
+      "statusCode": "ActualDiagnosticApproachHarvestStartPassedCompletionPending",
+      "shortClickActualResult": "r85 실제진단한click/release11.1236초열림유지·Camera10Canvas3/PNG불변. 기존접근tree02완료, 활성1P중앙ray1.97817m/Player-marker2.36379m. 일반LMB1로Harvest/tree02 required4/completed0 시작; release후heldfalse/진행0유지. 개발이실제진단/벌목중PNG와23:52:50사본을직접확인. Escape는도구전체실행전안전거부/OS입력0로완료·접촉NotRun. 23:54:08정상Stop/4701직렬·파일5/Assembly4/PNG보존, Consoleerror0/warn12·Scope332별도. 최종manifest는전문마감대기.",
+      "cursorReleaseCompletionPlan": {
+        "statusCode": "CursorReleaseBlockedCompletionNotRun",
+        "result": "r88정상Stop00:02:20/lease반환. Escape실제요청00:01:58.110~58.174 정상반환뒤CursorLocked, Runtimekeyedge/hold미계측으로원인미확정. Actor player:session:owner/Origin unity-local:BeginHarvest:revision-125:104/Targettree02/진행0·완료[]동일; Graph/Ownershiptrue·normalized.03437486동일은r85와별도. 작업유지/15초완료observer미실행. 개발이manifest0C59170D1E33371BBC9C08C864B514D02EE45A0DFBD19A7B347F91ED7120E9BE의27/27hash·길이와UI PNG93BA6BAF…A2572E직접확인. 4701/파일5/Assembly4/CameraCanvas/PNG보존, Scope205변화·Consoleerror0/warn12별도.",
+        "escapeInputProbe": {
+          "statusCode": "NoEscapeInputObservedCauseUnconfirmed",
+          "finalIntake": "개발이최종보고FB1D371EE4F173C3C1F4554D97ED365975D7F828DF8394F7F9C7DAF0AF4978E5 및manifest EF2DD87163F2911516424C557CDBF8F1F86BD58626663E9423392D81F3C96BB7의26/26hash·길이불일치0과UI PNG FBA165200BCC480DD0E6224D452F2B241C2F317503FFCED2E6211CFF13EA0C98를직접확인. 입력원인/완료미검증은해제하지않음.",
+          "result": "r89 00:12:34정상Stop/lease반환. 15초창00:11:56.063~00:12:11.063 안의Escape1회요청00:12:00.603~00.663, 자동해제11.065. beforeEditor/beforeDynamic/afterDynamic각1137·유한93행/rawEscape0/held·pressed·released0/mouse좌edge0/cursorLocked. 관찰InputPhaseReady/Locksfalse/active·battle·tacticalnull/Player활성PresentationOnly/1P전이false. 실제PlayerUpdate분기는미계측, OS미전송/코드원인확정아님. 같은Actor/Origin revision-124:103/Targettree02/진행0·완료[]보존, 4701/파일5/Assembly4/CameraCanvas/PNG동일, Scope205→180/WorldTick0별도,Consoleerror0/warn12. 개발이관찰window/표본·preservation파일을읽었고최종manifest는전문마감대기. 같은키반복실행배분없음.",
+          "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+          "writePath": "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/overnight-d375/actual-input/runtime-escape-probe",
+          "scope": "개발시작통보후공간단독Editor. 현재게임소스/Scene동결, 기존r88제품Nature/장착/닫기/진단/접근/접기/LMB한나무준비만재사용. CursorLocked·같은작업진행0·held/holdfalse와기존Escape안전전제에추가로InputPhaseCode/LocksPlayerMovement/activeFrame·localBattle·tactical존재/카메라전이/Player활성·presentationOnly를읽는다. Entering/Submitting/전투입력가능/지원불가상태면키를누르지않고차단반환. 준비후15초최대읽기관찰창안에서Escape1회만,동시초점용mouseclick/다른키/반복/완료작업유지없음.",
+          "observation": "기존artifact onEvent/입력update관찰구조재사용, rawKeyboard는현재Keyboard의Escape비트/시각/device만추출하고원패킷·다른키문자/전역키로그저장금지. Dynamic전후Escape held/pressed/released·최초getter시각/추적효과·updateType/device/초점/커서, 같은frame mouse좌edge/위치·owner모달·Player모드/전이·InputPhase/LocksPlayerMovement읽기를유한300표본이내로기록한다. F1/F2/F3/T와Attack/Defend는기존필드의진입차단여부만읽고원입력로그를확장하지않음. TryHandleCombatInput/TryHandleTacticalViewInput/ReadFrame/EnsureActions/ReleaseCursor/권위진전은진단으로재호출하지않는다. 코드미계측PlayerUpdate실제통과분기는미관측으로남긴다.",
+          "verification": "실제입력요청/반환시각과15초창겹침확인,기한지나면입력취소. raw없음/Runtimeedge없음/edge있으나게이트차단/해제후재잠금가능성을분리하며사후값을그frame분기증거로승격하지않음. 기한/Stop자동해제·해제확인,한회뒤추가입력없이정상Stop. Actor/Origin/Target/진행·완료[]·Camera10Canvas3/4701/파일5/Assembly4/기존PNGhashmtime/PreviewGraph보존대조. 직접setter/가상장치/InputSystem.Update·Reset/새OS입력helper/환경·SaveRoot·SceneSave/Assets코드쓰기금지. 지원도구가거부하면우회없음."
+        },
+        "identityCapture": "Nature생존WorkState.ActorStableId/OriginCommandId는NonSerialized이므로state전체JSON만으로누락을원본빈값이라고판정하지않는다. 동일current사본에서ActiveWork의Actor/Origin/Target/Required/Completed를명시익명DTO로읽어관찰파일에보존,완료기록도명시필드추출. 기존Save직렬화·게임모델변경없음. r85 NotObserved/Graphfalse는heldfalse일때새lease를얻지않는기존분기와일치할수있으며후속heldtrue상태의실제결과를확인한다.",
+        "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+        "writePath": "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/overnight-d375/actual-input/retry-cursor-release-completion",
+        "scope": "이전안전거부를우회하거나재실행하지않고새슬롯의명시범위를정한다. A1정상Stop/컴파일·시험반환+개발시작통보후 기존세계실제Nature/장착/닫기/진단/기존접근/접기/LMB로한나무작업시작을다시확인. 무전투/관전자전술일시정지없음/배치모드false/창고Preview없음/장착창닫힘·실제1P 조건일때만 커서해제를위한 Escape 실키1회를명시허용한다. 직접ReleaseCursor/setter/입력주입은금지. 실제도구권한·안전관문이추가거부하면우회없이다시반환한다.",
+        "escapeEffects": "파일검토상 Player.Update의Escape→ReleaseCursor, Nature는열린장착창만닫음이며Harvest취소키는C다. 단오늘작업계획Presenter는coordinator존재시Escape로HostedBeaconOpen표시bool을토글하고전략선택해제/관전종료/Farm배치종료/창고Preview취소/전투관전자Skip 경로도별도로존재하므로무부수효과라고주장하지않는다. 위비활성전제를실제확인하고선택/HostedBeacon표시·CameraCanvas·작업Origin/Target/진행·완료기록을입력전후읽기비교. 의미있는권위취소/전투입력가능조건이면Escape하지않고차단반환. 동반표시변화는정확기록하며직접원복하지않는다.",
+        "completion": "커서None/작업동일·완료미발행확인후 실제진단펼치기→기존작업유지켜기 버튼으로진행. 저장/진행작업취소/오두막버튼클릭금지. 작업유지는기존제품UI의승인된의미이며새권위명령직접주입이아님. 가능하면켜기직전최대15초/유한300표본의읽기상태관찰을설치하여current단일사본의Session/Actor/Origin/Target/Revision/진행/완료기록, Graph/segment/token/ReturnReady/소유·효과진단과소유낙하객체수를기록하고자동해제한다. TryConsumeContact/상태진전메서드를관찰로호출하지않는다. 접촉/낙하/반환은실제관측한것만, 빠진프레임·소리미청취는미검증. 정상Stop파일5/PNG/4701/Preview·콜백해제보존. SceneSave/SaveRoot/환경/날씨/Clock변경0."
+      },
+      "shortClickRetryCondition": "정상컴파일/정식123(조준23/장착25/단축키38/Core14/연결19/순수1/전술3) 개발XML7 직접파싱·보호41/41현행hash일치, 애니23:46:17 Editor반환 후 공간단독슬롯. Controller BC781031E3187208DE92D07A702A08429168401B4A38D11FFFCC8266E4C14FB0/Player86E478FDF9997D685BA0675C38F11E9D7E29F544ED4F64D1A53A1F0F3E11338D. actual-input/retry-short-click-edge/새증거+기존보고후속만. 기존세계 실제Nature→장착창/도끼장착/닫기→진단펼치기 한click·release뒤열림확인→기존다음목표접근 실제버튼→실제대상/거리3.2m/활성1P Camera확인→필요시진단접기→일반중앙조준LMB 한나무. 단일소비·CameraCanvas/기존촬영PNG보존부터검사, 성공한만큼기존중단/재개/완료/접촉/복귀관찰. 짧은click을작업유지로합성하지않으며실제hold가제공되지않으면기존작업유지UI만사용. 원래F8/W전달미검증은그대로. 직접권위/setter/가상입력·새SaveRoot/환경/날씨/Scene저장없음. 동일실패3회반복금지, 기능차단이면정확증거후Stop반환.",
+      "pointerAimRetryResult": "공간23:27:26 Stop/lease반환. 실제Nature·장착·닫기재성공, 진단버튼첫click1뒤expandedfalse/status닫힘. 사후owner/visibletrue/CursorNone이나입력frame미계측으로원인미확정. 4701직렬·파일5/Assembly4/Camera10Canvas3/기존PNG불변, Consoleerror0/warn12·복원Session124는별도. 접근/벌목NotRun.",
+      "mouseInputDeliveryProbe": {
+        "statusCode": "RawPressReleaseSameUpdateObserved",
+        "result": "23:34:05 정상Stop·반환. raw Mouse2 down/up 같은Dynamic frame7343,eventTime차8.985ms; afterDynamic heldfalse/downtrue/uptrue·GUI235.401,125.510437 buttonHittrue/ownervisibletrue/primaryWasHeldfalse. 15초창내실제click1회·콜백자동해제·50표본/raw3. Nature/PlayerUpdate실제분기미계측이나현재held폴링이짧은edge를놓치는경계와일치. 좌표오류/미전송만으로설명하지않음. 4701/파일5/CameraCanvas/PNG보존·Consoleerror0/warn12.",
+        "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+        "writePath": "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/overnight-d375/actual-input/runtime-pointer-probe",
+        "scope": "기존게임코드불변·소유artifact의제한읽기관찰만, 현재표시버튼한회click. 기존승인제품UI외직접메서드/가상입력/장치Reset/환경변경금지.",
+        "observation": "기존F8probe의소유artifact/자동해제구조재사용. 정상Play/Nature진입·장착창닫힘/진단접힘의실제기준선에서 최대15초창을설치하고표시된진단버튼실제click1회만. Mouse현재/작업선택deviceID, raw event의좌버튼값과시각(지원시), Dynamic update전후 held/선택시edge 최초조회시각, frame/초점/커서/position/Screen/GUI환산/버튼Rect hit, 사후controller primaryWasHeld/owner/가시문맥/전이/차단/expanded를유한표본으로관찰. raw키보드/다른텍스트·전역입력로그는수집하지않는다. 코드삽입/패치없이관찰못하는Nature/Player실제Update순서·최종분기는미관측으로남긴다.",
+        "verification": "호출직전UnityWindow상대좌표와현재GameView내용영역/실제UI버튼의대응을화면에서확인, raw event·Dynamic window·실제OS요청시각을구분. 관찰은정확1회/15초기한자동해제+Stop시해제, 실패해도반복/입력주입/Toggle직접호출없음. 기한지나면click취소. 정상Stop4701/SceneSavePackages/기존PNG·Preview보존, 새권위작업/접근/장착/벌목은이번계측중실행하지않음. GUI열림은발생한그대로결과로기록하고테스트성공으로강제하지않는다."
+      },
+      "pointerAimRetryCondition": "Controller866FC1F7DD79BC21C071D325E75F8850BF82D7C3C48CBDDAE537B6D78A53842D/Player86E478FDF9997D685BA0675C38F11E9D7E29F544ED4F64D1A53A1F0F3E11338D 및 정식118 통과·애니23:23:27 Editor반환 후 공간단독슬롯. actual-input/retry-pointer-aim/새증거+기존보고후속만 작성. 기존세계 실제Nature버튼→장착창/주손장착/닫기→진단펼치기 실제버튼→기존다음목표접근 실제버튼으로 거리/대상확인→필요시진단접기→일반1P중앙LMB 한나무. 실제활성FirstPersonCamera와player/marker거리를 사용하고 PlayerCamera의3P별칭을 혼동하지않는다. 접근버튼이 다른목표를 고르면 기록하고 직접target주입하지않는다. 진단UI전환/해제후단일소비·CameraCanvas/기존촬영PNG불변을 먼저검증, F8/W 전달성공은 별도미검증으로둔다. 기존scope의중단/재개/완료근거·최종접촉·낙하·반환관찰을 이어가되 동일실패3회반복/직접권위·setter·입력장치주입/새SaveRoot·환경·Scene저장금지. 기능차단이면정확증거후Stop반환.",
+      "diagnosticRetryResult": "공간23:03:59정상Stop반환. 실제F8총1회뒤Camera10/Canvas3/기존자동PNG CF59hashmtime불변Passed, Nature진단expandedfalse/consumed-1은Blocked. 일반나무LMB1은CursorLocked만, W짧은1은이동0/ActiveWorknull. 최근나무6.2706m>상호작용3.2m. 4701직렬·파일5/Assembly4/자동PNG불변, Console새error0/경고12, Scope복원457은별도. 사후무입력35초probe samples[]는원입력전달증거아님.",
+      "inputDeliveryProbe": {
+        "statusCode": "ObservedInputEdgeAbsent",
+        "result": "23:09:58정상Stop/4701직렬·파일5/Assembly4/자동PNG보존, Camera10/Canvas3전후동일. 15초창내실제F8요청1회와Dynamic1311의F8 held/edge true0, 유한16표본/consumed-1/expandedfalse. OS미전송또는게임결함확정아님. 23:08:21.425콜백자동해제, Consoleerror0/warn12. 키누름52ms는API응답길이이며hold보장아님.",
+        "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+        "writePath": "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/overnight-d375/actual-input/runtime-input-probe",
+        "scope": "기존정상Play/Nature실제버튼진입 뒤소유artifact onAfterUpdate 관찰을최대15초설치하고관찰창안에서실제OS F8 한회만입력. Editor/Runtime updateType별호출수·유한baseline과F8 held/edge·좌우modifier·device/updateMode/editorInputBehavior·focus·Controller활성/owner/가시문맥/consumed/expanded를기록한다. F8 getter첫조회관찰효과명시. 다른키/텍스트/전역키로그수집없음. 장시간키hold가도구에없으면없는대로기록, 가상입력/InputSystem.Update/Reset/MakeCurrent/ControllerSetter/직접권위호출금지.",
+        "verification": "실제OS요청시각/지원누름방식/길이보장여부와콜백관찰창겹침확인. 기본영프레임·device미제공도기록해samples빈값을미수신확정으로올리지않음. 콜백은기한또는Play종료시자동해제하고해제확인전슬롯반환금지. CameraCanvas/자동PNG/SceneSave불변·정상Stop4701보존. 결과확보후추가입력없이개발반환; 이번회차벌목행위는하지않는다."
+      },
+      "diagnosticRetryCondition": "단축키 정상컴파일/정식96후 공간단독슬롯. 기존세계 실제열기장착닫기→F8 Nature진단만토글/전체Camera·Canvas상태와자동촬영PNG CF59F450B72BFB27E9728585416EAEB4C509D184445406C452BB6228DD1E0197 hash·mtime불변 확인. 입력전후동기상태사본/실제UI출력 분리. 성공후 기존한나무범위 진행, 실패시반복/내부setter우회금지. 새증거 actual-input/retry-diagnostic-shortcut/ 및기존보고후속만. ControllerEB1ADD4B1AF90FB450FAE90E8C120AEDAD4EAFAF5EF6B96EBA40502431345429/Player86E478FDF9997D685BA0675C38F11E9D7E29F544ED4F64D1A53A1F0F3E11338D, Scene/SaveRoot/환경/원본보존.",
+      "cursorRetryResult": "실제열기/장착/상단닫기1회와closed·CursorNone·카메라동일유지성공. 뒤F8이Editor캡처메뉴를실행하여다른Camera활성/화면전환, 작업시작전NotRun. 22:48:05정상Stop/4701·디스크5보존, 자동캡처산출물은별도기록.",
+      "cursorRetryCondition": "Controller1E662EE325586F7DBF672F07A694E8402BF50AB0B7F7FC34A15F0CF03023E487/Player86E478FDF9997D685BA0675C38F11E9D7E29F544ED4F64D1A53A1F0F3E11338D 및정식58후공간단독슬롯. actual-input/retry-equipment-cursor-owner/ 새증거로 기존세계실제열기/장착/닫기·release후커서/시야관찰→성공하면원한나무범위. 이전20/12실패·성공파일보존, 새SceneSave/주입/SaveRoot/환경변경없음.",
+      "retryResult": "실제한클릭열림/release후유지 및 주손도끼장착 EquipmentRevision1→2/woodcutting 성공. 뒤닫기1/Esc2에도Open+CursorLocked라벌목NotRun. 22:34:10정상Stop/4701객체·디스크5보존, 추가권위주입없음.",
+      "retryCondition": "Controller0838A8596455D77B07D00F2DE337D8210EBFDD255CFA8803A97B405D9DBC93AE・정식42/42 후 실제한클릭열림/해제후유지부터 재시도. actual-input/retry-equipment-single-consumer/에 새증거만 기록, 최초실패원본보존. 패널성공후 기존주손장착/한나무범위를 이어간다. I전달은 별도미확인 유지.",
+      "firstAttemptResult": "Nature 탐험 전환 성공, 장착창 버튼 두 번 모두 닫힘으로 끝나 장착/벌목 NotRun. 22:21:22 정상Stop, 객체4701/디스크5 보존. down/up 내부 이벤트 미계측이며 중복토글은 코드 경로로 확인한 가설이다.",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "scenePath": "C:/Users/user/ssalddel/Assets/Ssalddel/Scenes/SimulationWorldShell.unity",
+      "sceneSha256": "D1D31BFDD9A727D1744B888D2AE25D7C275CC9E7F9A6D21EF5FB5CCBDD243271",
+      "writePaths": [
+        "C:/Users/user/ssalddel/artifacts/local/validation/nature-woodcutting-d359/overnight-d375/actual-input",
+        "docs/Reports/Nature벌목동작-D375-실제입력-2026-08-30.md"
+      ],
+      "baseline": "D378 저장후Play 읽기에서 기존복원Session706a/Player player:session:owner, 도끼보유1/주손비어있음/capability0/Standing6/ActiveWorknull 관찰. 실제시작시 다시읽으며 없으면 주입/새세계로대체하지 않는다. 기본SaveRoot/env/권위규칙/원본Scene 보존.",
+      "scope": "정상Play의 Nature 탐험 버튼/실제I장착창으로 기존도끼 주손장착, 실제이동/조준으로 Standing나무 하나에 접근. 실제LMB작업 시작→놓기+작업유지off/이동으로 표현중단·권위작업보존 구분→같은작업재개→완료근거/최종접촉/낙하/복귀를 우선 한그루에서 검증. 명시C취소는 필요시 별도작업으로 구분, 재클릭 BeginHarvest 재요청문구와 held진행을혼동하지 않는다. 실제UI/입력 없이 테스트전용메서드·권위명령직접호출·도끼/자원주입 금지.",
+      "observation": "각 단계의 한 상태사본에서 Session/Actor/OriginCommand/Target/Revision/CompletedSeconds/완료기록을 수집하고 common/specialist 소유·Graph/segment/token/ReturnReady·AudioFX진단을 함께 기록. 마지막접촉 후 낙하·중복효과/루트발미끄러짐/손도끼결합은 연속Game출력으로 별도판정. UI포함 실제PNG와 가능하면연속프레임, 미판독/청취없음은 미검증. 바닥통나무완료와 별도수집을 구분.",
+      "preservation": "Editor단독/시작stopped·dirtyfalse·Scenehash·Packages/Save2·전체객체/비소유Preview 기준선. 명시저장/Scene저장/SaveRoot·환경·기상·시간설정변경 없이 정상Stop 후 파일불변 확인. 실제입력으로 만든 메모리 권위전이는 테스트성공의관찰이며 영속저장 완료가 아니다. 불가시 현화면/정확차단 반환, 반복같은실패3회금지."
+    },
+    "equipmentInputRepair": {
+      "statusCode": "CodeAndFixtureVerified",
+      "verifiedResults": "정상컴파일0/정식42/42(신규9/Core14/연결19), 개발XML3 직접파싱. 신규9는 hit격리7/소스구조2이며 실제GUI down/up 미검증. 기존보호27hash불변/Collector3error별도, 임시전용9빈폴더생성은기록보존.",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "earliestReopenEvidenceStage": "E3",
+      "writePaths": [
+        "Assets/Ssalddel/Presentation/World/Nature생존Controller.cs",
+        "Assets/Ssalddel/Tests/EditMode/Nature장착입력Tests.cs",
+        "Assets/Ssalddel/Tests/EditMode/Nature장착입력Tests.cs.meta"
+      ],
+      "scope": "기존 Update mouse-down을 장착창/장착/해제 단일 소비자로 유지하고 OnGUI는 표시만 수행. 열린 패널 상단 닫기 경로 보완. I 키 전달/입력체계 전체 변경, 권위 장착규칙/Save 변경은 제외.",
+      "verification": "소유 Preview 집중시험으로 열기/닫기/패널 안팎 입력과 단일 소비를 검증하고 기존 Core14/벌목연결19 회귀. 이후 공간 실제 클릭 한 번 열림/장착/벌목 재시도로 화면 확인. Fixture/코드 검증을 실제 OS 입력 증거로 대체하지 않는다."
+    },
+    "equipmentCursorRepair": {
+      "statusCode": "CodeAndFixtureVerified",
+      "verifiedResults": "정상컴파일 및정식58/58(21+14+19+1+3) XML5 개발직접파싱. 첫21중2실패와null외부owner거부허위통과1은DisallowMultipleComponent 시험구성결함으로보존, 별도소유child/NotNull 수정뒤재검증. 실제Play커서/닫기는미검증이며 종료보존확인뒤재배분.",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "writePaths": [
+        "Assets/Ssalddel/Presentation/World/Nature생존Controller.cs",
+        "Assets/Ssalddel/Presentation/World/플레이어경관Controller.cs",
+        "Assets/Ssalddel/Tests/EditMode/Nature장착입력Tests.cs"
+      ],
+      "scope": "기존 Nature.Configure의 실제 Player에 소유자검사 UI조회 결속. 가시패널/상단hit/해당frame전이 및 기존키edge 읽기로 Update순서와무관하게 커서잠금/3P포인터누출 거부. 좌표는 Nature 재사용, Disable/Destroy/교체시자기소유해제. 기존키이동/목적지/시간/권위취소/Save변경없음.",
+      "verification": "소유Preview의 순서별조회/닫기frame/다음세계클릭/가시문맥/소유교체·해제/3Pgesture취소 시험, 기존42회귀+통합SimulationWorldTests 순수커서메서드1만. 공식Scene Open 시험전체실행금지. 실제OS/Play커서는공간재검증으로분리."
+    },
+    "diagnosticShortcutRepair": {
+      "statusCode": "CodeAndFixtureVerified",
+      "verifiedResults": "정상컴파일 및정식96/96(38+21+14+19+1+3), 개발XML6 직접파싱. 소유Preview/순수정책/소스선언 증거이며실제F8미검증. 22:54:56반환기존37hash·4701객체보존/Scope컴파일해제/Collector15별도, 신규meta2/Temp21총72빈폴더보존. 메뉴본문/Play/SceneOpenSave없음.",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "writePaths": [
+        "Assets/Ssalddel/Editor/대한민국법정동WorldBuilder.cs",
+        "Assets/Ssalddel/Editor/공간TileStreamingBuilder.cs",
+        "Assets/Ssalddel/Presentation/World/공간StreamingTreeDiagnosticPresenter.cs",
+        "Assets/Ssalddel/Presentation/World/Nature생존Controller.cs",
+        "Assets/Ssalddel/Presentation/World/월드진단단축키Policy.cs",
+        "Assets/Ssalddel/Presentation/World/월드진단단축키Policy.cs.meta",
+        "Assets/Ssalddel/Tests/EditMode/월드진단단축키Tests.cs",
+        "Assets/Ssalddel/Tests/EditMode/월드진단단축키Tests.cs.meta"
+      ],
+      "scope": "기존Editor캡처메뉴호출은유지하고 bare_F8만제거. Runtime Nature F8/Streaming Shift+F8을배타modifier조건·wasPressedThisFrame으로분리, 표시문구동기화. 메뉴캡처실행/Scene저장/CameraCanvas임의복구·F7F9변경/권위시간변경금지.",
+      "verification": "순수키modifier표/상호배타·UI라벨/Editor메뉴선언검사 및기존58회귀. 소유Preview만, 메뉴메서드호출없음. 이후공간실제F8에서Nature진단만변하고CameraCanvas보존·벌목진행을분리검증."
+    },
+    "pointerAimRepair": {
+      "statusCode": "FormalTestsPassedActualInputPending",
+      "result": "정상컴파일 completed/failedfalse/errors[] 및 정식XML7을 개발이 직접파싱: 장착25/조준18/단축키38/Core14/벌목연결19/순수커서1/전술3 합118Passed·nonPassed0. 23:23:27 Editor반환·보호40hash동일·새meta1·Temp총97빈폴더보존. Scope171컴파일해제/중간초기화집계변화·Console Collector21error·원요청timeout과 별도완료조회는 구분. 실제OS/중앙Raycast/벌목접촉 성공은 아직 미검증.",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "writePaths": [
+        "Assets/Ssalddel/Presentation/World/Nature생존Controller.cs",
+        "Assets/Ssalddel/Tests/EditMode/Nature장착입력Tests.cs",
+        "Assets/Ssalddel/Tests/EditMode/Nature조준입력Tests.cs",
+        "Assets/Ssalddel/Tests/EditMode/Nature조준입력Tests.cs.meta"
+      ],
+      "scope": "기존진단표시만클릭으로열고닫는상시제품UI진입을추가하고Update 단일소비/OnGUI표시만유지. 장착패널중겹친진단버튼은숨김·입력불가, F8기존정책은그대로별도미검증. 진단전이는기존Player exactowner커서해제/동일frame UI전이보호를재사용. 일반1P Locked 조준은모달/전이/owner보호뒤기존중앙marker경로만허용하며자유포인터HUD·하단0좌표오판을피한다. 3P/자유커서/기존실제하단UI판정불변, cabin/workbench배치모드는조준우회제외. 새권위명령/자동장착·접근·작업/새세계·Save·Scene·입력장치주입없음.",
+      "verification": "입력분류조합·두순서의UI보호/모달·닫기전이·배치제외·3P불변과기존진단클릭열닫기/가시성/명령개정불변을소유Fixture로검증. 기존96 중변경된장착class와신규조준class·Core/연결/단축키회귀후공간이실제진단버튼→기존다음목표접근/일반LMB의한나무를검증. 시험을키전달해결/실제벌목완료로세지않음."
+    },
+    "shortClickRepair": {
+      "statusCode": "CodeAndFixtureVerified",
+      "verifiedResults": "정상컴파일/정식123/123 failed0·개발XML7직접파싱, 보호41/41현행hash일치. 23:46:17 Editor반환·4701/SceneState시작종료동일·Graph0/Scopefalse. 메모리Scope147컴파일해제/중간초기화집계변화/Collector21error·응답지연은별도. Temp97+25=122빈폴더보존/새meta0. 실제OS/GUI/벌목해결미검증으로공간후속분리.",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "writePaths": [
+        "Assets/Ssalddel/Presentation/World/Nature생존Controller.cs",
+        "Assets/Ssalddel/Tests/EditMode/Nature조준입력Tests.cs"
+      ],
+      "scope": "r82실측에따라새primaryPressed만선택Mouse의native wasPressedThisFrame+같은Unityframe단일소비로계산. physicalMouseHeld/workHold/권위시간·작업유지의미는그대로, 짧은click의held를true로합성하지않음. primaryWasHeld기존진단/시험필드보존, 모달·전이·owner·UI/조준분기·좌표는변경없음. 재Configure/테스트직접Update도같은edge중복소비를허용하지않음.",
+      "verification": "짧은pressededge/heldfalse·같은frame재호출·release/다음press·edge없음/유지·입력프레임음성/소스연결을순수시험, 기존118회귀. 실제InputSystem주입이나Controller메서드직접호출을실제GUI성공으로세지않음. 컴파일/시험후공간실제진단한click부터확인, 권위진행/Save/Scene불변."
+    },
+    "decisionCode": "D-375",
+    "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "repositoryRoot": "C:/Users/user/ssalddel",
+    "additionalWritePaths": [
+      "Assets/Ssalddel/Presentation/World/Nature감각표현Presenter.벌목.cs",
+      "Assets/Ssalddel/Presentation/World/Nature감각표현Presenter.벌목.cs.meta",
+      "Assets/Ssalddel/Presentation/World/Nature생존Controller.cs",
+      "Assets/Ssalddel/Presentation/NatureWoodcutting/벌목완료근거선택.cs",
+      "Assets/Ssalddel/Presentation/NatureWoodcutting/벌목완료근거선택.cs.meta",
+      "Assets/Ssalddel/Tests/EditMode/벌목완료근거선택Tests.cs",
+      "Assets/Ssalddel/Tests/EditMode/벌목완료근거선택Tests.cs.meta",
+      "Assets/Ssalddel/Tests/EditMode/Nature벌목표현연결Tests.cs",
+      "Assets/Ssalddel/Tests/EditMode/Nature벌목표현연결Tests.cs.meta"
+    ],
+    "scope": "기존 Presenter/공용lease와 완료선택·관측 Projector·Graph·AudioFX의 단일소비 연결. Controller Configure 관측세대/실제 held 읽기 공급, 같은개정 제어 갱신, 실패 뒤기준선 재구성/과거접촉 폐기, 마지막완료접촉뒤 낙하·복귀. 기존 Clip5.1A만, 상태/Save/새키프레임 변경 없음.",
+    "verification": "선택기41예상·실제 Farm Rig 격리 연결시험, 기존84/14 회귀 후 공간이 실제입력/접촉/복귀/GameView를 검증한다. 예외·소유권거부·낮은epoch·종료근거·중간token1/최종4·중복효과·생성객체정리를 분리하고 미실행을 성공으로 올리지 않는다."
   },
   "runtimeEvidenceRefs": [],
   "sceneEvidenceRefs": [],

@@ -1,4 +1,234 @@
 {
+  "d385PotVisualReplacement": {
+    "statusCode": "ExteriorSelected_HeatExteriorBlockedBeforePrefabLoad",
+    "approvalDocumentRef": "docs/AI/약초차-냄비표현교체-2026-08-31.md",
+    "approvalSha256": "ACBE115C09D4C9792D628C2A82FB2C85814CB8F06D1DD457D7278FCD69845F90",
+    "supersedes": "D382의 원후보 자동교체금지는 이 명시승인 이후 냄비역할에한해 대체된다. CampPot01 냄비역할제외, 원본과과거근거보존. Mug01불변.",
+    "requiredFollowupStudyRef": "docs/Architecture/PlayableLoops/Nature약초차-냄비표현교체-적용연구.md",
+    "studyStatus": "Accepted_Section8Selection_Section10Exterior_Section12DependencyPreparationOnly",
+    "studySha256": "C46404610AACD697A3AFF4967214DC51E2BB8B05B2BA74FFAB3D26273DD8D9F5",
+    "heatDependencyFingerprintExecution": {
+      "revision": "d385-heat-dependency-fingerprint-execution.r129",
+      "executionAllowed": true,
+      "permissionGate": "개발동결전체검토 및 공간의명시단독시작통보 이후만 실행. 준비파일존재/이명세만으로 자동실행0",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "preparationSpecSha256": "0C456FAA2BDE5B37E495D982B456D81BB2CEB65E089E2741A564B71931DF1788",
+      "studySha256": "C46404610AACD697A3AFF4967214DC51E2BB8B05B2BA74FFAB3D26273DD8D9F5",
+      "sourcePath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/dependency-fingerprint-r128/probe.cs",
+      "sourceSha256": "05243811B181BEFE86DBD7BC2F41B249962ED3AF98414E0864EE0BF84DDBC0DF",
+      "planSha256": "BC0FED0F72F68FE4CC68021049F5C3CE776F2274F27CA65F97EF2282F168BBFE",
+      "loaderPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/dependency-fingerprint-r128/execution-loader.cs",
+      "outputRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/dependency-fingerprint-r128/capture-r128",
+      "slotRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/dependency-fingerprint-r128/slot-r129",
+      "additionalProtectedPng": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+      "additionalProtectedPngSha256": "CF59F450B72BFB27E9728585416EAEB4C509D184445406C452BB6228DD1E0197",
+      "preflight": "현재ready/stopped/compilefalse/updatingfalse/dirtyfalse·canonical/전체유효Scene/기존Preview신원·Graph0/Scopefalse/env2null/선택/Console·추가modal 직접관찰. outputRoot부재/조상reparse0·여유1GiB. slot만외부생성, capture-r128은probe만생성. 기존수치고정·수동Reset없음",
+      "singleExecution": "원자r129-once.claim→메모리RoslynCompilationService Compile1. 성공한정확반환Assembly의정확public static string Run(bool,string,string)만1회. AssetDatabase/Preview는그호출내, 전체recompile/정식Runner/Play/키입력0. timeout이면원요청/파일회수만",
+      "dependencyGate": "동결계획 exact14 transitive/direct2 ordinal집합·14쌍 SHA/metaGUID/등록GUID·물리경로/패키지json2 및 등록PackageInfo name/version17.5.0/resolvedPath·unity6000.5. 추가/누락/중복/drift/미해석이면PrefabLoad전차단. 최초전체통과시에만 자기cleanup후 고정operation오류관찰내 최종direct/transitive 각1회; 실패해도 다른finally보존검사유지. 초기실패재조회0. component4·원본재질/mesh/Collider 기대불변.",
+      "capture": "자기빈Preview priming최대1회후정적CampFire1복제본 native25/65도768² PNG2만. 첫오류·단색·시간/보존실패뒤추가촬영0. Actor/skin/Graph writer/수면생성·AlignGround·가열Service·냄비조립0",
+      "artifactBudgets": "probe협력60초·단일Render선점불가. capture-r128 원PNG각4합8MiB·JSON32MiB(일반28/요약실패4). 별도slot-r129 외부현재관찰/Console/loader/인계·manifest64MiB(일반60/최종4), 모든파일flat/하위폴더금지·매저장검사, loader개별2MiB. 큰texture전체직렬0. 모두CreateNew/덮어쓰기0",
+      "preservation": "계획96개+현재Spec/새Probe/새Plan/새Loader 중복제거100개 기대(기존CF59PNG는96에포함), 기존r125manifest27실제행 별도대조. 현재Scene/Preview신원·전체객체직렬/selection/Graph/Scopeenv·Assembly4/Console 독립전후대조. 새파일hash를실제시작시확인하며과거수치로대체X. 전용메모리Assembly잔류구분. 원r125소스3/결과27불변.",
+      "collection": "Run반환JSON문자열을바깥변수에보유→CreateNew보존→status/images/failures/보존bool형식확인. 원문저장실패시2MiB내원문은final/도구반환에도포함, 상한초과는명시차단. 완전회수와이미지검증·형상판독분리. 성공주장때2PNG의정확경로/서명/IHDR길이13/768/hash검사. 부분실패는실제output경로목록을먼저저장하고파일별길이/hash 또는오류행을수집, 재실행0. 최종쓰기예외도원도구응답·독립외부관찰로보존 새bool4/nullable dependencyObservationEqual/JObject before·after의필수필드·형식확인후collectionComplete, 이후일관성/성공의존검사는독립stage. 미완료비교null유지. 성공주장에양쪽14집합/14fingerprints/2packages·등록정보·beforeafter동일/모든완료flag 및 기존보존·2PNG관문통과필요. dependencyEvidenceVerified와collectionComplete/품질별도. 새사본표본이나개수를정식시험수로세지않음.",
+      "closeout": "자기PRU/clone/texture/로그/RT정리 뒤 별도외부Scene/Preview/Graph/Console 관찰·파일검사, lease먼저반환. 원PNG2직접열람·manifest마감은파일만. 정리실패시비소유/전역강제정리0",
+      "resultCap": "격리정적열원자산외형·native외곽판독만. Sphere최고점/Rendererbounds는냄비받침면아님. 실제지지·접근·가열·연료·Runtime/GameView/E승격NotRun. 승인09시경계유지/추가후보자동실행0"
+    },
+    "heatDependencyFingerprintPreparation": {
+      "revision": "d385-heat-dependency-fingerprint-preparation.r128",
+      "executionAllowed": false,
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "studySha256": "C46404610AACD697A3AFF4967214DC51E2BB8B05B2BA74FFAB3D26273DD8D9F5",
+      "acceptedDraftSha256": "56F0C62BEF691D335B5CACDBE0F733487CFA129DB10FFEF6B3B1ED7AE3049EFB",
+      "writeRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/dependency-fingerprint-r128",
+      "allowedFiles": ["probe.cs", "input-plan.json"],
+      "futureOutputRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/dependency-fingerprint-r128/capture-r128",
+      "api": "CampFireExteriorProbe.Run(bool executionApproved,string executionSpecSha256,string approvedPlanSha256) returns string JSON; same namespace/signature, unique returned Assembly. No automatic entry/menu.",
+      "sourceBasis": "Original probeBB40B4D2D7297108632E70CA6DC14740938A46CE4291BBE645970F9C4E97BC11 and planE691BF5D131A3DC80BA31C2AB8431CC8B428DB547670213A1FDA86DA240263D6 immutable; exact diff embedded in new input-plan or handoff message, no third file.",
+      "changeScope": "Preparation/output/revision binding plus exact14 dependency identity/fingerprint and two package.json name/version/unity checks. Before/after dependency observations and explicit nullable comparison fields may be added to returned JSON; original fields/API preserved. No static component/render/geometry expectations removed or broadened.",
+      "dependencyGate": "Exact14 AssetPath unique ordinal set matching r125 dependencies. Each exact physical file/meta hash+GUID, no wildcard/auto path rewrite/update. Package name/version17.5.0/unity6000.5 and package.json SHA frozen; manifest/lock unchanged. Initial direct model/material list preserved. Addition/omission/duplicate/hash/GUID/package mismatch blocks before PrefabLoad.",
+      "postDependencyGate": "Only if initial dependency gate passed, collect final dependency snapshot once inside fixed operation-error observation before observer detach; independent try preserves ownCleanup and all original finally checks even on failure. No initial-failure retry. Pre/post set+file fingerprint mismatch fails; no silent import/metadata creation.",
+      "preservation": "Old protected files remain except current accepted study hash is explicitly rebound/history preserved. Add all14 asset+meta files/two package.json, original probe/plan/loader and r125 manifest+27 rows as exact protected references; source raw evidence unchanged. Additional CF59 PNG/SceneSavePackages/Assembly/ScenePreviewGraphScopeenvConsole protections retained. Enumerate/deduplicate actual exact count in plan, no guessed count.",
+      "invariants": "Prefab component4, nativeTRS/mesh/material/Collider/submesh/unsupported types, static PNG2 at25/65/768, firstError/uniformPixel rejection, no original writes, fixed PRU/RT/texture/log lifetime, CreateNew60seconds/PNG8MiB/JSON32MiB and later external slot64MiB unchanged. No Actor/skin/Graph writer/importer change/Refresh/reimport/Service/pot assembly/SceneSave.",
+      "preparationValidation": "Static syntax/text/diff/JSON/hash only. Compile/Run/AssetDatabase/Preview/Render/Editor0; outputRoot absent. Preparation spec rejected as execution authority. Developer whole-code review and new execution spec/loader/single lease required.",
+      "limitations": "Known importer callback and implicit cache behavior not certified absent. Lit.mat inclusion middle chain unresolved. Dependency fingerprint does not prove game support/heating/access or whole shader safety. r125 failure preserved; no E/quality promotion."
+    },
+    "heatDependencyReviewPreparation": {
+      "revision": "d385-heat-dependency-review-preparation.r127",
+      "executionAllowed": false,
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "studyPath": "docs/Architecture/PlayableLoops/Nature약초차-냄비표현교체-적용연구.md",
+      "preservedStudyPrefixSha256": "CD67FE45CFDECD8D7A8C9ED98AFDA8C47B7AD9D5C3FE06402320CED268877012",
+      "allowedWrites": "같은 연구 새11절 Draft 추록 및 해당문서 Fast로그만. 기존1~10전체바이트 접두부 보존. 코드/plan/loader/원artifact/Assets/명세/원장/상태판은 공간쓰기금지",
+      "scope": "r125 실제의존14와 기존허용7 차집합7개 파일/meta GUID/hash, URP/ShaderGraph17.5.0·Unity6000.5 패키지판본/물리경로, metadata/Importer/Material/Shader 역할을 기록. 정적Prefab component4 허용과 정확 package dependency fingerprint 별도계층 설계",
+      "proposedNextGate": "후속준비안에 정확14 AssetPath 집합/각파일meta·패키지판본 보호, 추가/누락/drift거부를 명시. 원본4타입/재질/shared참조·Scene/Preview/Graph/파일·로그/정리 검사는 유지. 아직허용목록확대/코드작성/실행권한없음",
+      "limits": "ShaderGraphImporter.OnImportAsset는 실제callback. cached load/GetDependencies의 암묵import·nativecache 불변 미입증. Lit.mat 유입 중간연결·HLSL/CustomEditor전체안전 미확정. 직접ImportAsset/Refresh/reimport/metadata생성/재질대체/PrefabLoad/Editor/Render0",
+      "nextStep": "Draft 전체/기존prefix/hash 검토→개발 제한수용 여부·명세 재결속→정확외부파일 준비 배분. 이번 Draft만으로 재실행하지 않음"
+    },
+    "heatExteriorResult": {
+      "revision": "d385-campfire-exterior-result.r126",
+      "executedSpecSha256": "884403B048E4C89D8D9655F94C31C5E2B9F1F5059B35D90D8714CB024C7733CC",
+      "statusCode": "BlockedBeforePrefabLoad",
+      "compileCount": 1,
+      "runCount": 1,
+      "collectionComplete": true,
+      "pngCount": 0,
+      "firstFailure": "UnreviewedDependency:Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/UniversalMetadata.cs",
+      "dependencyCounts": "Actual14/previouslyAllowed7/new7. No automatic allowlist expansion.",
+      "reportSha256": "0A7629717B99A32BC33A39B90A5C8FACB86C948561BA33637117C5F99BBB368E",
+      "finalSha256": "6616F0CDB19E695FE7A65D1FFAF8FDCBF0597A01AB07EF66E5C7B8B4742FB86C",
+      "handoffPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/slot-r125/handoff.md",
+      "handoffSha256": "4D929A6E2DC43043D330785A740BBDDF138E7D9C4885924C5927F1F42B224200",
+      "manifestSha256": "1B054E473E0E37DE2321FD88F620244E6E1EEEB6D53FD062CE6E4174E58D51D6",
+      "integrationReview": "Developer read original report/dependencies/final/handoff and verified27/27 manifest file hashes/lengths. Compile diagnostics0 and complete collection are not rendering success. PrefabLoad/PRU/clone/Render0; originalObservationEqual=false means not observed(null), not detected asset mutation.",
+      "preservation": "04:39:28 independent before/after4704 objects(canonical4701+existingPreview3), scenes/graphs/selection/files/assemblies/windows identical; objectHash49E39F9B586E47F070123CB98619DBB1FB76A8B15F890E99E1253DBA2AED0007. Protected53/Assembly4 unchanged, Graph0/Preview1/Scopefalse/envnull/dirtyfalse, Console8791 unchanged. Dedicated memory Assembly addition is separate. Lease returned04:39:42.",
+      "nextScope": "File-only review of the exact7 new dependency paths/versions/hash/types/callbacks; no Editor/load/render/source/allowlist/study writes. New frozen study/spec required before any subsequent execution.",
+      "resultCap": "No new exterior image/support/access/heating/GameView/E evidence. Execution consumed; no retry."
+    },
+    "heatExteriorExecution": {
+      "revision": "d385-campfire-exterior-execution.r125",
+      "executionAllowed": false,
+      "permissionGate": "개발동결전체검토 및 공간의명시단독시작통보 이후만 실행. 준비파일존재/이명세만으로 자동실행0",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "preparationSpecSha256": "9402626419EE0A75CBE328CAA56EA10EE1F6197B838DC80673FDA9AAC61F8707",
+      "studySha256": "CD67FE45CFDECD8D7A8C9ED98AFDA8C47B7AD9D5C3FE06402320CED268877012",
+      "sourcePath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/probe.cs",
+      "sourceSha256": "BB40B4D2D7297108632E70CA6DC14740938A46CE4291BBE645970F9C4E97BC11",
+      "planSha256": "E691BF5D131A3DC80BA31C2AB8431CC8B428DB547670213A1FDA86DA240263D6",
+      "loaderPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/execution-loader.cs",
+      "outputRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/capture-r124",
+      "slotRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight/slot-r125",
+      "additionalProtectedPng": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+      "additionalProtectedPngSha256": "CF59F450B72BFB27E9728585416EAEB4C509D184445406C452BB6228DD1E0197",
+      "preflight": "현재ready/stopped/compilefalse/updatingfalse/dirtyfalse·canonical/전체유효Scene/기존Preview신원·Graph0/Scopefalse/env2null/선택/Console·추가modal 직접관찰. outputRoot부재/조상reparse0·여유1GiB. slot만외부생성, capture-r124는probe만생성. 기존수치고정·수동Reset없음",
+      "singleExecution": "원자r125-once.claim→메모리RoslynCompilationService Compile1. 성공한정확반환Assembly의정확public static string Run(bool,string,string)만1회. AssetDatabase/Preview는그호출내, 전체recompile/정식Runner/Play/키입력0. timeout이면원요청/파일회수만",
+      "dependencyGate": "계획48 보호hash+외부추가PNG/spec/probe/plan/loader와현재Assembly4. GetDependencies의미확인경로는PrefabLoad전차단, 자동허용확대0. 정적4타입/자식0/native/GUID/fileID/submesh/재질타입이기대와다르면설정제거없이반환",
+      "capture": "자기빈Preview priming최대1회후정적CampFire1복제본 native25/65도768² PNG2만. 첫오류·단색·시간/보존실패뒤추가촬영0. Actor/skin/Graph writer/수면생성·AlignGround·가열Service·냄비조립0",
+      "artifactBudgets": "probe협력60초·단일Render선점불가. capture-r124 원PNG각4합8MiB·JSON32MiB(일반28/요약실패4). 별도slot-r125 외부현재관찰/Console/loader/인계·manifest64MiB(일반60/최종4), 모든파일flat/하위폴더금지·매저장검사, loader개별2MiB. 큰texture전체직렬0. 모두CreateNew/덮어쓰기0",
+      "preservation": "동결계획48파일+spec/probe/plan/loader/기존CF59PNG 및외부현재Scene5/Assembly4·전체4701+기존Preview객체의동일식직렬hash/선택/Scope/env/Graph/Console 전후대조. 원D385 manifest22실제행 재대조. 숫자/개수만으로보존주장X. 전용평가Assembly잔류는구분",
+      "collection": "Run반환JSON문자열을바깥변수에보유→CreateNew보존→status/images/failures/보존bool형식확인. 원문저장실패시2MiB내원문은final/도구반환에도포함, 상한초과는명시차단. 완전회수와이미지검증·형상판독분리. 성공주장때2PNG의정확경로/서명/IHDR길이13/768/hash검사. 부분실패는실제output경로목록을먼저저장하고파일별길이/hash 또는오류행을수집, 재실행0. 최종쓰기예외도원도구응답·독립외부관찰로보존",
+      "closeout": "자기PRU/clone/texture/로그/RT정리 뒤 별도외부Scene/Preview/Graph/Console 관찰·파일검사, lease먼저반환. 원PNG2직접열람·manifest마감은파일만. 정리실패시비소유/전역강제정리0",
+      "resultCap": "격리정적열원자산외형·native외곽판독만. Sphere최고점/Rendererbounds는냄비받침면아님. 실제지지·접근·가열·연료·Runtime/GameView/E승격NotRun. 승인09시경계유지/추가후보자동실행0"
+    },
+    "heatExteriorPreparation": {
+      "revision": "d385-campfire-exterior-preparation.r124",
+      "executionAllowed": false,
+      "acceptedDraftSha256": "FE6ABEB966CBC6E15377F85FBE0CDAA0FCABAA83D23F61C4A84D692109D5759F",
+      "studySha256": "CD67FE45CFDECD8D7A8C9ED98AFDA8C47B7AD9D5C3FE06402320CED268877012",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "candidatePath": "Assets/Synty/PolygonNature/Prefabs/Props/SM_Prop_CampFire_01.prefab",
+      "candidateGuid": "1fbdd99ef1d1e2b4dac24a8d8ef04741",
+      "candidateSha256": "7D2BF08438AEFD66C31669A9E2BA4569D32A200EEA116E79D2DCAF04F7340E32",
+      "candidateMetaSha256": "4BBF8BBAA1BA01CBDC4937603285F754EAE245B5C3E63FA10C2707653DD63AF2",
+      "writeRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385/heat-support-preflight",
+      "allowedPreparationFiles": ["probe.cs", "input-plan.json"],
+      "scope": "외부2파일 준비만. 연구9.2 정확10hash와 타입소스/meta·전이의존 관문, 정적Mesh/native좌표·Renderer/Sphere외곽 읽기 및 자기Preview25/65도768² 원PNG2장 계획. 아직Editor/Compile/Load/Render0",
+      "renderContract": "r113 고정named log/Begin뒤target nonnull768²/자기target이전값재대입금지/외부RT.active복원/Begin성공시finallyEnd1회/texture·로그정리/첫오류·정확단색중단/CreateNew. 빈소유Preview priming 최대1·본PNG2, 협력60초/단일Render선점불가. PNG각4MiB·합8MiB/기록32MiB·여유1GiB",
+      "preservation": "후속단독슬롯의현재stopped/dirtyfalse·Scene/Scope/env/선택/기존Preview신원·Graph/전체객체·Console·SceneSave2Packages2/의존파일·Assembly 전후같은식확인. 자기clone/Preview만정리, 비직렬cache보존완전주장X",
+      "exclusions": "냄비조립/상대TRS/받침면추정/Player접근/가열·연료·ServiceConfirm/수면CreateVisual·AlignGround/.65배/Actor·skin·Graph조작/읽기가능변경/reimport/게임·SceneSave/새제작·E승격0",
+      "nextGate": "개발 두준비파일전체검토·hash/정확출력/보호목록·실행명세재결속→공간단독시작통보. 준비안만으로실행하지않으며실패자동수정·재시도0"
+    },
+    "selectedPresentationReference": {
+      "visualKey": "Survival.Brew.Vessel",
+      "path": "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_CookingPot_01.prefab",
+      "guid": "28522495c7273dc4fa67b894ae25ff11",
+      "sha256": "3BB5376B0AFE523B03238122C117A45D4A7B286FD2AC8F3CBBB0C44629976E3B",
+      "metaSha256": "8AF03FFAACDD8D8C9EAE7E30930DC3F348F4375661FA9DE8D785AEF538547A22",
+      "supersededGuidForPotRoleOnly": "29fc435e87f624c4aa417f109a26bdf2",
+      "applicationLevel": "Current work-order presentation selection. Runtime consumer/Scene not changed; original Prefab/default closed lid preserved.",
+      "reason": "Four isolated PNGs directly reviewed: broad opening, inner wall and bottom, long handle. Original CampPot01 bottle form excluded for this role; Mug unchanged.",
+      "limits": "No heat-source support/access/volume/contents/brewing/drinking/hand contact or actual GameView validation. Hidden lid is diagnostic on owned clone only."
+    },
+    "exteriorResult": {
+      "capturedSpecSha256": "7A81D064805CA2739996255DF23E8014DB3E84CD6AC3005E41A647C34265E83C",
+      "capturedStudySha256": "BFEFC1FA6B638DD096E7A8EF0CE091FCB44750A47300D820ECBD2CF0D63010F9",
+      "manifestSha256": "972C79F1FFC7FF7FC09DA675CA080782A89F6A8CCA16A21D29F612B27EFD15EF",
+      "handoffSha256": "358139922458218EB896B56B17593B22D3DD90D88F4DF25CC0558401F22779D4",
+      "integrationReview": "Developer directly viewed four PNGs and verified22/22 file hashes/lengths. Body bounds0.6271664/0.203881681/0.3254663; complete bounds0.6340182/0.3077426/0.338767081, native1. Not vessel volume.",
+      "preservation": "02:00:49 stopped/dirtyfalse/root2/selection[], canonical4701 serialized diff0/files5/Assembly4/dependencies32 unchanged. Preview count1 only, Graph0/Scopefalse/envnull/Console0. Unowned Preview internal serialization not collected; no complete native-cache preservation claim."
+    },
+    "previewPlan": {
+      "candidatePath": "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_CookingPot_01.prefab",
+      "guid": "28522495c7273dc4fa67b894ae25ff11",
+      "sha256": "3BB5376B0AFE523B03238122C117A45D4A7B286FD2AC8F3CBBB0C44629976E3B",
+      "metaSha256": "8AF03FFAACDD8D8C9EAE7E30930DC3F348F4375661FA9DE8D785AEF538547A22",
+      "outputRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-pot-replacement-d385",
+      "procedure": "stopped/compilefalse/Scopefalse/envnull·Scene/4701공식객체와기존Preview/Graph·파일5/Assembly4/원본의존 기준선. persistent null/동적타입/mesh/material/bounds 관문 뒤 자기Preview native1/25·65도 각 기본뚜껑PNG. 정확Lid자식Renderer만일시숨김2PNG진단, 같은camera/TRS/본체Collider재질비교, Renderer원복·자기Cleanup. 원본/Scene/Save/기존20artifact불변.",
+      "limits": "입구/내부외형·native실측만. 실제열원지지/Player접근/용량/가열/음용/참조교체/GameView는미검증. 불명script/원본drift시중지, 원본Instantiate부수효과관문유지."
+    },
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "currentDispatch": "r129 동결실행준비: 개발 r128 Probe전체/계획계약·diff/96파일 대조완료, 새로더 의존사본수집·실패분리 교차검토 후 최종hash와 명시단독시작통보때만 Compile1/Run1/PNG2. 현재실행전이며 기존r125실패27/3소스보존. 품질·지지·접근·가열/E성과아님",
+    "selectionCriteria": "위·옆 실제격리외형에서 넓은입구/내부조리용기로읽힘, 크기/pivot/Collider·열원배치접근적합성 확인. 병/화분/막힌소품을 이름만으로통과시키지않음.",
+    "nextGate": "연구/정확후보 검토 후 단독미리보기배분→실측 인수→선정근거/참조교체 결속. 적합한보유후보선택은사용자재질문불필요. 새가공·권리·게임의미변경만반환.",
+    "boundary": "용량/가열/연료/시간/음용규칙·Mug01·원본자산·Scene저장보호·E불변. 외형선정과참조교체/실제게임연결을분리. commit/push없음.",
+    "automaticPromotionAllowed": false
+  },
+  "d382IsolatedVesselReview": {
+    "reviewResult": {
+      "statusCode": "IsolatedExteriorObserved_NoGameplayPromotion",
+      "handoffSha256": "81AA0E264065069208E35715FE784388EFBF70E254C8500EBADA0A6757D51ED7",
+      "manifestSha256": "3D956C03502A40305B35864C18E8BECFBEE6F44F89F634C050D712AF8D706BF3",
+      "integrationReview": "개발 PNG4장 직접열람 및 manifest20/20 hash/길이 대조. 25/65도 각768 PNG, native1/개별카메라fit.",
+      "observedForm": "기존 CampPot01은 긴 좁은 목과 둥근 몸통의 병 같은 형상. Mug01은 열린 입구/손잡이, Collider0. 원후보를 자동 교체하지 않으며 가열용기 적합성은 미확정.",
+      "preservation": "공간01:35:59 반환: 4701직렬차이0/파일5/Assembly4/직접의존52경로 및 원본관찰동일, Preview1/Graph0/Scopefalse/envnull/Console새0. 비직렬캐시 완전보존은 미검증.",
+      "limitations": "GameView/내용물/용량/열원/음용/손접촉/SessionSave NotRun. persistent activeInHierarchy 검사오류와 activeSelf계보 정정 이력 보존. 원JSON3개 각230.6MB는보존하고 asset-summary/verification으로빠른검토.",
+      "automaticPromotionAllowed": false
+    },
+    "statusCode": "ApprovedIsolatedAssetReviewOnly",
+    "approvalDocumentRef": "docs/AI/야간개발-분야별시각진척-2026-08-31.md",
+    "approvalHashSha256": "2404EA5BD27DC12214E46824B3EEAE2ADCF80F3C2D96FA93D8AA3F7E9F03C2CB",
+    "scope": "D382의 비권위 격리 자산 외형 검토. 기존 HB01 순수 계산의 NotApplicable/현재E/Required 전체 공간·음용 연구 상태를 변경하지 않는다.",
+    "candidateSourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/약초Recipe제작/herbal-recipe-crafting.inquiry.r1.md#보유-synty-표현-자산-조사",
+    "sourceReview": "기존 Survival.Brew.Vessel/Cup 후보 파일·GUID/직접 mesh/material을 검토. Generic Pot01로 원후보를 대체하지 않는다. 이것은 외형 조사 배분이며 새 제작·가열/섭취 구현 Accepted 연구가 아니다.",
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "outputRoot": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/herbal-vessel-review",
+    "candidates": [
+      {
+        "visualKey": "Survival.Brew.Vessel",
+        "path": "Assets/Synty/PolygonDungeonRealms/Prefabs/Props/SM_Prop_Camp_Pot_01.prefab",
+        "guid": "29fc435e87f624c4aa417f109a26bdf2",
+        "sha256": "BECD94A3B590B40AFBA2D39211878F0BE8474B78C5C9A322AB95733FB5CBC7AC",
+        "metaSha256": "079CD71101C5B2A7D730C7A129730BBEB4B2C62544ADE26209DC593F802DD5E8"
+      },
+      {
+        "visualKey": "Survival.Brew.Cup",
+        "path": "Assets/Synty/PolygonGeneric/Prefabs/Props/SM_Gen_Prop_Mug_01.prefab",
+        "guid": "d23c715168b31804ba6fa370a6502b8f",
+        "sha256": "2609BF1E13F7500548CA4B76C3C63B03F198F9D2E527CC921DB7963A39CC3357",
+        "metaSha256": "F920F854D7AFD7022C80F5B1B30C187D7CAA15B6C413C650724C6086B93E9973"
+      }
+    ],
+    "preflight": [
+      "단독 Editor 슬롯, stopped/compilefalse/dirtyfalse/기존 Preview1·Graph·Scope/env/Scene·Packages2·Save2·4701직렬·직접소비파일 기준선 기록. Play/컴파일/SceneOpenSave/수동ScopeReset 없음.",
+      "먼저 AssetDatabase persistent 읽기만으로 정확 GUID/path, 상속 Mug의 실제 컴포넌트/mesh/material/bounds, null 슬롯/MonoBehaviour·Animator·Rigidbody 부재 확인. 미지원이면 원본수정·컴포넌트제거·fallback 없이 해당후보 실패반환.",
+      "직접 Prefab/meta·mesh/meta·material/meta·collider mesh/meta 및 직접 shader/texture 의존경로/hash 목록을 생성 전 동결. 로드 후 직렬값/hash 변화는 보존 한계로 반환하며 자동 재import/보정하지 않는다.",
+      "기존 q364 inspect-preview.cs는 읽기 재사용만. 새 출력경로/정확2후보용 artifact 복사본으로 한정하고 기존8종/기존PNG 덮어쓰기 금지. 스크립트없는 수동형상 Prefab만 자기 PreviewRenderUtility에 조립."
+    ],
+    "execution": [
+      "사전관문 통과한 후보별 원본 nativeScale 유지·바닥 없는 중립 배경/소유 카메라·조명으로 25도/65도 768px PNG 각각1장. priming1장은 폐기, 실제 파일 인코딩 PNG 검사/직접 열람. 각 이미지의 카메라 fitting은 기록하며 물체간 동일화면크기를 실제 동일크기로 오인하지 않는다.",
+      "Collider는 후보 읽기 자료만; 물리시뮬레이션/용량측정/열원/액체/손-컵/음용/새재질·mesh가공 없음.",
+      "finally 자기 texture/PreviewRenderUtility만 정리. 기존 Scene/Preview/Graph/Scope/env/원본과직접의존직렬/filehash·mtime 비교, 실패시 자기범위 밖 정리 금지.",
+      "각후보 하나가 차단되면 반복하지 않고 다른 후보 관문을 독립 평가. 결과별 Passed/Blocked/NotRun과 직접 근거를 분리."
+    ],
+    "resultLabels": [
+      "격리 자산 외형 검토 · 실제 Game View 아님",
+      "내용물/용량/가열/섭취/손접촉/SessionSave 미연결",
+      "1000/200mL는 기존 게임 시험값이며 이 mesh 부피에서 확인한 값 아님"
+    ],
+    "forbidden": [
+      "Play/실제입력/권위명령/SaveRoot변경",
+      "Assets·vendor·Scene·Packages쓰기",
+      "신규공식Scene·외부호출·Blender/Clip/자산가공",
+      "원본Instantiate를 공식Scene에 수행/전역Camera·Graph·Selection 변경",
+      "E 승격/실제 달이기·음용 성공 주장"
+    ],
+    "previousPresentationE4Plan": {
+      "code": "E4",
+      "disposition": "Blocked",
+      "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+    }
+  },
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
   "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
@@ -19,6 +249,64 @@
     "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
   },
   "presentationE4Preparation": {
+    "assetSurvey": {
+      "approvalRef": "docs/AI/Logic선행기능-Presentation균형계획-2026-08-31.md",
+      "approvalSha256": "BD8532C58EE625B8563AAAD939450A80CB27BB003C7A691FA6160E831FE5C463",
+      "reportRef": "docs/Reports/Presentation최소모듈-D386기술통합-2026-08-31.md",
+      "method": "FileReadAndExistingEvidenceReuse",
+      "result": "FileSurveyPrepared_ProductUnlinked",
+      "runtimeVerified": false,
+      "automaticEvidencePromotionAllowed": false,
+      "scope": "HB01 전체 용기 표현의 후보 재사용 조사. 이 명세의 NotApplicable는 기존 첫 순수 계산 묶음에만 유지; 부모 WI-ACTOR-03 지식 E4를 달이기·음용 E4로 확대하지 않음.",
+      "studyRef": "docs/Architecture/PlayableLoops/Nature약초차-냄비표현교체-적용연구.md",
+      "studySha256": "C46404610AACD697A3AFF4967214DC51E2BB8B05B2BA74FFAB3D26273DD8D9F5",
+      "candidates": [
+        {
+          "role": "Survival.Brew.Vessel / 기존 D385 선정 유지",
+          "assetPath": "Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_CookingPot_01.prefab",
+          "guid": "28522495c7273dc4fa67b894ae25ff11",
+          "fileSha256": "3BB5376B0AFE523B03238122C117A45D4A7B286FD2AC8F3CBBB0C44629976E3B",
+          "metaSha256": "8AF03FFAACDD8D8C9EAE7E30930DC3F348F4375661FA9DE8D785AEF538547A22",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        },
+        {
+          "role": "Survival.Brew.Cup",
+          "assetPath": "Assets/Synty/PolygonGeneric/Prefabs/Props/SM_Gen_Prop_Mug_01.prefab",
+          "guid": "d23c715168b31804ba6fa370a6502b8f",
+          "fileSha256": "2609BF1E13F7500548CA4B76C3C63B03F198F9D2E527CC921DB7963A39CC3357",
+          "metaSha256": "F920F854D7AFD7022C80F5B1B30C187D7CAA15B6C413C650724C6086B93E9973",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완"
+        },
+        {
+          "role": "D385 제외 원냄비 후보 / 삭제하지 않음",
+          "assetPath": "Assets/Synty/PolygonDungeonRealms/Prefabs/Props/SM_Prop_Camp_Pot_01.prefab",
+          "guid": "29fc435e87f624c4aa417f109a26bdf2",
+          "fileSha256": "BECD94A3B590B40AFBA2D39211878F0BE8474B78C5C9A322AB95733FB5CBC7AC",
+          "metaSha256": "079CD71101C5B2A7D730C7A129730BBEB4B2C62544ADE26209DC593F802DD5E8",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "냄비 역할 부적합/원본 보존"
+        },
+        {
+          "role": "Survival.Camp.HeatSource / 파일 후보",
+          "assetPath": "Assets/Synty/PolygonNature/Prefabs/Props/SM_Prop_CampFire_01.prefab",
+          "guid": "1fbdd99ef1d1e2b4dac24a8d8ef04741",
+          "fileSha256": "7D2BF08438AEFD66C31669A9E2BA4569D32A200EEA116E79D2DCAF04F7340E32",
+          "metaSha256": "4BBF8BBAA1BA01CBDC4937603285F754EAE245B5C3E63FA10C2707653DD63AF2",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "외형·지지·접근 미검사; r129 중지 유지"
+        }
+      ],
+      "reusedArtifactCounts": "D385 manifest22/22 및 기존 용기 manifest20/20 파일 길이/hash 일치. 새 실측·촬영0.",
+      "animationRequirement": "정적 용기 Clip/Rig 불필요. 실제 음용·손 접촉·중단 복귀는 별도 상태/Actor/Clip 결속 미검사.",
+      "gaps": [
+        "재고 참조는 존재하나 Survival.Brew.Vessel/Cup의 HB01 제품 상태 소비 미확인. 원본 뚜껑 닫힘 유지; 숨김은 과거 격리 진단만.",
+        "수면 CampFire 소비는 .65배 장식+Light+AlignGround이며 달이기 열원/냄비 받침 계약 아님. Accessible은 지지면/접근 위치 계산이 아님.",
+        "HB01 Confirm 원자성·가열·섭취/Session/Save 미연결; 1000/500/200mL 시험값은 mesh 용량 아님. 기존44시험 기록을 이번 재실행이나 전체Loop 증거로 세지 않음."
+      ],
+      "nextOwner": "개발 Presentation E4 정확 상태 소비/조립 경로, HB01 Logic E3 잔여 및 Session/Save Logic E1 영향 검토; 공간/애니는 해당 계약·별도 승인 후. r129/기존 executionAllowed 값은 재개 권한 아님."
+    },
     "applicabilityCode": "NotApplicable",
     "notApplicableReason": "첫 공통 계산 지원 묶음에만 해당. HB01 전체 표현은 Required 연구/준비 Accepted 후 별도 결속.",
     "playerReadableMoment": "이번에는 순수 계산만 검증",
@@ -142,8 +430,8 @@
         },
         {
           "code": "E4",
-          "disposition": "Blocked",
-          "summary": "이번 작업은 비시각 공통 계산 지원. HB01 전체 표현 준비/Required 연구 Accepted와 Logic 상태 후 별도 작업으로 결속."
+          "disposition": "Affected",
+          "summary": "D382 추가범위의 기존 냄비·컵 비권위 격리 외형 조사만 허용. 기존 공통계산에는 비시각 NotApplicable 유지, 전체 HB01 제작·열원·섭취·Session 표현/Required 연구는 여전히 별도 결속. 단계 승격 없음."
         },
         {
           "code": "E3",

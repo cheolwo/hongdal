@@ -1,4 +1,215 @@
 {
+  "d396VisualCandidatePreparation": {
+    "approvalRef": "docs/AI/WI전체-E4문서코드자산준비-2026-08-31.md",
+    "approvalSha256": "7B94E8816E1C623533D14C52DFF0FDDBE8EF6E33CEF945308DA64CC05159942A",
+    "revision": "farm-harvest-visual-candidate-preparation.r1",
+    "worldInteractionId": "WI-FARM-04",
+    "scope": "기존 한 재배의 불변 상태를 세 동결 시각 후보/정확 family/표현 키에 대응하고 기존 읽기 전용 Preflight에서 소비한다. 자산 조회·조립·권위상태 공급·생산량 계산·Runtime setter·E5 미연결을 우회하지 않는다.",
+    "owner": "개발 통합/비중첩 코드 시험 담당",
+    "writePaths": [
+      "Ssalddel.Unity/Runtime/Farm/Farm수확시각후보Preparation.cs",
+      "Ssalddel.Unity/Runtime/Farm/Farm수확시각후보Preparation.cs.meta",
+      "Ssalddel.Unity.Tests/Farm수확시각후보PreparationTests.cs",
+      "Ssalddel.Unity.Tests/Farm수확시각후보PreparationTests.cs.meta",
+      "Ssalddel.Unity/Runtime/Farm/Farm수확표현연결Preflight.cs"
+    ],
+    "basis": "planningGate Approved Farm r1/requiredStudies Accepted 공간 r1의 Growing→PotatoS, HarvestReady→PotatoL, Harvested Lot→PotatoBox와 정적 대체 허용. r2/LS01 공간 배치 범위 확대 없음. 현재 assetSurvey exact 후보/GUID/file/meta hash 재사용.",
+    "reuseApis": ["Farm수확상태PresentationPreparation.TryPrepare", "Farm수확상태PresentationState", "Farm수확표현연결Preflight.Review", "표현연결Plan/관측/결과"],
+    "validation": "세 상태/정확후보·family·표현키 대응, 누락/중복/drift/다른제품·상태 거부, 입력불변·결정성, 원본 상태판본 불일치 및 E5 미관측 보존. netstandard2.1/C#9 소비 빌드·독립 시험. 파일 getter/Unity API 없음.",
+    "productSceneBinding": "E5Unlinked",
+    "currentResult": "PurePreparationAndFocusedTestsPassed_ProductUnlinked",
+    "reportRef": "docs/Reports/WI전체-E4-Farm시각후보준비-D396-2026-08-31.md",
+    "terminologyBoundary": "CropGrowing/CropHarvested는 PresentationStateCode이며 권위 상태를 변경하지 않는다. farm.crop.grow/harvest는 기존 명세/Slot의 기대 VisualKey 문자열이며 실제 WorldVisualCatalog 조회 성공이 아니다. AssetLookupVerified/CatalogLookupVerified=false.",
+    "focusedTests": { "total": 65, "newCandidateTests": 29, "failed": 0, "skipped": 0, "scope": "독립 Fixture; 실제 자산조회/Editor/권위상태 공급 증거 아님" },
+    "editorAllowed": false,
+    "logicChangesAllowed": false,
+    "automaticPromotionAllowed": false
+  },
+  "connectionPreflightImplementation": {
+    "approvalRef": "docs/AI/Presentation-E4-E5연결사전검사-2026-08-31.md",
+    "approvalSha256": "AD2300CBA2DE8BB11624F42FF9996EC0D5BD150D95335D301F2771BBEF7D3399",
+    "revision": "presentation-connection-preflight.design.r1",
+    "scope": "읽기 전용 공통 검사/Farm 한 재배 첫 소비/방문자 기존 준비 계약은 시험입력만. Ready는 연결 준비이며 E5 완료 아님.",
+    "studyBasis": "기존 planningGate Approved Farm r1 및 requiredStudies Accepted 공간 r1/r2, presentationE4Preparation.assetSurvey의 D388 후보/상태 공백을 재사용. 새 접촉/가공/Scene 동작 없음.",
+    "writePaths": [
+      "Ssalddel.Unity/Runtime/PresentationContracts/표현연결Preflight.cs",
+      "Ssalddel.Unity/Runtime/PresentationContracts/표현연결Preflight.cs.meta",
+      "Ssalddel.Unity/Runtime/Farm/Farm수확표현연결Preflight.cs",
+      "Ssalddel.Unity/Runtime/Farm/Farm수확표현연결Preflight.cs.meta",
+      "Ssalddel.Unity.Tests/표현연결PreflightTests.cs",
+      "Ssalddel.Unity.Tests/표현연결PreflightTests.cs.meta"
+    ],
+    "reuseApis": [
+      "Farm수확상태PresentationPreparation.TryPrepare/읽기 전용 Farm수확상태PresentationState",
+      "기존 StableIdReconciler/PresentationRevision은 위 소비자를 통해 유지",
+      "WorldVisualCatalog.Resolve/기존 분야별 lease는 실제 조회/소유 관측 공급자 경계; 새 대장/조립/해제 실행 없음",
+      "방문자체류PresentationPreparationProjector/방문자체류CardPresentation은 두번째 시험입력"
+    ],
+    "resultCode": "Conditional",
+    "resultEvidenceScope": "독립 코드 소비: 상태/관측 미확보 입력은 Conditional/FarmSnapshotMissing_E5Unlinked. E3+null component를 모사한 Fixture는 Blocked/ObservedMismatch·ObservedMissing. 실제 현재 Scene 관측 결과 아님.",
+    "fixtureResultCode": "Blocked",
+    "reportRef": "docs/Reports/Presentation연결사전검사-D389-2026-08-31.md",
+    "nextOwnerAndEarliestStage": "개발 Presentation E4: 정확 상태→VisualKey→후보 대응/관측 공급. Logic E5 사본·Session/Save 영향은 기존 승인 범위에서 별도. 공간 실제 대상/지지·접근·9밭 null 수리는 이번 미실행.",
+    "logicChangesAllowed": false,
+    "editorAllowed": false,
+    "automaticPromotionAllowed": false
+  },
+  "presentationModuleScope": {
+    "worldInteractionIds": [
+      "WI-FARM-04"
+    ],
+    "purpose": "D386~390 WI-FARM-04 지원: 한 재배 고유 식별자의 Growing/HarvestReady/Harvested 상태 사본→정확 후보 준비→읽기 전용 연결 사전검사. 향후 같은 대상의 실제 표시·입력/결과·해제까지가 작은 실제 성립 단위이며 지금은 준비/시험만. 기존 Preview/Confirm·권위 규칙 재사용, 이번 호출 없음. 부모 Farm 전체 E5·FB01 위임 Logic 작업·전체 경관 조화와 구분; active WI01/E/상한 불변. 대응표: docs/Reports/E5개별성립-D390기술반영-2026-08-31.md",
+    "approvalRef": "docs/AI/Presentation단계별최소모듈-2026-08-31.md",
+    "approvalSha256": "602306949E897AFBD59B066A9547A76D611A8CD7001476B7564DC294FB1CEF53",
+    "logicChangesAllowed": false,
+    "automaticPromotionAllowed": false,
+    "reportRef": "docs/Reports/Presentation최소모듈-Farm소비-2026-08-31.md"
+  },
+  "presentationModuleBindings": [
+    {
+      "moduleCode": "presentation-requirement-contract",
+      "statusCode": "Unverified",
+      "reason": "D386 승인 연결. 개별 모듈 EvidencePackage 검토/등록 전이며 기존 Farm E를 유지한다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [
+        "repo:docs/AI/Presentation단계별최소모듈-2026-08-31.md"
+      ],
+      "testRefs": [
+        "repo:eng/tests/playable-loop-presentation-validation.ps1"
+      ],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "presentation-projection-lifecycle",
+      "statusCode": "Unverified",
+      "reason": "D386 한 재배 단위의 불변 준비·판본 거부 코드와 집중50/전체587 회귀는 검증했다. 자산 조회·실제 객체 수명·UI 연결을 포함한 모듈 전체는 미검증으로 유지한다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [
+        "repo:Ssalddel.Unity/Runtime/PresentationContracts/Reconciliation/StableIdReconciliation.cs",
+        "repo:Ssalddel.Unity/Runtime/Farm/Farm수확상태PresentationPreparation.cs"
+      ],
+      "testRefs": [
+        "repo:Ssalddel.Unity.Tests/StableIdReconciliationTests.cs",
+        "repo:Ssalddel.Unity.Tests/Farm수확상태PresentationPreparationTests.cs",
+        "repo:Ssalddel.Unity.Tests/PresentationRevisionFirstApplyTests.cs"
+      ],
+      "evidenceRefs": ["evidence:farm-presentation-minimum-preparation-d386-20260831"]
+    },
+    {
+      "moduleCode": "presentation-automated-regression",
+      "statusCode": "Unverified",
+      "reason": "D386 관리 연결42사례와 준비 코드 전체587 회귀는 통과했다. 실제 표현 수명·촬영 도구 건전성의 전체 소비 검증은 미실행이므로 모듈 전체 Passed로 바꾸지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [
+        "repo:eng/common/presentation-module-bindings.ps1",
+        "repo:Ssalddel.Unity/Runtime/Farm/Farm수확상태PresentationPreparation.cs"
+      ],
+      "testRefs": [
+        "repo:eng/tests/playable-loop-presentation-validation.ps1",
+        "repo:Ssalddel.Unity.Tests/StableIdReconciliationTests.cs",
+        "repo:Ssalddel.Unity.Tests/Farm수확상태PresentationPreparationTests.cs",
+        "repo:Ssalddel.Unity.Tests/PresentationRevisionFirstApplyTests.cs"
+      ],
+      "evidenceRefs": ["evidence:farm-presentation-minimum-preparation-d386-20260831"]
+    },
+    {
+      "moduleCode": "presentation-binding",
+      "statusCode": "Unverified",
+      "reason": "D388 4후보 파일조사 완료/D389 읽기 전용 연결 사전검사 구현. 실제 상태·관측 미확보 소비는 Conditional/FarmSnapshotMissing_E5Unlinked; E3+null 결손 Fixture는 Blocked. 상태명/정확 family/제품 소비·지지/접근 미연결, 모듈 전체 Unverified/E5 아님. 보고: docs/Reports/Presentation연결사전검사-D389-2026-08-31.md",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [
+        "repo:eng/execution-ledgers/manage-e7-vertical-work-order.ps1",
+        "repo:Ssalddel.Unity/Runtime/PresentationContracts/표현연결Preflight.cs",
+        "repo:Ssalddel.Unity/Runtime/Farm/Farm수확표현연결Preflight.cs"
+      ],
+      "testRefs": ["repo:Ssalddel.Unity.Tests/표현연결PreflightTests.cs"],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "visual-source-bounds",
+      "statusCode": "Blocked",
+      "reason": "D389 사전검사와 실제 E5 구분: 기존9밭 null/상태 공급·선택 미연결, 새 관측 없음. Fixture 결손 거부가 현재 Scene 수리·실제 배치/입력 성공을 대신하지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [
+        "unity:Assets/Ssalddel/Presentation/World/WorldVisualCatalog.cs"
+      ],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "player-scale-spacing",
+      "statusCode": "Blocked",
+      "reason": "기존 9밭 null 컴포넌트·상태 공급/선택 연결 미완료. 격리 시험을 실제 배치·입력 성공으로 대체하지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "state-difference-readability",
+      "statusCode": "Blocked",
+      "reason": "기존 9밭 null 컴포넌트·상태 공급/선택 연결 미완료. 격리 시험을 실제 배치·입력 성공으로 대체하지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [
+        "repo:Ssalddel.Unity/Runtime/PresentationContracts/Reconciliation/StableIdReconciliation.cs",
+        "repo:Ssalddel.Unity/Runtime/Farm/Farm수확상태PresentationPreparation.cs"
+      ],
+      "testRefs": [
+        "repo:Ssalddel.Unity.Tests/Farm수확상태PresentationPreparationTests.cs",
+        "repo:Ssalddel.Unity.Tests/PresentationRevisionFirstApplyTests.cs"
+      ],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "actual-camera-input-result-return",
+      "statusCode": "Blocked",
+      "reason": "기존 9밭 null 컴포넌트·상태 공급/선택 연결 미완료. 격리 시험을 실제 배치·입력 성공으로 대체하지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "surface-clearance",
+      "statusCode": "Blocked",
+      "reason": "기존 9밭 null 컴포넌트·상태 공급/선택 연결 미완료. 격리 시험을 실제 배치·입력 성공으로 대체하지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "work-zone-readability",
+      "statusCode": "Blocked",
+      "reason": "기존 9밭 null 컴포넌트·상태 공급/선택 연결 미완료. 격리 시험을 실제 배치·입력 성공으로 대체하지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [
+        "unity:Assets/Ssalddel/Presentation/World/Farm표시범위Lease.cs"
+      ],
+      "testRefs": [],
+      "evidenceRefs": []
+    },
+    {
+      "moduleCode": "camera-occlusion",
+      "statusCode": "Blocked",
+      "reason": "기존 9밭 null 컴포넌트·상태 공급/선택 연결 미완료. 격리 시험을 실제 배치·입력 성공으로 대체하지 않는다.",
+      "candidateRevisionOrFingerprint": "presentation-minimum-modules.design.r1/farm-harvest-preparation.r1",
+      "implementationRefs": [],
+      "testRefs": [],
+      "evidenceRefs": []
+    }
+  ],
+  "r99ActualPreflightResult": {
+    "statusCode": "BlockedBeforePlay",
+    "observedAt": "2026-08-31T01:27:31+09:00",
+    "dispatchHashSha256": "2E09910CCF1070B5907EAA90965CD99AF137CE586C867E741815B0E0871804F4",
+    "finding": "정지 실제 계층에서 허용9밭 component[4] null, 제외Lot component[5] null. FarmPlot_0_1만 누락없음. FarmViewUnsupportedComponent는 코드기반예측, guard/버튼 실제호출0.",
+    "execution": "Play0/input0/Acquire0/SceneSave0. 실제Farm화면/왕복은 NotRun, 격리33시험과 구분.",
+    "preservation": "4701직렬차이0/ScenePackagesSave5 hash·길이·mtime동일/Assembly4동일/Preview1·Graph0·Sessionnull/Console8419 신규0. 개발 manifest11/11 hash·길이 직접대조.",
+    "handoffRef": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/farm/view-repair-actual-r99/handoff.md",
+    "handoffSha256": "587A8AF01C5C1C0D0EB89F2BC09643DF677091B49E7D45D0848ED27B66CD9714",
+    "remaining": "저장Scene binary MonoScript GUID 매핑 미확정. guard/누락삭제/일괄대체하지 않고 정확 참조/생성주체 수리범위 검토. 동일Play차단반복 대신 독립 D382 자산검토·D383 이동후보준비 진행."
+  },
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
   "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
@@ -9,6 +220,73 @@
   "targetEvidenceStage": "E7",
   "currentEvidenceStage": "E1",
   "promotionEligible": false,
+  "crossDomainVisualReview": {
+    "decisionCode": "D-382",
+    "documentRef": "docs/AI/야간개발-분야별시각진척-2026-08-31.md",
+    "sha256": "2404EA5BD27DC12214E46824B3EEAE2ADCF80F3C2D96FA93D8AA3F7E9F03C2CB",
+    "statusCode": "ExistingScreenCapturedFarmViewBlocked",
+    "farmViewRepair": {
+      "statusCode": "ScopedDisplayRepairImplementation",
+      "focusedTestIntake": "r98 개발직접 정상compile/33Passed(XML9:25+정확순수8), 신규meta2. 4701직렬/파일5/보호10hash불변. Scope61컴파일해제, 중간probe변화 및 Collector36error 별도. artifacts/local/validation/overnight-cross-domain-visual-d382/farm/view-repair-tests/handoff-r98.md(Unity). 전체Mode/Player 실행과 실제GameView 미검증.",
+      "actualValidationPlan": "r99 공간단독. 현재SceneD1D31/8소스+meta2/PackagesSave5/기존PNG/Preview1/Graph0·4701 기준선→정상Play1. 기존 자동Load만 허용. Farmanchor 실제trackedXZ 포함 및 Player.CanFocusTacticalCameraAt 읽기검사(부수효과없는검증)까지 최대60초 조건관찰, 불충족시입력없이반환. 준비되면 UI포함 before PNG→실제Farm3P버튼1click→전이종료 및30frame이후 초점/활성카메라/23허용root/Renderer·관리안내·제외Lot/Tactical/상위형제 확인→after PNG. PlayerTRS/목적지 및같은권위상태를대조; 카메라이동은Actor도착/지면통행성공아님. Farm표시성공한경우만 실제Nature버튼1click으로명시해제/기존표현복귀 확인 및PNG, 가능하면Farm재진입1회로다시30frame유지 확인. 최대입력3click, 밭선택/키/Task/PreviewConfirmTick/Save/직접표시setter없음. 각실패는진단반환하고반복하지않음. normalStop/전체4701·파일5·8소스·meta2·기존PNG보존, Scope변화분리. 전후카메라가바뀌는시점결속검증이므로동일카메라비교라고표시하지않음; clock/fog동결없음.",
+      "preflightIntake": "r96 공간01:04:47 정상Stop 반환. frame2 trackedXZ 밖에서 frame3314 자동확장 뒤 Farm anchor(-27,1.5,2) 포함으로변화. 실제지면/통행준비 증명아님. Renderer240 중 원래237true/3false→정책뒤0true. 실제승인Root는 H/Nature뿐. Farm아래 TacticalBattleRoot804객체는false이며 VisualBaseRoot73객체는활성수명함수없는정적표현. 기존파일/4701보존, Scope73→61/Tick0 자동Load차이별도.",
+      "repairPolicy": "Farm3P만 명시진입. 카메라사전검사는 기존movementGate 실제trackedBounds의 XZ와finite anchor를 사용하고 미제공/profilefallback/범위밖은 무변경거부. 기존Player3P 초기화의 focus만 정확anchor로연결하고 순간이동/목적지/WorldTick변경없음. Farm정적표시범위는 DistrictSurface/Label_FARM/밭10/밭highlight10/VisualBaseRoot만. 기존Lot300kg·SceneObjectPlacements·PlayerPlacementRoot·TacticalBattleRoot 등나머지하위는숨겨확대활성금지. 조상두개Transform-only검증, 허용하위는Transform/MeshFilter/MeshRenderer/BoxCollider/MeshCollider/TextMesh와수명함수없는기존District/Navigation/Management/WorldVisualView만허용; 누락script/Animator/미지원은거부. 상위/제외직접자식기준선은첫진입에만기록, 재적용에서덮어쓰지않고이탈시자기변경만원복. 계층추가/재부모화는검사실패로반환. 외부동일bool작성자부재는이범위소유전제이며감지보장X.",
+      "rendererOwnership": "SinglePlayerView가 실제true→false한Renderer만메모리기록, 정확runtimeRoot/소유자 허용시1회복원하고기록소비. 원래false·기록없는false는절대승격하지않음. 주기재적용은허용안의enabled를건드리지않음. Farm퇴장/Disable/Destroy는자기허용만해제. static승인Root/Nature/LH 정책불변.",
+      "modeAndSnapshotPolicy": "Farm표시임대는권위Snapshot재조회와표현선택에도유지, 전략/Hub/Nature/Farm1P 명시이탈시해제후기존정책적용. Farm3P재클릭은동일초점재적용이며자산재조립아님. 실패진입은버튼Mode/표시를성공으로변경하지않음. 예상하지못한엔진예외는자기임대해제/진단으로반환하고카메라전체복원성공주장X. 관리안내는기존IMGUI에기존검토표현/작업미연결표시, 실제수확Lot및세션ID결속완료아님. 전투/NPC/기존300kg표현은이번허용밖.",
+      "requestedAt": "2026-08-31T00:55:00+09:00",
+      "approval": "D382 및 00:55 기획의 사용자 재개 요청. 기존 Farm 표시/시점 연결의 기술 결함만 보완하며 새 규칙/권위/배치 승인 아님.",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "spaceThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "testThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "testOwnershipUpdate": "D383 animation-visible-outcome-operation.r1 / docs/AI/애니메이션-동작성과중심운영-2026-08-31.md SHA1DA448E35410780F0963A3981BBA8BB7C18E9F476764BEE361DB00673E7046D4 전체인수. r97 전문 읽기에서 재부모화 해제결함2건 반환, Editor/컴파일/시험0. 이후 Farm 일반회귀는 개발직접실행, 애니 기본Queue에서제외.",
+      "ownershipReleaseRepair": "원래 부모사슬이 달라진 객체는 활성반납쓰기없이 기록소비. Renderer는 등록시목록과 당시정확부모사슬/정책범위가모두유효한항목만해제; 새하위/외부이동항목 쓰기금지. 자기Preview의 외부활성부모·조상이동·새Renderer·정상소유복원·반복해제 회귀5case추가. 새class정적예상25+정확순수8, 실행전숫자이며실제XML로확정.",
+      "preflight": "공간 단독 정상Play 1회, 입력0/표시setter0. 정확 FarmDistrict와 상위 두 Transform·형제목록, SinglePlayerView 승인Root 직접참조/현재Renderer, 기존 Farm focus anchor, Player profile 범위 및 movementGate.TryGetTrackedWorldBounds 읽기만. anchor가 실제허용 XZ밖이면 clamp/범위확대 없이 차단반환. root의 기존4701직렬사본과 대조하고 정상Stop/파일5·자동PNG·Assembly4·Preview1·Graph 보존 확인. 환경/SaveRoot/Clock/Session 주입/Scene저장/원본설정 변경금지.",
+      "artifactPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/farm/view-repair-preflight",
+      "sourceReview": "Shell.FocusWorldPresentation이 Settlement를 숨기고, Player의 Farm3P가 Player위치에 다시초점, 단일보기는 Farm을 명시허용하지않음. 세경계를 별도수정해야하며 실제호출프레임 원인추적완료로 확대하지 않는다.",
+      "proposedWritePaths": [
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/SimulationWorldShellPresenter.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/통합월드ModePresenter.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/플레이어경관Controller.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/단일PlayerViewController.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/Farm표시범위Lease.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/DioramaTopDownCameraRig.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/농장경영시점Controller.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/Farm표시결속Tests.cs"
+      ],
+      "implementationGate": "r96 실제읽기 후 위repairPolicy를r97에결속. 개발소유명시8cs만수정/신규2meta정상import 허용. 기존WorldRoot/Player/LH 유지하고 임대기간제외조상자식/허용Farm정적하위만표시, 원본Scene저장/계층재배치없음. 전체카메라/선택 전역열거는격리시험에서실행하지않음. 연구r1/r2의기존플레이어·카메라재사용/정적대체표현 범위이며 새배치후보/생산면적변경아님.",
+      "validationPlan": "표시임대·허용Renderer·범위거부 순수/자기Preview시험 먼저. 기존8정확순수 회귀만, canonicalOpen/Scope.Reset전체suite금지. 정상컴파일 후 Scopefalse확인, 메모리해제와Save불변 구별. 공간 실제버튼/전후 GameView는 수정검증후 별도배분. 미충족은 기존차단보존하고 독립분야 시각검토로 이어감.",
+      "automaticPromotionAllowed": false
+    },
+    "firstScreenIntake": {
+      "capturedAt": "2026-08-31T00:39:18+09:00",
+      "editorReturnedAt": "2026-08-31T00:39:20+09:00",
+      "dispatchWorkOrderSha256": "F39ACAA18F765089155A76388441F4F42D6EC3A7DD92A49199543BF3FA9091B2",
+      "manifestRef": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/farm/manifest.json",
+      "manifestSha256": "454EFC14253962581D01BB552127A18138FDF0B8548D021D23AEFDE4AE97D686",
+      "imageRef": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/farm/game-farm3p.png",
+      "imageSha256": "61C8D2E3E1652619A1A2A140C3A8D7A8D84EF4B6B4BBED0A56CD5E1451D96A8B",
+      "result": "개발 직접PNG열람/12파일hash길이대조. 실제Play/UI포함726x470/기존Farm3P클릭1, 숲과하단버튼만보임. 클릭전부터FarmTactical이므로새전이성공아님. 밭10+마당1비활성/시야밖, Daily공급없음. 밭선택/PreviewConfirmTick/상태주입0, 농장화면목표Blocked.",
+      "preservation": "정상Stop/dirtyfalse/root2/4701전체직렬차이0/Preview1/Graph0, ScenePackagesSave5/Assembly4/기존PNG보존. Scope null→복원Session73/Tick0메모리차이 별도. Console error0/warn12. 평가오류/mtime표현차이와.NET ticks정확10/10검사는별도이력.",
+      "nextScope": "동일입력반복없이 D382의 다른분야 비실행시각검토로이동. FarmDistrict표시·시점결속은정확코드소유추가뒤별도. 현재Untilled/Tilling근거없어WI01시작제안철회; 향후기존HarvestReady WI04후보도Local포트결속전미실행.",
+      "automaticEvidencePromotionAllowed": false
+    },
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "artifactPath": "C:/Users/user/ssalddel/artifacts/local/validation/overnight-cross-domain-visual-d382/farm",
+    "integrationReportRef": "docs/Reports/야간-분야별시각진척-2026-08-31.md",
+    "purpose": "기존 canonical Farm3P 관리 화면과 현재 밭/작물·선택정보를 실제 UI포함 Game View 한 장으로 확인한다. 네WI완주·수확명령 연결이나 새경관조립은 이번 범위가 아니다.",
+    "sourceBaseline": {
+      "sceneSha256": "D1D31BFDD9A727D1744B888D2AE25D7C275CC9E7F9A6D21EF5FB5CCBDD243271",
+      "modePresenterSha256": "06793FABC6723F9A19623B98F1CD6B7958E52D97EC07A8FD4BD3BFDC583F5295",
+      "dailyRootSha256": "CE7DFC54AE01554B7B5ABB55255302CE92BD4C87924AB00D44DBE34084AD5070",
+      "dailyPresenterSha256": "6C048779DA0527D38092DB815DCDF4C1B093FCAC10BDCFC457FD3F89F78AF10B",
+      "managementSha256": "7342B0B8F302662B47F36E760FA81E19F75EAF0A3E9A1F8A8857A6FB2FBD19EB",
+      "saveR5Sha256": "D28FAE1190A3F799741E72FEA012C9BF42B9B355DBFD03E3B31E88EA3137CE15"
+    },
+    "allowedActions": "개발 시작통보 뒤 공간 단독Editor. 시작상태/파일기준선 읽기→정상Play(기존Scope 자동Load와메모리변화기록)→기존하단Farm3P 실제uGUI 버튼1회→현재화면/카메라/문맥/LocalScope·Daily준비/현재Farm사본 읽기→UI포함ScreenCapture→정상Stop/보존비교. 밭이 식별되면 기존선택View 1개를 선택하는 표현전용 클릭1회만 추가가능하며 명령호출/Task/예약/자원 변화없는 분기임을 먼저 확인한다. 선택이 불확실하면 클릭하지않고 현재화면만 반환한다.",
+    "forbidden": "F8/Escape/이동키 반복·가상입력·직접UI setter·임의카메라/날씨/Clock변경·권위Preview/Confirm/다음Tick/위임·새Session수동생성/상태주입·Save/Scene저장·Scene재생성·LS01조립·새Prefab/Assets소스·외부HTTP/DB 호출금지. 기존자동Scope설치/Load 경로를 시작전확인하고 자동외부호출 위험이 있으면 Play전 차단반환. 정상Play뒤설치실패도 원격fallback없이 Stop한다. 깊은차단의 추가진단반복 없이 확보화면과한계를 반환한다.",
+    "preservation": "Scene/Packages2/Save2/기존자동PNG·소비소스hash 및4701객체직렬/dirty/root/selection/Preview1/Graph/Console를 시작·종료 비교. 소유콜백만해제, 비소유Preview/Graph정리없음. UI표현선택/카메라/자연시간·자동Bootstrap 메모리변화와 파일불변을 구분하며 전체메모리보존을 단정하지 않는다.",
+    "evidenceBoundary": "실제Runtime 출력으로 기록하되 Farm3P 진입/현재표현까지만 성공판정. 저장 r5는Tilled10/HarvestReady10·수확능력Actor2/작업·Lot0이었고 복원후현재사본은 별도다. 기존Daily Local공급중단/HarvestOnly를 기능완료로감추지 않으며 실제밭과권위ID미결속은표시한다. 명령연결후보는수확WI04가현재재고에더가깝지만 이번에는실행하지않는다. E/기획·후보승인 불변."
+  },
   "deliveryCap": {
     "currentDispatchTargetStage": "E5",
     "promotionBeyondStageAllowed": false,
@@ -19,6 +297,93 @@
     "nextReopenCondition": "Session 권위·명령·저장 영향은 Logic E1부터 재검증하고 실제 자산·통행·Rig 실패는 해당 Presentation E4로 반환한다."
   },
   "presentationE4Preparation": {
+    "assetSurvey": {
+      "approvalRef": "docs/AI/Logic선행기능-Presentation균형계획-2026-08-31.md",
+      "approvalSha256": "BD8532C58EE625B8563AAAD939450A80CB27BB003C7A691FA6160E831FE5C463",
+      "reportRef": "docs/Reports/Presentation최소모듈-D386기술통합-2026-08-31.md",
+      "method": "FileReadAndExistingEvidenceReuse",
+      "result": "FileSurveyPrepared_ProductUnlinked",
+      "runtimeVerified": false,
+      "automaticEvidencePromotionAllowed": false,
+      "scope": "WI-FARM-04 한 재배의 Growing/HarvestReady/Harvested 상태 준비. 활성 WI-FARM-01 및 전체 Loop E는 유지.",
+      "comparisonBasisRef": "C:/Users/user/ssalddel/artifacts/local/validation/farm-h2-measurement/20260830T030719482Z/measurements.json",
+      "comparisonBasisSha256": "99F8B557D4DC8C2E6044D7D7D688B043CBF502F86C5370418F44D6EE09BE9CC8",
+      "historicalDependencyFilesCompared": 48,
+      "candidates": [
+        {
+          "role": "밭 기반/기존 준비 Slot farm.crop.prepare",
+          "assetPath": "Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_Rows_01.prefab",
+          "guid": "c738b62174ab09f4eb2d7b486398a6ed",
+          "fileSha256": "1C9876DE7FE7B6F3800617ECB0B23C2206152D4AF1B7C6065193E7774356E15A",
+          "metaSha256": "8A15007ED17215972969BB5160F8BF65ED27F8E6CE3EB035DE011040E57D7F30",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완",
+          "catalogFamilyId": "synty-family:farm:environments:dirt-rows",
+          "historicalFileDependencyFingerprint": "f37d1fa4ee5ed756145d21f8b4507b548ed0d4ccf7629fb0ae112d919f874668",
+          "historicalNativeSize": [
+            4.990549,
+            0.198393449,
+            5.06839371
+          ]
+        },
+        {
+          "role": "성장 상태 정적 후보/farm.crop.grow",
+          "assetPath": "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_S.prefab",
+          "guid": "53e5ab917382c9749a58810d6e170537",
+          "fileSha256": "2D5093E764F6F66C08EC2C862ECDF250745B66694CE5278622083E3C9FD12912",
+          "metaSha256": "EE7CDCB2404C218F97697C60B6E1299A307DDE102B9F52C1E54C1EBFE917BD70",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완",
+          "catalogFamilyId": "synty-family:farm:plants:potato-s",
+          "historicalFileDependencyFingerprint": "46ec931e3485e60a91cffefa2b014bc7a3b4d5f77f5dfb7ed519242e7b4929f9",
+          "historicalNativeSize": [
+            0.186849356,
+            0.3714474,
+            0.262023926
+          ]
+        },
+        {
+          "role": "수확 가능 상태 정적 후보/farm.crop.grow + HarvestReady 라벨",
+          "assetPath": "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_L.prefab",
+          "guid": "e48b8d820d122d64484926ce5e8f6e8c",
+          "fileSha256": "FC01F89A96545D8FBA023FCAE7BE54F4EAE5330306A46519D52D6F3C945FF627",
+          "metaSha256": "D960A73F1FB4EB2A5A55A3F8045C65B7FF0A889771AABECA8CA1085CDBB98703",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완",
+          "catalogFamilyId": "synty-family:farm:plants:potato-l",
+          "historicalFileDependencyFingerprint": "376104d5cef4c47d1e51bc0224ec338e1a744c0abcd02bb67ebefc7959b95e1e",
+          "historicalNativeSize": [
+            1.1754415,
+            1.00500667,
+            1.12609553
+          ]
+        },
+        {
+          "role": "HarvestedAtField Lot 후보/farm.crop.harvest; 포장·수거 성공 아님",
+          "assetPath": "Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Box_Potato_01.prefab",
+          "guid": "2131bc3845099584ebe0cb30614e96f4",
+          "fileSha256": "A128993CF0644A5988A537A0196DC69DCD36619538FC499E01ED7F5A3377C583",
+          "metaSha256": "374ED7092770D129BFC362BAA94068F24CE76EADC5EE3B6AEE29A0498306011B",
+          "fingerprintKind": "SourceFileAndMetaSha256_NotCurrentImportedDependencyHash",
+          "reuseDecision": "연결·설정 보완",
+          "catalogFamilyId": "synty-family:farm:plants:box-potato",
+          "historicalFileDependencyFingerprint": "69862f79e92b76085b7b46e48b10508baae7ab191325b254af0638f15cfedc44",
+          "historicalNativeSize": [
+            0.755736053,
+            0.385134041,
+            0.452614427
+          ]
+        }
+      ],
+      "animationRequirement": "첫 정적 상태 준비에는 Clip/Rig 불필요. Accepted r1의 정적 Actor·진행/결과 대체 허용을 재사용하며 농작업 접촉/이동/새 Clip 성공을 주장하지 않는다.",
+      "gaps": [
+        "TryPrepare 기존 SimulationFarmSurvivalStateSnapshot 소비 API는 있으나 제품 호출이 조사 범위에서 발견되지 않음. LocalScope 오늘작업 공급은 capability waiting.",
+        "기존 Slot family potato/crate와 정확 후보 family potato-s/potato-l/box-potato가 다름. FindCandidates는 family 정확 일치이므로 Slot이나 후보 파일 존재만으로 직접 선택을 주장하지 않음. Growing/HarvestReady/Harvested와 CropGrowing/CropHarvested의 표시 변환 필요.",
+        "작은/큰 식물 Collider0, 원 pivot과 음수 minY·밭 외곽을 보존. 상태→정확 후보/소유 조립/지지면/접근/선택 표시 미연결; native 면적≠100㎡ 생산 면적.",
+        "9밭 null component 및 Farm 표시/시점은 별개 기존 통합 차단. 수리·재실행 없음. E5 상태 사본 부족을 주입으로 우회하지 않음."
+      ],
+      "nextOwner": "개발: Presentation E4 상태명/정확 후보/단일 소비 경로 계약; Logic E5 사본·Session/Save는 별도 승인. 공간: 계약 공급 후 지지/접근·실제 배치 검증."
+    },
     "applicabilityCode": "Required",
     "notApplicableReason": "",
     "playerReadableMoment": "밭갈이·파종·관리·수확 결과와 다음 파종을 판독한다.",
@@ -44,13 +409,17 @@
     "fallbackPresentationRefs": [
       "기존 지면+상태 Outline/UI: Synty 실물 증거 아님"
     ],
-    "placementIntent": "D-320 추가 승인 연구 r2에 따라 Barn/Player native 비율을 보존하고 실측 회전 외곽·Player 접근 여유로 새 후보의 예약부지·마당·통로를 조정한다. r1 후보 및 거부 회귀는 보존한다.",
+    "placementIntent": "D-320 추가 승인 연구 r2에 따라 Barn/Player native 비율을 보존하고 실측 회전 외곽·Player 접근 여유로 새 후보의 예약부지·마당·통로를 조정한다. r1 후보 및 거부 회귀는 보존한다. D390: approvedStudyRefs r1/r2의 적용 공간 기준을 소비하되 한 재배 대상이 소비하는 지지·접근·통행·소유 조건을 확인한다. 구후보/확대연구/현 Scene 계보 차이는 미검증이며 전체 Farm 시설 활성화를 현재 준비의 선행조건으로 추가하지 않는다.",
     "interactionAnchorIntent": "기존 Player의 실제 접근과 Preview/Confirm 연결. 배치 엔진은 권위를 변경하지 않는다.",
     "candidateRevisionOrFingerprint": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0",
     "e5ReadinessCode": "Conditional",
     "openGapRefs": [
       "실측9자산·구후보16/16 예상 거부 확인. 확대 후보 생성·통로/지지면 검증·실제 Scene 결속은 미완료.",
-      "Session·새 밭 두 주기·저장 재진입 미검증"
+      "D390 필수/현재 대상: Logic E5 사본·Session/판본·상태→정확 family/제품 소비·필수 컴포넌트(null9 과거관측)·지지/접근/통행·입력/결과·표시/해제 소유 결손은 차단 유지. 미관측은 Conditional이지 면제 아님. 개발 Logic E1/E5·Presentation E4, 실제 공간 관측은 별도 승인.",
+      "D390 간섭/후속: 현재 대상의 통로 차단·카메라 가림·자원/상태 간섭은 가장 이른 원인 E의 차단이며 E9로 이관해 우회하지 않는다. 주변 장식의 실제 영향은 미검증이다. 데이터 전용 D386/D389는 Scene/다른 WI/Renderer를 읽거나 쓰지 않는 코드·순수 시험 범위에서만 다른 장식 완성의 비선행 근거가 있다; 실제 E5로 일반화 금지. 공간 영향 조사 후 무영향이 확인된 범위만 후속 품질/조화로 분리. 담당 개발·공간, 검토 위치 이 openGapRefs와 기술 보고.",
+      "D390 변경 영향: 후보/기준 공간·대상·Session/판본·배치/소유 계약 변경 시 해당 소비자/근거만 재검토. D389 문맥 지문 불일치는 재검사 차단, 영향 미확인은 미검증 유지. 논리와 무관한 미감 변경으로 관계없는 논리 증거를 자동 폐기하지 않으며 실제 E9는 E8 Core 둘 이상/AreaHarmonySet·사람 승인 유지.",
+      "Session·새 밭 두 주기·저장 재진입 미검증",
+      "D388: 기존4후보/Accepted 연구·과거 의존48파일을 대조해 연결·설정 보완으로 분류했다. 실제 imported 기하/지지/접근/제품 소비는 미검사이며 가공·신규 제작 필요는 미확정이다. 상태명과 정확 family 불일치·9밭 null 수리는 별개. 전체 팩 재조사·새 촬영·가공을 자동 실행하지 않는다."
     ],
     "approvedStudyRefs": [
       {
@@ -148,44 +517,44 @@
         }
       ]
     },
-    "presentation": {
+"presentation": {
       "trackCode": "Presentation",
       "currentEvidenceStage": "E1",
       "downwardPlan": [
         {
           "code": "E7",
           "disposition": "Blocked",
-          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+          "summary": "실제 한 밭 선택·Preview·명시Confirm·완료·회복·귀환의 입력/화면 증거. 현재 미연결이며 E5 전달 상한 유지."
         },
         {
           "code": "E6",
           "disposition": "Blocked",
-          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+          "summary": "선택 밭과 작물/수확 결과의 크기·가림·통행·상태 판독 정제. Actor 동작은 적용 범위만 검사."
         },
         {
           "code": "E5",
           "disposition": "Affected",
-          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+      "summary": "WI-FARM-04 한 재배 지원 범위에서 같은 Session/WorldRevision의 토양·재배·Lot을 실제 View와 Renderer/필요 Collider/Bounds·지지/접근/입력·결과/해제에 결속. 상태 준비만으로 통과하지 않음. D390: 한 대상 부분 증거는 부모 Farm 전체 E5가 아니며 필수 결손/간섭은 차단, 무영향 근거가 있는 독립 장식·후속 조화만 비선행. 실제 연결 미확보/E 불변."
         },
         {
           "code": "E4",
           "disposition": "Affected",
-          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+          "summary": "D387/D388에 따라 기존 Accepted Farm 연구·Slot·주/대체/fallback과 presentationE4Preparation.assetSurvey를 재사용한다. 한 재배 상태의4후보/GUID/파일 및 과거 실측을 대조해 연결·설정 보완으로 분류했다. 상태/정확 family/소비자·지지/접근은 미연결·미검사이며 가공/신규 제작 필요는 미확정이다. 파일 조사 완료는 실제 자산 적용·E5 증거가 아니다."
         },
         {
           "code": "E3",
           "disposition": "Affected",
-          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+          "summary": "한 밭 준비 소비자의 중복/과거/충돌 판본·불변사본·실패 보존 및 기존 공통 비교기 소비자 자동 회귀."
         },
         {
           "code": "E2",
           "disposition": "Affected",
-          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+          "summary": "기존 StableIdReconciler/판본 계산기를 재사용한 한 밭 상태 투영 코드. D387의 가벼운 기존 목록·Adapter 선행 조회는 잠정 재사용 경로이며 실제 적합성은 E4에서 구분한다. 기존 연구·후보 참조를 유지하고 전수 재조사/신규 생산 규칙·Scene 실행 없음."
         },
         {
           "code": "E1",
           "disposition": "Defined",
-          "summary": "Farm 밭·작물·수확 Lot과 접근 동선을 실제 상태에서 표현한다."
+          "summary": "한 밭의 Growing/HarvestReady/Harvested·실제 Lot과 미연결/오류·다음 선택의 판독 계약. D386 추가 승인 범위."
         }
       ],
       "upwardValidation": [
@@ -293,6 +662,30 @@
   ],
   "additionalApprovals": [
     {
+      "designDocumentRef": "docs/AI/배치책임구분-리팩토링승인-2026-08-31.md",
+      "designRevision": "placement-responsibility-refactor.plan.r1",
+      "designHashSha256": "1C0FBAC3AA377F1096FF398CAFB096CEE036A90CBA08EC1D52A195447B64A5CE",
+      "statusCode": "ApprovedScopedWork",
+      "approvalEvidenceRef": "docs/AI/배치책임구분-리팩토링승인-2026-08-31.md",
+      "boundary": "D423 선언검사 내부 책임 분리만. landscapeConsumptionBinding.d423Refactor 정확2소스/시험·기존보고·명세/Goal. 공개 API/직렬화/meta/v1~v4/조건순서/예외문구 보존, Coordinator/계획 결과·Save·E 변경0. 실제 버그/표현 변경은 D422와 별도 기록한다."
+    },
+    {
+      "designDocumentRef": "docs/AI/Farm월드맵-배치계층경유-점진구성-2026-08-31.md",
+      "designRevision": "farm-world-map-placement-layer.plan.r1",
+      "designHashSha256": "C4672FB891BB699CFEE95DBB52AA1C85DA56AA3E7CC09E97852A313993BB966A",
+      "statusCode": "ApprovedScopedWork",
+      "approvalEvidenceRef": "docs/AI/Farm월드맵-배치계층경유-점진구성-2026-08-31.md",
+      "boundary": "D422 별도 추가승인. 기존 Farm 기획/Accepted r1/r2/LS01 및 원A/B 보존. 실제 한 Farm 셀의 계보·지면/보호/통로와 exact 단일Prefab 해결부터 기존변환/Partition/Coordinator로 연결한다. 이번 준비는 landscapeConsumptionBinding.d422Preparation의 정확 소유 범위이며 관찰→계획/검사→실제적용/보행은 각 기준선·코드·출력hash 및 공간단독 실행절 결속 후 이어간다. 기존 E/생산/Save/null9/r129·야간 중지 불변. D419~421 동결4원문과 sources에 이 승인을 섞지 않는다."
+    },
+    {
+      "designDocumentRef": "docs/AI/E5개별성립과전체배치책임분리-2026-08-31.md",
+      "designRevision": "e5-local-realization-scope.design.r1",
+      "designHashSha256": "97FF8D8524DA9BC5E1D00BFD821FB9B2E5C251B3B2DE4DFDA315B6CB9E85667C",
+      "statusCode": "Approved",
+      "approvalEvidenceRef": "docs/AI/DECISIONS.md",
+      "boundary": "D390 관리 설명만. 정확 쓰기: 이 명세의 기존 scope/추가승인/E4 gap/E5 summary, 기존 Goal hash, 기존18모듈 visual-source-bounds 출력/참조, eng/tests/presentation-local-realization-scope.ps1, docs/Reports/E5개별성립-D390기술반영-2026-08-31.md, CURRENT_WORK/개발통합상태판과 기존 생성물. 새 schema/API/Goal/Runtime/Scene 없이 WI-FARM-04 한 재배 지원과 부모 판정을 분리. 기획3문서 읽기만, r129/야간 중지 유지."
+    },
+    {
       "designDocumentRef": "docs/Architecture/PlayableLoops/PlanningSessions/건물공간배치/landscape-composition.inquiry.r1.md",
       "designRevision": "landscape-composition.inquiry.r2",
       "designHashSha256": "ABF57E4907FAC5A152EA08CFC5AAEAF24C172C0731809B0B6AAF7785131731EC",
@@ -363,6 +756,219 @@
     }
   ],
   "landscapeConsumptionBinding": {
+    "d422ObservationExecution": {
+      "revision": "farm-cell-observation-execution.d422.r1",
+      "statusCode": "FrozenPendingSeparateStartNotice",
+      "executionAllowed": true,
+      "sourceSha256": "2F8227CEE65088D71804E0C92D890E6497BBC34C80F423E873B3BB737B872CE6",
+      "planSha256": "537AC9137B2A79AEE6D25511C30D3CB4E60DE11E3C0D799A7DBD18FE28BFDE8F",
+      "loaderSha256": "40D48B2D07C062F9CA68868C088F95660FB547349EC10B9569B7C7F8C3FF69FE",
+      "baselineSha256": "BCD2D899F97C04EC7301DDB783846D2F489A0863A5E307D43C2CEA892051CD5F",
+      "loaderPath": "C:/Users/user/source/repos/Hongdal/artifacts/local/validation/farm-world-map-d422/preparation-01/observation-loader.cs",
+      "baselinePath": "C:/Users/user/source/repos/Hongdal/artifacts/local/validation/farm-world-map-d422/preparation-01/baseline-read.cs",
+      "slotRoot": "C:/Users/user/ssalddel/artifacts/local/validation/farm-world-map-d422/observation-01/slot-01",
+      "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "publicApi": "Ssalddel.Unity.Editor.FarmWorldMapD422.Farm셀관찰Probe.Observe(string inputPlanJson)",
+      "input": "원 plan.observationInput 7필드 compact JSON만. cellKey/경로null을 그대로 유지하며 현재 단일참조/셀 식별요약만; 과거값 주입0.",
+      "callBudget": "기존 상태/Scene/선택/Console/창 읽기 → baseline-read eval_file 1 → loader eval_file 1(내부 Compile1/자체검사3/Observe 최대1) → 같은 baseline-read eval_file 1/독립사후 읽기. 각 eval wrapper 합성컴파일과 메모리Assembly는 내부Compile1과 별도로 기록. 임의새관찰코드/재호출/Play/입력/시험/촬영0.",
+      "startGate": "현재 ready/stopped/compilefalse/updatingfalse/전환없음·Scopefalse/env2null, 모든관측Scene dirtyfalse/저장복구창 미관측 및 현재열린canonical 식별. 디스크39 입력 hash/길이/mtime 기준선, 원D406 manifest11행현재hash 별도확인. 새slot부재/reparse0/여유1GiB. 관문실패면 오류보존/Observe0/점유반환. 과거상태 대체/모달클릭/재시작/원인추정0.",
+      "baselineContract": "loadedScene+유효GameObject의Scene 합집합8이하;8192객체/32768컴포넌트 명시TRS/활성/부모/신원·선택·Preview·Graph요약·창만. string각2048/누적2097152chars; 고정8MiB stream 넘침거부. 전체컴포넌트필드/비직렬cache/빈Preview신원/OSnative모달·Graph값동등 전체보존은미검증. count만으로신원동일선언0. baseline 실패시 Observe금지.",
+      "preservation": "전후 observation JSON객체별비교(UTC/frame/assembly는별도), 파일39개hash/길이/mtime, Consolecursor+new/dropped,scope/env/Scene/선택/Preview신원. 메모리Assembly AppDomain과Pipeline현재목록은조회기준별도이며 생성된wrapper/전용Assembly잔류를전체동일로보고하지않음.",
+      "outputBudget": {
+        "loaderAggregateBytes": 12582912,
+        "reservation": "loader 호출 전 현재사용량+loader 전체출력12MiB+사후baseline8MiB<=일반28MiB를 검사하며 부족하면 Observe0. loader 모든Save는 증가분12MiB·slot합계20MiB이하를 강제해 사후baseline8MiB와 최종요약4MiB를 선예약한다. 외부는 baseline-after 저장 뒤 비교/Console/manifest를 남은 예약4MiB 안에서 기록한다.",
+        "aggregateBytes": 33554432,
+        "ordinaryBytes": 29360128,
+        "finalReserveBytes": 4194304,
+        "baselinePerFileBytes": 8388608,
+        "otherPerFileBytes": 4194304,
+        "minimumFreeBytes": 1073741824,
+        "mode": "flat/CreateNew/no-reparse/no-overwrite; 외부저장도매파일전에전체누적상한확인"
+      },
+      "externalFiles": [
+        "disk-preflight.json",
+        "baseline-before.json",
+        "baseline-after.json",
+        "external-files-before.json",
+        "external-files-after.json",
+        "external-comparison.json",
+        "console.json",
+        "tool-return.txt",
+        "failure.json",
+        "handoff.md",
+        "manifest.json"
+      ],
+      "loaderFiles": [
+        "once.claim.json",
+        "loader-before-files.json",
+        "observation-input.json",
+        "compilation.json",
+        "self-test.json",
+        "returned-report.json",
+        "loader-after-files.json",
+        "loader-final.json"
+      ],
+      "failureContract": "첫실패에서추가Observe/재Compile금지. 가능한독립사후/원오류/실제경로목록·부분파일별오류를예산내보존하고삭제0. 원Report선저장, 원문저장실패시총4MiB내tool JSON포함시도; escaped원문예산초과/직렬실패는 originalResponseOmitted/UTF8길이와명시사유, 원문절단정상화0. baseline8MiB는외부호출자가별도저장(loader4MiB Save로저장하지않음). 외부파싱실패도raw반환자체4MiB이내보존, 초과시누락사실을기록.",
+      "resultBoundary": "3자체검사는 입력parse/중복필드거부/최소nullableReport왕복만이며26DTO/실제Scene시험아님. collectionComplete/reportStatus/파일보존/외부Scene관측대조/현재계보준비를분리. NotObserved셀부재는실제초기화실패나0셀생산상태가아님. Provider/Raycast/지지/통로/Prefab조회·조립/보행은이번0.",
+      "sceneSaveAllowed": false,
+      "automaticEvidencePromotionAllowed": false,
+      "additionalProtectedFiles": [
+        {
+          "path": "C:/Users/user/source/repos/Hongdal/docs/AI/Farm월드맵-배치계층경유-점진구성-2026-08-31.md",
+          "sha256": "C4672FB891BB699CFEE95DBB52AA1C85DA56AA3E7CC09E97852A313993BB966A",
+          "bytes": 20651
+        },
+        {
+          "path": "C:/Users/user/source/repos/Hongdal/docs/AI/배치책임구분-리팩토링승인-2026-08-31.md",
+          "sha256": "1C0FBAC3AA377F1096FF398CAFB096CEE036A90CBA08EC1D52A195447B64A5CE",
+          "bytes": 8112
+        },
+        {
+          "path": "C:/Users/user/source/repos/Hongdal/docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+          "sha256": "FF9D86E660486E77DCEA1D6E6D8A69669C7C7D8A885966D4651486861D477FFC",
+          "bytes": 13954
+        },
+        {
+          "path": "C:/Users/user/source/repos/Hongdal/docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r1.md",
+          "sha256": "EADA84A0CA49E2D0BE986866420030612249CC622398F06C7BE83A72B57711B0",
+          "bytes": 19528
+        },
+        {
+          "path": "C:/Users/user/source/repos/Hongdal/docs/Architecture/PlayableLoops/Farm경작세계발현E5-공간배치연구.r2.md",
+          "sha256": "EC9AD2D5333102B22477A8063A6938C5CE15817A09D53900CC98C5EC8A78ACE5",
+          "bytes": 7354
+        },
+        {
+          "path": "C:/Users/user/source/repos/Hongdal/docs/Architecture/PlayableLoops/Farm경관-LS01-공간배치연구.md",
+          "sha256": "90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F",
+          "bytes": 22464
+        },
+        {
+          "path": "C:/Users/user/source/repos/Hongdal/artifacts/local/validation/farm-world-map-d422/preparation-01/baseline-read.cs",
+          "sha256": "BCD2D899F97C04EC7301DDB783846D2F489A0863A5E307D43C2CEA892051CD5F",
+          "bytes": 6211
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/배치통제계층Root.cs",
+          "sha256": "6FB1EFAD82C559FC46E766A7913A8A54C2089ED0E03D503AB09F07A4F36D3265",
+          "bytes": 21985
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/배치통제계층Root.cs.meta",
+          "sha256": "46B22968ED9802FF41900C606484003FC05819AE05660621D8EABEF6040FCE4F",
+          "bytes": 60
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/Hub창고정밀배치Tests.cs",
+          "sha256": "046CC0601E2DC417A35911C1428DF9C1926FDDAC3514167FCAE0CA80FA64C01A",
+          "bytes": 13051
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/Hub창고정밀배치Tests.cs.meta",
+          "sha256": "8A8DA836289361CCEA6B95029B5F1157E9231C890D3D4E428CC53FD37F7786EF",
+          "bytes": 60
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Library/ScriptAssemblies/Ssalddel.Unity.Presentation.dll",
+          "sha256": "E248B4E17E52EE6B5F2D6E85C6D91D9A911949B8D7FB52F36717B5E3F9BCC202",
+          "bytes": 1005568
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Library/ScriptAssemblies/Ssalddel.Unity.Infrastructure.dll",
+          "sha256": "D6600A105D81D999E1D2E1DA70038CEA7DD751F6922DED8A9037CB4F35AA4CE7",
+          "bytes": 385536
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Library/ScriptAssemblies/Ssalddel.Unity.Runtime.dll",
+          "sha256": "5859E212C7728A0190D242367ADD1E2789AF1CAF477B360F040223D1FB47AE2B",
+          "bytes": 559104
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Library/ScriptAssemblies/Ssalddel.Simulation.Contracts.dll",
+          "sha256": "6DFF6F202A25327268B8A7CB9D6E433B99A6523EFE06C38C3CFCD5F0DC66052E",
+          "bytes": 1923072
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Library/ScriptAssemblies/Unity.Pipeline.dll",
+          "sha256": "994BE9B77307438C4552FA5A3540FF9BC425241C77EF6D884CE8CC0A3EA87B30",
+          "bytes": 202752
+        },
+        {
+          "path": "C:/Users/user/ssalddel/Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion/06-daegwallyeong-farm-first-person-play-game-view.png",
+          "sha256": "CF59F450B72BFB27E9728585416EAEB4C509D184445406C452BB6228DD1E0197",
+          "bytes": 160265
+        }
+      ]
+    },
+    "d423Refactor": {
+      "revision": "placement-declaration-validation-refactor.d423.r1",
+      "statusCode": "ImplementationAssigned",
+      "approvalSha256": "1C0FBAC3AA377F1096FF398CAFB096CEE036A90CBA08EC1D52A195447B64A5CE",
+      "responsibilityDocumentSha256": "46BB377E26DD3D03D2ABC52E21668EF616EB6D12C19926792024069692EB776E",
+      "compatibilityDocumentSha256": "84937331818D4DBECAB236455A2F2689281B626F2F450BEFAEAFF07EF2967512",
+      "workItemId": "work:farm-crop-cycle:landscape-binding-guard",
+      "sourceWritePaths": ["C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/배치통제계층Root.cs", "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/Hub창고정밀배치Tests.cs"],
+      "artifactRoot": "artifacts/local/validation/farm-world-map-d422/preparation-01/d423",
+      "change": "Validate 내부 상향성립 선언/감각채널 선언 조건을 같은 단락 위치에서 private 메서드로 추출한다. 기존 조건식·단락 순서·null 실패·예외문구 및 나머지 Configure/필드/상수 본문 보존. Root의 주석을 선언·참조 검사라고 명시한다.",
+      "validation": "전후 정확 역치환 대조와 조건식 동등성, v1~v4 및 손상 선언/거부 순서·입력 불변 소유 fixture 시험. 기존 Scene 여는 시험은 이 슬롯에서 실행하지 않는다. 생성 csproj 소비자 컴파일은 별도 출력에 수행하고 실제 EditMode 실행은 준비 hash/단독 슬롯을 결속한 뒤만 수행한다.",
+      "fixtureBoundary": "소유 Preview Scene1을 만들고 비활성 소유 GameObject만 이동한다. 그 자손만 생성/폐기하고 finally 소유 Preview만 닫는다. 기존 Scene을 열거나 활성Scene을 바꾸거나 기존 Player를 검색하지 않는다. Controller Awake/기존 초기화 호출0. 해당 시험 성공도 실제 Collider/Renderer/통행·E5 성공이 아니다.",
+      "editorExecutionAllowed": false,
+      "sceneSaveAllowed": false,
+      "automaticEvidencePromotionAllowed": false
+    },
+    "d422Preparation": {
+      "revision": "farm-world-map-connection-preparation.d422.r1",
+      "statusCode": "PreparationBound",
+      "approvalRef": "docs/AI/Farm월드맵-배치계층경유-점진구성-2026-08-31.md",
+      "approvalSha256": "C4672FB891BB699CFEE95DBB52AA1C85DA56AA3E7CC09E97852A313993BB966A",
+      "workItemId": "work:farm-crop-cycle:landscape-binding-guard",
+      "spatialWorkItemId": "work:farm-crop-cycle:landscape-ls01-study",
+      "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "spatialOwnerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+      "developmentWritePaths": [
+        "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+        "eng/execution-ledgers/codex-playable-loop-goals.json",
+        "docs/Reports/Farm경관-LS01-배치소비경계-개발검토-2026-08-30.md",
+        "docs/Reports/월드맵우선-D406-진단과실행인계-2026-08-31.md",
+        "docs/AI/CURRENT_WORK.md",
+        "docs/AI/개발통합상태판.md",
+        "docs/AI/generated/codex-playable-loop-goals.md",
+        "artifacts/local/validation/farm-world-map-d422/preparation-01"
+      ],
+      "spatialPreparationRoot": "C:/Users/user/ssalddel/artifacts/local/validation/farm-world-map-d422/observation-01",
+      "spatialPreparationFiles": ["observation-probe.cs", "input-plan.json"],
+      "spatialPreparationAssigned": true,
+      "observationPreparationContract": {
+        "publicApi": "public static string Observe(string inputPlanJson)",
+        "mode": "ReadOnlyPreparation_NotExecutionApproved",
+        "identity": "정확 serialized 참조와 유한 식별요약으로 단일 engine/셀/Player를 식별한다. 없거나 복수면 NotObserved/Blocked를 반환하며 과거셀/FindFirst로 임의 선택하지 않는다.",
+        "readBoundary": "공개 읽기 조회와 정확 private field의 명시 DTO 투영만. Sessions.GetAsync/Initialize/RequestWindow/Install/ValidateFrozen/Gate.CanEnter/상태 setter와 임의 property/범용 객체 직렬화는 호출하지 않는다. Provider TrySample은 실제 타입·읽기 계약 검토 후 별도 실행계획에 결속할 때만 허용한다.",
+        "missingEvidence": "stopped cells/profile 부재, 보호다각형·통로폭·표면공급 부재는 null+관측상태/진단으로 남긴다. 빈 배열·0으로 성공을 대신하지 않는다. 정상 Play 관찰은 별도 실행절 이전 금지한다.",
+        "surface": "Provider 높이/경사/허용과 정확 Floor Collider hitY/normal을 분리한다. 좌표/원점이동/TRS 및 각 출처를 기록하고 max/대체높이로 합치지 않는다.",
+        "collection": "명시 DTO/유한 배열·깊이·총량, RawValue와 SceneHandle 문자열, 실패부분 진단 보존. 관찰 자체는 파일을 쓰지 않고 JSON만 반환한다. 실행 산출물 전체32MiB 상한/정확경로·CreateNew·기준선은 별도 실행계획에 결속한다.",
+        "preparationGate": "외부2파일만 작성/정적검토 후 전체본문·hash·정확diff·API·보호목록 반환. Compile/Run/Editor/Play/Render/출력폴더 생성·Scene변경은 아직0."
+      },
+      "editorExecutionAllowed": false,
+      "runtimeImplementationAssigned": false,
+      "sceneSaveAllowedInThisPreparation": false,
+      "reuse": "기존 FarmH2 Adapter/고정배치Service/소비검증Service/PlanPartitioning와 LH Streaming/World공간표현조립Coordinator를 사용한다. 배치통제계층Root v1~v4의 구조기록/상향H성립/외곽통행제약/감각표현은 서로 다른 책임이며 기존 다영역 평탄실증의 4영역·100객체 조건을 첫 한셀에 강제하지 않는다.",
+      "requiredEvidence": [
+        "실제 프로젝트/Scene·저장hash·dirty/선택·Editor점유/복구창·Console 시작/종료. 현재상태는 새슬롯에서 읽고 과거4701/NoPipeline으로 대체하지 않는다.",
+        "한 Farm 셀의 정확 key/LocalToWorld/단위·SourceWorldRevision/지도·H1/H2/H4 계보 및 근거제공자. topology 부재/default 문자열은 미관측이다.",
+        "실제 지면 제공값과 유효Collider·Renderer/pivot/활성상태를 분리한 표본, PlayerCollider/이동설정/접근·보호·통로·기존점유 사본. 빈보호집합은 실제 확인/출처 없이 선언하지 않는다.",
+        "단일Prefab key/path/GUID/hash·의존·등록Resolver와 구성묶음 차이. 원본/소유표현·해제주체 및 기대ID·보정/경고를 연결한다."
+      ],
+      "knownGaps": [
+        "D375 당시 Farm셀 kr5186:l3:2801:4581/원점(15.4,0,10.25)은 재사용 관찰이력이지 현재값이 아니다. profile farm-hub-town.v1와 변환요구 farm-production.v1의 H계보가 미결속이다.",
+        "D375 Provider0m/Collider약-.05m의 차이는 실제지지와 제공표면을 합칠 근거가 아니다. 현재표본과 유효 지지면 소유를 확인해야 한다.",
+        "현재 Resolver는 Nature키/CompositionCatalog이며 LS01 single-prefab 등록은 파일검색에서 미발견이다. 자동Y정렬/선택장식skip·Apply=true는 동결계획 발현성공을 뜻하지 않는다.",
+        "D406 observation-02의 정지화면과 뒤 보호11파일 hash·길이 일치만 확인했다. 현재 Editor/메모리·전체코드 불변 및 실제정리/보행은 미검증이다."
+      ],
+      "progressionGate": "원문/기존연구·명세hash→공간의 기존도구/API읽기 반환→정확관찰코드/plan 검토·동결→별도 단독실행절→실제계보·지면·보호/통로 수집→범위내 기존변환/검사·후보판본 결속→작은 실제적용/보행·재적용. 기술후속은 D422 범위 안에서 진행하되 추가코드경로/실행hash를 먼저 기록한다. 관측미확보를 0/빈집합으로 대체하거나 전체13개를 첫실행 필수로 강제하지 않는다.",
+      "candidateAndEvidenceBoundary": "원A/B와 불변검사는 유지한다. 새 관측/소유 문맥에 대한 별도후보는 필요한 연구후속 Accepted 전에 조립하지 않는다. 환경 경관 지원과 Farm 네 WI·null9·Logic E5를 구분하며 Ready/Apply/CellActive를 실제 기대객체/지지/통행·E5로 세지 않는다.",
+      "exclusions": ["H/AreaSet ID 위장 치환", "합성높이의 실제지면 전용", "미기록 자동Align/fallback", "null9 자동수리", "전체 Builder", "새 공식 Scene", "생산/Save/권위 변경", "원A/B·연구·Synty 원본 변경", "무제한 셀 상주", "미소유dirty 저장/폐기", "r129/야간 재개", "commit/push"],
+      "automaticEvidencePromotionAllowed": false
+    },
     "decisionCode": "D-363",
     "statusCode": "ImplementationInProgress",
     "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
@@ -379,6 +985,113 @@
     "scope": "기존 공통 배치 계획의 정규형hash/기대ID/등록CompositionKey/OwnerCell/상위H계보/Environment·Ambient·PresentationOnly/nativeScale1/유한TRS를 순수 검증하고 실제 조립에서 확인할 기대ID 사본을 반환한다. 성공은 BindingVerified만 의미하며 지지면·통로·겹침·실물 발현 성공을 대신하지 않는다. 원A 보존과 미등록·누락·중복·잘못된 소유·손상hash 거부를 집중시험한다.",
     "excluded": ["B 후보 승인", "원A 변경", "공통 FarmH2 검사 완화", "새 LH/Save/게임규칙", "지지면·통행 성공 추정", "Unity/Scene 조립", "E 자동승격"],
     "followUp": "공간 단일Prefab/구성키·소유·실측지지면 대응표와 공통 검사 재사용을 결속한 뒤 B 실제 변환·지면검사·조립을 순차 연결한다.",
+    "automaticEvidencePromotionAllowed": false
+  },
+  "overnightDevelopment": {
+    "decisionCode": "D-375",
+    "directiveRef": "docs/AI/야간개발순환-2026-08-30.md",
+    "directiveSha256": "F853CC84D20A8435F5D04C5BB15D5A95BBCEB24747E87A007A2AB62A33A6A3FF",
+    "stopStartingNewBatchesAt": "2026-08-31T09:00:00+09:00",
+    "firstBatch": "실제 Resolver 6종/13객체 기대집합·지면/셀/상태판본 조회 및 검증 가능한 표본 확보. 기존 고정변환을 실제 표본으로 호출해 통과한 계획만 기존 조립에 전달한다. 실패면 거부·화면을 보존하며 합성표본으로 대체하지 않는다.",
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "repositoryRoot": "C:/Users/user/ssalddel",
+    "writePaths": [
+      "Assets/Ssalddel/Editor/FarmLandscapeLS01Validation",
+      "Assets/Ssalddel/Editor/FarmLandscapeLS01Validation.meta",
+      "artifacts/local/validation/farm-landscape-ls01/overnight-d375"
+    ],
+    "sharedReportRef": "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md",
+    "conditions": "Editor 단일점유를 별도 획득한다. 첫 조립 전 실제 셀/TRS/지지면·동결계획 소비 대응과 공통코드 필요변경을 개발에 반환한다. 공통 Runtime/Resolver 코드는 개발 소유이며 임의 수정하지 않는다. 변경한 전용 도구도 컴파일 슬롯을 조율한다. canonical 저장은 본인 변경 분리 가능할 때만; 기존 dirty/원본/Scene/Packages/후보·연구 불변, E 승격 없음.",
+    "evidenceBoundary": "실제 Play·입력·같은 카메라/시간 A/B 화면과 반복조립/해제/재진입을 목표로 하되 코드/표본/실제화면 증거를 분리한다. 종전 데이터 전용 작업의 제외조건은 해당 과거 묶음에 보존한다."
+  },
+  "overnightWorldContinuity": {
+    "decisionCode": "D-376",
+    "corridorOverlayRepair": {
+      "statusCode": "BoundForImplementation",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "sourceReportSha256": "F5EA237D525750E966EAAF92616A1FF2030A6B5B8BB2CBB76A6229C04D9C246C",
+      "writePaths": [
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/H계층배치증거Root.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/H계층회랑표시Tests.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/H계층회랑표시Tests.cs.meta"
+      ],
+      "scope": "확인된 corridorRoot 하위 진단 Renderer를 기존 showHierarchyOverlayOnPlay 표시 정책에 포함한다. Awake와 SetHierarchyOverlay의 공통 경로를 사용해 기존 저장 Scene/재조립에서도 적용한다. GameObject·Collider·H계보/연결·표면 높이는 변경하지 않는다.",
+      "verification": "격리시험에서 overlay false/true 반복·Awake 재적용·비활성 자식 Renderer·Collider/다른 지지바닥 불변·구조수 보존. 실제 Play UI 전후/통행/재진입은 공간 다음 단독 슬롯에서 검증한다.",
+      "exclusions": "흰 부유 객체 미특정 삭제 금지. H3 underlay와 LH 실제 지지면은 이 수정에서 숨김/삭제하지 않음. 새원경/새후보/원본/Save/Scene 저장/E승격 없음."
+    },
+    "cloudInitialVisibilityRepair": {
+      "statusCode": "CodeAndFixtureVerified",
+      "verificationEvidence": "Unity 정상컴파일/정식 신규7+Sky3+회랑6=16/16, XML3 직접대조. Collector3error 별도, Play/저장Scene 미검증.",
+      "savedSceneTransaction": {
+        "statusCode": "ConditionallyAssigned",
+        "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+        "writePaths": [
+          "C:/Users/user/ssalddel/Assets/Ssalddel/Scenes/SimulationWorldShell.unity",
+          "C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/overnight-d375/world-continuity-d376/cloud-scene-initial-state"
+        ],
+        "expectedSavedSceneSha256": "B270E1CC1DDAAE219D56D3F2D15B127A05743718DC0903D93D833DB17FF1F849",
+        "exactTargets": "SimulationWorldShell/SkyEngineVisualRoot/Clouds/SyntyCloud_01~05의 GameObject.activeSelf만 false. 이름/부모/5개 수/Prefab경로와GUID/원본hash/Collider0를 대조. Clouds 부모/Renderer.enabled/Transform 불변.",
+        "preconditions": "Editor 단독/stopped/compilefalse/canonical dirtyfalse/디스크hash 일치, 모든 열린 Scene과 비소유Preview/선택/전체직렬값 및 Scene 원본바이트와 Packages/Save2/참조원본 사본/hash 확보. 비소유dirty/추가창/미식별대상이면 수정과저장 안 함.",
+        "commitBoundary": "정확5개 active만 변경한 뒤 전체직렬값 비교에서 허용차이 외0일 때 canonical Scene만 SaveScene. SaveAssets/전체Builder/원본Prefab/Packages/다른Scene 저장 금지. 예상외 변화/저장실패/추가대화는 상태보존 후 반환, 임의파일원복/dirty해제 금지.",
+        "postconditions": "정지 동일MainCamera 가림 전후PNG와 신규Scenehash/사본 기록. 정상Play에서 Sky/기상보기정책/회랑숨김/오류를 읽고 정상Stop. 비소유Preview/Save2/Packages/원본 보존. 실제 디스크 재열기는 다른dirty없음/비소유Preview보존이 안전할 때만 추가검증하며 미수행이면 저장reload미검증 명시. 저장은 이5개 본인변경만, E/권위기상 변경 없음."
+      },
+      "decisionCode": "D-378",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "sourceReportSha256": "CB59295D1CD59ECBAFB85B4E7EC7B30DC95DAD9C82C4847B6FAEED3B62B4EDCC",
+      "sourceManifestSha256": "87892D3DE568A72185E8AD3E40474214B4154F1D9CA57C27324D82D14206E758",
+      "writePaths": [
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Editor/SimulationWorldShellBuilder.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/Sky구름초기표시Tests.cs",
+        "C:/Users/user/ssalddel/Assets/Ssalddel/Tests/EditMode/Sky구름초기표시Tests.cs.meta"
+      ],
+      "scope": "정지 MainCamera를 가린 실제 SkyEngineVisualRoot/Clouds/SyntyCloud_03/01과 동일 생성군01~05의 초기 active만 false로 정한다. 생성된 원본 참조/구름 개수/TRS/Renderer 보기정책을 보존하고 Play 권위 ApplyClouds가 기존 규칙대로 자식 active를 갱신한다. 날씨/WorldTick/자원/H 변경과 원본Prefab 삭제는 없다.",
+      "verification": "소유 Preview에서 기존 private BuildSkyEngineVisualRoot만 호출하며 Save/메뉴/공식Scene Open을 호출하지 않는다. 초기5개 inactive·원본연결/배치 불변·두번째 생성 중복없음·ApplyClouds 기존비율별 활성복원 및 Renderer표시정책 불변을 시험한다. 기존 Sky3/회랑6 회귀 후 실제 저장Scene 반영 여부는 별도 단독 공간 슬롯에서 검증한다.",
+      "savedSceneFollowup": "코드시험 통과 후에만 공간 단독 슬롯 배분. canonical 저장/메모리 사본과 전체직렬 차이를 보존하고 사전 dirty=false·소유불명 변경없음·정확 Clouds 자식01~05 active 외 변경없음을 확인할 수 있을 때만 본인변경 저장/재진입을 허용하는 D375/D378 경계를 적용한다. 불분리/추가 대화면 저장하지 않고 반환. 전체 Builder 재생성/SaveAssets/원본Prefab 덮어쓰기 금지.",
+      "exclusions": "H3/LH 지지면/구름 크기·높이/기상 상태·Renderer 전역해제·권위 모델·Save 슬롯·원후보/E 변경 없음. Scene 저장은 현재 코드 배분에 포함하지 않는다."
+    },
+    "floatingOverlapAddendum": {
+      "decisionCode": "D-378",
+      "directiveRef": "docs/AI/야간부유객체-겹침정리-2026-08-30.md",
+      "directiveSha256": "8C4C4D6F7341534DBA410E21F04896AD542C5AEAD29EE3EA11DB9DE0A5FDB8A7",
+      "scope": "기존 D376 다음 안전 슬롯에서 흰색 부유 객체/겹친 네모 면의 정확한 경로·생성주체·Renderer/Collider/WI를 식별하고 UI 포함 표시 캡처를 반환한다. 불필요 임시/중복 표현 제거 또는 필요한 객체의 배치 교정은 식별 결과와 정확한 생성코드 소유를 개발이 추가 결속한 뒤 진행한다.",
+      "boundary": "색상 일괄삭제·지지 Collider/상호작용 삭제·원본Prefab/미소유dirty 변경 금지. 제거 대상/복구방법·재조립 재발/통행을 기록, D376/D375 및 09:00 안전마감/E상한 유지. 현재는 식별 배분이지 삭제 실행 증거가 아니다."
+    },
+    "directiveRef": "docs/AI/야간월드경계보완-2026-08-30.md",
+    "directiveSha256": "C5536D2A9D707C84FDD1AE13FDCCCCF2C7A175FAC094FE1CA3049F80899E2812",
+    "statusCode": "DiagnosticAssigned",
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "integrationOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+    "writePaths": ["C:/Users/user/ssalddel/artifacts/local/validation/farm-landscape-ls01/overnight-d375/world-continuity-d376", "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md"],
+    "scope": "다음 단독 Editor 슬롯에서 기존 화면 직선 경계의 카메라/LOD/컬링·셀 준비/해제·지면/재질·식생 원인을 분리 조사한다. UI 포함 같은 위치/카메라/시간 기준선과 왕복/회전/재진입·셀/객체/프레임/메모리 관찰을 반환한다. 최초 배분은 읽기 및 비저장 Play 진단이며 공통 코드 수정 경로는 발견 후 개발이 좁게 추가 결속한다.",
+    "studyBoundary": "기존 LS01 Accepted 90EB996164A480E63B1218C9CCA4EAF97F36BF5DFEDEA5BB33C9AA56DCB5C08F의 비교·보존 절차를 재사용한다. 새 원경/숲 구성은 별도 Required 후속 연구 및 Accepted 결속 전 미착수. 기존 연구/원후보/hash를 바꾸지 않는다.",
+    "exclusions": "무제한 표시거리/셀 상주·안개로 누락 숨김·새 권위 지형/자원/H·생산/Save 변경·일괄 Scene 저장/폐기·E 승격 금지. D359 작업은 독립 지속하며 D375의 09:00 안전 마감 유지.",
+    "automaticEvidencePromotionAllowed": false
+  },
+  "landscapeFrozenConversion": {
+    "decisionCodes": ["D-363", "D-364"],
+    "statusCode": "CodeAndSyntheticFixtureVerified",
+    "receivedReportSha256": "BC34F1502A2E677DEA82D5D242710DF6A6C3273B57C118A8B4D73E7AD33FB44E",
+    "receivedManifestRef": "artifacts/local/validation/farm-landscape-fixed-conversion/handoff-manifest.r1.json",
+    "receivedManifestSha256": "C268AEC05DD9F6AF800772141AEAD6EF289EB08DAF0EE4DB995F55932F8756DC",
+    "receivedVerification": "전달10파일 hash 및 전문 최종155/155·skip0을 개발이 대조했다. 개발 Fast195411의 지도 검사·3프로젝트 빌드·집중155 재실행 통과. A5+B8/합성1170표본·Partition/LH 검증이며 실제 Resolver/지형/Unity 조립/통행/GameView는 미검증이다. 원본/연구/현재 E·E5상한은 유지한다.",
+    "ownerThreadId": "01a04fb7-7c73-75a3-b7c2-a29c64766c26",
+    "implementationProposalRef": "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md",
+    "proposalSha256AtDispatch": "7BDB4241C015D4ADABF818ABD49C26945F971A3F20BD19EC4E6626A2050807F2",
+    "adapterSha256BeforeExtraction": "CDF7A9679A3CEC3BF5643588A6415225E13A1020F4F07C9DD2602E80CA9B345E",
+    "writePaths": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFarm경관고정배치Contracts.cs",
+      "Ssalddel.Simulation.Application/SimulationFarm경관고정배치Service.cs",
+      "Ssalddel.Simulation.Application/Simulation배치적합성검사.cs",
+      "Ssalddel.Simulation.Application/SimulationFarmH2PlacementAdapter.cs",
+      "Ssalddel.Simulation.Tests/SimulationFarm경관고정배치Tests.cs",
+      "Ssalddel.Simulation.Tests/Simulation배치적합성호환Tests.cs",
+      "Ssalddel.Simulation.Tests/Fixtures/FarmLandscapeLS01",
+      "docs/Reports/Farm경관-LS01-전문인계-2026-08-30.md"
+    ],
+    "scope": "공통 Adapter의 표면관찰/외곽/지지/간격/보호/통로 원시 검사만 같은 담당이 단일 구현으로 추출하고 기존90검사 및 A hash/거부 호환을 먼저 검증한다. Farm 역할/H1/골격 wrapper와 A 정규형은 유지. frozen B8의 정확한 hash/계보/벡터 순서/TRS/native1과 실측 단일자산 결속을 읽고 필수 제공지면에 대해 A+B 교차 표본 일관성과 점유를 검사한다. A5 불변·B8 별도 결합 봉인/deep-copy 후 기존 generic Partition/LH만 소비한다. 새 난수/자동 lift/표면0 fallback/가짜 H1/legacy key 위장 금지.",
+    "validation": "기존90 호환 + 원A/B 불변 + 13객체/결정성/손상·누락·표본변조·지지·통로·보호 거부 + Partition/LH. 합성지면은 SyntheticFixture, 결과는 제공지면에 대한 검증이며 실제 Resolver/Scene 실행 준비가 아니다.",
+    "candidateStatusCode": "UnapprovedCandidate",
+    "excluded": ["Unity 코드/Scene 조립", "원본·연구·frozen B 수정", "새 게임규칙/Save/LH 재설계", "Q392 표면2개", "E 승격"],
     "automaticEvidencePromotionAllowed": false
   },
   "landscapeComparisonPreparation": {
