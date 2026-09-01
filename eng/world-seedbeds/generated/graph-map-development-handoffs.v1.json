@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "mirror-graph-map-development-handoff-output.v1",
+  "revision": "mirror-graph-map-development-handoff-output.r1",
+  "generatedAtRuleCode": "DeterministicNoWallClock",
+  "sourceLedgerRef": "eng/world-seedbeds/graph-map-development-handoffs.json",
+  "sourceLedgerSha256": "1531780650f5fa3c1d34af9c731fee8d2f75bd8592ea475c42d6fe6bd1d94c3a",
+  "counts": {
+    "total": 1,
+    "readyForDevelopment": 1,
+    "acceptedByDevelopment": 0,
+    "inProgress": 0,
+    "integrated": 0,
+    "blocked": 0,
+    "deferred": 0
+  },
+  "ownershipBoundary": {
+    "graphMapOwnerCode": "GraphMapWorkstream",
+    "developmentOwnerCode": "Development",
+    "specialistIntegrationOwnerCode": "Development",
+    "planningOwnerCode": "Planning",
+    "graphMapIsImplementationAuthority": false,
+    "automaticGoalActivation": false,
+    "automaticWorkItemCreation": false,
+    "automaticUnityExecution": false,
+    "automaticEvidencePromotion": false
+  },
+  "items": [
+    {
+      "handoffId": "graph-map-development-handoff:farm-production-work-yard:r1",
+      "statusCode": "ReadyForDevelopment",
+      "source": {
+        "planningHandoffId": "graph-map-handoff:northern-life-hub-discovery:r3",
+        "graphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "graphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r3",
+        "graphMapPlanRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
+        "graphMapPlanSha256": "665b1b34ca6545d1b34a69af5fec8c6470da01eae836b4c0f65de053e0eb2e0b",
+        "graphMapOutputRef": "eng/world-seedbeds/generated/graph-map-plans.v1.json",
+        "graphMapOutputSha256": "b70ee5eb75b605afcb70cb25c9637504c2e367aa388f642e62a83686182d5c58"
+      },
+      "slice": {
+        "sliceStableId": "graph-map-dev-slice:farm-production-work-yard.v1",
+        "title": "Farm 생산에서 작업마당까지의 흐름 분리 준비",
+        "nodeRefs": [
+          "gm-node:farm-production",
+          "gm-node:farm-work-yard"
+        ],
+        "edgeRefs": [
+          "gm-edge:farm-production-to-work-yard"
+        ],
+        "constraintRefs": [
+          "gm-constraint:actual-reference-identity",
+          "gm-constraint:farm-flow-separation",
+          "gm-constraint:asset-candidate-not-assignment"
+        ],
+        "codeBindingRefs": [
+          "gm-code:actual-e5-network-pipeline",
+          "gm-code:landscape-runtime-realization",
+          "gm-code:farm-h-placement-plan",
+          "gm-code:wi-seedbed-editor-preview",
+          "gm-code:h-spatial-rule-editor"
+        ],
+        "planningMeaningRefs": [
+          "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md#3-첫-graph-map-범위",
+          "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md#5-레벨-1--플레이-관계",
+          "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md#6-레벨-2--실제-배치-전-제약",
+          "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md#7-레벨-3--unity-코드component-결속"
+        ],
+        "scopeSummary": "WI-FARM-01의 독립 Farm 폐루프를 유지하면서 생산·작업마당의 실제 참조와 역할 분리를 기존 검사·준비 코드에 연결한다.",
+        "excludedScope": [
+          "Farm 전체 Graph 또는 모든 시설 구현",
+          "Farm에서 Hub로의 화물 이동",
+          "Prefab 자동 선택·Scene 저장",
+          "Play Mode·Game View·E5 승격",
+          "요동성 미해결 관문"
+        ]
+      },
+      "developmentTarget": {
+        "loopStableId": "playable-loop:farm-crop-cycle.v1",
+        "worldInteractionId": "WI-FARM-01",
+        "trackCode": "Presentation",
+        "targetEvidenceStageCode": "E4",
+        "goalStateCode": "Active",
+        "candidateWorkItemId": "work:farm-crop-cycle:landscape-binding-guard",
+        "candidateStatusCode": "Active",
+        "candidateOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+        "candidateWritePaths": [
+          "Ssalddel.Simulation.Application/Simulation경관배치소비검증Service.cs",
+          "Ssalddel.Simulation.Tests/Simulation경관배치소비검증Tests.cs",
+          "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+          "docs/Reports/Farm경관-LS01-배치소비경계-개발검토-2026-08-30.md"
+        ],
+        "candidateSharedContractKeys": [
+          "landscape-placement-binding-validation"
+        ],
+        "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+        "workOrderSha256": "cef233d99c8fcf6a588999bf85b9aa359cbeef71c14d073830cad423c886f6e7",
+        "planningDesignRef": "docs/Architecture/PlayableLoops/Farm경작세계발현E5.md",
+        "planningDesignSha256": "ff9d86e660486e77dcea1d6e6d8a69669c7c7d8a885966d4651486861d477ffc"
+      },
+      "acceptanceContract": {
+        "requiredBeforeAcceptCodes": [
+          "GraphMapRevisionCurrent",
+          "PlanningGateApproved",
+          "GoalAndWorkOrderCurrent",
+          "CandidateWorkItemConflictChecked",
+          "ExactWritePathsDeclared",
+          "ValidationUpperBoundDeclared"
+        ],
+        "requiredResultCodes": [
+          "GraphElementConsumptionRecorded",
+          "CodeOrNoChangeEvidenceRecorded",
+          "FocusedRegressionRecorded",
+          "OpenFeedbackReturned",
+          "AuthorityBoundaryPreserved"
+        ],
+        "completionEvidenceUpperBoundCode": "PresentationE4Preparation",
+        "runtimeRequiredForThisSlice": false,
+        "gameViewRequiredForThisSlice": false,
+        "sceneSaveAllowed": false,
+        "commitAllowed": false,
+        "pushAllowed": false
+      },
+      "readiness": {
+        "readyForDevelopment": true,
+        "developmentAccepted": false,
+        "autoActivated": false,
+        "unresolvedSelectedElementCount": 0,
+        "blockerItems": [],
+        "planningQuestionRequired": false,
+        "nextAction": "개발 담당이 현재 Goal·작업 명세·후보 work item의 소유와 겹침을 다시 확인한 뒤 수용 또는 차단을 반환한다."
+      },
+      "result": {
+        "resultCode": "PendingDevelopmentAcceptance",
+        "consumedGraphElementRefs": [],
+        "workItemRefs": [],
+        "changedPaths": [],
+        "verificationRefs": [],
+        "openFeedbackItems": [],
+        "returnSummary": "아직 개발 수용 전이며 코드·시험·Unity 결과가 없다."
+      },
+      "evidenceBoundary": {
+        "codeChanged": false,
+        "testsExecuted": false,
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "saveReplayVerified": false,
+        "serverConnected": false,
+        "evidencePromoted": false,
+        "committed": false,
+        "pushed": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "schemaVersion": "mirror-graph-map-partition-catalog.v1",
+  "revision": "mirror-graph-map-partition-catalog.r1",
+  "federationStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+  "title": "북부 생활권 Graph Map 하위 맵·포트 대장",
+  "meaning": "레벨 1~3의 의미는 각 하위 맵에서 유지하고, World 규모에서는 하위 맵과 명시 포트·connector만 조합한다.",
+  "splitPolicy": {
+    "softNodeLimit": 25,
+    "softEdgeLimit": 40,
+    "softAreaSetLimit": 3,
+    "hardNodeLimit": 40,
+    "hardEdgeLimit": 70,
+    "triggers": [
+      "서로 다른 AreaSet이 4개 이상",
+      "쓰기 소유자가 4개 이상",
+      "생성 조회 한 행이 1200자를 초과",
+      "한 변경이 무관한 Area의 검증까지 무효화"
+    ],
+    "rule": "임계값은 자동 분할 명령이 아니라 검토 관문이다. 새 하위 맵은 독립 WI·귀환·포트 의미가 있을 때만 만든다."
+  },
+  "sourceElementCatalogRef": {
+    "path": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
+    "expectedRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r3"
+  },
+  "subgraphs": [
+    {
+      "subgraphId": "gm-subgraph:nature-discovery",
+      "label": "Nature 발견·Farm 경계",
+      "scopeCode": "AreaBoundary",
+      "ownerCode": "NatureWorldPlanning",
+      "areaSetRefs": [
+        "area-set:sim:pyeongchang:nature-home.v1",
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
+      "nodeRefs": [
+        "gm-node:nature-trailhead",
+        "gm-node:nature-farm-edge"
+      ],
+      "internalEdgeRefs": [
+        "gm-edge:nature-trail-to-farm-edge"
+      ],
+      "constraintRefs": [],
+      "ports": [
+        {
+          "portId": "gm-port:nature-farm-edge:to-farm",
+          "nodeRef": "gm-node:nature-farm-edge",
+          "directionCode": "Outbound",
+          "capabilityCodes": [
+            "Discovery",
+            "Walker"
+          ],
+          "meaning": "숲 가장자리에서 Farm 생산 구역을 발견·접근하는 경계 포트"
+        }
+      ]
+    },
+    {
+      "subgraphId": "gm-subgraph:farm-production",
+      "label": "Farm 생산·집하·상차",
+      "scopeCode": "IndependentArea",
+      "ownerCode": "FarmWorldPlanning",
+      "areaSetRefs": [
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
+      "nodeRefs": [
+        "gm-node:farm-production",
+        "gm-node:farm-work-yard",
+        "gm-node:farm-loading-gate"
+      ],
+      "internalEdgeRefs": [
+        "gm-edge:farm-production-to-work-yard",
+        "gm-edge:farm-work-yard-to-loading-gate"
+      ],
+      "constraintRefs": [
+        "gm-constraint:farm-flow-separation"
+      ],
+      "ports": [
+        {
+          "portId": "gm-port:farm-production:from-nature",
+          "nodeRef": "gm-node:farm-production",
+          "directionCode": "Inbound",
+          "capabilityCodes": [
+            "Discovery",
+            "Walker"
+          ],
+          "meaning": "Nature 경계에서 Farm 생산 구역으로 들어오는 발견 포트"
+        },
+        {
+          "portId": "gm-port:farm-loading:to-hub",
+          "nodeRef": "gm-node:farm-loading-gate",
+          "directionCode": "Outbound",
+          "capabilityCodes": [
+            "Cargo",
+            "VehicleCandidate"
+          ],
+          "meaning": "Farm 독립 폐루프를 마친 뒤 선택적으로 Hub로 넘기는 화물 포트"
+        }
+      ]
+    },
+    {
+      "subgraphId": "gm-subgraph:hub-logistics",
+      "label": "Hub 입고·차량·출고",
+      "scopeCode": "IndependentArea",
+      "ownerCode": "HubWorldPlanning",
+      "areaSetRefs": [
+        "area-set:sim:pyeongchang:logistics-hub.v1"
+      ],
+      "nodeRefs": [
+        "gm-node:hub-receiving-storage",
+        "gm-node:hub-vehicle-yard",
+        "gm-node:hub-outbound-staging"
+      ],
+      "internalEdgeRefs": [
+        "gm-edge:hub-receiving-to-vehicle-yard",
+        "gm-edge:hub-vehicle-yard-to-outbound"
+      ],
+      "constraintRefs": [
+        "gm-constraint:hub-entry-contact-exit"
+      ],
+      "ports": [
+        {
+          "portId": "gm-port:hub-receiving:from-farm",
+          "nodeRef": "gm-node:hub-receiving-storage",
+          "directionCode": "Inbound",
+          "capabilityCodes": [
+            "Cargo",
+            "VehicleCandidate"
+          ],
+          "meaning": "Farm connector가 있을 때만 소비하는 Hub 입고 포트"
+        },
+        {
+          "portId": "gm-port:hub-outbound:to-town",
+          "nodeRef": "gm-node:hub-outbound-staging",
+          "directionCode": "Outbound",
+          "capabilityCodes": [
+            "Cargo",
+            "TownMarket"
+          ],
+          "meaning": "Town으로 이어지는 선택형 출고 포트"
+        },
+        {
+          "portId": "gm-port:hub-outbound:to-yodong",
+          "nodeRef": "gm-node:hub-outbound-staging",
+          "directionCode": "Outbound",
+          "capabilityCodes": [
+            "ExternalUnresolved"
+          ],
+          "meaning": "요동성 경로가 승인되기 전에는 미해결로 유지하는 외부 포트"
+        }
+      ]
+    },
+    {
+      "subgraphId": "gm-subgraph:town-life",
+      "label": "Town 시장·생활",
+      "scopeCode": "IndependentArea",
+      "ownerCode": "TownWorldPlanning",
+      "areaSetRefs": [
+        "area-set:sim:pyeongchang:town-market.v1"
+      ],
+      "nodeRefs": [
+        "gm-node:town-market-receiving",
+        "gm-node:town-living-square"
+      ],
+      "internalEdgeRefs": [
+        "gm-edge:town-receiving-to-living-square"
+      ],
+      "constraintRefs": [],
+      "ports": [
+        {
+          "portId": "gm-port:town-market:from-hub",
+          "nodeRef": "gm-node:town-market-receiving",
+          "directionCode": "Inbound",
+          "capabilityCodes": [
+            "Cargo",
+            "TownMarket"
+          ],
+          "meaning": "Hub 출고와 결속할 수 있으나 Town 독립 활동의 필수 시작 조건은 아닌 포트"
+        }
+      ]
+    },
+    {
+      "subgraphId": "gm-subgraph:yodong-gateway",
+      "label": "요동성 방비 관문",
+      "scopeCode": "UnresolvedExternal",
+      "ownerCode": "YodongPlanning",
+      "areaSetRefs": [],
+      "nodeRefs": [
+        "gm-node:yodong-defense-gateway"
+      ],
+      "internalEdgeRefs": [],
+      "constraintRefs": [],
+      "ports": [
+        {
+          "portId": "gm-port:yodong:from-hub",
+          "nodeRef": "gm-node:yodong-defense-gateway",
+          "directionCode": "Inbound",
+          "capabilityCodes": [
+            "ExternalUnresolved"
+          ],
+          "meaning": "승인된 AreaSet·WI·경로가 생기기 전까지 결속할 수 없는 관문"
+        }
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "connectorId": "gm-connector:nature-farm",
+      "edgeRef": "gm-edge:farm-edge-to-production",
+      "fromPortRef": "gm-port:nature-farm-edge:to-farm",
+      "toPortRef": "gm-port:farm-production:from-nature",
+      "requiredCapabilityCodes": [
+        "Discovery"
+      ],
+      "stateCode": "ReferenceAvailable"
+    },
+    {
+      "connectorId": "gm-connector:farm-hub",
+      "edgeRef": "gm-edge:farm-loading-to-hub-receiving",
+      "fromPortRef": "gm-port:farm-loading:to-hub",
+      "toPortRef": "gm-port:hub-receiving:from-farm",
+      "requiredCapabilityCodes": [
+        "Cargo"
+      ],
+      "stateCode": "ReferenceAvailable"
+    },
+    {
+      "connectorId": "gm-connector:hub-town",
+      "edgeRef": "gm-edge:hub-outbound-to-town-receiving",
+      "fromPortRef": "gm-port:hub-outbound:to-town",
+      "toPortRef": "gm-port:town-market:from-hub",
+      "requiredCapabilityCodes": [
+        "Cargo",
+        "TownMarket"
+      ],
+      "stateCode": "ReferenceAvailable"
+    },
+    {
+      "connectorId": "gm-connector:hub-yodong",
+      "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway",
+      "fromPortRef": "gm-port:hub-outbound:to-yodong",
+      "toPortRef": "gm-port:yodong:from-hub",
+      "requiredCapabilityCodes": [
+        "ExternalUnresolved"
+      ],
+      "stateCode": "Unresolved"
+    }
+  ],
+  "federationConstraintRefs": [
+    "gm-constraint:actual-reference-identity",
+    "gm-constraint:required-traversal-return",
+    "gm-constraint:unresolved-never-verified",
+    "gm-constraint:route-capability-separation",
+    "gm-constraint:season-does-not-rewrite-topology",
+    "gm-constraint:asset-candidate-not-assignment",
+    "gm-constraint:no-whole-map-prerequisite"
+  ]
+}

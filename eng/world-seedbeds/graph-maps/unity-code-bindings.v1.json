@@ -1,0 +1,291 @@
+{
+  "schemaVersion": "mirror-graph-map-code-binding-catalog.v1",
+  "revision": "mirror-graph-map-code-binding-catalog.r1",
+  "title": "Mirror Graph Map Unity 코드 결속 대장",
+  "meaning": "Graph Map의 여러 하위 맵이 공통으로 참조하는 Unity 파일·심볼·assembly·책임과 현재 소스 관측 hash를 한곳에서 관리한다. Graph Map에는 bindingId와 대상 selector만 둔다.",
+  "bindingStageOrder": [
+    "SourceKnown",
+    "AssemblyKnown",
+    "PrefabBound",
+    "SceneBound",
+    "RuntimeObserved"
+  ],
+  "evidenceBoundary": {
+    "sourceAndSymbolVerified": true,
+    "sceneWiringVerified": false,
+    "runtimeExecutionVerified": false,
+    "gameViewVerified": false,
+    "meaning": "SourceAndSymbolVerified는 현재 Unity 작업 사본에서 파일 hash와 선언 심볼을 읽었다는 뜻이다. MonoBehaviour가 canonical Scene에 실제 결속되었거나 Play Mode에서 해당 Graph Map을 소비했다는 증거가 아니다."
+  },
+  "sourceRoots": [
+    {
+      "sourceRootCode": "SsalddelUnity",
+      "repositoryKindCode": "UnityProject",
+      "projectFolderName": "ssalddel",
+      "observedRepositoryHead": "094f225d55f94f16de0f8bc3edbdaf2471e19147",
+      "canonicalScenePath": "Assets/Ssalddel/Scenes/SimulationWorldShell.unity",
+      "canonicalSceneSha256": "D1D31BFDD9A727D1744B888D2AE25D7C275CC9E7F9A6D21EF5FB5CCBDD243271",
+      "pathResolution": "-UnityProjectRoot 명시값, SSALDDEL_UNITY_ROOT 환경 변수, 사용자 프로필/ssalddel 순으로 읽기 전용 검증한다.",
+      "snapshotBoundary": "관측 hash는 현재 작업 사본을 기준으로 하며 commit 완료나 깨끗한 worktree를 뜻하지 않는다. 파일이 바뀌면 Level 3 결속을 다시 대조한다."
+    }
+  ],
+  "bindings": [
+    {
+      "bindingId": "gm-code:actual-e5-network-pipeline",
+      "label": "실제 E5 AreaSet 네트워크 조회·전환·HUD 파이프라인",
+      "relationshipCode": "SharedNetworkProjectionPipeline",
+      "runtimeUseCode": "Runtime",
+      "evidenceStateCode": "SourceAndSymbolVerified",
+      "bindingStageCode": "SourceKnown",
+      "responsibilities": [
+        "AreaSet·관계·직접/문맥 결속 데이터 모델 검증",
+        "초기 네트워크 조회와 활성 Area 전환",
+        "canonical World Shell의 Area·경로 표현 Controller",
+        "활성 Area·준비 상태·지역 인과성 HUD 표시"
+      ],
+      "files": [
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Runtime/World/실제E5AreaSetNetworkModels.cs",
+          "expectedSha256": "B78C3DCFF84CC58A98C0C4252F3DC1A68019D1A03337C445F5F347A0B7F32FD5",
+          "symbols": [
+            "실제E5AreaSetNetworkCodes",
+            "실제E5AreaSetNetworkData",
+            "실제E5NetworkRelationData"
+          ],
+          "componentKindCode": "RuntimeContract",
+          "assemblyName": "Ssalddel.Unity.Runtime",
+          "ownerCode": "WorldPresentationRuntime"
+        },
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Runtime/World/실제E5AreaSetNetworkStreaming.cs",
+          "expectedSha256": "973905DB12CDC4B3760E6D28E8B7C67514B19074866F8B9F54AC7D75B3662ADA",
+          "symbols": [
+            "I실제E5AreaSetNetworkRepository",
+            "실제E5AreaSetNetworkStreamingSession"
+          ],
+          "componentKindCode": "RuntimeRepository",
+          "assemblyName": "Ssalddel.Unity.Runtime",
+          "ownerCode": "WorldPresentationRuntime"
+        },
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Presentation/World/실제E5AreaSetNetworkController.cs",
+          "expectedSha256": "F6F1D57174CE59222DD4CF8C6675DFEC508B3376AEDDA3ABC948A204DF94A24A",
+          "symbols": [
+            "실제E5AreaSetNetworkController",
+            "InitializeAsync",
+            "SwitchAreaAsync"
+          ],
+          "componentKindCode": "MonoBehaviourController",
+          "assemblyName": "Ssalddel.Unity.Presentation",
+          "ownerCode": "WorldPresentationRuntime"
+        },
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Presentation/World/실제E5AreaSetNetworkHudPresenter.cs",
+          "expectedSha256": "03C85F3B7BAEDE6F2BF1A42D1FE61BB7EC31DF26B14834AF61A3AFE45A5A2D4A",
+          "symbols": [
+            "실제E5AreaSetNetworkHudPresenter",
+            "ShowRegionalCausality"
+          ],
+          "componentKindCode": "MonoBehaviourPresenter",
+          "assemblyName": "Ssalddel.Unity.Presentation",
+          "ownerCode": "WorldPresentationRuntime"
+        }
+      ]
+    },
+    {
+      "bindingId": "gm-code:landscape-runtime-realization",
+      "label": "노드의 지형·타일·VisualKey 실제화 준비 파이프라인",
+      "relationshipCode": "SharedLandscapeRealizationPipeline",
+      "runtimeUseCode": "Runtime",
+      "evidenceStateCode": "SourceAndSymbolVerified",
+      "bindingStageCode": "SourceKnown",
+      "responsibilities": [
+        "공간 문법 배치 후보를 별도 staging root에 조립",
+        "카메라·플레이어 초점 주변 타일의 생성·해제",
+        "VisualKey에서 Prefab 후보를 조회",
+        "생성된 표현 인스턴스의 배선 상태 검증"
+      ],
+      "files": [
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Presentation/World/공간문법LandscapeRuntimeAssembler.cs",
+          "expectedSha256": "33DBC8E3E7F7DAE75DE9DB470940A11D23E235F9927B7289296180832D252496",
+          "symbols": [
+            "공간문법LandscapeRuntimeAssembler",
+            "공간문법PlacementInstanceView",
+            "CommitAtomic"
+          ],
+          "componentKindCode": "RuntimeAssembler",
+          "assemblyName": "Ssalddel.Unity.Presentation",
+          "ownerCode": "WorldPresentationRuntime"
+        },
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Presentation/World/공간TileStreamingController.cs",
+          "expectedSha256": "77A8B4B3550CC1A15C7C8BB7FA6779902901B0D06EA233354E18E845B6D5599F",
+          "symbols": [
+            "공간TileStreamingController",
+            "ConfigureLandscapeAssembly",
+            "TryGetTrackedWorldBounds"
+          ],
+          "componentKindCode": "MonoBehaviourController",
+          "assemblyName": "Ssalddel.Unity.Presentation",
+          "ownerCode": "WorldPresentationRuntime"
+        },
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Presentation/World/WorldVisualCatalog.cs",
+          "expectedSha256": "2DD5717B54DCC7B0F97F4DB4A0650BA2E25E0FAE124CD13163EC0A8E266AF288",
+          "symbols": [
+            "WorldVisualCatalog",
+            "WorldVisualCatalogEntry",
+            "Resolve"
+          ],
+          "componentKindCode": "ScriptableObjectCatalog",
+          "assemblyName": "Ssalddel.Unity.Presentation",
+          "ownerCode": "WorldPresentationRuntime"
+        },
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Presentation/World/WorldVisualInstanceView.cs",
+          "expectedSha256": "01CEA1FBE70435C387929E30CF18A30159191B33C7135A26C9FB9C86CB8B96B7",
+          "symbols": [
+            "WorldVisualInstanceView",
+            "ValidateWiring"
+          ],
+          "componentKindCode": "MonoBehaviourView",
+          "assemblyName": "Ssalddel.Unity.Presentation",
+          "ownerCode": "WorldPresentationRuntime"
+        }
+      ]
+    },
+    {
+      "bindingId": "gm-code:farm-h-placement-plan",
+      "label": "Farm H1 후보와 실외 배치 계획",
+      "relationshipCode": "ExactHStableIdConsumer",
+      "runtimeUseCode": "Runtime",
+      "evidenceStateCode": "SourceAndSymbolVerified",
+      "bindingStageCode": "SourceKnown",
+      "responsibilities": [
+        "Farm 생산·작업마당·상차 관문의 H1 고유 식별자 제공",
+        "실외 배치 후보 좌표와 회전을 결정적으로 준비",
+        "LH World의 H 결속·표면·연결자 후보를 데이터로 반환"
+      ],
+      "files": [
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Runtime/World/공간실외자산배치Planning.cs",
+          "expectedSha256": "74DD48EB94CC1C8D7CDC222F2086B3BAAE51C0FE1CDEF68119BEE084D02D72B9",
+          "symbols": [
+            "I공간실외자산배치PlanProvider",
+            "결정적공간실외자산배치PlanProvider",
+            "h1-stock:farm-loading-gate"
+          ],
+          "componentKindCode": "RuntimePlanningProvider",
+          "assemblyName": "Ssalddel.Unity.Runtime",
+          "ownerCode": "WorldPresentationRuntime"
+        },
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Runtime/World/공간LHWorldModels.cs",
+          "expectedSha256": "36E9B634BA62F9175883B1DF3BE6E0BEFC6FA65CA856A37DD9ACF78EE0C5E71B",
+          "symbols": [
+            "I공간LHWorldRepository",
+            "로컬공간LHWorldEngine",
+            "h1-stock:farm-production"
+          ],
+          "componentKindCode": "RuntimeWorldModel",
+          "assemblyName": "Ssalddel.Unity.Runtime",
+          "ownerCode": "WorldPresentationRuntime"
+        }
+      ]
+    },
+    {
+      "bindingId": "gm-code:nature-trail-expression",
+      "label": "Nature 숲길 입구 감각 표현",
+      "relationshipCode": "ExactHStableIdConsumer",
+      "runtimeUseCode": "Runtime",
+      "evidenceStateCode": "SourceAndSymbolVerified",
+      "bindingStageCode": "SourceKnown",
+      "responsibilities": [
+        "Nature 상태를 읽어 숲길 입구 H1 표현 키를 선택",
+        "표현 wiring을 검증하고 감각 표현을 갱신"
+      ],
+      "files": [
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Presentation/World/Nature감각표현Presenter.cs",
+          "expectedSha256": "18CEA1197A1B53457434EA2783C2DE32D7E6D00DA38EEA310A4B6FFB740CFFD9",
+          "symbols": [
+            "Nature감각표현Presenter",
+            "h1-stock:nature-trailhead",
+            "ValidateWiring"
+          ],
+          "componentKindCode": "MonoBehaviourPresenter",
+          "assemblyName": "Ssalddel.Unity.Presentation",
+          "ownerCode": "WorldPresentationRuntime"
+        }
+      ]
+    },
+    {
+      "bindingId": "gm-code:wi-seedbed-editor-preview",
+      "label": "Farm·Hub H1 모판 Editor 검토 진입점",
+      "relationshipCode": "EditorPreviewOnly",
+      "runtimeUseCode": "EditorOnly",
+      "evidenceStateCode": "SourceAndSymbolVerified",
+      "bindingStageCode": "SourceKnown",
+      "responsibilities": [
+        "기존 WI 공간 모판을 Editor에서 개별 조회",
+        "제품 Runtime이나 canonical Scene 결속과 분리된 시각 검토"
+      ],
+      "files": [
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Editor/WI공간모판검토실Builder.cs",
+          "expectedSha256": "986D388E54DDB8DD6D8CAE21B062A466124598DFB49692D359B453F9B6038C90",
+          "symbols": [
+            "WI공간모판검토실Builder",
+            "ShowFarmProduction",
+            "ShowFarmWorkYard",
+            "ShowFarmLoadingGate",
+            "ShowHubReceivingStorage"
+          ],
+          "componentKindCode": "EditorBuilder",
+          "assemblyName": "Ssalddel.Unity.Editor",
+          "ownerCode": "WorldSpatialEditor"
+        }
+      ]
+    },
+    {
+      "bindingId": "gm-code:h-spatial-rule-editor",
+      "label": "Farm H 배치 규칙 Editor 검사",
+      "relationshipCode": "EditorConstraintInspector",
+      "runtimeUseCode": "EditorOnly",
+      "evidenceStateCode": "SourceAndSymbolVerified",
+      "bindingStageCode": "SourceKnown",
+      "responsibilities": [
+        "Farm H 역할 토큰의 상대 배치를 Editor 검토용으로 구성",
+        "Level 2 제약의 제품 Runtime 적용이 아닌 별도 검사 보조"
+      ],
+      "files": [
+        {
+          "sourceRootCode": "SsalddelUnity",
+          "path": "Assets/Ssalddel/Editor/H공간배치규칙EditorEngine.cs",
+          "expectedSha256": "707A23C31757BBD3BCEAC1096B2B9A68381348DA6E8F6624BC601A3A977070C1",
+          "symbols": [
+            "H공간배치규칙EditorEngine",
+            "farm-production",
+            "farm-work-yard"
+          ],
+          "componentKindCode": "EditorRuleEngine",
+          "assemblyName": "Ssalddel.Unity.Editor",
+          "ownerCode": "WorldSpatialEditor"
+        }
+      ]
+    }
+  ]
+}

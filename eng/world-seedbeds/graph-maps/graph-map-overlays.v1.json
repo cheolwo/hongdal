@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "mirror-graph-map-overlay-catalog.v1",
+  "revision": "mirror-graph-map-overlay-catalog.r1",
+  "title": "Mirror Graph Map 시간·날씨 오버레이 대장",
+  "meaning": "절기·날씨·시간대는 기본 노드·엣지 토폴로지를 복제하거나 조용히 변경하지 않고 발견 난도·표현 후보·통행 조건을 별도 판본으로 덧씌운다.",
+  "overlays": [
+    {
+      "overlayId": "gm-overlay:spring-equinox",
+      "label": "춘분 기본 검토 오버레이",
+      "triggerKindCode": "SeasonalTerm",
+      "stateCode": "PlanningReference",
+      "targetSubgraphRefs": [
+        "gm-subgraph:nature-discovery",
+        "gm-subgraph:farm-production"
+      ],
+      "topologyMutationAllowed": false,
+      "authorityMutationAllowed": false,
+      "effectCategories": [
+        "DiscoveryReadability",
+        "LandscapePaletteCandidate",
+        "CropAvailabilityContext"
+      ],
+      "sourceDecisionIds": [
+        "D-399",
+        "D-400",
+        "D-405",
+        "D-409"
+      ],
+      "valueBoundary": "정확 날짜·온도·작물·몬스터·재질 값은 승인된 Simulation 상태나 전문 조사 없이 이 대장에서 생성하지 않는다."
+    },
+    {
+      "overlayId": "gm-overlay:weather-discovery-visibility",
+      "label": "날씨에 따른 발견 판독 오버레이",
+      "triggerKindCode": "WeatherState",
+      "stateCode": "ConfirmedDirection",
+      "targetSubgraphRefs": [
+        "gm-subgraph:nature-discovery"
+      ],
+      "topologyMutationAllowed": false,
+      "authorityMutationAllowed": false,
+      "effectCategories": [
+        "DiscoveryDifficulty",
+        "SightlineReadability",
+        "SkyAndLandscapePresentation"
+      ],
+      "sourceDecisionIds": [
+        "D-408",
+        "D-409"
+      ],
+      "valueBoundary": "날씨는 발견 난도와 표현에 영향을 줄 수 있지만 승인된 WI·경로·권위 결과를 자동으로 추가·삭제하지 않는다."
+    }
+  ]
+}
