@@ -18,7 +18,8 @@ namespace Ssalddel.Simulation.Domain
             Simulation명상성장적용Snapshot 명상성장적용, bool 재사용)
             AppendActionManifestationAndProgression(
                 Simulation행위발현Record draft,
-                Simulation집중판정ResultSnapshot? focusResult = null)
+                Simulation집중판정ResultSnapshot? focusResult = null,
+                string? progressionPlayerStableId = null)
         {
             if (draft == null)
                 throw new SimulationContractException(
@@ -33,7 +34,9 @@ namespace Ssalddel.Simulation.Domain
             var meditationFamilyBinding =
                 Simulation기본명상WiFamilyCatalog.Resolve(
                     draft.WorldInteractionId);
-            var playerStableId = RequireActionPlayerStableId(draft);
+            var playerStableId = string.IsNullOrWhiteSpace(progressionPlayerStableId)
+                ? RequireActionPlayerStableId(draft)
+                : progressionPlayerStableId.Trim();
             var canApplyField = string.Equals(draft.TriggerSourceCode,
                                     SimulationWorldInteractionTriggerSourceCodes
                                         .PlayerDriven,
@@ -143,7 +146,8 @@ namespace Ssalddel.Simulation.Domain
             else
             {
                 status = Simulation분야성장적용상태Codes.NotApplicable;
-                reason = PlayerProgressNotApplicableReason(draft, binding);
+                reason = PlayerProgressNotApplicableReason(
+                    draft, binding, playerStableId);
             }
 
             var meditationBeforeRevision = playerDomain.Snapshot().Revision;
@@ -371,7 +375,8 @@ namespace Ssalddel.Simulation.Domain
 
         private static string PlayerProgressNotApplicableReason(
             Simulation행위발현Record record,
-            SimulationWI분야결속Definition binding)
+            SimulationWI분야결속Definition binding,
+            string playerStableId)
         {
             if (record.결과분류Code == Simulation행위결과분류Codes.취소)
                 return "CancelledActionHasNoProgress";
@@ -381,12 +386,16 @@ namespace Ssalddel.Simulation.Domain
                     || record.WorldInteractionId == "WI-FARM-04")
                 && record.PrimaryOutcomeCode.EndsWith(":TaskStarted", StringComparison.Ordinal))
                 return "FarmTaskAwaitingCompletion";
+            if (binding.기여방식Code == Simulation분야기여방식Codes.None)
+                return string.IsNullOrWhiteSpace(binding.NoPlayerProgressReason)
+                    ? "WorldInteractionHasNoPlayerProgressBinding"
+                    : binding.NoPlayerProgressReason;
             if (!string.Equals(record.TriggerSourceCode,
                     SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
                     StringComparison.Ordinal))
                 return "TriggerSourceIsNotPlayerDriven";
             if (!string.Equals(record.ActorStableId,
-                    RequireActionPlayerStableId(record),
+                    playerStableId,
                     StringComparison.Ordinal))
                 return "ActorIsNotPlayer";
             if (binding.기여방식Code ==

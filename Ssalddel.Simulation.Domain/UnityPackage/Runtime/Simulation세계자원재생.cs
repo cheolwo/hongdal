@@ -85,7 +85,12 @@ namespace Ssalddel.Simulation.Domain
                 if (전이들.TryGetValue(id, out var 이전))
                 {
                     if (입력 != 이전.입력) throw new SimulationConflictException("ResourceRegenerationTransitionConflict");
-                    return new Simulation자원재생TickResult { Reused = true, State = 복사(이전.결과) };
+                    return new Simulation자원재생TickResult
+                    {
+                        Reused = true,
+                        State = 복사(이전.결과),
+                        분야성장적용 = 세계파생성장미적용(),
+                    };
                 }
                 var 다음 = 준비(요청);
                 if (!다음.판독.CanApply) throw new SimulationConflictException(다음.판독.BlockReasonCodes[0]);
@@ -99,15 +104,31 @@ namespace Ssalddel.Simulation.Domain
                     OutcomeStableId = "outcome:resource-regeneration:" + id,
                     PrimaryOutcomeCode = 다음.판독.변경노드StableIds.Length == 0 ? "ResourceAvailabilityUnchanged" : "ResourceAvailabilityRestored",
                     결과분류Code = Simulation행위결과분류Codes.성공,
-                    변화의미Codes = 다음.판독.변경노드StableIds.Length == 0 ? new[] { "WorldTickAdvanced" } : new[] { "ResourceAvailabilityChanged" },
+                    변화의미Codes = 다음.판독.변경노드StableIds.Length == 0
+                        ? new[] { "WorldTickAdvanced" }
+                        : new[] { Simulation세계자원재생Codes.ResourceAvailabilityChanged },
                     AppliedWorldTick = checked((int)요청.WorldTick), BeforeWorldRevision = 개정, AfterWorldRevision = 개정 + 1,
                     RuleRevision = Simulation세계자원재생Codes.RuleRevision, SourceReferenceIds = new[] { "policy-sha256:" + 정책Hash },
                 });
                 노드들 = 다음.노드; Tick = 요청.WorldTick; 개정++; 행위 = 다음행위;
                 var 결과 = 사본(); 전이들.Add(id, (입력, 결과));
-                return new Simulation자원재생TickResult { State = 복사(결과) };
+                return new Simulation자원재생TickResult
+                {
+                    State = 복사(결과),
+                    분야성장적용 = 세계파생성장미적용(),
+                };
             }
         }
+
+        private static Simulation분야성장적용Snapshot 세계파생성장미적용()
+            => new Simulation분야성장적용Snapshot
+            {
+                상태Code = Simulation분야성장적용상태Codes.NotApplicable,
+                사유Code = Simulation세계자원재생Codes.PlayerProgressionNotApplicableReason,
+                PlayerStableId = string.Empty,
+                BeforeProfileRevision = 0,
+                AfterProfileRevision = 0,
+            };
 
         private (Simulation자원재생Preview 판독, Dictionary<string, Simulation자원재생Node> 노드) 준비(Simulation자원재생TickRequest 요청)
         {

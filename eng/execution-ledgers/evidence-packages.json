@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-evidence-package-catalog.v3",
-  "revision": "ssalddel-evidence-package-catalog.r42",
+  "revision": "ssalddel-evidence-package-catalog.r43",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
   "principles": {
@@ -167,7 +167,7 @@
       "evidenceKindCode": "AutomatedTest",
       "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
-      "statusCode": "Current",
+      "statusCode": "Superseded",
       "subjectRefs": [
         "playable-loop:nature-night-day2.v1",
         "WI-WORLD-RESOURCE-REGENERATE"
@@ -196,23 +196,23 @@
           "locationKind": "RepositoryPath",
           "retentionCode": "Tracked"
         },
-        {
-          "locator": "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json",
-          "sha256": "c5732583e046b90a4fded89f2cab15bc22a4c03d306451159601b6f80c8cefac",
-          "locationKind": "RepositoryPath",
-          "retentionCode": "Tracked"
+      {
+        "locator": "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json",
+        "sha256": "c5732583e046b90a4fded89f2cab15bc22a4c03d306451159601b6f80c8cefac",
+        "locationKind": "RepositoryPath",
+        "retentionCode": "LocalOnly"
         },
-        {
-          "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
-          "sha256": "0a3aaff7f3d26d730cdf5708e45e31ae62dc7616596517ce657472a947d1e65b",
-          "locationKind": "RepositoryPath",
-          "retentionCode": "Tracked"
+      {
+        "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
+        "sha256": "0a3aaff7f3d26d730cdf5708e45e31ae62dc7616596517ce657472a947d1e65b",
+        "locationKind": "RepositoryPath",
+        "retentionCode": "LocalOnly"
         },
-        {
-          "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation세계자원재생.cs",
-          "sha256": "63b4a9dcab7541b4f38cb04d351bbfa76a57edd41300cbd7d3599e57162306d5",
-          "locationKind": "RepositoryPath",
-          "retentionCode": "Tracked"
+      {
+        "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation세계자원재생.cs",
+        "sha256": "63b4a9dcab7541b4f38cb04d351bbfa76a57edd41300cbd7d3599e57162306d5",
+        "locationKind": "RepositoryPath",
+        "retentionCode": "LocalOnly"
         },
         {
           "locator": "Ssalddel.Simulation.Application/RuntimeCore/Simulation세계자원재생Service.cs",
@@ -220,11 +220,11 @@
           "locationKind": "RepositoryPath",
           "retentionCode": "Tracked"
         },
-        {
-          "locator": "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
-          "sha256": "716205072f412ab482a722be62c650ebcba32a01c1509aaef88927ff2a1ed2f4",
-          "locationKind": "RepositoryPath",
-          "retentionCode": "Tracked"
+      {
+        "locator": "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
+        "sha256": "716205072f412ab482a722be62c650ebcba32a01c1509aaef88927ff2a1ed2f4",
+        "locationKind": "RepositoryPath",
+        "retentionCode": "LocalOnly"
         },
         {
           "locator": "artifacts/local/remaining-32-wi/resource-tests/ResourceRegeneration.Focused.Tests.csproj",
@@ -275,7 +275,7 @@
       "evidenceKindCode": "AutomatedTest",
       "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
-      "statusCode": "Current",
+      "statusCode": "Superseded",
       "subjectRefs": [
         "playable-loop:nature-night-day2.v1",
         "WI-ACTOR-PLAN-SET"
@@ -298,11 +298,11 @@
         "Q340 이후"
       ],
       "artifactReferences": [
-        {
-          "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs",
-          "sha256": "6948e888f6494708c0f671a56d3d578f43c81af04944a406cf763c18dba47d64",
-          "locationKind": "RepositoryPath",
-          "retentionCode": "Tracked"
+      {
+        "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs",
+        "sha256": "6948e888f6494708c0f671a56d3d578f43c81af04944a406cf763c18dba47d64",
+        "locationKind": "RepositoryPath",
+        "retentionCode": "LocalOnly"
         },
         {
           "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation개인계획.cs",
@@ -341,7 +341,7 @@
       "evidenceKindCode": "AutomatedTest",
       "evidenceTrackCode": "Logic",
       "resultCode": "Passed",
-      "statusCode": "Current",
+      "statusCode": "Superseded",
       "subjectRefs": [
         "playable-loop:nature-night-day2.v1",
         "WI-HEAT-SOURCE-STATE-CHANGE"
@@ -365,10 +365,10 @@
       ],
       "artifactReferences": [
         {
-          "locationKind": "RepositoryPath",
-          "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation열원상태Contracts.cs",
-          "sha256": "e828486b23012ad6eb64c39256472cfd365cf58b1e0f0b960539aeb8b3f85a50",
-          "retentionCode": "Tracked"
+        "locationKind": "RepositoryPath",
+        "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation열원상태Contracts.cs",
+        "sha256": "e828486b23012ad6eb64c39256472cfd365cf58b1e0f0b960539aeb8b3f85a50",
+        "retentionCode": "LocalOnly"
         },
         {
           "locationKind": "RepositoryPath",
@@ -2060,6 +2060,110 @@
         { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260830-farm-defense-return-e3-final/farm-defense-return-e3-final.trx", "sha256": "27ac9a022a6b589c2126e19c885aacffafac24bfb7cf1d0c9dd51d63cd124106", "retentionCode": "LocalOnly" }
       ],
       "invalidationTriggers": ["WI-FARM-DEFENSE-RETURN 계약·Aggregate·Application Service 변경", "귀환 카드 또는 후속 대기열 정규형 변경", "farm-defense-return.r1 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-personal-plan-current-e4-20260901",
+      "title": "Nature 개인 계획 현행 Logic·Presentation E4 준비",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1", "WI-ACTOR-PLAN-SET"],
+      "evidenceStageCodes": ["E1", "E2", "E3", "E4"],
+      "sourceRevision": "nature-personal-plan.design.r1/personal-plan.current-action-record.r1/presentation-e4-preparation.r1",
+      "executedAt": "2026-09-01T12:00:11.6661272+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; 비공간 UI 표현 준비 정적 계약",
+      "scope": "개인 계획 설정·수정의 무변경 Preview, 멱등·경합·거부, 현행 ActionRecord와 revision, PlayerDomain NotApplicable을 집중 회귀하고 읽기 전용 계획표 VisualKey와 Synty 비적용 E4 인계를 결속했다. 개인 계획·열원·공통 분야 성장 집중시험 46/46이 통과했다.",
+      "exclusions": ["실제 UI 구현·입력·표시 수명", "Save/Replay·RemoteHost", "Unity·Scene·Play Mode·Game View", "수치 회복·진척·보상"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs", "sha256": "d39110ee6049a15df59adcee6197365a070272589a09c77d640407dadface084", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation개인계획.cs", "sha256": "184155aa8dd3e101c9e5a264e0c4b099010bfacd69b827b8f9ac5e0ba9bb33b0", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/Simulation개인계획Service.cs", "sha256": "1246c67e64fe7744d723f7cc7d17cf500116312e2c9cc324bd694d415a99db1f", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs", "sha256": "70be7855e9adab2593625f630174d47fee9c7056bd50977968d4dd947b703139", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-nature-six-wi-e4/nature-plan-heat-e4-focused.trx", "sha256": "769ca297224bc0fb8fa97ae027170e9a5767424effb409fce47fa92b58003186", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["개인 계획 계약·Aggregate·Application Service·시험 변경", "ActionRecord 또는 PlayerDomain NotApplicable 의미 변경", "계획표 VisualKey·읽기 전용 상태 사본·Synty 비적용 경계 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-heat-source-current-e4-20260901",
+      "title": "Nature 열원 상태 현행 Logic·Presentation E4 준비",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1", "WI-HEAT-SOURCE-STATE-CHANGE"],
+      "evidenceStageCodes": ["E1", "E2", "E3", "E4"],
+      "sourceRevision": "nature-heat-source.design.r1/heat-source-state.current-action-record.r1/presentation-e4-preparation.r1",
+      "executedAt": "2026-09-01T11:38:51.4843839+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; 보유 Synty 파일 재고 정적 대조",
+      "scope": "점화·연료 추가·소화의 무변경 Preview, 멱등·경합·거부, 현행 ActionRecord와 revision, PlayerDomain NotApplicable을 집중 회귀하고 CampFire/Fire Small 정확 후보와 HeatSourceInteractionAnchor의 Conditional E5 인계를 결속했다. 개인 계획·열원·공통 분야 성장 집중시험 46/46이 통과했다.",
+      "exclusions": ["실제 Prefab 로드·Renderer·Collider·Bounds", "실제 배치·접근·통행·조립 수명", "연소 Tick·수면·Save/Replay·RemoteHost", "Unity·Scene·Play Mode·Game View", "냄비 지지·가열 규칙"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation열원상태Contracts.cs", "sha256": "5efc7cb7d1af43b328b375bf2dcdef4c973deda54561e37bbe650b3fa03ccc35", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation열원상태.cs", "sha256": "5ea3ed0d5a92dd57669840a8b47dd863655a67cb853f447f9b65982cb1acee2b", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/Simulation열원상태Service.cs", "sha256": "84b1caec75e44cbc78a96e11e271c6ca09985fc719984bd717584bb525069110", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs", "sha256": "4d842e526a4ef314f692352104430ee16ae2b4b362139aa0cdd4a353934fb099", "retentionCode": "Tracked" },
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/Props/SM_Prop_CampFire_01.prefab", "sha256": "7d2bf08438aefd66c31669a9e2ba4569d32a200eea116e79d2dcaf04f7340e32", "retentionCode": "External" },
+        { "locationKind": "ExternalCheckout", "locator": "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/FX/FX_Fire_Small_01.prefab", "sha256": "07bdf873c92e1b4d2bfe3ec9512fe4c8c59cc943b3721964375fff3f3c83e5a9", "retentionCode": "External" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-nature-six-wi-e4/nature-plan-heat-e4-focused.trx", "sha256": "769ca297224bc0fb8fa97ae027170e9a5767424effb409fce47fa92b58003186", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["열원 계약·Aggregate·Application Service·시험 변경", "ActionRecord 또는 PlayerDomain NotApplicable 의미 변경", "CampFire/Fire Small path·GUID·SHA·fingerprint 또는 HeatSourceInteractionAnchor 경계 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-six-wi-e4-20260901",
+      "title": "Nature 밤→Day2 여섯 WI Logic·Presentation E4 준비",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Integrated",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-HEAT-SOURCE-STATE-CHANGE", "WI-ACTOR-PLAN-SET", "WI-WORLD-RESOURCE-REGENERATE"],
+      "evidenceStageCodes": ["E1", "E2", "E3", "E4"],
+      "sourceRevision": "nature-resource-regeneration.design.r1/nature-six-wi-e4-preparation.r1",
+      "executedAt": "2026-09-01T11:38:51.4843839+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; 보유 Synty 파일·표현 모듈·H 상태 정적 대조",
+      "scope": "WI-NATURE-13/14/15, 열원 상태, 개인 계획, 세계 자원 재생의 현행 상태 전이·ActionRecord·분야 성장 NotApplicable·Save/Replay·Local/Hosted·표현 조립 관련 집중 회귀 155/155, 범위 Fast 202/202, Task 전체 1607/1607과 정확 Synty 후보·비공간 NotApplicable·VisualKey·InteractionAnchor·Conditional E5 인계를 결속했다.",
+      "exclusions": ["Unity Editor·Prefab 실제 로드", "Scene·Play Mode·실제 입력·Game View·Console", "Renderer·Collider·Bounds·Rig·조립 수명", "E5 실제 제품 연결·E 승격", "새 자산 가공·새 규칙·Save 의미 변경"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "eng/execution-ledgers/playable-loop-synty-expression-modules.json", "sha256": "cda253cc399c889917db970b7cfc0c1f4024bc581eb1cd870200f67a1a6fdd4b", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "eng/execution-ledgers/manage-playable-loop-synty-expression-modules.ps1", "sha256": "0c335aac959c6067ef7370ba192043c896f1abd0f73e842a3bc4daa596e71510", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "eng/tests/playable-loop-synty-expression-modules.ps1", "sha256": "344317a228d59240fdc485259e81ab6fe5dc4b62c8505d70150569aa8f694b3b", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "docs/AI/generated/playable-loop-synty-expression-modules.md", "sha256": "5099305e3e65941c6d3e8c906be38a29fe98b5612fc5e98853d6142cab564514", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "eng/execution-ledgers/world-interactions.json", "sha256": "ecfec4187f9d33eb9cde8c75dc95e2b5f532a114ccc9c0913658e6195fe12898", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "eng/world-seedbeds/generated/wi-eh-status.v1.json", "sha256": "9df9303479418a12d32d08e6473326bfa46580ad74d7ea1e9e84a03d24d20d18", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "docs/AI/generated/wi-eh-spatial-status.md", "sha256": "cc1c340262bea29ef32bb504416a5421b7e912b8f486d9992b1f3aca25449617", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-nature-six-wi-e4/nature-night-day2-six-wi-e4.trx", "sha256": "0c75ab303b6e95b795bd8d2913768a12fff8e96600ef39c1352f1fef653aa9f8", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-115317/Ssalddel.Simulation.Tests.trx", "sha256": "22269714cd80dfac09ca0885d9eb176c3ba192d81c360f5a6117232d3e30eb70", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-115926/Ssalddel.Simulation.Tests.trx", "sha256": "e7cee6885942593c3cd4567e313319cc324475c0632fa334b82c826955a666a5", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["여섯 WI 계약·상태 전이·ActionRecord·Save/Replay·Local/Hosted 의미 변경", "Synty 모듈 family·Prefab path·GUID·SHA·fingerprint 변경", "VisualKey·H capability·InteractionAnchor·Conditional E5 인계 변경"]
+    },
+    {
+      "evidenceId": "evidence:nature-night-day2-session-logic-e5-20260901",
+      "title": "Nature 보관→수면→Day2→자원 재생 Session Logic E5 통합",
+      "evidenceKindCode": "AutomatedTest",
+      "evidenceTrackCode": "Logic",
+      "resultCode": "Passed",
+      "statusCode": "Current",
+      "subjectRefs": ["playable-loop:nature-night-day2.v1", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-WORLD-RESOURCE-REGENERATE"],
+      "evidenceStageCodes": ["E5"],
+      "sourceRevision": "nature-resource-regeneration.design.r1/session-observation.logic-e5.r1",
+      "executedAt": "2026-09-01T13:00:00+09:00",
+      "environment": "Windows; .NET 10; Ssalddel.Simulation.Tests; LocalSimulationRuntime와 ASP.NET Core TestServer",
+      "scope": "오두막 보관 자원이 수면 자격을 실제로 제한하고, 수면 뒤 같은 Session 권위 전이에서 Day2 선택과 소진 자원의 1회 재생이 이어지는지 검증했다. 같은 revision 관측 결과에서 보관량·Day2·Standing 자원·다음 BeginHarvest 기회·ActionRecord를 함께 조회하고, 재생 기록의 원 clock command와 harvest origin command, 명령 멱등성, 낡은 revision 거부와 동시 경합을 확인했다. 집중 통합시험 1/1, 생활거점 Save/Replay·LocalProcess·HTTP TestServer 동등성 6/6, 관련 회귀 11/11, 전체 Simulation 회귀 1608/1608이 통과했다.",
+      "exclusions": ["실제 배포 RemoteHost와 운영 네트워크", "E8 Save/Replay 재진입 캠페인", "Unity Editor·Scene·Play Mode·실제 입력·Game View", "Presentation E5 실제 Prefab·Renderer·Collider·Bounds 결속", "방문자 체류 표현 hash 불일치 수정"],
+      "artifactReferences": [
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs", "sha256": "266bf23bde70b8211c24ae3ccb3cf7a5733ee8d6e167616534095b4549b2ebae", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNature표현관측Contracts.cs", "sha256": "b710e8779abd7a960bacb27ce8b36d39117d89323f9d01a84fc69af486a1b3ab", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs", "sha256": "01c9b2dfd0f9532c8a1bfffd16e9ee2fd918edee7a6503a23c877459cdcacf9e", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs", "sha256": "e7c3cdee974f4830818367264aad25b4422b3309b35272a95f9be312bfb2b647", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs", "sha256": "38716eb59dae06b7d4f198055c718892f3ef187e5bf779d0d82e3ca70fdd8156", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Server/Controllers/SimulationNatureSurvivalController.cs", "sha256": "435f1ea035300f2df90445b2d888a14e75338af7090b375db640407644066250", "retentionCode": "Tracked" },
+        { "locationKind": "RepositoryPath", "locator": "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs", "sha256": "89b346b0625e079c68d3a7fb1d990293b6840fef924ccc23aecbda6b69a5f748", "retentionCode": "Tracked" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-nature-e5-session-integration/nature-e5-session-integrated-lineage.trx", "sha256": "e9652e6cfa9c3819ea7a2bc0758d806c9816c137cbfdcb82f96527644f0ce65f", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-nature-e5-save-replay-local-http/nature-night-day2-save-replay-local-http-parity.trx", "sha256": "343b5e82ab5361388a0efdb37fa74982b2a1fefdcf3fae3250bfa19926357540", "retentionCode": "LocalOnly" },
+        { "locationKind": "LocalArtifact", "locator": "artifacts/local/validation/20260901-nature-e5-session-integration-full-r2/Ssalddel.Simulation.Tests-r2.trx", "sha256": "06eb8033c99ecb8b8160f922a0e5705d33213540601196c9c2f2b71c48689d10", "retentionCode": "LocalOnly" }
+      ],
+      "invalidationTriggers": ["Nature 보관·수면·Day2·자원 재생 상태 전이 또는 동일 revision 관측 계약 변경", "ActionRecord·origin command·expected revision·멱등·경합 의미 변경", "LocalSimulationRuntime·HTTP 관측 경로·Save/Replay 직렬화 의미 변경"]
     }
   ]
 }

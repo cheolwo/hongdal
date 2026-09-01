@@ -88,16 +88,15 @@
       "profileKey": "playable-loop:nature-night-day2.v1|WI-WORLD-RESOURCE-REGENERATE",
       "profileRevision": "nature-resource-regeneration.engine-interaction.r1",
       "logicStatusCode": "Passed",
-      "presentationStatusCode": "Pending",
-      "integratedStatusCode": "Pending",
-      "earliestReopenEvidenceStageCode": "E2",
+      "presentationStatusCode": "Passed",
+      "integratedStatusCode": "Passed",
+      "earliestReopenEvidenceStageCode": "E5",
       "evidenceRefs": [
-        "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+        "evidence:nature-night-day2-six-wi-e4-20260901"
       ],
       "blockerCodes": [
-        "PresentationRevisionRequired",
         "ProductionSpatialAndGrowthPolicyUndefined",
-        "SharedManagementLedgerHandoffPending"
+        "UnityStandingStumpBindingPending"
       ]
     }
   },
@@ -603,15 +602,18 @@
       "loopStableId": "playable-loop:nature-night-day2.v1",
       "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
       "trackCode": "Logic",
-      "targetEvidenceStageCode": "E3",
-      "statusCode": "Active",
+      "targetEvidenceStageCode": "E5",
+      "statusCode": "ReadyForIntegration",
       "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
       "worktreePath": "C:/Users/user/source/repos/Hongdal",
       "writePaths": [
-        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
-        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation세계자원재생.cs",
-        "Ssalddel.Simulation.Application/RuntimeCore/Simulation세계자원재생Service.cs",
-        "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs"
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNature표현관측Contracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs",
+        "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs",
+        "Ssalddel.Simulation.Server/Controllers/SimulationNatureSurvivalController.cs",
+        "Ssalddel.Simulation.Tests/LocalSimulationRuntimeTests.cs",
+        "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs"
       ],
       "sharedContractKeys": [
         "simulation-world-resource-regeneration"
@@ -624,7 +626,7 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json",
-      "workOrderSha256": "c5732583e046b90a4fded89f2cab15bc22a4c03d306451159601b6f80c8cefac",
+      "workOrderSha256": "e288f8df77268013e27b4d954dc44d88da2ef5611adbda39e697863dc05cf4f1",
       "planningGate": {
         "statusCode": "Approved",
         "designDocumentRef": "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md",

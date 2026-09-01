@@ -153,18 +153,20 @@
       ],
       "implementation": {
         "status": "Done",
-        "currentStage": "E3",
-        "targetStage": "E3",
+        "currentStage": "E4",
+        "targetStage": "E4",
         "evidence": [
-          "집중 시험 16/16: artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+          "집중 시험 16/16: artifacts/local/remaining-32-wi/personal-plan-e3.trx",
+          "evidence:nature-personal-plan-current-e4-20260901"
         ]
       },
       "integration": {
         "status": "InProgress",
-        "currentStage": "E1",
+        "currentStage": "E4",
         "targetStage": "E7",
         "evidence": [
-          "docs/Architecture/PlayableLoops/Nature개인계획E3.md"
+          "docs/Architecture/PlayableLoops/Nature개인계획E3.md",
+          "evidence:nature-personal-plan-current-e4-20260901"
         ]
       },
       "sourceReferences": [
@@ -172,7 +174,7 @@
       ],
       "notes": [
         "상위 분류: eng/execution-ledgers/world-interaction-registration-relations.json",
-        "독립 Logic E3만 검증. 회복 수치·진척·Save·RemoteHost·Unity 미구현."
+        "Logic·Presentation E4 준비와 비공간 계획표 NotApplicable, ActionRecord·분야 성장 NotApplicable을 검증했다. 실제 UI·입력·Save·RemoteHost·Unity는 E5 이상 후속이다."
       ]
     },
     {
@@ -1418,18 +1420,19 @@
       ],
       "implementation": {
         "status": "Done",
-        "currentStage": "E3",
-        "targetStage": "E3",
+        "currentStage": "E4",
+        "targetStage": "E4",
         "evidence": [
-          "Simulation열원상태Tests 23/23: Q032~034의 단일 플레이어 열원 상태 변경. 멱등·경합·거부·정수경계·정책 사본·행위 기록."
+          "Simulation열원상태Tests 23/23: Q032~034의 단일 플레이어 열원 상태 변경. 멱등·경합·거부·정수경계·정책 사본·행위 기록.",
+          "evidence:nature-heat-source-current-e4-20260901"
         ]
       },
       "integration": {
         "status": "InProgress",
-        "currentStage": "E1",
+        "currentStage": "E4",
         "targetStage": "E7",
         "evidence": [
-          "Logic E3 / Presentation E1. Session·Save·RemoteHost·Unity·NPC·연소 Tick은 미연결."
+          "evidence:nature-heat-source-current-e4-20260901"
         ]
       },
       "sourceReferences": [
@@ -1441,7 +1444,7 @@
       ],
       "notes": [
         "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
-        "2026-08-30 신규 33개 E3 요청 중 첫 WI. Q032~034/Q053 열원 변경만 구현; 날씨·수면·화재 분기는 미구현."
+        "Q032~034/Q053 열원 변경의 Logic·Presentation E4 준비와 CampFire/Fire Small 후보, ActionRecord·분야 성장 NotApplicable을 검증했다. 실제 배치·입력·날씨·수면·화재 분기는 E5 이상 후속이다."
       ]
     },
     {
@@ -2219,15 +2222,21 @@
       ],
       "implementation": {
         "status": "Done",
-        "currentStage": "E3",
-        "targetStage": "E3",
-        "evidence": ["artifacts/local/remaining-32-wi/resource-regeneration-isolated.trx"]
+        "currentStage": "E4",
+        "targetStage": "E4",
+        "evidence": [
+          "artifacts/local/remaining-32-wi/resource-regeneration-isolated.trx",
+          "evidence:nature-night-day2-six-wi-e4-20260901"
+        ]
       },
       "integration": {
         "status": "InProgress",
-        "currentStage": "E1",
+        "currentStage": "E4",
         "targetStage": "E7",
-        "evidence": ["docs/Architecture/PlayableLoops/Nature세계자원재생E3.md"]
+        "evidence": [
+          "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md",
+          "evidence:nature-night-day2-six-wi-e4-20260901"
+        ]
       },
       "sourceReferences": [
         "docs/Architecture/PlayableLoops/PlanningSessions/Nature자원건설/nature-resource-construction.inquiry.r1.md",
@@ -2235,7 +2244,7 @@
       ],
       "notes": [
         "상위 분류·중복 결정: eng/execution-ledgers/world-interaction-registration-relations.json",
-        "분리 집중시험 Debug/Release 각각 35/35, 개인계획·열원 포함 분리 회귀 74/74. 공유 프로젝트 집중시험 35/35와 관련 회귀 77/77. Logic E3 / Presentation E1 / 통합 E1이며 실제 Session·Save·RemoteHost·Unity 화면은 미검증이다."
+        "기존 E3 회귀에 더해 같은 Session revision의 자원 재생 ActionRecord·분야 성장 NotApplicable·Save/Replay·Local/Hosted와 Standing 표현 준비를 E4로 검증했다. 실제 Unity 입력·배치·Game View는 E5 이상 후속이다."
       ],
       "automaticTransition": {
         "triggerKindCode": "WorldTick",

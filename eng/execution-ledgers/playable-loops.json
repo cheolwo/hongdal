@@ -616,7 +616,7 @@
         "AfterCabinStorage",
         "Day2Ready"
       ],
-      "currentEvidenceStage": "E1",
+      "currentEvidenceStage": "E4",
       "nextClosureTargetStage": "E7",
       "finalEvidenceStage": "E7",
       "closureStateCode": "Open",
@@ -624,38 +624,41 @@
       "maturityTracks": {
         "logic": {
           "trackCode": "Logic",
-          "currentStage": "E1",
+          "currentStage": "E5",
           "targetStage": "E7",
           "statusCode": "InProgress",
           "evidencePackageRefs": [
             "evidence:nature-personal-plan-logic-e3-20260830",
             "evidence:nature-heat-source-logic-e3-20260830",
+            "evidence:nature-personal-plan-current-e4-20260901",
+            "evidence:nature-heat-source-current-e4-20260901",
+            "evidence:nature-night-day2-six-wi-e4-20260901",
+            "evidence:nature-night-day2-session-logic-e5-20260901",
             "evidence:nature-night-day2-wi13-hosted-parity-20260826",
             "evidence:nature-night-day2-wi14-hosted-parity-20260826",
             "evidence:nature-night-day2-wi15-hosted-parity-20260826"
           ],
           "blockers": [
-            "세계 자원 재생 E1→E3 구현 중. 개인 계획·열원 E3 증거는 보존.",
-            "열원 변경 경로 독립 Core E3까지만 시험. 이전 다른 WI의 증거는 보존하되 열원으로 전이하지 않는다.",
-            "v28 행위 원장·분야 성장 계보가 포함된 실제 입력과 LocalProcess·RemoteHost 반복 증거를 다시 확보해야 한다."
+            "열원·개인계획의 Logic E5와 여섯 WI의 Presentation E5 실제 소비는 별도 후속이다.",
+            "Session Logic E5 자동 근거는 Scene·Play·실제 입력·Game View·Console을 증명하지 않는다."
           ]
         },
         "presentation": {
           "trackCode": "Presentation",
-          "currentStage": "E1",
+          "currentStage": "E4",
           "targetStage": "E7",
-          "statusCode": "Blocked",
+          "statusCode": "InProgress",
           "evidencePackageRefs": [
             "evidence:nature-night-day2-wi13-playmode-20260826",
             "evidence:nature-night-day2-wi14-playmode-20260826",
             "evidence:nature-night-day2-wi15-playmode-20260826",
             "evidence:nature-dual-loop-game-view-20260826",
-            "evidence:nature-night-day2-presentation-e7-20260826"
+            "evidence:nature-night-day2-presentation-e7-20260826",
+            "evidence:nature-night-day2-six-wi-e4-20260901"
           ],
           "blockers": [
-            "재생 성장 단계·채집 가능 상태의 판독 요구 E1만 정의.",
-            "표현 엔진의 행위 원장 cursor 소비와 같은 Revision Game View 증거가 없다.",
-            "Day2 계획판의 세 선택·비용·다음 행동 판독과 오두막 주변 구도, 사람 직접 입력·청음 수용이 남았다."
+            "E5 실제 Prefab/UI 연결, Renderer·Collider·Bounds·InteractionAnchor·배치·해제 수명과 같은 revision 소비가 남았다.",
+            "과거 Unity PlayMode·Game View 패키지는 현재 E4 후보 준비를 대신하지 않으며 E5에서 새 증거가 필요하다."
           ]
         }
       },
@@ -687,6 +690,9 @@
         }
       ],
       "evidencePackageRefs": [
+        "evidence:nature-personal-plan-current-e4-20260901",
+        "evidence:nature-heat-source-current-e4-20260901",
+        "evidence:nature-night-day2-six-wi-e4-20260901",
         "evidence:nature-personal-plan-logic-e3-20260830",
         "evidence:nature-heat-source-logic-e3-20260830",
         "evidence:nature-r2-core-20260825",
@@ -703,11 +709,17 @@
         "eng/execution-ledgers/work-orders/nature-survival-solo-placement.e9-work-order.json",
         "eng/execution-ledgers/work-orders/nature-sky-engine.e9-work-order.json"
       ],
-      "blockers": [
-        "행위 원장·분야 성장 공통 관문 소급으로 기존 E6/E7 증거가 무효화됐다.",
-        "Unity 표현 엔진의 cursor 소비와 현재 Game View 증거를 다시 검증해야 한다."
+      "workOrderRefs": [
+        "eng/execution-ledgers/work-orders/nature-night-day2.e7-work-order.json",
+        "eng/execution-ledgers/work-orders/nature-personal-plan.e7-work-order.json",
+        "eng/execution-ledgers/work-orders/nature-heat-source.e7-work-order.json",
+        "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
       ],
-      "nextAction": "세계 자원 재생 Logic E3 검증 후 캠페인 다음 WI로 전환.",
+      "blockers": [
+        "여섯 WI의 Logic·Presentation E4 준비는 현재 코드·자동 회귀·정확 후보 fingerprint와 r5 작업 명세로 결속됐지만 E5 실제 제품 연결은 미검증이다.",
+        "과거 Unity PlayMode·Game View 패키지는 Superseded/Stale이므로 Current E5로 재사용하지 않는다. 이번 범위에서는 Editor·Scene·Play·E5를 열지 않는다."
+      ],
+      "nextAction": "E5 후속 승인에서 여섯 WI 각각의 실제 Prefab/UI 소비·상태 revision·InteractionAnchor·배치·표시·해제 수명과 실제 입력·Game View를 검증한다.",
       "sourcePlanningDocumentRefs": [
         "docs/Architecture/PlayableLoops/Nature열원관리E3.md",
         "docs/Architecture/PlayableLoops/PlanningSessions/nature-night-day2.inquiry.r1.md",

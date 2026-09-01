@@ -42,9 +42,12 @@ public sealed class SimulationServerHttpBoundaryTests
         var hash = Convert.ToHexString(SHA256.HashData(
                 Encoding.UTF8.GetBytes(string.Join("\n", manifest))))
             .ToLowerInvariant();
-        Assert.Equal(168, manifest.Length);
+        Assert.Equal(169, manifest.Length);
+        Assert.Contains(
+            "GET api/simulation/v1/sessions/{sessionStableId}/nature-survival/observation",
+            manifest);
         Assert.Equal(
-            "17db9a0f104db4f05ad3a07829e53967e64e9cb7e97b81ea6c1014353d0160b8",
+            "8340666e76350296e43474585d2ffdf511942524576af4ec1075f8c11f4a2d1a",
             hash);
     }
 

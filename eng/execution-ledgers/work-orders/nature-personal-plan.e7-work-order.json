@@ -1,32 +1,32 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-NATURE-PERSONAL-PLAN",
-  "title": "개인 계획 설정 Logic E3",
+  "title": "개인 계획 설정 Logic·Presentation E4 준비",
   "playableUnitStableId": "playable-loop:nature-night-day2.v1",
   "activeWorldInteractionId": "WI-ACTOR-PLAN-SET",
   "targetEvidenceStage": "E7",
-  "currentEvidenceStage": "E1",
+  "currentEvidenceStage": "E4",
   "promotionEligible": false,
   "deliveryCap": {
-    "currentDispatchTargetStage": "E3",
+    "currentDispatchTargetStage": "E4",
     "promotionBeyondStageAllowed": false,
-    "reason": "남은32개 순차LogicE3 요청 중 개인계획 설정과 일회성 안정 근거만. 수치보상 제외."
+    "reason": "개인 계획의 현행 ActionRecord·결정성 회귀와 읽기 전용 계획표 표현 준비까지만 결속한다. 실제 UI·입력·Scene·Save·수치 회복·진척과 E5는 제외한다."
   },
   "iterationState": {
     "currentPass": "UpwardAssemblyAndValidation",
-    "nextReopenCondition": "설정 WI가 실제 보상·진척·수면 책임까지 변경하면 E1 재검토."
+    "nextReopenCondition": "실제 계획 UI 소비·입력·표시 수명 또는 수치 회복·진척 규칙을 열 때 가장 이른 E1~E5를 다시 검토한다."
   },
   "trackPlans": {
     "logic": {
       "trackCode": "Logic",
-      "currentEvidenceStage": "E3",
+      "currentEvidenceStage": "E4",
       "downwardPlan": [
         {
           "code": "E7",
           "disposition": "Blocked",
-          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+          "summary": "실제 입력·UI·Game View와 결과 재조회는 후속 승인 범위다."
         },
         {
           "code": "E6",
@@ -40,8 +40,8 @@
         },
         {
           "code": "E4",
-          "disposition": "Blocked",
-          "summary": "개인 계획 계약·원자 확정·멱등·거부 검토; 실제 보상은 제외."
+          "disposition": "Affected",
+          "summary": "계획 상태 사본·ActionRecord·분야 성장 NotApplicable을 같은 명령 결과로 읽는 현재 계약을 검증한다. 실제 보상은 제외한다."
         },
         {
           "code": "E3",
@@ -86,8 +86,10 @@
         },
         {
           "code": "E4",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "evidence:nature-personal-plan-current-e4-20260901"
+          ]
         },
         {
           "code": "E5",
@@ -108,37 +110,37 @@
     },
     "presentation": {
       "trackCode": "Presentation",
-      "currentEvidenceStage": "E1",
+      "currentEvidenceStage": "E4",
       "downwardPlan": [
         {
           "code": "E7",
           "disposition": "Blocked",
-          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+          "summary": "사람 입력과 Game View에서 계획 설정·수정·다음 선택 판독을 확인하는 단계이며 이번 범위 밖이다."
         },
         {
           "code": "E6",
           "disposition": "Blocked",
-          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+          "summary": "계획명·본문·상태·revision의 실제 판독 품질은 후속 범위다."
         },
         {
           "code": "E5",
           "disposition": "Blocked",
-          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+          "summary": "계획 상태를 읽는 실제 UI/Presentation 소비자와 표시 수명 연결은 후속 범위다."
         },
         {
           "code": "E4",
-          "disposition": "Blocked",
-          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+          "disposition": "Affected",
+          "summary": "읽기 전용 계획 상태 사본을 비공간 계획표 VisualKey로 소비하는 계약과 Synty 비적용 사유를 동결한다. 실제 화면은 미구현이다."
         },
         {
           "code": "E3",
-          "disposition": "Blocked",
-          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+          "disposition": "Affected",
+          "summary": "계획명·본문·상태·revision의 중복·오래된 반영을 거부하는 표현 준비 경계를 정의한다."
         },
         {
           "code": "E2",
-          "disposition": "Blocked",
-          "summary": "계획과 수정 결과의 판독 요구만. 화면 미구현."
+          "disposition": "Affected",
+          "summary": "계획 상태를 읽는 소비자가 권위 상태를 쓰지 않는 읽기 전용 사본 경계를 정의한다."
         },
         {
           "code": "E1",
@@ -156,18 +158,24 @@
         },
         {
           "code": "E2",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs"
+          ]
         },
         {
           "code": "E3",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs"
+          ]
         },
         {
           "code": "E4",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "evidence:nature-personal-plan-current-e4-20260901"
+          ]
         },
         {
           "code": "E5",
@@ -188,29 +196,28 @@
     }
   },
   "integratedGate": {
-    "currentEvidenceStage": "E1",
+    "currentEvidenceStage": "E4",
     "status": "Passed",
     "candidateRevision": "nature-personal-plan.design.r1",
     "evidenceRefs": [
-      "docs/Architecture/PlayableLoops/Nature개인계획E3.md"
+      "evidence:nature-personal-plan-current-e4-20260901"
     ],
     "openFeedbackRefs": [
-      "Presentation E2 이후 미구현",
-      "Logic E4 이상·Save·RemoteHost·수치 회복·진척은 별도 승인"
+      "E5 실제 UI·입력·표시 수명과 Game View는 별도 승인",
+      "Save·RemoteHost·수치 회복·진척은 별도 승인"
     ]
   },
   "pipelineValidation": {
     "profileKey": "playable-loop:nature-night-day2.v1|WI-ACTOR-PLAN-SET",
     "profileRevision": "nature-personal-plan.engine-interaction.r1",
     "logicStatusCode": "Passed",
-    "presentationStatusCode": "Pending",
-    "integratedStatusCode": "Pending",
-    "earliestReopenEvidenceStageCode": "E2",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E5",
     "evidenceRefs": [
-      "eng/execution-ledgers/work-orders/nature-personal-plan.e7-work-order.json"
+      "evidence:nature-personal-plan-current-e4-20260901"
     ],
     "blockerCodes": [
-      "PresentationRevisionRequired",
       "NumericRecoveryAndProgressPolicyUndefined"
     ]
   },
@@ -235,10 +242,51 @@
   ],
   "implementationEvidence": {
     "test": "Simulation개인계획Tests",
-    "passed": 16,
+    "passed": 46,
     "failed": 0,
     "runtimeVerified": false,
     "playModeVerified": false,
-    "resultArtifactRef": "artifacts/local/remaining-32-wi/personal-plan-e3.trx"
+    "resultArtifactRef": "artifacts/local/validation/20260901-nature-six-wi-e4/nature-plan-heat-e4-focused.trx"
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "NotApplicable",
+    "notApplicableReason": "개인 계획은 비공간 계획표·상태 패널 표현이며 Synty Prefab 또는 월드 배치가 필요하지 않다. 실제 UI 연결은 E5에서 별도 검증한다.",
+    "playerReadableMoment": "플레이어가 계획을 설정하거나 수정한 직후 계획명·본문·현재 revision과 결과 상태를 읽고 다음 선택을 판단한다.",
+    "requiredHCapabilities": [],
+    "visualKeys": [
+      "Nature.PersonalPlan.Board"
+    ],
+    "primaryAssetCandidateRefs": [],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [
+      "기존 상태 패널의 텍스트 카드 표현"
+    ],
+    "placementIntent": "월드 배치 없이 기존 읽기 전용 UI 계층에서 계획 상태 사본을 표시한다.",
+    "interactionAnchorIntent": "비공간 UI이므로 InteractionAnchor는 적용하지 않는다. 기존 계획 설정 Command와 상태 재조회 경계를 유지한다.",
+    "candidateRevisionOrFingerprint": "Simulation개인계획Contracts.cs@D39110EE6049A15DF59ADCEE6197365A070272589A09C77D640407DADFACE084;Simulation개인계획.cs@184155AA8DD3E101C9E5A264E0C4B099010BFACD69B827B8F9AC5E0BA9BB33B0;Simulation개인계획Service.cs@1246C67E64FE7744D723F7CC7D17CF500116312E2C9CC324BD694D415A99DB1F",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "E5 후속: 실제 계획 UI 소비자·입력·표시 수명·중복/오래된 revision 거부와 Game View 검증",
+      "수치 회복·진척 정책은 미정이며 자동 적용하지 않는다."
+    ]
+  },
+  "e4PreparationEvidence": {
+    "statusCode": "PreparedNotPromoted",
+    "logicRefs": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation개인계획.cs",
+      "Ssalddel.Simulation.Application/RuntimeCore/Simulation개인계획Service.cs",
+      "Ssalddel.Simulation.Tests/Simulation개인계획Tests.cs"
+    ],
+    "presentationRefs": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation개인계획Contracts.cs"
+    ],
+    "automatedChecks": [
+      "계획_설정과수정은_ActionRecord와_revision을_같이남긴다",
+      "개인계획은_분야성장_NotApplicable을_명시한다",
+      "Preview와실패는_입력상태를_변경하지않는다"
+    ],
+    "taskValidationRef": "artifacts/local/validation/20260901-nature-six-wi-e4/nature-plan-heat-e4-focused.trx",
+    "boundary": "코드·자동 시험과 비공간 표현 준비 근거다. 실제 UI·Unity·E5 증거가 아니다."
   }
 }

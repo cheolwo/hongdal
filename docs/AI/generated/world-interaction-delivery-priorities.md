@@ -6,7 +6,7 @@
 - 전체 WI: `105`
 - 진행 방식: 의존성·담당 소유권 기반 병렬 개발 / 고정 작업 수 제한 없음
 - 실행 중 WI: `WI-ACTOR-03, WI-COMMUNITY-VISITOR-STAY, WI-FARM-01, WI-FARM-04, WI-NATURE-06, WI-WORLD-RESOURCE-REGENERATE` / 원본: `eng/execution-ledgers/codex-playable-loop-goals.json`
-- 대표 표시 WI: `WI-WORLD-RESOURCE-REGENERATE` / `E1` → `E7` (전체 실행 목록이 아님)
+- 대표 표시 WI: `WI-WORLD-RESOURCE-REGENERATE` / `E4` → `E7` (전체 실행 목록이 아님)
 - Synty H1 설계 재고: `84`
 - E7은 최신 PlayMode·Game View·Hosted 동등성 증거가 있을 때만 승격한다.
 
@@ -14,10 +14,7 @@
 
 | E 단계 | 판정 | 정제·검증 요약 |
 | --- | --- | --- |
-| E1 | Passed | 정책·WorldTick 자동 재생 계약 요구. |
-| E2 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
-| E3 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
-| E4 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
+| E4 | Passed | 여섯 WI의 정확 후보·VisualKey·Anchor와 Conditional E5 준비를 현행 근거에 결속했다. |
 | E5 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
 | E6 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
 | E7 | Pending | 실제 공간·표현·Runtime은 별도 범위. |
@@ -150,7 +147,7 @@
 | 순서 | 한국어 행동명 · 고유 식별자 | 작업 | 역할 | 현재 구현 | 현재 통합 | 다음 관문 | NPC E8 | H 상태 | Synty | 폐루프 |
 | ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 물품 섭취<br>`WI-ACTOR-CONSUME` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
-| 2 | 개인 계획 설정<br>`WI-ACTOR-PLAN-SET` | Queued | Extension | E3 | E1 | E2 | NotApplicable | NeedsDecision | None | playable-loop:nature-night-day2.v1 |
+| 2 | 개인 계획 설정<br>`WI-ACTOR-PLAN-SET` | Queued | Extension | E4 | E4 | E5 | NotApplicable | NeedsDecision | None | playable-loop:nature-night-day2.v1 |
 | 3 | 직접 전투 조종 전환<br>`WI-COMBAT-DIRECT-CONTROL-SET` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
 | 4 | 분대 전술 명령 확정<br>`WI-COMBAT-TACTICAL-COMMAND` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
 | 5 | 공동체 협력 제안<br>`WI-COMMUNITY-COOPERATION-PROPOSE` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
@@ -169,7 +166,7 @@
 | 18 | 토양 개량<br>`WI-FARM-SOIL-AMEND` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
 | 19 | 농업 용수 이송<br>`WI-FARM-WATER-TRANSFER` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
 | 20 | 손님 활동 권한 설정<br>`WI-GUEST-PERMISSION-SET` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
-| 21 | 열원 상태 변경<br>`WI-HEAT-SOURCE-STATE-CHANGE` | Queued | Extension | E3 | E1 | E2 | Conditional | NeedsDecision | None | playable-loop:nature-night-day2.v1 |
+| 21 | 열원 상태 변경<br>`WI-HEAT-SOURCE-STATE-CHANGE` | Queued | Extension | E4 | E4 | E5 | Conditional | NeedsDecision | None | playable-loop:nature-night-day2.v1 |
 | 22 | Hub 수요 재고 할당<br>`WI-HUB-DEMAND-ALLOCATE` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
 | 23 | Hub 조달 과제 수락<br>`WI-HUB-SUPPLY-TASK-ACCEPT` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
 | 24 | 목표 비축 미달 판매 확정<br>`WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
@@ -181,4 +178,4 @@
 | 30 | Town 후방 재고 적재<br>`WI-TOWN-STOCK-PUTAWAY` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
 | 31 | Town 재고 보충 주문<br>`WI-TOWN-STOCK-REPLENISH` | Deferred | DeferredRegistration | E0 | E0 | E1 | NotApplicable | NeedsDecision | None | 후속 정의 |
 | 32 | Town 공급 운송 출발 확정<br>`WI-TOWN-SUPPLY-DISPATCH` | Deferred | DeferredRegistration | E0 | E0 | E1 | Conditional | NeedsDecision | None | 후속 정의 |
-| 33 | 세계 자원 재생<br>`WI-WORLD-RESOURCE-REGENERATE` | Active | Extension | E3 | E1 | E2 | NotApplicable | NeedsDecision | None | playable-loop:nature-night-day2.v1 |
+| 33 | 세계 자원 재생<br>`WI-WORLD-RESOURCE-REGENERATE` | Active | Extension | E4 | E4 | E5 | NotApplicable | NeedsDecision | None | playable-loop:nature-night-day2.v1 |

@@ -1,27 +1,27 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-NATURE-HEAT-SOURCE",
-  "title": "Nature 열원 상태 변경 Logic E3",
+  "title": "Nature 열원 상태 변경 Logic·Presentation E4 준비",
   "playableUnitStableId": "playable-loop:nature-night-day2.v1",
   "activeWorldInteractionId": "WI-HEAT-SOURCE-STATE-CHANGE",
   "targetEvidenceStage": "E7",
-  "currentEvidenceStage": "E1",
+  "currentEvidenceStage": "E4",
   "promotionEligible": false,
   "deliveryCap": {
-    "currentDispatchTargetStage": "E3",
+    "currentDispatchTargetStage": "E4",
     "promotionBeyondStageAllowed": false,
-    "reason": "사용자 신규 33개 E3 요청. Q032~034/Q053의 열원 상태 변경 단일 플레이어 Core만 Logic E3. Presentation E1/통합 E1."
+    "reason": "Q032~034/Q053의 열원 상태 변경 계약과 현행 ActionRecord 회귀, CampFire 후보의 E4 준비까지만 결속한다. 실제 연소 Tick·Prefab 연결·Scene·입력·Game View와 E5는 제외한다."
   },
   "iterationState": {
     "currentPass": "UpwardAssemblyAndValidation",
-    "nextReopenCondition": "열원 변경이 수면·연소·자동 성장 책임을 소유하면 Logic E1 재검토."
+    "nextReopenCondition": "실제 열원 Prefab 연결·배치·입력·연소 Tick·수면 책임을 열 때 가장 이른 E1~E5를 다시 검토한다."
   },
   "trackPlans": {
     "logic": {
       "trackCode": "Logic",
-      "currentEvidenceStage": "E3",
+      "currentEvidenceStage": "E4",
       "downwardPlan": [
         {
           "code": "E7",
@@ -40,8 +40,8 @@
         },
         {
           "code": "E4",
-          "disposition": "Blocked",
-          "summary": "Session·연소·수면·실제 실행은 후속 승인 범위다."
+          "disposition": "Affected",
+          "summary": "열원 상태 사본·ActionRecord·분야 성장 NotApplicable을 같은 명령 결과로 읽는 현재 계약을 검증한다."
         },
         {
           "code": "E3",
@@ -83,8 +83,10 @@
         },
         {
           "code": "E4",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "evidence:nature-heat-source-current-e4-20260901"
+          ]
         },
         {
           "code": "E5",
@@ -105,7 +107,7 @@
     },
     "presentation": {
       "trackCode": "Presentation",
-      "currentEvidenceStage": "E1",
+      "currentEvidenceStage": "E4",
       "downwardPlan": [
         {
           "code": "E7",
@@ -124,18 +126,18 @@
         },
         {
           "code": "E4",
-          "disposition": "Blocked",
-          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+          "disposition": "Affected",
+          "summary": "꺼짐·점화·연소 상태의 VisualKey, CampFire 주 후보와 상호작용 기준점의 E5 인계 조건을 동결한다."
         },
         {
           "code": "E3",
-          "disposition": "Blocked",
-          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+          "disposition": "Affected",
+          "summary": "CampFire/Fire Small 후보의 정확 경로·GUID·fingerprint와 권위 비소유 경계를 준비한다."
         },
         {
           "code": "E2",
-          "disposition": "Blocked",
-          "summary": "상태·잔량·비용·거부를 읽는 요구만 정의. 실제 표현은 이번 범위 밖이다."
+          "disposition": "Affected",
+          "summary": "열원 StableId·Session·WorldRevision·Status·Energy·Accessible 상태 사본을 읽기 전용 표현 입력으로 사용한다."
         },
         {
           "code": "E1",
@@ -153,18 +155,24 @@
         },
         {
           "code": "E2",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation열원상태Contracts.cs"
+          ]
         },
         {
           "code": "E3",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+          ]
         },
         {
           "code": "E4",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "evidence:nature-heat-source-current-e4-20260901"
+          ]
         },
         {
           "code": "E5",
@@ -185,35 +193,34 @@
     }
   },
   "integratedGate": {
-    "currentEvidenceStage": "E1",
+    "currentEvidenceStage": "E4",
     "status": "Passed",
     "candidateRevision": "nature-heat-source.design.r1",
     "evidenceRefs": [
-      "docs/Architecture/PlayableLoops/Nature열원관리E3.md"
+      "evidence:nature-heat-source-current-e4-20260901"
     ],
     "openFeedbackRefs": [
-      "Presentation E2 이후 미구현",
-      "Logic E4 이상·Save·RemoteHost·연소 Tick·NPC는 별도 승인"
+      "E5 실제 Prefab 연결·Scene·입력·Renderer/Collider/Bounds와 Game View는 별도 승인",
+      "Save·RemoteHost·연소 Tick·NPC는 별도 승인"
     ]
   },
   "pipelineValidation": {
     "profileKey": "playable-loop:nature-night-day2.v1|WI-HEAT-SOURCE-STATE-CHANGE",
     "profileRevision": "nature-heat-source.engine-interaction.r1",
     "logicStatusCode": "Passed",
-    "presentationStatusCode": "Pending",
-    "integratedStatusCode": "Pending",
-    "earliestReopenEvidenceStageCode": "E2",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E5",
     "evidenceRefs": [
-      "eng/execution-ledgers/work-orders/nature-heat-source.e7-work-order.json"
+      "evidence:nature-heat-source-current-e4-20260901"
     ],
     "blockerCodes": [
-      "PresentationImplementationDeferred",
-      "LogicBeyondE3NotApproved"
+      "HeatSourcePlacementAndRuntimeBindingDeferred"
     ]
   },
   "playerProgression": {
     "statusCode": "NotApplicable",
-    "reason": "문답에 열원 관리의 성장량·집중 조건이 없음. 자동 경험치·명상 성장 발명 금지."
+    "reason": "HeatSourceProgressPolicyUndefined"
   },
   "approvedQuestionScope": [
     "Q-032",
@@ -231,9 +238,59 @@
   ],
   "implementationEvidence": {
     "test": "Simulation열원상태Tests",
-    "passed": 23,
+    "passed": 46,
     "failed": 0,
     "runtimeVerified": false,
-    "playModeVerified": false
+    "playModeVerified": false,
+    "resultArtifactRef": "artifacts/local/validation/20260901-nature-six-wi-e4/nature-plan-heat-e4-focused.trx"
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "플레이어가 열원에 접근할 때 꺼짐·점화 가능·연소 중 상태와 남은 에너지, 접근 가능 여부를 구분한다.",
+    "requiredHCapabilities": [
+      "HeatSourceAccessible"
+    ],
+    "visualKeys": [
+      "Nature.HeatSource.Off",
+      "Nature.HeatSource.Burning"
+    ],
+    "primaryAssetCandidateRefs": [
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/Props/SM_Prop_CampFire_01.prefab"
+    ],
+    "alternativeAssetCandidateRefs": [
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/FX/FX_Fire_Small_01.prefab"
+    ],
+    "fallbackPresentationRefs": [
+      "기존 열원 상태 표식의 primitive fallback"
+    ],
+    "placementIntent": "CampFire는 기존 Nature 거점 열원 후보로만 준비한다. SphereCollider 최고점을 받침면으로 해석하거나 수면용 .65 배치 경로를 재사용하지 않는다.",
+    "interactionAnchorIntent": "HeatSourceInteractionAnchor는 권위 HeatSourceStableId와 Accessible 상태 사본을 읽고 점화·연료 추가·소화 Command를 선택하는 접근 기준점이다. 정확 상대 TRS와 통행은 E5에서 검증한다.",
+    "candidateRevisionOrFingerprint": "SM_Prop_CampFire_01.prefab|guid=1fbdd99ef1d1e2b4dac24a8d8ef04741|sha256=7D2BF08438AEFD66C31669A9E2BA4569D32A200EEA116E79D2DCAF04F7340E32|catalogFingerprint=83513aad1807863cacf52b7a1b608eaa3ac4d90d63d76ad2f36694cef2be70de;FX_Fire_Small_01.prefab|guid=0f8982e7a09431147a4a9b72a57ef449|sha256=07BDF873C92E1B4D2BFE3EC9512FE4C8C59CC943B3721964375FFF3F3C83E5A9|catalogFingerprint=9bbc9bc854ad541b0e6b6fe0dd81a10bef2a91c528781378958d135e0aa2a5f5",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "E5 후속: 실제 Prefab/Renderer/Collider/Bounds·상태별 표시·InteractionAnchor·접근·통행·해제 수명 검증",
+      "CampFire는 HB01 냄비 지지면이나 실제 가열 규칙을 증명하지 않는다."
+    ]
+  },
+  "e4PreparationEvidence": {
+    "statusCode": "PreparedNotPromoted",
+    "logicRefs": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation열원상태Contracts.cs",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime/Simulation열원상태.cs",
+      "Ssalddel.Simulation.Application/RuntimeCore/Simulation열원상태Service.cs",
+      "Ssalddel.Simulation.Tests/Simulation열원상태Tests.cs"
+    ],
+    "presentationRefs": [
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/Props/SM_Prop_CampFire_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/FX/FX_Fire_Small_01.prefab"
+    ],
+    "automatedChecks": [
+      "열원_점화연료추가소화는_ActionRecord와_revision을_같이남긴다",
+      "열원상태변경은_분야성장_NotApplicable을_명시한다",
+      "Preview와실패는_입력상태를_변경하지않는다"
+    ],
+    "taskValidationRef": "artifacts/local/validation/20260901-nature-six-wi-e4/nature-plan-heat-e4-focused.trx",
+    "boundary": "코드·자동 시험과 자산 후보 준비 근거다. 실제 Unity 로드·배치·표현·E5 증거가 아니다."
   }
 }

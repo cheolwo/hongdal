@@ -19,7 +19,7 @@
 | `playable-loop:nature-shelter-foundation.v1` | E7 | Blocked | False | 기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다. |
 | `playable-loop:nature-twilight-return.v1` | E7 | Blocked | False | 기존 v27 후보에는 소급된 행위 원장·조건부 성장·파이프라인 trace 증거가 없다. |
 | `playable-loop:nature-tactical-self-navigation.v1` | E7 | Passed | True |  |
-| `playable-loop:nature-night-day2.v1` | E1 | WaitingForE7 | False | 현재 폐루프 원장의 E1 상태 사본을 반영한다. 승인 작업의 논리·표현 경로와 E7을 다시 닫기 전 E8 반복 검증을 시작하지 않는다. |
+| `playable-loop:nature-night-day2.v1` | E4 | WaitingForE7 | False | 현재 폐루프 원장의 E4 준비 상태를 반영한다. 여섯 WI의 실제 E5~E7을 닫기 전 E8 반복 검증을 시작하지 않는다. |
 | `playable-loop:nature-workbench-foundation.v1` | E6 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:nature-field-supply-return.v1` | E1 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |
 | `playable-loop:farm-crop-cycle.v1` | E1 | WaitingForE7 | False | PlayableUnit E7이 아직 닫히지 않았다. |

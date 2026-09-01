@@ -272,7 +272,20 @@
         "synty-shared:nature-atmosphere.v1",
         "synty-shared:construction-progress.v1"
       ],
-      "worldInteractionIds": ["WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15"],
+      "worldInteractionIds": [
+        "WI-NATURE-13",
+        "WI-NATURE-14",
+        "WI-NATURE-15",
+        "WI-HEAT-SOURCE-STATE-CHANGE",
+        "WI-ACTOR-PLAN-SET",
+        "WI-WORLD-RESOURCE-REGENERATE"
+      ],
+      "notApplicableWorldInteractions": [
+        {
+          "worldInteractionId": "WI-ACTOR-PLAN-SET",
+          "reason": "개인 계획은 비공간 계획표·상태 패널 표현이며 Synty Prefab 또는 월드 배치가 적용되지 않는다."
+        }
+      ],
       "requiredHCapabilities": ["ShelterStorage", "ShelterSleep", "DawnPlanChoice"],
       "slots": [
         {
@@ -356,6 +369,25 @@
             "synty-family:farm:props:fence-wood",
             "synty-family:construction:props:barrier"
           ]
+        },
+        {
+          "slotStableId": "nature-night.heat-source",
+          "worldInteractionId": "WI-HEAT-SOURCE-STATE-CHANGE",
+          "loopMomentCode": "Progress",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["HeatSourceStateAvailable"],
+          "assetFamilyIds": [
+            "synty-family:nature:props:campfire",
+            "synty-family:nature:fx:fire-small"
+          ]
+        },
+        {
+          "slotStableId": "nature-night.resource-regenerated",
+          "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+          "loopMomentCode": "Return",
+          "placementRoleCode": "functional-anchor",
+          "authorityStateCodes": ["NatureResourceStanding"],
+          "assetFamilyIds": ["synty-family:nature:trees:birch"]
         }
       ]
     },

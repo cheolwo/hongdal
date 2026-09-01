@@ -37,7 +37,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string Revision = "world-interaction-delivery-priorities.r40";
         [Obsolete("대표 표시 호환 값입니다. 실행 판단은 ActiveWorldInteractionIds를 사용하세요.")]
         public const string ActiveWorldInteractionId = "WI-WORLD-RESOURCE-REGENERATE";
-        public const string ActiveEvidenceStage = "E1";
+        public const string ActiveEvidenceStage = "E4";
         [Obsolete("구형 호환 값이며 실행 제한이 아닙니다. MaximumConcurrentWorkItems를 사용하세요.")]
         public const int WorkInProgressLimit = 1;
         public static int? MaximumConcurrentWorkItems => null;

@@ -25,9 +25,11 @@ public sealed class LocalSimulationRuntimeTests
         Assert.Equal(created.Revision, first.Session.Revision);
         Assert.Equal(created.CurrentTick, first.Session.CurrentTick);
         Assert.Equal(first.Session.NatureSurvival.PlayerStableId, first.Nature.PlayerStableId);
+        Assert.NotEmpty(first.PlayerOpportunities);
         first.Session.Revision = 999;
         first.Nature.ResourceNodes[0].StateCode = "changed-by-reader";
         first.BuildingProgression.AreaCode = "changed-by-reader";
+        first.PlayerOpportunities[0].TargetStableId = "changed-by-reader";
         var again = await runtime.GetNature표현관측Async(created.SessionStableId);
         Assert.Equal(before, System.Text.Json.JsonSerializer.Serialize(again));
         Assert.False(Directory.Exists(root) && Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories).Any());

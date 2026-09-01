@@ -224,18 +224,8 @@ namespace Ssalddel.Simulation.Application
         /// <summary>Local 명령 gate를 한 번 획득하여 상태/완료 기록의 서로 다른 조회 시점을 방지한다.</summary>
         public ValueTask<SimulationNature표현관측Snapshot> GetNature표현관측Async(
             string sessionStableId, CancellationToken cancellationToken = default)
-            => ExecuteAsync(() =>
-            {
-                var aggregate = RequireSession(sessionStableId);
-                return new SimulationNature표현관측Snapshot
-                {
-                    Session = lifecycle.Get(sessionStableId),
-                    Nature = nature.Get(sessionStableId),
-                    BuildingProgression = nature.GetBuildingProgression(
-                        sessionStableId, Simulation영역건물발전Codes.Nature),
-                    ActionLedger = aggregate.GetActionManifestationLedger(),
-                };
-            }, cancellationToken);
+            => ExecuteAsync(() => RequireSession(sessionStableId)
+                .GetNature표현관측Snapshot(), cancellationToken);
 
         public ValueTask<Simulation플레이어기회Snapshot[]>
             GetPlayerOpportunitiesAsync(string sessionStableId,

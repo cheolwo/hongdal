@@ -33,6 +33,10 @@ namespace Ssalddel.Simulation.Application
         public SimulationNatureSurvivalStateSnapshot Get(string sessionStableId)
             => Find(sessionStableId).GetNatureSurvivalState();
 
+        public SimulationNature표현관측Snapshot GetObservation(
+            string sessionStableId)
+            => Find(sessionStableId).GetNature표현관측Snapshot();
+
         public Simulation플레이어기회Snapshot[] GetPlayerOpportunities(
             string sessionStableId)
             => Find(sessionStableId).GetNaturePlayerOpportunities();

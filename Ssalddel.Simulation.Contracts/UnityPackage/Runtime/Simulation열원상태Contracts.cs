@@ -8,6 +8,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string WorldInteractionId = "WI-HEAT-SOURCE-STATE-CHANGE";
         public const string PlayableLoopStableId = "playable-loop:nature-night-day2.v1";
         public const string RuleRevision = "heat-source-state.r1";
+        public const string PlayerProgressionNotApplicableReason =
+            "HeatSourceProgressPolicyUndefined";
         public const string 점화 = "Ignite", 연료추가 = "AddFuel", 소화 = "Extinguish";
         public const string 꺼짐 = "Off", 잔불 = "Smoldering", 연소중 = "Burning";
     }

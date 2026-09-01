@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-NATURE-NIGHT-DAY2",
   "title": "Nature 오두막 수면과 Day2 확장 계획 반환",
@@ -32,7 +32,7 @@
         { "code": "E2", "status": "Passed", "evidenceRefs": ["nature-survival.realtime.r5"] },
         { "code": "E3", "status": "Passed", "evidenceRefs": ["evidence:nature-night-day2-wi15-hosted-parity-20260826"] },
         { "code": "E4", "status": "Passed", "evidenceRefs": ["WI-NATURE-14", "WI-NATURE-15"] },
-        { "code": "E5", "status": "Passed", "evidenceRefs": ["evidence:nature-r2-core-20260825"] },
+        { "code": "E5", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs", "artifacts/local/validation/20260901-nature-e5-session-integration/nature-e5-session-integrated-lineage.trx"] },
         { "code": "E6", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-wi15-hosted-parity-20260826"] },
         { "code": "E7", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-wi15-playmode-20260826"] }
       ]
@@ -53,7 +53,7 @@
         { "code": "E1", "status": "Passed", "evidenceRefs": ["WI-NATURE-15"] },
         { "code": "E2", "status": "Passed", "evidenceRefs": ["world-atmosphere.r1"] },
         { "code": "E3", "status": "Passed", "evidenceRefs": ["world-atmosphere.r1"] },
-        { "code": "E4", "status": "Passed", "evidenceRefs": ["evidence:nature-night-day2-wi14-playmode-20260826"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["evidence:nature-night-day2-six-wi-e4-20260901"] },
         { "code": "E5", "status": "Blocked", "evidenceRefs": ["evidence:nature-dual-loop-game-view-20260826"] },
         { "code": "E6", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-presentation-e7-20260826"] },
         { "code": "E7", "status": "Blocked", "evidenceRefs": ["evidence:nature-night-day2-wi15-playmode-20260826"] }
@@ -62,19 +62,124 @@
   },
   "integratedGate": {
     "currentEvidenceStage": "E4",
-    "status": "Blocked",
+    "status": "Passed",
     "candidateRevision": "nature-night-day2.r1/world-atmosphere.r1/simulation-save.v28",
-    "evidenceRefs": ["evidence:nature-night-day2-wi15-hosted-parity-20260826", "evidence:nature-night-day2-wi15-playmode-20260826", "evidence:nature-night-day2-presentation-e7-20260826"],
+    "evidenceRefs": ["evidence:nature-night-day2-six-wi-e4-20260901"],
     "openFeedbackRefs": ["feedback:nature-night-day2:sky-engine-runtime.r1", "feedback:nature-night-day2:pipeline-presentation-cursor.r1"]
   },
   "pipelineValidation": {
     "profileKey": "playable-loop:nature-night-day2.v1|WI-NATURE-15",
     "profileRevision": "nature-night-day2.engine-interaction.r2",
     "logicStatusCode": "Passed",
-    "presentationStatusCode": "Blocked",
-    "integratedStatusCode": "Blocked",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
     "earliestReopenEvidenceStageCode": "E5",
-    "evidenceRefs": ["test:SimulationNatureSurvivalTests", "test:SimulationPlayableLoopEngineInteractionTests"],
+    "evidenceRefs": ["evidence:nature-night-day2-six-wi-e4-20260901", "test:SimulationNatureSurvivalTests", "test:SimulationPlayableLoopEngineInteractionTests"],
     "blockerCodes": ["PresentationActionRecordCursorEvidenceMissing", "CurrentGameViewPipelineEvidenceMissing"]
+  },
+  "logicE5SessionIntegration": {
+    "statusCode": "Passed",
+    "authorityPath": "경영SimulationSessionAggregate.AdvanceNatureSurvivalClock→RegrowNatureResources",
+    "observationPath": "경영SimulationSessionAggregate.GetNature표현관측Snapshot",
+    "verifiedSequence": "StoreAtCabin→SleepInCabin→Dawn→SelectExpansionPlan→Cycle+3 Regeneration→Next BeginHarvest",
+    "evidenceRefs": [
+      "evidence:nature-night-day2-session-logic-e5-20260901",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs",
+      "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs",
+      "Ssalddel.Simulation.Server/Controllers/SimulationNatureSurvivalController.cs",
+      "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+      "artifacts/local/validation/20260901-nature-e5-session-integration-full-r2/Ssalddel.Simulation.Tests-r2.trx"
+    ],
+    "boundary": "Logic E5의 Session·LocalProcess·HTTP TestServer·Save/Replay 직렬화 자동 증거다. 실제 배포 Hosted 재진입·E8 Save/Replay 캠페인·Presentation E5·Unity Scene·Play Mode·Game View 증거는 아니다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "플레이어가 자원을 거점에 보관하고 수면으로 새벽을 맞은 뒤 작업대·보관·방어 중 다음 확장 계획을 구분한다.",
+    "requiredHCapabilities": [
+      "ShelterInterior",
+      "StorageInteractionAnchor",
+      "SleepInteractionAnchor",
+      "DawnPlanChoiceAnchor"
+    ],
+    "visualKeys": [
+      "Nature.Shelter.Storage.Empty",
+      "Nature.Shelter.Storage.Partial",
+      "Nature.Shelter.Storage.Full",
+      "Nature.Shelter.Sleep.Bed",
+      "Nature.Shelter.Dawn.Return",
+      "Nature.Day2Plan.Workbench",
+      "Nature.Day2Plan.Storage",
+      "Nature.Day2Plan.Barricade"
+    ],
+    "primaryAssetCandidateRefs": [
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Rack_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Crate_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonConstruction/Prefabs/Props/SM_Prop_Crate_Stack_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Bed_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/FX/FX_SunBeams_Particle_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Table_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Wood_01.prefab"
+    ],
+    "alternativeAssetCandidateRefs": [
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonTown/Prefabs/Props/SM_Prop_Bed_Single_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonNature/Prefabs/FX/FX_Fire_Small_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonConstruction/Prefabs/Props/SM_Prop_ToolBox_01.prefab",
+      "C:/Users/user/ssalddel/Assets/Synty/PolygonConstruction/Prefabs/Props/SM_Prop_Barrier_01.prefab"
+    ],
+    "fallbackPresentationRefs": [
+      "기존 오두막 보관·수면·Day2 계획 primitive/텍스트 fallback"
+    ],
+    "placementIntent": "기존 nature-shelter H1 내부에서 보관 후보는 StorageInteractionAnchor 주변, 침상은 SleepInteractionAnchor, 새벽 반환 효과는 기존 Sky/Interior 경계, 세 계획 후보는 DawnPlanChoiceAnchor의 비권위 미리보기 위치에 배치한다.",
+    "interactionAnchorIntent": "WI-NATURE-13은 StorageInteractionAnchor, WI-NATURE-14는 SleepInteractionAnchor, WI-NATURE-15는 DawnPlanChoiceAnchor를 사용한다. 정확 상대 TRS·통행·Renderer/Collider/Bounds는 E5에서 검증한다.",
+    "candidateRevisionOrFingerprint": "rack|guid=39adf611006c395439df5f752c1e4d3e|sha256=E72A2B9FAD7BC77C11628FF2FFEDDF42DA36F5206754A7073531E4EBDA3253E7|fp=20720c4f40796b8687953a9da53eda0e15587899ade94b9b1015c8a6caa2a44f;crate|guid=17f62eefbfea0bf44a08d7be65339372|sha256=106B090BFF9D2570430168B81D342F453FAD52D4A7BBF4A5329AE24720E924B0|fp=7eb6bf5044334b987f722e50e11aaf8f170689a36dfb99b73a0e29bc38144aa0;crate-stack|guid=ff8d268568baa1048b6423606068d5ab|sha256=08BAC44C0B11EDCD3C1EFF897BE8A499863D5C1A653D49658CF0FD1414A69E1E|fp=04ba890e3bde19a5811c6df5b777f3aa2dd6ed854399cbe33d53eba8b4c7af73;farm-bed|guid=fce9f6a9a97c1e24592390be3e3f01ef|sha256=53BC5CAB842052C0E0F30935462708AAF35531974E17B0CA625A586AADE82DEC|fp=a5b846d63352a8ed0fa463bb3cf6043d9a16f04c49a6e45aa8d21caf6df8d197;town-bed|guid=f0bf7294cedd0f34e8a32a4292903641|sha256=5222AA75718A8B8184BCA18F2AEE871594887AA0344BF88D4348B18E08D855B0|fp=29ce7400bf578efb7eb014b8f7f1acdabcee98f8fc1441bbfac7bbc555b2d36a;sunbeams|guid=29d06c673ff3f1948abb2e144ac73d66|sha256=39D4ECCA818CDF6ED2006B14A85FB1977AFE9C6C968DC08A3230C98CF283D57C|fp=d793b407d669bafbe0191f9fef5ff76b813fa9b5497f6bcbb939ea95dfeeb860;fire-small|guid=0f8982e7a09431147a4a9b72a57ef449|sha256=07BDF873C92E1B4D2BFE3EC9512FE4C8C59CC943B3721964375FFF3F3C83E5A9|fp=9bbc9bc854ad541b0e6b6fe0dd81a10bef2a91c528781378958d135e0aa2a5f5;table|guid=0504778a38044d446a030c9203219e0d|sha256=E1B25694E7E58253B59BE6B60F32E39E595D098DB967C0488E428A99EB71C3DE|fp=49ab0708b5cbc62a068075298e28474d153b9a840b407bf5d9e85e1bd3f1222d;toolbox|guid=b1e26128d52359245ad05476f411dee7|sha256=EC5CB7F782DAED43D69042002682E20CD170CE7503E1D9E7DA698B7DA6CF60EF|fp=9c7f35e6049b4c323bf2cf94fff4521152477ba38361b9b8a35216bc45f12721;fence|guid=8157d7b10c2fa75449c20daa36513d38|sha256=39D40027FFCD7AAEAB74A087AD8EA2F46F027C9704F35D0E3F705C38D208FC9D|fp=7b30d1e7e9b0f2645b2038b0347fa99a3acb6fbbd25bd78c3397ec2c9d5da3e4;barrier|guid=f7d843f28c60d5f42af313f8b9a12259|sha256=1AE37072ACB551CF9B479AAB207FC415048488321B38B43D0157C00FB5AB125A|fp=b32ca5e0ccc4df63705344fc7db78fd9dbb50063678e22ad485907dd5fb6e980",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "E5 후속: 실제 Prefab 로드·상태별 선택·Renderer/Collider/Bounds·상대 TRS·통행·조립 수명과 Game View 검증",
+      "Synty 후보는 needs-review presentationOnly이며 현재 E5 연결 증거가 아니다."
+    ]
+  },
+  "wiPresentationPreparations": [
+    {
+      "worldInteractionId": "WI-NATURE-13",
+      "visualKeys": ["Nature.Shelter.Storage.Empty", "Nature.Shelter.Storage.Partial", "Nature.Shelter.Storage.Full"],
+      "interactionAnchor": "StorageInteractionAnchor",
+      "primaryCandidateRoles": ["rack", "crate", "crate-stack"],
+      "e5ReadinessCode": "Conditional"
+    },
+    {
+      "worldInteractionId": "WI-NATURE-14",
+      "visualKeys": ["Nature.Shelter.Sleep.Bed", "Nature.Shelter.Dawn.Return"],
+      "interactionAnchor": "SleepInteractionAnchor",
+      "primaryCandidateRoles": ["farm-bed", "sunbeams"],
+      "alternativeCandidateRoles": ["town-bed", "fire-small"],
+      "e5ReadinessCode": "Conditional"
+    },
+    {
+      "worldInteractionId": "WI-NATURE-15",
+      "visualKeys": ["Nature.Day2Plan.Workbench", "Nature.Day2Plan.Storage", "Nature.Day2Plan.Barricade"],
+      "interactionAnchor": "DawnPlanChoiceAnchor",
+      "primaryCandidateRoles": ["table", "rack", "fence"],
+      "alternativeCandidateRoles": ["toolbox", "crate-stack", "barrier"],
+      "e5ReadinessCode": "Conditional"
+    }
+  ],
+  "e4PreparationEvidence": {
+    "statusCode": "PreparedNotPromoted",
+    "logicRefs": [
+      "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs",
+      "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs"
+    ],
+    "presentationRefs": [
+      "eng/execution-ledgers/playable-loop-synty-expression-modules.json",
+      "eng/world-seedbeds/generated/wi-eh-status.v1.json"
+    ],
+    "automatedChecks": [
+      "WI_NATURE_13_14_15_현행_상태전이와_SaveReplay_LocalHosted_회귀",
+      "정확_Synty_후보_GUID_SHA_fingerprint_고정",
+      "Storage_Sleep_DawnPlanChoice_Anchor_E5_인계_분리"
+    ],
+    "taskValidationRef": "artifacts/local/validation/20260901-nature-night-day2-e4-audit/nature-night-day2-e4-audit.trx",
+    "boundary": "현행 자동 회귀와 후보 준비 근거다. 과거 PlayMode/Game View를 Current로 되살리거나 실제 E5를 선언하지 않는다."
   }
 }

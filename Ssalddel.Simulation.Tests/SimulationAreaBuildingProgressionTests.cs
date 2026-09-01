@@ -359,6 +359,12 @@ public sealed class SimulationAreaBuildingProgressionTests
             SimulationNatureSurvivalCodes.BeginCabinBuild,
             "facility:nature-cabin");
         Advance(session, NatureSurvivalRules.CabinWorkSeconds, true, "cabin");
+        Confirm(session, "command:r3:cabin:enter",
+            SimulationNatureSurvivalCodes.EnterCabin,
+            "facility:nature-cabin");
+        Confirm(session, "command:r3:cabin:store",
+            SimulationNatureSurvivalCodes.StoreAtCabin,
+            SimulationNatureSurvivalCodes.CabinStorageContainerStableId);
 
         AdvanceTo(session, NatureSurvivalRules.DaylightEndsAtSecond + 1);
         var encounter = session.GetNatureSurvivalState().Encounter!;

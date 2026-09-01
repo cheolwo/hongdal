@@ -73,6 +73,36 @@ public sealed class Simulation세계자원재생Tests
         Assert.Equal("resource:dry-grass", 묶음.자원StableId); Assert.Equal("Loose", 묶음.종류Code);
     }
 
+    [Fact]
+    public void 세계파생재생은_행위원장과_사유있는분야성장미적용을_같이반환한다()
+    {
+        var 원장 = new Simulation세계자원재생Aggregate(초기값());
+        var 요청값 = 요청();
+
+        var 최초 = 원장.ApplyTick(요청값);
+        var 기록 = Assert.Single(최초.State.ActionLedger.TailRecords);
+
+        Assert.Equal(요청값.TransitionId, 기록.CommandId);
+        Assert.Equal(최초.State.WorldRevision, 기록.AfterWorldRevision);
+        Assert.Equal(Simulation분야성장적용상태Codes.NotApplicable,
+            최초.분야성장적용.상태Code);
+        Assert.Equal(Simulation세계자원재생Codes.PlayerProgressionNotApplicableReason,
+            최초.분야성장적용.사유Code);
+        Assert.Equal(string.Empty, 최초.분야성장적용.PlayerStableId);
+        Assert.Equal(0, 최초.분야성장적용.BeforeProfileRevision);
+        Assert.Equal(0, 최초.분야성장적용.AfterProfileRevision);
+
+        var 재전송 = 원장.ApplyTick(요청값);
+
+        Assert.True(재전송.Reused);
+        Assert.Equal(기록.기록HashSha256,
+            Assert.Single(재전송.State.ActionLedger.TailRecords).기록HashSha256);
+        Assert.Equal(Simulation분야성장적용상태Codes.NotApplicable,
+            재전송.분야성장적용.상태Code);
+        Assert.Equal(Simulation세계자원재생Codes.PlayerProgressionNotApplicableReason,
+            재전송.분야성장적용.사유Code);
+    }
+
     [Theory]
     [InlineData("Natural", true)]
     [InlineData("Flattened", false)]

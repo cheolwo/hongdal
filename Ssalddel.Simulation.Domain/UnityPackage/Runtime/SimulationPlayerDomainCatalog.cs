@@ -137,6 +137,12 @@ namespace Ssalddel.Simulation.Domain
                 Bind("WI-WORLD-06", Simulation분야기여방식Codes.PlayerDirect, Simulation플레이어분야Codes.제작장비, "equipment"),
                 Bind("WI-WORLD-07", Simulation분야기여방식Codes.PlayerOrOperation, Simulation플레이어분야Codes.운영조직, "planning"),
                 Bind("WI-WORLD-08", Simulation분야기여방식Codes.PlayerDirect, Simulation플레이어분야Codes.운영조직, "turn-closing"),
+                None(Simulation개인계획Codes.WorldInteractionId,
+                    Simulation개인계획Codes.PlayerProgressionNotApplicableReason),
+                None(Simulation열원상태Codes.WorldInteractionId,
+                    Simulation열원상태Codes.PlayerProgressionNotApplicableReason),
+                None(Simulation세계자원재생Codes.WorldInteractionId,
+                    Simulation세계자원재생Codes.PlayerProgressionNotApplicableReason),
                 Bind("WI-REVIEW-01", Simulation분야기여방식Codes.PlayerDirect, Simulation플레이어분야Codes.운영조직, "review"),
             };
 

@@ -20,7 +20,7 @@
 | 장착 상태 변경 · `WI-ACTOR-02` | `E3/E5` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 | 지식 습득 · `WI-ACTOR-03` | `E3/E4` | `NotRequired` | `-` | `NotApplicable` | `P5` | `NotApplicable` |  |
 | 물품 섭취 · `WI-ACTOR-CONSUME` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
-| 개인 계획 설정 · `WI-ACTOR-PLAN-SET` | `E3/E1` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 개인 계획 설정 · `WI-ACTOR-PLAN-SET` | `E4/E4` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` | E4WithoutApprovedH1 |
 
 ## 메이저 아르카나 (`CARD`)
 
@@ -140,7 +140,7 @@
 | 현장 보급 제작 업무 위임 · `WI-NATURE-17` | `E3/E4` | `Required` | `H1` | `EstablishedH1` | `P1` | `ReadyForApprovedH1Input` |  |
 | 벌목 통나무 줍기 · `WI-NATURE-18` | `E3/E7` | `Required` | `H3` | `EstablishedH3` | `P1` | `ReadyForActualE5Input` |  |
 | 배합물 달이기 · `WI-CRAFT-BREW` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
-| 열원 상태 변경 · `WI-HEAT-SOURCE-STATE-CHANGE` | `E3/E1` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 열원 상태 변경 · `WI-HEAT-SOURCE-STATE-CHANGE` | `E4/E4` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` | E4WithoutApprovedH1 |
 | 약초 채집 · `WI-NATURE-HERB-GATHER` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 | 자연 흔적 조사 · `WI-NATURE-TRACE-INVESTIGATE` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 
@@ -185,7 +185,7 @@
 | 탐사 임무 파견 · `WI-EXPEDITION-DISPATCH` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 | 목표 비축 미달 판매 확정 · `WI-INVENTORY-BELOW-RESERVE-SALE-CONFIRM` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
 | 생존 배급 정책 설정 · `WI-SURVIVAL-RATION-POLICY-SET` | `E0/E0` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
-| 세계 자원 재생 · `WI-WORLD-RESOURCE-REGENERATE` | `E3/E1` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` |  |
+| 세계 자원 재생 · `WI-WORLD-RESOURCE-REGENERATE` | `E4/E4` | `Contextual` | `-` | `NeedsDecision` | `P5` | `BlockedMissingDesign` | E4WithoutApprovedH1 |
 
 ## P1 기준 플레이 공간 구성
 
@@ -199,6 +199,7 @@
 
 ## 확인이 필요한 공백
 
+- `WI-ACTOR-PLAN-SET` 개인 계획 설정: `E4WithoutApprovedH1`
 - `WI-CITY-01` 도심 서비스 수요 확정: `RequiredSpatialDesignMissing`
 - `WI-CITY-02` 도심 서비스용 지역 재고 배정: `RequiredSpatialDesignMissing`
 - `WI-CITY-03` 도심 주민 서비스 처리: `RequiredSpatialDesignMissing`
@@ -206,5 +207,7 @@
 - `WI-COMMUNITY-VISITOR-STAY` 방문자 임시 체류 결정: `E4WithoutApprovedH1`
 - `WI-FARM-DEFENSE-MOBILIZE` 방위 분대 소집: `E4WithoutApprovedH1`
 - `WI-NATURE-05` 벌목 도끼 획득: `E5PlacementReferenceMissing`
+- `WI-HEAT-SOURCE-STATE-CHANGE` 열원 상태 변경: `E4WithoutApprovedH1`
 - `WI-REFLECT-01` 승인 자료로 거점 성찰 확정: `RequiredSpatialDesignMissing`
 - `WI-WORLD-04` 손상된 시설 수리: `GraphBindingWithoutApprovedH1`
+- `WI-WORLD-RESOURCE-REGENERATE` 세계 자원 재생: `E4WithoutApprovedH1`

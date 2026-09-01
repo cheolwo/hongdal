@@ -5,7 +5,7 @@
 - 대장 revision: `playable-loop-synty-expression-modules.r1`
 - 폐루프 모듈: `4`
 - 공유 모듈: `4`
-- 표현 슬롯: `23`
+- 표현 슬롯: `25`
 - 사용 자산 계열: `31`
 - 기존 A/B/C 기준 문법: `LegacyGenerated / 신규 생성 금지`
 
@@ -13,7 +13,7 @@
 | --- | --- | ---: | ---: | --- |
 | `playable-loop:nature-shelter-foundation.v1` | `synty-loop:nature-shelter-foundation.v1` | 10 | 10 | synty-shared:nature-ground.v1, synty-shared:construction-progress.v1 |
 | `playable-loop:nature-twilight-return.v1` | `synty-loop:nature-twilight-return.v1` | 2 | 3 | synty-shared:nature-ground.v1, synty-shared:nature-atmosphere.v1 |
-| `playable-loop:nature-night-day2.v1` | `synty-loop:nature-night-day2.v1` | 3 | 8 | synty-shared:shelter-interior.v1, synty-shared:nature-atmosphere.v1, synty-shared:construction-progress.v1 |
+| `playable-loop:nature-night-day2.v1` | `synty-loop:nature-night-day2.v1` | 6 | 10 | synty-shared:shelter-interior.v1, synty-shared:nature-atmosphere.v1, synty-shared:construction-progress.v1 |
 | `playable-loop:nature-workbench-foundation.v1` | `synty-loop:nature-workbench-foundation.v1` | 2 | 2 | synty-shared:construction-progress.v1 |
 
 ## 팩 사용 정책

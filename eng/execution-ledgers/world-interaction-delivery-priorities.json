@@ -13,40 +13,16 @@
   "activeWork": {
     "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
     "workStateCode": "Active",
-    "currentEvidenceStage": "E1",
+    "currentEvidenceStage": "E4",
     "targetEvidenceStage": "E7",
     "startedReason": "32개 순차 E3: 개인 계획 증거 보존 후 세계 자원 재생.",
     "stageReviews": [
       {
-        "stageCode": "E1",
-        "resultCode": "Passed",
-        "summary": "정책·WorldTick 자동 재생 계약 요구.",
-        "evidenceRefs": [
-          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
-        ]
-      },
-      {
-        "stageCode": "E2",
-        "resultCode": "Pending",
-        "summary": "실제 공간·표현·Runtime은 별도 범위.",
-        "evidenceRefs": [
-          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
-        ]
-      },
-      {
-        "stageCode": "E3",
-        "resultCode": "Pending",
-        "summary": "실제 공간·표현·Runtime은 별도 범위.",
-        "evidenceRefs": [
-          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
-        ]
-      },
-      {
         "stageCode": "E4",
-        "resultCode": "Pending",
-        "summary": "실제 공간·표현·Runtime은 별도 범위.",
+        "resultCode": "Passed",
+        "summary": "여섯 WI의 정확 후보·VisualKey·Anchor와 Conditional E5 준비를 현행 근거에 결속했다.",
         "evidenceRefs": [
-          "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+          "evidence:nature-night-day2-six-wi-e4-20260901"
         ]
       },
       {

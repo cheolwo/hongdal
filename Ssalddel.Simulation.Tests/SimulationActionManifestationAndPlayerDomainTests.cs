@@ -166,15 +166,39 @@ public sealed class SimulationActionManifestationAndPlayerDomainTests
     }
 
     [Fact]
-    public void 기본Catalog는_새검토WI를포함한65개를_중복없이결속한다()
+    public void 기본Catalog는_계획_열원_세계자원재생을포함한68개를_중복없이결속한다()
     {
         var catalog = Simulation기본플레이어분야Catalog.Create();
 
-        Assert.Equal(65, catalog.Wi결속들.Length);
-        Assert.Equal(65, catalog.Wi결속들.Select(value => value.WorldInteractionId)
+        Assert.Equal(68, catalog.Wi결속들.Length);
+        Assert.Equal(68, catalog.Wi결속들.Select(value => value.WorldInteractionId)
             .Distinct(StringComparer.Ordinal).Count());
         Assert.Contains(catalog.Wi결속들,
             value => value.WorldInteractionId == "WI-REVIEW-01");
+        Assert.Contains(catalog.Wi결속들,
+            value => value.WorldInteractionId ==
+                     Simulation개인계획Codes.WorldInteractionId
+                     && value.기여방식Code ==
+                     Simulation분야기여방식Codes.None
+                     && value.NoPlayerProgressReason ==
+                     Simulation개인계획Codes
+                         .PlayerProgressionNotApplicableReason);
+        Assert.Contains(catalog.Wi결속들,
+            value => value.WorldInteractionId ==
+                     Simulation열원상태Codes.WorldInteractionId
+                     && value.기여방식Code ==
+                     Simulation분야기여방식Codes.None
+                     && value.NoPlayerProgressReason ==
+                     Simulation열원상태Codes
+                         .PlayerProgressionNotApplicableReason);
+        Assert.Contains(catalog.Wi결속들,
+            value => value.WorldInteractionId ==
+                     Simulation세계자원재생Codes.WorldInteractionId
+                     && value.기여방식Code ==
+                     Simulation분야기여방식Codes.None
+                     && value.NoPlayerProgressReason ==
+                     Simulation세계자원재생Codes
+                         .PlayerProgressionNotApplicableReason);
         Assert.Contains(catalog.분야들,
             value => value.분야StableId == Simulation플레이어분야Codes.설비에너지
                      && value.준비상태Code == Simulation분야준비상태Codes.AssetSeed);

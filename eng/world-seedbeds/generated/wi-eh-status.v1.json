@@ -132,8 +132,8 @@
       "sequence": 5,
       "title": "개인 계획 설정",
       "interactionKindCode": "Command",
-      "implementationEvidenceStage": "E3",
-      "integrationEvidenceStage": "E1",
+      "implementationEvidenceStage": "E4",
+      "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Contextual",
       "priorityCode": "P5",
       "spatialDesignStateCode": "NeedsDecision",
@@ -148,7 +148,9 @@
       "e5PlacementCandidateRefs": [],
       "requiredSpatialCapabilityCodes": [],
       "lhEngineHandoffStateCode": "BlockedMissingDesign",
-      "warningCodes": []
+      "warningCodes": [
+        "E4WithoutApprovedH1"
+      ]
     },
     {
       "worldInteractionId": "WI-CARD-01",
@@ -3089,8 +3091,8 @@
       "sequence": 20,
       "title": "열원 상태 변경",
       "interactionKindCode": "Command",
-      "implementationEvidenceStage": "E3",
-      "integrationEvidenceStage": "E1",
+      "implementationEvidenceStage": "E4",
+      "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Contextual",
       "priorityCode": "P5",
       "spatialDesignStateCode": "NeedsDecision",
@@ -3105,7 +3107,9 @@
       "e5PlacementCandidateRefs": [],
       "requiredSpatialCapabilityCodes": [],
       "lhEngineHandoffStateCode": "BlockedMissingDesign",
-      "warningCodes": []
+      "warningCodes": [
+        "E4WithoutApprovedH1"
+      ]
     },
     {
       "worldInteractionId": "WI-NATURE-HERB-GATHER",
@@ -3994,8 +3998,8 @@
       "sequence": 14,
       "title": "세계 자원 재생",
       "interactionKindCode": "AutomaticTransition",
-      "implementationEvidenceStage": "E3",
-      "integrationEvidenceStage": "E1",
+      "implementationEvidenceStage": "E4",
+      "integrationEvidenceStage": "E4",
       "spatialParticipationCode": "Contextual",
       "priorityCode": "P5",
       "spatialDesignStateCode": "NeedsDecision",
@@ -4010,7 +4014,9 @@
       "e5PlacementCandidateRefs": [],
       "requiredSpatialCapabilityCodes": [],
       "lhEngineHandoffStateCode": "BlockedMissingDesign",
-      "warningCodes": []
+      "warningCodes": [
+        "E4WithoutApprovedH1"
+      ]
     }
   ],
   "authorityBoundary": {
@@ -4024,5 +4030,5 @@
   },
   "presentationOnly": true,
   "isOperationalState": false,
-  "contentHashSha256": "067e9356628b768777bdecf71e9936a5d12c7709a11850703d08255e03ed70e4"
+  "contentHashSha256": "abb246b5176e36945ceac4a426128b1c647226588c6c466178214ce8e970feb7"
 }

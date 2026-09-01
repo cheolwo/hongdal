@@ -7,6 +7,8 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string WorldInteractionId = "WI-ACTOR-PLAN-SET";
         public const string RuleRevision = "personal-plan.r1";
+        public const string PlayerProgressionNotApplicableReason =
+            "NumericRecoveryAndProgressPolicyUndefined";
         public const string 안내명 = "내면의 울림";
     }
 
@@ -57,7 +59,8 @@ namespace Ssalddel.Simulation.Contracts
         public long WorldRevision { get; set; }
         public string InitialStabilityEligibilityStableId { get; set; } = string.Empty;
         public bool RecoveryApplied => false;
-        public string RecoveryNotAppliedReasonCode => "NumericRecoveryAndProgressPolicyUndefined";
+        public string RecoveryNotAppliedReasonCode =>
+            Simulation개인계획Codes.PlayerProgressionNotApplicableReason;
         public Simulation행위기록LedgerSnapshot ActionLedger { get; set; } = new Simulation행위기록LedgerSnapshot();
         public string StateHashSha256 { get; set; } = string.Empty;
     }

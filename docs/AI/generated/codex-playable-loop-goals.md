@@ -20,12 +20,12 @@ E7 PlayClosed까지 닫는다.
 오두막에 자원을 보관하고 수면한 뒤 새벽에 다음 확장 계획을 선택한다.
 
 현재 기준:
-- 현재 폐루프 증거 단계: E1
-- 현재 WI 증거 단계: E1
+- 현재 폐루프 증거 단계: E4
+- 현재 WI 증거 단계: E4
 - 현재 성숙도 궤적: Logic
 - 현재 작업 WI: WI-WORLD-RESOURCE-REGENERATE 세계 자원 재생
-- 파이프라인 관문: Logic Passed / Presentation Pending / 통합 Pending
-- 파이프라인 재개 E: E2
+- 파이프라인 관문: Logic Passed / Presentation Passed / 통합 Passed
+- 파이프라인 재개 E: E5
 - 기준 revision: world-interaction-delivery-priorities.r40 / nature-resource-regeneration.design.r1
 
 운영 규칙:
@@ -53,7 +53,7 @@ E7 PlayClosed까지 닫는다.
 
 | 현재 WI | 현재 E | 현재 증거 | 남은 차단 | 다음 최저 의존성 |
 | --- | --- | --- | --- | --- |
-| `WI-WORLD-RESOURCE-REGENERATE` 세계 자원 재생 | 폐루프 E1 / WI E1 → E7 | evidence:nature-personal-plan-logic-e3-20260830<br>evidence:nature-heat-source-logic-e3-20260830<br>evidence:nature-r2-core-20260825<br>evidence:nature-night-day2-wi13-playmode-20260826<br>evidence:nature-night-day2-wi13-hosted-parity-20260826<br>evidence:nature-night-day2-wi14-playmode-20260826<br>evidence:nature-night-day2-wi14-hosted-parity-20260826<br>evidence:nature-night-day2-wi15-playmode-20260826<br>evidence:nature-night-day2-wi15-hosted-parity-20260826<br>evidence:nature-dual-loop-game-view-20260826<br>evidence:nature-night-day2-presentation-e7-20260826 | 행위 원장·분야 성장 공통 관문 소급으로 기존 E6/E7 증거가 무효화됐다.<br>Unity 표현 엔진의 cursor 소비와 현재 Game View 증거를 다시 검증해야 한다. | `WI-WORLD-RESOURCE-REGENERATE E2` |
+| `WI-WORLD-RESOURCE-REGENERATE` 세계 자원 재생 | 폐루프 E4 / WI E4 → E7 | evidence:nature-personal-plan-current-e4-20260901<br>evidence:nature-heat-source-current-e4-20260901<br>evidence:nature-night-day2-six-wi-e4-20260901<br>evidence:nature-personal-plan-logic-e3-20260830<br>evidence:nature-heat-source-logic-e3-20260830<br>evidence:nature-r2-core-20260825<br>evidence:nature-night-day2-wi13-playmode-20260826<br>evidence:nature-night-day2-wi13-hosted-parity-20260826<br>evidence:nature-night-day2-wi14-playmode-20260826<br>evidence:nature-night-day2-wi14-hosted-parity-20260826<br>evidence:nature-night-day2-wi15-playmode-20260826<br>evidence:nature-night-day2-wi15-hosted-parity-20260826<br>evidence:nature-dual-loop-game-view-20260826<br>evidence:nature-night-day2-presentation-e7-20260826 | 여섯 WI의 Logic·Presentation E4 준비는 현재 코드·자동 회귀·정확 후보 fingerprint와 r5 작업 명세로 결속됐지만 E5 실제 제품 연결은 미검증이다.<br>과거 Unity PlayMode·Game View 패키지는 Superseded/Stale이므로 Current E5로 재사용하지 않는다. 이번 범위에서는 Editor·Scene·Play·E5를 열지 않는다. | `WI-WORLD-RESOURCE-REGENERATE E5` |
 
 ## 병렬 작업과 통합 인계
 
@@ -74,7 +74,7 @@ E7 PlayClosed까지 닫는다.
 | work:nature-camp-visitor-stay:d396-state-binding-preparation | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Integrated |  |
 | work:nature-camp-visitor-stay:e5-logic | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:nature-camp-visitor-stay:local-npc-dialogue | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Presentation / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | ReadyForIntegration |  |
-| work:nature-resource-regeneration:logic | playable-loop:nature-night-day2.v1<br>WI-WORLD-RESOURCE-REGENERATE | Logic / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
+| work:nature-resource-regeneration:logic | playable-loop:nature-night-day2.v1<br>WI-WORLD-RESOURCE-REGENERATE | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | ReadyForIntegration |  |
 | work:nature-shelter:locomotion-comparison-preparation | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a04676-8d10-7480-b851-707fbd655d46 | Active |  |
 | work:nature-shelter:locomotion-synchronous-render-preparation | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a04fb7-7c73-75a3-b7c2-a29c64766c26 | Active |  |
 | work:nature-shelter:woodcutting-animation-integration | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |

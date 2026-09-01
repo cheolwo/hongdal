@@ -316,6 +316,179 @@ public sealed class SimulationNature생활거점동등성Tests
     }
 
     [Fact]
+    public async Task 보관수면Day2자원재생은_한Session계보로조회되고_중복과경합을거부한다()
+    {
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+        var savesRoot = Path.Combine(Path.GetTempPath(),
+            "ssalddel-nature-day2-regrowth-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var request = CreateR2Request();
+            var slotStore = new FileSimulationLocalSaveSlotStore(savesRoot);
+            using var local = new LocalSimulationRuntime(
+                new InMemory경영SimulationSessionStore(),
+                new InMemorySimulationSessionSaveStore(), slotStore);
+            var localCreated = await local.Sessions.CreateAsync(request);
+            var localCurrent = await RunLocalDay2LoopAsync(local,
+                localCreated.SessionStableId, localCreated.Revision);
+
+            var createResponse = await client.PostAsJsonAsync(
+                "/api/simulation/v1/sessions", request);
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+            var remoteCreated = (await createResponse.Content.ReadFromJsonAsync<
+                경영SimulationSessionSnapshot>())!;
+            var remoteCurrent = await RunRemoteDay2LoopAsync(client,
+                remoteCreated.SessionStableId, remoteCreated.Revision);
+            var remoteRoute = "/api/simulation/v1/sessions/" +
+                Uri.EscapeDataString(remoteCreated.SessionStableId);
+
+            SimulationNatureSurvivalClockAdvanceRequest? regeneration = null;
+            var sequence = 0;
+            while (localCurrent.NatureSurvival.CycleIndex <
+                   NatureSurvivalRules.TreeRegrowthCycleCount)
+            {
+                var elapsed = Math.Min(60, NatureSurvivalRules.CycleSeconds -
+                    localCurrent.NatureSurvival.ElapsedSecondsInCycle);
+                var command = Clock($"nature-day2:regrowth:{sequence++}",
+                    localCurrent.Revision, elapsed);
+                if (localCurrent.NatureSurvival.CycleIndex ==
+                        NatureSurvivalRules.TreeRegrowthCycleCount - 1
+                    && localCurrent.NatureSurvival.ElapsedSecondsInCycle + elapsed
+                    >= NatureSurvivalRules.CycleSeconds)
+                    regeneration = command;
+                localCurrent = await local.Nature.AdvanceRealtimeAsync(
+                    localCreated.SessionStableId, command);
+                remoteCurrent = await RemoteAdvanceAsync(client,
+                    remoteCreated.SessionStableId, Clock(command.CommandId,
+                        remoteCurrent.Revision, elapsed));
+            }
+            Assert.NotNull(regeneration);
+            Assert.Equal(localCurrent.Revision, remoteCurrent.Revision);
+
+            var localObserved = await local.GetNature표현관측Async(
+                localCreated.SessionStableId);
+            var remoteObserved = await client.GetFromJsonAsync<
+                SimulationNature표현관측Snapshot>(remoteRoute +
+                    "/nature-survival/observation");
+            Assert.NotNull(remoteObserved);
+            Assert.Equal(localObserved.Session.Revision,
+                remoteObserved!.Session.Revision);
+            Assert.Equal(localObserved.Nature.StoredTimberQuantity,
+                remoteObserved.Nature.StoredTimberQuantity);
+            Assert.True(localObserved.Nature.Day2Ready);
+            Assert.Equal(SimulationNatureSurvivalCodes.Workbench,
+                localObserved.Nature.SelectedExpansionPlanCode);
+            Assert.Equal(SimulationNatureSurvivalCodes.Standing,
+                localObserved.Nature.ResourceNodes.Single(value =>
+                    value.ResourceNodeStableId == "resource:nature-tree:01")
+                    .StateCode);
+            Assert.Contains(localObserved.PlayerOpportunities, value =>
+                value.ActionCode == SimulationNatureSurvivalCodes.BeginHarvest
+                && value.TargetStableId == "resource:nature-tree:01"
+                && value.Available);
+
+            var records = localObserved.ActionLedger!.TailRecords;
+            Assert.Contains(records, value => value.WorldInteractionId ==
+                SimulationNatureSurvivalCodes.StoreAtCabinWorldInteractionId);
+            Assert.Contains(records, value => value.WorldInteractionId ==
+                SimulationNatureSurvivalCodes.SleepInCabinWorldInteractionId);
+            Assert.Contains(records, value => value.WorldInteractionId ==
+                SimulationNatureSurvivalCodes.SelectExpansionPlanWorldInteractionId);
+            var regenerated = Assert.Single(records, value =>
+                value.WorldInteractionId ==
+                    Simulation세계자원재생Codes.WorldInteractionId);
+            Assert.Equal(regeneration!.CommandId, regenerated.CommandId);
+            Assert.Equal(localObserved.Session.Revision,
+                regenerated.AfterWorldRevision);
+            Assert.Contains("origin-command:nature-storage:tree:1:start",
+                regenerated.SourceReferenceIds);
+
+            var recordCount = records.Length;
+            var duplicate = await local.Nature.AdvanceRealtimeAsync(
+                localCreated.SessionStableId, regeneration);
+            Assert.Equal(localCurrent.Revision, duplicate.Revision);
+            Assert.Equal(recordCount, (await local.GetNature표현관측Async(
+                localCreated.SessionStableId)).ActionLedger!.TailRecords.Length);
+            var remoteDuplicate = await client.PostAsJsonAsync(remoteRoute +
+                "/nature-survival/clock/advance", regeneration);
+            Assert.Equal(HttpStatusCode.OK, remoteDuplicate.StatusCode);
+            Assert.Equal(recordCount, (await client.GetFromJsonAsync<
+                SimulationNature표현관측Snapshot>(remoteRoute +
+                    "/nature-survival/observation"))!.ActionLedger!.TailRecords.Length);
+
+            var stale = Clock("nature-day2:stale", localCurrent.Revision - 1, 0);
+            var staleError = await Assert.ThrowsAsync<SimulationConflictException>(
+                () => local.Nature.AdvanceRealtimeAsync(
+                    localCreated.SessionStableId, stale).AsTask());
+            Assert.Equal(SimulationNatureSurvivalCodes.ExpectedRevisionMismatch,
+                staleError.Message);
+            var remoteStale = await client.PostAsJsonAsync(remoteRoute +
+                "/nature-survival/clock/advance", stale);
+            Assert.Equal(HttpStatusCode.Conflict, remoteStale.StatusCode);
+
+            await local.Sessions.SaveSlotAsync(localCreated.SessionStableId,
+                new SimulationLocalSaveSlotRequest
+                {
+                    SlotStableId = "slot-nature-day2-regrowth",
+                    ExpectedRevision = localCurrent.Revision,
+                });
+            var localPackage = slotStore.Read(
+                "slot-nature-day2-regrowth").Package;
+            var remoteSave = await client.PostAsJsonAsync(remoteRoute + "/saves",
+                new SimulationSessionSaveRequest
+                {
+                    SaveStableId = localPackage.SaveStableId,
+                    ExpectedRevision = remoteCurrent.Revision,
+                });
+            Assert.Equal(HttpStatusCode.OK, remoteSave.StatusCode);
+            var remotePackage = (await remoteSave.Content.ReadFromJsonAsync<
+                SimulationSessionSavePackage>())!;
+            Assert.Equal(localPackage.ReplayHash, remotePackage.ReplayHash);
+
+            using var restored = new LocalSimulationRuntime(
+                new InMemory경영SimulationSessionStore(),
+                new InMemorySimulationSessionSaveStore(), slotStore);
+            var restoredResult = await restored.Sessions.LoadSlotAsync(
+                "slot-nature-day2-regrowth");
+            var restoredObserved = await restored.GetNature표현관측Async(
+                restoredResult.Restore.Session.SessionStableId);
+            Assert.Equal(localObserved.Session.Revision,
+                restoredObserved.Session.Revision);
+            Assert.True(restoredObserved.Nature.Day2Ready);
+            Assert.Single(restoredObserved.ActionLedger!.TailRecords, value =>
+                value.WorldInteractionId ==
+                    Simulation세계자원재생Codes.WorldInteractionId);
+
+            var raceRevision = localObserved.Session.Revision;
+            async Task<string> RaceAsync(string commandId)
+            {
+                try
+                {
+                    await local.Nature.AdvanceRealtimeAsync(
+                        localCreated.SessionStableId,
+                        Clock(commandId, raceRevision, 0));
+                    return "Applied";
+                }
+                catch (SimulationConflictException error)
+                {
+                    return error.Message;
+                }
+            }
+            var raceResults = await Task.WhenAll(
+                Task.Run(() => RaceAsync("nature-day2:race:a")),
+                Task.Run(() => RaceAsync("nature-day2:race:b")));
+            Assert.Single(raceResults, value => value == "Applied");
+            Assert.Single(raceResults, value => value ==
+                SimulationNatureSurvivalCodes.ExpectedRevisionMismatch);
+        }
+        finally
+        {
+            if (Directory.Exists(savesRoot)) Directory.Delete(savesRoot, true);
+        }
+    }
+
+    [Fact]
     public async Task 작업대건설취소재시도는_LocalProcess와_RemoteHost에서_같은운영상태와ReplayHash를만든다()
     {
         using var factory = new WebApplicationFactory<Program>();
@@ -400,6 +573,9 @@ public sealed class SimulationNature생활거점동등성Tests
             NatureSurvivalRules.CabinWorkSeconds));
         current = await confirm(Command("workbench:cabin:enter", current.Revision,
             SimulationNatureSurvivalCodes.EnterCabin, "facility:nature-cabin"));
+        current = await confirm(Command("workbench:cabin:store", current.Revision,
+            SimulationNatureSurvivalCodes.StoreAtCabin,
+            SimulationNatureSurvivalCodes.CabinStorageContainerStableId));
         current = await AdvanceToAsync(advance, current,
             NatureSurvivalRules.DaylightEndsAtSecond + 1, "workbench:dusk");
         var encounterId = current.NatureSurvival.Encounter!.EncounterStableId;

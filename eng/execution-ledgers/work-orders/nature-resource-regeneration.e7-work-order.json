@@ -1,62 +1,93 @@
 {
   "schemaVersion": "simulation-e7-vertical-work-order.v2",
-  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r4",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r5",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-NATURE-RESOURCE-REGENERATION",
-  "title": "세계 자원 재생 Logic E3",
+  "title": "세계 자원 재생 Session Logic E5 통합",
   "playableUnitStableId": "playable-loop:nature-night-day2.v1",
   "activeWorldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
   "targetEvidenceStage": "E7",
-  "currentEvidenceStage": "E1",
+  "currentEvidenceStage": "E4",
   "promotionEligible": false,
   "deliveryCap": {
-    "currentDispatchTargetStage": "E3",
+    "currentDispatchTargetStage": "E5",
     "promotionBeyondStageAllowed": false,
-    "reason": "32개 캠페인: 정책 기반 WorldTick 자동 재성장·생성. 실제 공간·저장·출시 수치 제외."
+    "reason": "2026-09-01 후속 승인: 기존 Cycle+3의 같은 자리 자원 재생을 Session 단일 revision·command·행위 기록과 LocalProcess·HTTP TestServer·Save/Replay 직렬화 Logic E5까지 검증한다. 실제 배포 Hosted 재진입·E8 Save/Replay 캠페인·Presentation E5·Scene·Play·실제 입력·Game View·Console·실제 배치는 제외한다."
   },
   "iterationState": {
     "currentPass": "UpwardAssemblyAndValidation",
-    "nextReopenCondition": "실제 공간 후보·생산 정책·기존 WorldTick/Save에 연결하면 E1 재검토."
+    "nextReopenCondition": "Session 권위·명령·행위 기록·Save/Replay·LocalProcess/RemoteHost 또는 기존 Standing/Stump 표현 준비가 같은 revision을 보존하지 못하면 가장 이른 E1~E4를 다시 연다. E5 이상은 별도 재승인 전 열지 않는다."
+  },
+  "changeImpactReviewRef": "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json",
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "보관과 수면을 거쳐 Day2로 진행한 뒤, 이전에 소진된 같은 Nature 자원 자리의 Stump가 Standing으로 돌아와 다시 선택 가능한 상태로 보인다.",
+    "requiredHCapabilities": [
+      "NatureResourceNode",
+      "HarvestResourceWorkArea"
+    ],
+    "visualKeys": [
+      "Nature.Tree.Stump",
+      "Nature.Tree.Standing"
+    ],
+    "primaryAssetCandidateRefs": [
+      "C:/Users/user/ssalddel/Assets/Ssalddel/Infrastructure/Simulation/Nature생존CoreRuntimeAdapter.cs",
+      "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureWorldCellAssemblyEngine.cs",
+      "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/World공간표현조립Coordinator.cs"
+    ],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [
+      "기존 Nature.Tree.Stump/Standing 조립 fallback"
+    ],
+    "placementIntent": "새 자원 표현 권위를 만들지 않고 권위 ResourceNode의 기존 StableId·H·좌표를 유지한 채 같은 자리 상태 코드만 기존 조립 경로가 다시 읽는다.",
+    "interactionAnchorIntent": "기존 ResourceNode 상호작용 표식과 채집 선택 경계를 재사용한다. Unity 표현은 revision을 변경하지 않는다.",
+    "candidateRevisionOrFingerprint": "Nature생존CoreRuntimeAdapter.cs@0E83D4AB03C0495FBBA1CFD9C834F1CE4B76714928A1F2526749AFEEDF917B35;SimulationNatureWorldCellAssemblyEngine.cs@DEB213A7D18D69200C54CAA4464FDCFF4EE31545835AD390F5446D829B2980A0;World공간표현조립Coordinator.cs@055A86D431A68544393141CE7E361C5111BE592A7649C743C8C2B7EA80974D1A",
+    "e5ReadinessCode": "Conditional",
+    "openGapRefs": [
+      "E5 후속: canonical SimulationWorldShell 실제 입력·Game View·Console·재진입 증거 필요",
+      "빈 자연 셀 신규 생성·LandUse 적합성·밀도 정책은 미승인 후속"
+    ]
   },
   "trackPlans": {
     "logic": {
       "trackCode": "Logic",
-      "currentEvidenceStage": "E3",
+      "currentEvidenceStage": "E5",
       "downwardPlan": [
         {
           "code": "E7",
           "disposition": "Blocked",
-          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+          "summary": "같은 보관→수면→Day2 명령열을 실제 입력으로 실행하고 결과 재조회·다음 선택·Game View·Console·재진입을 확인한다."
         },
         {
           "code": "E6",
           "disposition": "Blocked",
-          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+          "summary": "재생 결과와 플레이어가 이해할 수 있는 원인·회복·다음 선택을 같은 revision으로 설명한다. D466/D467 후보 정렬은 후속 조회 조건이며 권위 결과를 바꾸지 않는다."
         },
         {
           "code": "E5",
-          "disposition": "Blocked",
-          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+          "disposition": "ReusedWithVerification",
+          "summary": "Session Aggregate의 ResourceNode 전이·ActionRecordAppend·분야 성장 NotApplicable·Save checkpoint를 한 command와 revision에 결속하고 원 벌목 OriginCommandId를 SourceReference로 보존한다."
         },
         {
           "code": "E4",
-          "disposition": "Blocked",
-          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+          "disposition": "Affected",
+          "summary": "LocalSimulationRuntime과 RemoteHost가 별도 자원 API 없이 같은 Session Core의 WorldTick 전이를 호출하고 동일 결과를 반환한다."
         },
         {
           "code": "E3",
           "disposition": "Affected",
-          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+          "summary": "Cycle+3 재생·동일 command 멱등·Save/Restore/Replay hash와 기존 저장 호환을 검증한다. 이전 독립 E3 정책 시험은 이력으로 보존한다."
         },
         {
           "code": "E2",
           "disposition": "Affected",
-          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+          "summary": "별도 WI-WORLD-RESOURCE-REGENERATE aggregate가 Session ResourceNode를 다시 쓰지 않도록 기존 AdvanceNatureSurvivalClock→RegrowNatureResources를 단일 권위 경계로 삼는다."
         },
         {
           "code": "E1",
           "disposition": "Affected",
-          "summary": "신뢰 정책·결정적 자동 Tick·원자 기록·멱등·거부."
+          "summary": "같은 자리 Stump→Standing 전이, 같은 Session revision, 같은 command의 ActionRecord와 WorldDerivedResourceRegeneration NotApplicable 반환 계약을 정의한다."
         }
       ],
       "upwardValidation": [
@@ -64,6 +95,7 @@
           "code": "E1",
           "status": "Passed",
           "evidenceRefs": [
+            "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
             "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
             "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx"
           ]
@@ -72,27 +104,30 @@
           "code": "E2",
           "status": "Passed",
           "evidenceRefs": [
-            "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
-            "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx"
+            "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"
           ]
         },
         {
           "code": "E3",
           "status": "Passed",
           "evidenceRefs": [
-            "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs",
-            "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx"
+            "Ssalddel.Simulation.Tests/Simulation세계자원재생Tests.cs"
           ]
         },
         {
           "code": "E4",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "evidence:nature-night-day2-six-wi-e4-20260901"
+          ]
         },
         {
           "code": "E5",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+            "artifacts/local/validation/20260901-nature-e5-session-integration/nature-e5-session-integrated-lineage.trx"
+          ]
         },
         {
           "code": "E6",
@@ -108,42 +143,42 @@
     },
     "presentation": {
       "trackCode": "Presentation",
-      "currentEvidenceStage": "E1",
+      "currentEvidenceStage": "E4",
       "downwardPlan": [
         {
           "code": "E7",
           "disposition": "Blocked",
-          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+          "summary": "canonical SimulationWorldShell 실제 입력·Game View·Console에서 Stump→Standing과 다음 선택을 확인한다."
         },
         {
           "code": "E6",
           "disposition": "Blocked",
-          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+          "summary": "정지·재생 상태 차이, 카메라·접근·피드백과 Day2 귀환 판독성을 검토한다."
         },
         {
           "code": "E5",
           "disposition": "Blocked",
-          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+          "summary": "같은 권위 revision의 ResourceNode 사본을 기존 Standing/Stump Prefab·Renderer/Collider/Bounds·상호작용 표식에 결속한다."
         },
         {
           "code": "E4",
-          "disposition": "Blocked",
-          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+          "disposition": "Affected",
+          "summary": "기존 Nature생존CoreRuntimeAdapter→SimulationNatureWorldCellAssemblyEngine→World공간표현조립Coordinator와 자산 후보를 재사용하고 새 표현 권위를 만들지 않는다."
         },
         {
           "code": "E3",
-          "disposition": "Blocked",
-          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+          "disposition": "Affected",
+          "summary": "revision 변경·과거 사본·중복 조립·해제·재진입을 자동 회귀하며 화면 미검증과 분리한다."
         },
         {
           "code": "E2",
-          "disposition": "Blocked",
-          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+          "disposition": "Affected",
+          "summary": "Session ResourceNodes StableId/H/좌표/StateCode/RegrowsAtCycleIndex를 기존 Adapter가 읽기 전용 사본으로 투영하는 경계를 재검증한다."
         },
         {
           "code": "E1",
           "disposition": "Affected",
-          "summary": "성장 단계와 채집 가능 상태 판독 요구만."
+          "summary": "같은 자리의 소진 상태와 재생 상태, 다시 선택 가능한 자원임을 플레이어가 구분해야 한다."
         }
       ],
       "upwardValidation": [
@@ -156,18 +191,24 @@
         },
         {
           "code": "E2",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureWorldCellAssemblyEngine.cs"
+          ]
         },
         {
           "code": "E3",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "Ssalddel.Simulation.Tests/SimulationWorldAssetPlacementTests.cs"
+          ]
         },
         {
           "code": "E4",
-          "status": "Blocked",
-          "evidenceRefs": []
+          "status": "Passed",
+          "evidenceRefs": [
+            "evidence:nature-night-day2-six-wi-e4-20260901"
+          ]
         },
         {
           "code": "E5",
@@ -188,29 +229,54 @@
     }
   },
   "integratedGate": {
-    "currentEvidenceStage": "E1",
+    "currentEvidenceStage": "E4",
     "status": "Passed",
     "candidateRevision": "nature-resource-regeneration.design.r1",
     "evidenceRefs": [
-      "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md"
+      "evidence:nature-night-day2-six-wi-e4-20260901"
     ],
     "openFeedbackRefs": [
-      "Presentation E2 이후·실제 공간 정책 미구현",
-      "Logic E4·Save·Runtime·RemoteHost 별도 승인"
+      "E4 준비까지만 통과했으며 Scene·Play·실제 입력·Game View·Console·실제 배치와 E5 승격은 미검증 후속",
+      "빈 자연 셀 신규 생성·LandUse 적합성·밀도·실제 성장 기간은 미승인 후속",
+      "Simulation세계자원재생Aggregate는 독립 정책·fixture로 유지하고 Session Runtime·Service·RemoteHost에는 연결하지 않았다. 중복 권위 경로 추가는 별도 재승인 대상이다."
     ]
+  },
+  "logicE5SessionIntegration": {
+    "statusCode": "Passed",
+    "singleAuthorityPath": "경영SimulationSessionAggregate.AdvanceNatureSurvivalClock→RegrowNatureResources",
+    "duplicateAuthorityDisposition": "Simulation세계자원재생Aggregate는 독립 정책·fixture 경계로 유지하며 Session Runtime·Service·RemoteHost에 연결하지 않는다.",
+    "sameRevisionObservationPath": "경영SimulationSessionAggregate.GetNature표현관측Snapshot",
+    "verifiedContracts": [
+      "저장 자원 없는 수면 거부",
+      "보관→수면→Day2 계획→Cycle+3 재생→다음 벌목 선택",
+      "재생 clock command와 ActionRecord의 동일 AfterWorldRevision",
+      "원 벌목 origin-command SourceReference",
+      "동일 command 멱등 재시도",
+      "낡은 ExpectedRevision 거부",
+      "같은 revision 경합 중 하나만 적용",
+      "LocalProcess·HTTP TestServer 동일성과 Save/Replay 직렬화 왕복"
+    ],
+    "evidenceRefs": [
+      "evidence:nature-night-day2-session-logic-e5-20260901",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs",
+      "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs",
+      "Ssalddel.Simulation.Server/Controllers/SimulationNatureSurvivalController.cs",
+      "Ssalddel.Simulation.Tests/SimulationNature생활거점동등성Tests.cs",
+      "artifacts/local/validation/20260901-nature-e5-session-integration-full-r2/Ssalddel.Simulation.Tests-r2.trx"
+    ],
+    "boundary": "Logic E5의 Session·LocalProcess·HTTP TestServer·Save/Replay 직렬화 자동 증거다. 실제 배포 Hosted 재진입·E8 Save/Replay 캠페인·Presentation E5·Unity 실제 배치·Game View를 승격하지 않는다."
   },
   "pipelineValidation": {
     "profileKey": "playable-loop:nature-night-day2.v1|WI-WORLD-RESOURCE-REGENERATE",
     "profileRevision": "nature-resource-regeneration.engine-interaction.r1",
     "logicStatusCode": "Passed",
-    "presentationStatusCode": "Pending",
-    "integratedStatusCode": "Pending",
-    "earliestReopenEvidenceStageCode": "E2",
+    "presentationStatusCode": "Passed",
+    "integratedStatusCode": "Passed",
+    "earliestReopenEvidenceStageCode": "E5",
     "evidenceRefs": [
-      "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json"
+      "evidence:nature-night-day2-six-wi-e4-20260901"
     ],
     "blockerCodes": [
-      "PresentationRevisionRequired",
       "ProductionSpatialAndGrowthPolicyUndefined",
       "SharedManagementLedgerHandoffPending"
     ]
@@ -218,6 +284,126 @@
   "playerProgression": {
     "statusCode": "NotApplicable",
     "reason": "WorldDerivedResourceRegeneration"
+  },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/Architecture/PlayableLoops/Nature세계자원재생E3.md",
+    "designRevision": "nature-resource-regeneration.design.r1",
+    "designHashSha256": "F9A3E2043BA05A31F142615663AA061BF232E39D757AA7EFD58D1D53BFD941CF",
+    "approvalEvidenceRef": "thread:01a025cf-0772-7251-b842-156a20e7483e:2026-09-01-session-save-runtime-view-expansion"
+  },
+  "additionalApprovals": [
+    {
+      "statusCode": "ApprovedScopedWork",
+      "approvalEvidenceRef": "thread:01a025cf-0772-7251-b842-156a20e7483e:2026-09-01-session-save-runtime-view-expansion",
+      "boundary": "기존 r1의 Cycle+3 같은 자리 재생을 Session 단일 revision·command·행위 기록·Save/Replay·Local/Hosted·기존 Unity Standing/Stump 표현·실제 입력 증거로 확장한다. 기존 r1 hash와 E3 증거는 이력 보존한다. 빈 셀 신규 생성·LandUse 생산 정책·새 자산 선택은 승인하지 않는다."
+    },
+    {
+      "statusCode": "ApprovedScopedWork",
+      "approvalEvidenceRef": "thread:01a025cf-0772-7251-b842-156a20e7483e:2026-09-01-e4-scope-cap",
+      "boundary": "최신 사용자 범위 축소로 이번 전달은 Logic·Presentation E4 준비와 계약·Application·Local/Hosted·Save/Replay·어댑터 후보 자동 회귀까지만 수행한다. 앞선 E7 확장 승인은 역사로 남기되 Scene·Play·실제 입력·Game View·Console·실제 배치·E5 승격은 재개하지 않는다."
+    }
+  ],
+  "e4PreparationEvidence": {
+    "statusCode": "PreparedNotPromoted",
+    "logicRefs": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/Simulation세계자원재생Contracts.cs",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationNatureSurvival.cs",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationActionManifestationSaveReplay.cs",
+      "Ssalddel.Simulation.Application/RuntimeCore/LocalSimulationRuntime.cs",
+      "Ssalddel.Simulation.Tests/SimulationNatureSurvivalTests.cs"
+    ],
+    "presentationRefs": [
+      "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureWorldCellAssemblyEngine.cs",
+      "Ssalddel.Simulation.Tests/SimulationWorldAssetPlacementTests.cs",
+      "C:/Users/user/ssalddel/Assets/Ssalddel/Infrastructure/Simulation/Nature생존CoreRuntimeAdapter.cs",
+      "C:/Users/user/ssalddel/Assets/Ssalddel/Presentation/World/World공간표현조립Coordinator.cs"
+    ],
+    "nextChoiceReuse": "기존 Simulation플레이어기회Snapshot과 Local/Remote player-opportunities 조회를 재사용한다. 재생된 Standing 자원은 BeginHarvest 기회로 다시 조회되며 D466/D467의 정렬·표현 규칙은 후속이다.",
+    "automatedChecks": [
+      "같은자리자원재생은_Session_revision_행위기록_SaveReplay에_함께남는다",
+      "같은자리자원재생은_LocalProcess와_RemoteHost에서_같은SaveReplay를만든다",
+      "벌목상태가바뀌어도_자원배치StableId는유지되고_표현과Hash만바뀐다"
+    ],
+    "taskValidationRef": "artifacts/local/validation/20260901-111655",
+    "boundary": "자동 계약·Application·Local/Hosted·Save/Replay·표현 조립 준비 근거다. 현재 폐루프 원장의 Logic/Presentation/Integrated E1을 올리지 않으며 실제 Unity·E5 증거가 아니다."
+  },
+  "playableUnitE4Audit": {
+    "statusCode": "Passed",
+    "auditedWorldInteractionIds": [
+      "WI-NATURE-13",
+      "WI-NATURE-14",
+      "WI-NATURE-15",
+      "WI-HEAT-SOURCE-STATE-CHANGE",
+      "WI-ACTOR-PLAN-SET",
+      "WI-WORLD-RESOURCE-REGENERATE"
+    ],
+    "currentAutomatedEvidence": {
+      "resultCode": "Passed",
+      "passed": 119,
+      "failed": 0,
+      "artifactRef": "artifacts/local/validation/20260901-nature-night-day2-e4-audit/nature-night-day2-e4-audit.trx",
+      "artifactSha256": "7CE13B9551F66152B56AE0D6F0481027C96DC0292A46E0C2797FF2C752A744AD",
+      "boundary": "현행 Contracts·Domain·Application·Save/Replay·Local/Hosted·표현 조립 자동 회귀다. 과거 Unity PlayMode·Game View 근거를 Current로 되살리거나 E를 승격하지 않는다."
+    },
+    "items": [
+      {
+        "worldInteractionId": "WI-NATURE-13",
+        "logicPreparationCode": "Prepared",
+        "presentationPreparationCode": "PreparedNotPromoted",
+        "earliestReopenStageCode": "E5",
+        "reason": "현행 보관 회귀와 r5 작업 명세에 rack/crate/crate-stack의 정확 경로·GUID·SHA·fingerprint, StorageInteractionAnchor와 Conditional E5 인계를 결속했다.",
+        "requiredNext": "E5 후속에서 실제 Prefab·Renderer/Collider/Bounds·상태별 선택·배치·통행·해제 수명을 검증한다."
+      },
+      {
+        "worldInteractionId": "WI-NATURE-14",
+        "logicPreparationCode": "Prepared",
+        "presentationPreparationCode": "PreparedNotPromoted",
+        "earliestReopenStageCode": "E5",
+        "reason": "현행 수면·권위 시간·새벽 회귀와 r5 작업 명세에 bed/sunbeams/fire 후보 fingerprint, SleepInteractionAnchor와 기존 Sky/Interior 소비 경계를 결속했다.",
+        "requiredNext": "E5 후속에서 실제 수면·새벽 Prefab 소비, 조립 수명과 Game View를 검증한다."
+      },
+      {
+        "worldInteractionId": "WI-NATURE-15",
+        "logicPreparationCode": "Prepared",
+        "presentationPreparationCode": "PreparedNotPromoted",
+        "earliestReopenStageCode": "E5",
+        "reason": "현행 계획 선택·Day2Ready 회귀와 r5 작업 명세에 작업대·보관·방어 후보 fingerprint, DawnPlanChoiceAnchor와 Conditional E5 인계를 결속했다.",
+        "requiredNext": "E5 후속에서 세 계획의 실제 후보 선택·배치·Renderer/Collider/Bounds·입력과 Game View를 검증한다."
+      },
+      {
+        "worldInteractionId": "WI-HEAT-SOURCE-STATE-CHANGE",
+        "logicPreparationCode": "PreparedNotPromoted",
+        "presentationPreparationCode": "PreparedNotPromoted",
+        "earliestReopenStageCode": "E5",
+        "reason": "현행 ActionRecord·분야 성장 NotApplicable 회귀와 새 Current 근거 패키지, r5 상태 사본 읽기 계약 및 CampFire/Fire Small 정확 후보를 결속했다.",
+        "requiredNext": "E5 후속에서 실제 열원 Prefab·상태별 표시·Anchor·접근·통행·해제 수명을 검증한다."
+      },
+      {
+        "worldInteractionId": "WI-ACTOR-PLAN-SET",
+        "logicPreparationCode": "PreparedNotPromoted",
+        "presentationPreparationCode": "PreparedNotPromoted",
+        "earliestReopenStageCode": "E5",
+        "reason": "현행 ActionRecord·분야 성장 NotApplicable 회귀와 새 Current 근거 패키지, r5 계획 상태 사본의 읽기 전용 UI 소비·VisualKey 및 Synty NotApplicable 사유를 결속했다.",
+        "requiredNext": "E5 후속에서 실제 계획 UI 소비자·입력·표시 수명·중복/오래된 revision 거부와 Game View를 검증한다."
+      },
+      {
+        "worldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
+        "logicPreparationCode": "PreparedNotPromoted",
+        "presentationPreparationCode": "PreparedNotPromoted",
+        "earliestReopenStageCode": "E5",
+        "reason": "같은 command·Session revision·행위 기록·분야 성장 NotApplicable·Save/Replay·Local/Hosted와 Standing/Stump 조립 준비가 현행 자동 회귀로 확인됐다. 이 한 WI만으로 폐루프 전체 E4를 승격하지 않는다.",
+        "requiredNext": "E5 후속에서 canonical SimulationWorldShell 실제 입력·Prefab 상태 전환·Game View·Console·재진입을 검증한다."
+      }
+    ],
+    "d469Boundary": "D-469에 따라 E5는 여섯 WI 각각에 적용되는 E1~E4 근거를 같은 Goal·WI·Session·대상·권위 revision에서 소비해야 한다. 누락·만료·충돌은 가장 이른 E1~E4로 반환하며 이번 감사로 E5를 열지 않는다."
+  },
+  "historicalEvidence": {
+    "designRevision": "nature-resource-regeneration.design.r1",
+    "designHashSha256": "F9A3E2043BA05A31F142615663AA061BF232E39D757AA7EFD58D1D53BFD941CF",
+    "logicE3EvidenceRef": "evidence:nature-resource-regeneration-logic-e3-20260830",
+    "resultArtifactRef": "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx",
+    "boundary": "독립 메모리 자원 재생 정책의 35/35 증거이며 Session/Save/Runtime/RemoteHost/Unity 화면 증거가 아니다."
   },
   "approvedQuestionScope": [
     "Q-036",
@@ -233,13 +419,13 @@
     "Q-345"
   ],
   "implementationEvidence": {
-    "test": "Simulation세계자원재생Tests",
-    "passed": 35,
+    "test": "Ssalddel.Simulation.Tests full",
+    "passed": 1607,
     "failed": 0,
     "runtimeVerified": false,
     "playModeVerified": false,
-    "resultArtifactRef": "artifacts/local/remaining-32-wi/resource-regeneration-e3.trx",
+    "resultArtifactRef": "artifacts/local/validation/20260901-111655/Ssalddel.Simulation.Tests.trx",
     "releaseResultArtifactRef": "artifacts/local/remaining-32-wi/resource-regeneration-isolated-release.trx",
-    "executionBoundary": "공유 Simulation.Tests의 자원 재생 집중35/35와 분리 Debug/Release 각각35/35. 전체 회귀·Runtime·화면 증거 아님."
+    "executionBoundary": "Simulation solution build와 전체 자동 시험1607/1607. LocalProcess/RemoteHost API의 동일 Save/Replay는 WebApplicationFactory 자동 시험이며 실제 Unity Runtime·Play Mode·Game View 증거가 아니다. 이전 독립 자원 재생35/35는 historicalEvidence로 보존한다."
   }
 }

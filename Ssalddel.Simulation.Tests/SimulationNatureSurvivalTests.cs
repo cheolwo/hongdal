@@ -164,6 +164,325 @@ public sealed class SimulationNatureSurvivalTests
     }
 
     [Fact]
+    public void 같은자리자원재생은_Session_revision_행위기록_SaveReplay에_함께남는다()
+    {
+        var request = CreateRequest();
+        request.ScenarioSeed = FindNonTriggeringSeed(
+            request.ClientRequestId, NatureSurvivalRules.TreeRegrowthCycleCount);
+        var aggregate = new 경영SimulationSessionAggregate(request);
+        var sessions = new InMemory경영SimulationSessionStore();
+        sessions.Restore(aggregate);
+        var service = new SimulationNatureSurvivalService(sessions);
+        var started = service.Confirm(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:regrowth:harvest-start",
+            ExpectedRevision = 0,
+            PlayerStableId = "player:solo",
+            ActionCode = SimulationNatureSurvivalCodes.BeginHarvest,
+            TargetStableId = "resource:nature-tree:01",
+        });
+        var harvested = service.AdvanceClock(aggregate.SessionStableId, new()
+        {
+            CommandId = "command:regrowth:harvest-hold",
+            ExpectedRevision = started.Revision,
+            ElapsedRealtimeSeconds = NatureSurvivalRules.HarvestWorkSeconds,
+            WorkInputHeld = true,
+        });
+        var stump = harvested.NatureSurvival.ResourceNodes.Single(value =>
+            value.ResourceNodeStableId == "resource:nature-tree:01");
+        Assert.Equal(SimulationNatureSurvivalCodes.Stump, stump.StateCode);
+        Assert.Equal(NatureSurvivalRules.TreeRegrowthCycleCount,
+            stump.RegrowsAtCycleIndex);
+
+        SimulationNatureSurvivalClockAdvanceRequest? regenerationRequest = null;
+        경영SimulationSessionSnapshot? regenerated = null;
+        var clockIndex = 0;
+        while (aggregate.GetNatureSurvivalState().CycleIndex <
+               NatureSurvivalRules.TreeRegrowthCycleCount)
+        {
+            var state = aggregate.GetNatureSurvivalState();
+            var elapsed = Math.Min(60,
+                NatureSurvivalRules.CycleSeconds - state.ElapsedSecondsInCycle);
+            var candidate = new SimulationNatureSurvivalClockAdvanceRequest
+            {
+                CommandId = $"command:regrowth:clock:{clockIndex++}",
+                ExpectedRevision = aggregate.Revision,
+                ElapsedRealtimeSeconds = elapsed,
+            };
+            var result = service.AdvanceClock(aggregate.SessionStableId, candidate);
+            var node = result.NatureSurvival.ResourceNodes.Single(value =>
+                value.ResourceNodeStableId == "resource:nature-tree:01");
+            if (node.StateCode == SimulationNatureSurvivalCodes.Standing)
+            {
+                regenerationRequest = candidate;
+                regenerated = result;
+            }
+        }
+
+        Assert.NotNull(regenerationRequest);
+        Assert.NotNull(regenerated);
+        var regenerationRecord = Assert.Single(aggregate
+            .QueryActionManifestations(new Simulation행위기록Query
+            {
+                WorldStableId = aggregate.TerritoryStableId,
+                WorldInteractionIds = new[]
+                {
+                    Simulation세계자원재생Codes.WorldInteractionId,
+                },
+            }).Records);
+        Assert.Equal(regenerationRequest!.CommandId,
+            regenerationRecord.CommandId);
+        Assert.Equal(regenerationRequest.ExpectedRevision,
+            regenerationRecord.BeforeWorldRevision);
+        Assert.Equal(regenerated!.Revision,
+            regenerationRecord.AfterWorldRevision);
+        Assert.Equal(regenerated.CurrentTick,
+            regenerationRecord.AppliedWorldTick);
+        Assert.Equal(SimulationWorldInteractionTriggerSourceCodes.WorldDerived,
+            regenerationRecord.TriggerSourceCode);
+        Assert.Equal("world-system:nature-resource-regeneration",
+            regenerationRecord.ActorStableId);
+        Assert.Equal(new[] { "resource:nature-tree:01" },
+            regenerationRecord.TargetStableIds);
+        Assert.Contains(
+            Simulation세계자원재생Codes.ResourceAvailabilityChanged,
+            regenerationRecord.변화의미Codes);
+        Assert.Contains(
+            "player-progression:not-applicable:" +
+            Simulation세계자원재생Codes.PlayerProgressionNotApplicableReason,
+            regenerationRecord.SourceReferenceIds);
+        var binding = Simulation기본플레이어분야Catalog.Create().Wi결속들
+            .Single(value => value.WorldInteractionId ==
+                Simulation세계자원재생Codes.WorldInteractionId);
+        Assert.Equal(Simulation분야기여방식Codes.None, binding.기여방식Code);
+        Assert.Equal(
+            Simulation세계자원재생Codes.PlayerProgressionNotApplicableReason,
+            binding.NoPlayerProgressReason);
+        var profileRevisionBeforeDuplicate = aggregate
+            .GetPlayerDomainProfile("player:solo")!.Revision;
+
+        var duplicate = service.AdvanceClock(
+            aggregate.SessionStableId, regenerationRequest);
+        Assert.Equal(regenerated.Revision, duplicate.Revision);
+        Assert.Equal(profileRevisionBeforeDuplicate,
+            aggregate.GetPlayerDomainProfile("player:solo")!.Revision);
+        Assert.Single(aggregate.QueryActionManifestations(
+            new Simulation행위기록Query
+            {
+                WorldStableId = aggregate.TerritoryStableId,
+                WorldInteractionIds = new[]
+                {
+                    Simulation세계자원재생Codes.WorldInteractionId,
+                },
+            }).Records);
+
+        var saved = aggregate.CreateSavePackage(new()
+        {
+            SaveStableId = "save:nature-resource-regeneration",
+            ExpectedRevision = aggregate.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(saved);
+        var savedAgain = restored.CreateSavePackage(new()
+        {
+            SaveStableId = saved.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        var restoredRecord = Assert.Single(restored.QueryActionManifestations(
+            new Simulation행위기록Query
+            {
+                WorldStableId = restored.TerritoryStableId,
+                WorldInteractionIds = new[]
+                {
+                    Simulation세계자원재생Codes.WorldInteractionId,
+                },
+            }).Records);
+        Assert.Equal(saved.ReplayHash, savedAgain.ReplayHash);
+        Assert.Equal(regenerationRecord.기록HashSha256,
+            restoredRecord.기록HashSha256);
+        Assert.Equal(SimulationNatureSurvivalCodes.Standing,
+            restored.GetNatureSurvivalState().ResourceNodes.Single(value =>
+                value.ResourceNodeStableId == "resource:nature-tree:01")
+                .StateCode);
+    }
+
+    [Fact]
+    public async Task 같은자리자원재생은_LocalProcess와_RemoteHost에서_같은SaveReplay를만든다()
+    {
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+        var savesRoot = Path.Combine(Path.GetTempPath(),
+            "ssalddel-resource-regeneration-host-parity-" +
+            Guid.NewGuid().ToString("N"));
+        var request = CreateRequest();
+        request.ClientRequestId = Guid.Parse(
+            "fc3227f9-4a02-4934-a456-5679f8342554");
+        request.ScenarioSeed = FindNonTriggeringSeed(
+            request.ClientRequestId, NatureSurvivalRules.TreeRegrowthCycleCount);
+        try
+        {
+            var slotStore = new FileSimulationLocalSaveSlotStore(savesRoot);
+            using var local = new LocalSimulationRuntime(
+                new InMemory경영SimulationSessionStore(),
+                new InMemorySimulationSessionSaveStore(), slotStore);
+            var localSession = await local.Sessions.CreateAsync(request);
+            localSession = await local.Nature.ConfirmAsync(
+                localSession.SessionStableId,
+                new SimulationNatureSurvivalCommandRequest
+                {
+                    CommandId = "command:regrowth-parity:harvest",
+                    ExpectedRevision = localSession.Revision,
+                    PlayerStableId = "player:solo",
+                    ActionCode = SimulationNatureSurvivalCodes.BeginHarvest,
+                    TargetStableId = "resource:nature-tree:01",
+                });
+            localSession = await local.Nature.AdvanceRealtimeAsync(
+                localSession.SessionStableId,
+                new SimulationNatureSurvivalClockAdvanceRequest
+                {
+                    CommandId = "command:regrowth-parity:harvest-clock",
+                    ExpectedRevision = localSession.Revision,
+                    ElapsedRealtimeSeconds = NatureSurvivalRules.HarvestWorkSeconds,
+                    WorkInputHeld = true,
+                });
+
+            var createResponse = await client.PostAsJsonAsync(
+                "/api/simulation/v1/sessions", request);
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+            var remoteSession = (await createResponse.Content.ReadFromJsonAsync<
+                경영SimulationSessionSnapshot>())!;
+            var remoteRoute = "/api/simulation/v1/sessions/" +
+                Uri.EscapeDataString(remoteSession.SessionStableId);
+            var remoteHarvest = await client.PostAsJsonAsync(
+                remoteRoute + "/nature-survival/commands",
+                new SimulationNatureSurvivalCommandRequest
+                {
+                    CommandId = "command:regrowth-parity:harvest",
+                    ExpectedRevision = remoteSession.Revision,
+                    PlayerStableId = "player:solo",
+                    ActionCode = SimulationNatureSurvivalCodes.BeginHarvest,
+                    TargetStableId = "resource:nature-tree:01",
+                });
+            Assert.Equal(HttpStatusCode.OK, remoteHarvest.StatusCode);
+            remoteSession = (await remoteHarvest.Content.ReadFromJsonAsync<
+                경영SimulationSessionSnapshot>())!;
+            var remoteHarvestClock = await client.PostAsJsonAsync(
+                remoteRoute + "/nature-survival/clock/advance",
+                new SimulationNatureSurvivalClockAdvanceRequest
+                {
+                    CommandId = "command:regrowth-parity:harvest-clock",
+                    ExpectedRevision = remoteSession.Revision,
+                    ElapsedRealtimeSeconds = NatureSurvivalRules.HarvestWorkSeconds,
+                    WorkInputHeld = true,
+                });
+            Assert.Equal(HttpStatusCode.OK, remoteHarvestClock.StatusCode);
+            remoteSession = (await remoteHarvestClock.Content.ReadFromJsonAsync<
+                경영SimulationSessionSnapshot>())!;
+
+            var clockIndex = 0;
+            while (localSession.NatureSurvival.CycleIndex <
+                   NatureSurvivalRules.TreeRegrowthCycleCount)
+            {
+                var elapsed = Math.Min(60, NatureSurvivalRules.CycleSeconds -
+                    localSession.NatureSurvival.ElapsedSecondsInCycle);
+                var commandId = $"command:regrowth-parity:clock:{clockIndex++}";
+                localSession = await local.Nature.AdvanceRealtimeAsync(
+                    localSession.SessionStableId,
+                    new SimulationNatureSurvivalClockAdvanceRequest
+                    {
+                        CommandId = commandId,
+                        ExpectedRevision = localSession.Revision,
+                        ElapsedRealtimeSeconds = elapsed,
+                    });
+                var response = await client.PostAsJsonAsync(
+                    remoteRoute + "/nature-survival/clock/advance",
+                    new SimulationNatureSurvivalClockAdvanceRequest
+                    {
+                        CommandId = commandId,
+                        ExpectedRevision = remoteSession.Revision,
+                        ElapsedRealtimeSeconds = elapsed,
+                    });
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                remoteSession = (await response.Content.ReadFromJsonAsync<
+                    경영SimulationSessionSnapshot>())!;
+            }
+
+            var localState = await local.Nature.GetAsync(
+                localSession.SessionStableId);
+            var remoteState = await client.GetFromJsonAsync<
+                SimulationNatureSurvivalStateSnapshot>(
+                remoteRoute + "/nature-survival");
+            Assert.NotNull(remoteState);
+            Assert.Equal(localSession.Revision, remoteSession.Revision);
+            Assert.Equal(SimulationNatureSurvivalCodes.Standing,
+                localState.ResourceNodes.Single(value =>
+                    value.ResourceNodeStableId == "resource:nature-tree:01")
+                    .StateCode);
+            Assert.Equal(localState.ResourceNodes.Select(value => new
+                {
+                    value.ResourceNodeStableId,
+                    value.StateCode,
+                    value.RegrowsAtCycleIndex,
+                }), remoteState!.ResourceNodes.Select(value => new
+                {
+                    value.ResourceNodeStableId,
+                    value.StateCode,
+                    value.RegrowsAtCycleIndex,
+                }));
+            var localOpportunity = (await local.Nature
+                .GetPlayerOpportunitiesAsync(localSession.SessionStableId))
+                .Single(value => value.ActionCode ==
+                    SimulationNatureSurvivalCodes.BeginHarvest);
+            var remoteOpportunities = await client.GetFromJsonAsync<
+                Simulation플레이어기회Snapshot[]>(remoteRoute +
+                    "/nature-survival/player-opportunities");
+            var remoteOpportunity = remoteOpportunities!.Single(value =>
+                value.ActionCode == SimulationNatureSurvivalCodes.BeginHarvest);
+            Assert.Equal("resource:nature-tree:01",
+                localOpportunity.TargetStableId);
+            Assert.Equal(localOpportunity.OpportunityStableId,
+                remoteOpportunity.OpportunityStableId);
+            Assert.Equal(localOpportunity.Available,
+                remoteOpportunity.Available);
+            Assert.Equal(localOpportunity.NextPlayerFlowCode,
+                remoteOpportunity.NextPlayerFlowCode);
+
+            await local.Sessions.SaveSlotAsync(localSession.SessionStableId,
+                new SimulationLocalSaveSlotRequest
+                {
+                    SlotStableId = "slot-resource-regeneration-parity",
+                    ExpectedRevision = localSession.Revision,
+                });
+            var localPackage = slotStore.Read(
+                "slot-resource-regeneration-parity").Package;
+            var remoteSave = await client.PostAsJsonAsync(
+                remoteRoute + "/saves",
+                new SimulationSessionSaveRequest
+                {
+                    SaveStableId = localPackage.SaveStableId,
+                    ExpectedRevision = remoteSession.Revision,
+                });
+            Assert.Equal(HttpStatusCode.OK, remoteSave.StatusCode);
+            var remotePackage = (await remoteSave.Content.ReadFromJsonAsync<
+                SimulationSessionSavePackage>())!;
+            Assert.Equal(localPackage.ReplayHash, remotePackage.ReplayHash);
+            var localRegeneration = Assert.Single(
+                localPackage.ActionManifestationLedger!.TailRecords,
+                value => value.WorldInteractionId ==
+                    Simulation세계자원재생Codes.WorldInteractionId);
+            var remoteRegeneration = Assert.Single(
+                remotePackage.ActionManifestationLedger!.TailRecords,
+                value => value.WorldInteractionId ==
+                    Simulation세계자원재생Codes.WorldInteractionId);
+            Assert.Equal(localRegeneration.기록HashSha256,
+                remoteRegeneration.기록HashSha256);
+        }
+        finally
+        {
+            if (Directory.Exists(savesRoot)) Directory.Delete(savesRoot, true);
+        }
+    }
+
+    [Fact]
     public void r5벌목은_지면통나무를만들고_별도줍기WI가_인벤토리로옮긴다()
     {
         var aggregate = new 경영SimulationSessionAggregate(CreateR5Request());
@@ -2199,6 +2518,21 @@ public sealed class SimulationNatureSurvivalTests
                 return seed;
         }
         throw new InvalidOperationException("결정적 조우 seed를 찾지 못했습니다.");
+    }
+
+    private static int FindNonTriggeringSeed(Guid clientRequestId,
+        int throughCycleExclusive)
+    {
+        var sessionId = "simulation-session:" + clientRequestId.ToString("N");
+        for (var seed = 1; seed < 10_000; seed++)
+        {
+            if (Enumerable.Range(0, throughCycleExclusive).All(cycle =>
+                    !NatureSurvivalRules.RollFirstDuskEncounter(
+                        seed, sessionId, cycle, 1)))
+                return seed;
+        }
+        throw new InvalidOperationException(
+            "자원 재생 회귀용 비조우 seed를 찾지 못했습니다.");
     }
 
     private static 경영SimulationSessionAggregate BuildR2Cabin(int extraHarvestCount,

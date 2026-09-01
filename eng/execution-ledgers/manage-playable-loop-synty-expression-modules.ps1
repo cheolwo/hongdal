@@ -142,12 +142,31 @@ foreach ($module in @($catalog.loopModules)) {
         (@($loopH | Sort-Object) -join "|")) "ModuleHCapabilityMismatch:$moduleId"
 
     $coveredWis = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $notApplicableProperty = $module.PSObject.Properties["notApplicableWorldInteractions"]
+    $notApplicableWis = @()
+    if ($null -ne $notApplicableProperty) {
+        $notApplicableWis = @($notApplicableProperty.Value)
+    }
+    foreach ($notApplicable in $notApplicableWis) {
+        $wiId = [string] $notApplicable.worldInteractionId
+        Require-Text $wiId "NotApplicableWiMissing:$moduleId"
+        Require ($declaredWis -contains $wiId) `
+            "NotApplicableWiOutsideModule:${moduleId}:$wiId"
+        Require-Text $notApplicable.reason `
+            "NotApplicableReasonMissing:${moduleId}:$wiId"
+        Require (-not $coveredWis.Contains($wiId)) `
+            "NotApplicableWiDuplicate:${moduleId}:$wiId"
+        [void] $coveredWis.Add($wiId)
+    }
     foreach ($slot in @($module.slots)) {
         $slotId = [string] $slot.slotStableId
         $wiId = [string] $slot.worldInteractionId
         Require-Text $slotId "SlotIdMissing:$moduleId"
         Require (-not $slotIds.ContainsKey($slotId)) "SlotDuplicate:$slotId"
         Require ($declaredWis -contains $wiId) "SlotWiOutsideModule:${slotId}:$wiId"
+        Require (-not (@($notApplicableWis | Where-Object {
+            [string] $_.worldInteractionId -eq $wiId
+        }).Count -gt 0)) "SlotWiAlsoNotApplicable:${slotId}:$wiId"
         Require ($allowedMoments -contains [string] $slot.loopMomentCode) `
             "SlotMomentInvalid:$slotId"
         Require ($allowedRoles -contains [string] $slot.placementRoleCode) `

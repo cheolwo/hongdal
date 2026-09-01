@@ -720,6 +720,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string CabinAccessRequired = "SimulationNatureCabinAccessRequired";
         public const string CabinStorageFull = "SimulationNatureCabinStorageFull";
         public const string TimberNotCarried = "SimulationNatureTimberNotCarried";
+        public const string CabinStoredResourceRequired =
+            "SimulationNatureCabinStoredResourceRequired";
         public const string NightRequired = "SimulationNatureNightRequired";
         public const string CombatActiveClockFrozen =
             "SimulationNatureCombatActiveClockFrozen";

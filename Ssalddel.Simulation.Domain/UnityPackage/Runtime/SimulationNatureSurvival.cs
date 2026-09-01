@@ -52,6 +52,27 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
+        /// <summary>
+        /// Session revision, Nature 결과, 다음 선택과 행위 기록을 같은 잠금에서
+        /// 복제한다. 각 요소를 따로 조회해 서로 다른 revision을 섞지 않는다.
+        /// </summary>
+        public SimulationNature표현관측Snapshot GetNature표현관측Snapshot()
+        {
+            lock (gate)
+            {
+                EnsureNatureSurvivalEnabled();
+                return new SimulationNature표현관측Snapshot
+                {
+                    Session = CreateSnapshot(),
+                    Nature = CreateNatureSurvivalStateSnapshot(),
+                    BuildingProgression = GetAreaBuildingProgression(
+                        Simulation영역건물발전Codes.Nature),
+                    PlayerOpportunities = GetNaturePlayerOpportunities(),
+                    ActionLedger = GetActionManifestationLedger(),
+                };
+            }
+        }
+
         public SimulationNatureSurvivalStateSnapshot RegisterNatureCooperativeActor(
             string actorStableId, decimal inventoryCapacityUnits = 24m)
         {
@@ -306,6 +327,7 @@ namespace Ssalddel.Simulation.Domain
                     throw new SimulationConflictException(
                         SimulationNatureSurvivalCodes.ExpectedRevisionMismatch);
 
+                var regeneratedNodeStableIds = Array.Empty<string>();
                 var combatPaused = IsNatureR2
                     && natureEncounter?.StateCode ==
                         SimulationNatureSurvivalCodes.CombatActive;
@@ -336,7 +358,7 @@ namespace Ssalddel.Simulation.Domain
                     natureCycleIndex = projection.CycleIndex;
                     natureElapsedSecondsInCycle = projection.ElapsedSecondsInCycle;
                     AdvanceNatureLearningVisit();
-                    RegrowNatureResources();
+                    regeneratedNodeStableIds = RegrowNatureResources();
                     TryTriggerFirstDuskEncounter(previousCycleIndex, previousSecond,
                         elapsedSeconds);
                     if (natureSleeping && natureElapsedSecondsInCycle >=
@@ -348,6 +370,14 @@ namespace Ssalddel.Simulation.Domain
 
                 Revision++;
                 AppendNatureSurvivalClockCommand(request);
+                // v28 이전 저장자료의 명령 재생은 행위 원장을 새로 합성하지 않는다.
+                // 현재 Session에서 이미 공통 행위/분야 원장을 사용한 경우에만
+                // 같은 clock command와 revision에 자원 재생 결과를 덧붙인다.
+                if (regeneratedNodeStableIds.Length > 0
+                    && actionManifestationLedgerState != null
+                    && playerDomainProfileState != null)
+                    AppendNatureResourceRegenerationAction(
+                        commandId, regeneratedNodeStableIds);
                 var snapshot = CreateSnapshot();
                 appliedNatureSurvivalCommands.Add(commandId,
                     new AppliedNatureSurvivalCommand(payloadKey, Clone(snapshot)));
@@ -572,6 +602,9 @@ namespace Ssalddel.Simulation.Domain
                     reasons.Add(SimulationNatureSurvivalCodes.CabinRequired);
                 if (!naturePlayerInsideCabin)
                     reasons.Add(SimulationNatureSurvivalCodes.CabinAccessRequired);
+                if (NatureCabinStoredTimberQuantity() <= 0)
+                    reasons.Add(SimulationNatureSurvivalCodes
+                        .CabinStoredResourceRequired);
                 if (NatureSurvivalRules.PhaseAt(natureElapsedSecondsInCycle)
                     != NatureSurvivalClockPhaseCodes.Night)
                     reasons.Add(SimulationNatureSurvivalCodes.NightRequired);
@@ -1037,9 +1070,12 @@ namespace Ssalddel.Simulation.Domain
                 references);
         }
 
-        private void RegrowNatureResources()
+        private string[] RegrowNatureResources()
         {
-            foreach (var node in natureResourceNodes.Values)
+            var regenerated = new List<string>();
+            foreach (var node in natureResourceNodes.Values.OrderBy(
+                         value => value.ResourceNodeStableId,
+                         StringComparer.Ordinal))
             {
                 if (node.StateCode == SimulationNatureSurvivalCodes.Stump
                     && node.RegrowsAtCycleIndex >= 0
@@ -1047,8 +1083,98 @@ namespace Ssalddel.Simulation.Domain
                 {
                     node.StateCode = SimulationNatureSurvivalCodes.Standing;
                     node.RegrowsAtCycleIndex = -1;
+                    regenerated.Add(node.ResourceNodeStableId);
                 }
             }
+            return regenerated.ToArray();
+        }
+
+        private void AppendNatureResourceRegenerationAction(
+            string commandId,
+            string[] regeneratedNodeStableIds)
+        {
+            var regeneratedNodes = regeneratedNodeStableIds
+                .Select(value => natureResourceNodes[value])
+                .ToArray();
+            var worldSystemStableId =
+                "world-system:nature-resource-regeneration";
+            AppendActionManifestationAndProgression(
+                new Simulation행위발현Record
+                {
+                    WorldStableId = TerritoryStableId,
+                    SessionStableId = SessionStableId,
+                    PlayableLoopStableId =
+                        "playable-loop:nature-night-day2.v1",
+                    WorldInteractionId =
+                        Simulation세계자원재생Codes.WorldInteractionId,
+                    CommandId = commandId,
+                    TriggerSourceCode =
+                        SimulationWorldInteractionTriggerSourceCodes.WorldDerived,
+                    InitiatorStableId = worldSystemStableId,
+                    ActorStableId = worldSystemStableId,
+                    ActorKindCode = "WorldSystem",
+                    TargetStableIds = regeneratedNodeStableIds.ToArray(),
+                    OutcomeStableId =
+                        "outcome:resource-regeneration:" + commandId,
+                    PrimaryOutcomeCode = "ResourceAvailabilityRestored",
+                    결과분류Code = Simulation행위결과분류Codes.성공,
+                    변화의미Codes = new[]
+                    {
+                        Simulation세계자원재생Codes.ResourceAvailabilityChanged,
+                    },
+                    영향공간StableIds = regeneratedNodes
+                        .SelectMany(value => new[]
+                        {
+                            value.H2StableId,
+                            value.H1StableId,
+                        })
+                        .Where(value => !string.IsNullOrWhiteSpace(value))
+                        .Distinct(StringComparer.Ordinal)
+                        .OrderBy(value => value, StringComparer.Ordinal)
+                        .ToArray(),
+                    SourceReferenceIds = new[]
+                    {
+                        "rule:" + Simulation세계자원재생Codes.RuleRevision,
+                        "player-progression:not-applicable:" +
+                        Simulation세계자원재생Codes
+                            .PlayerProgressionNotApplicableReason,
+                        "rule:nature-tree-regrowth-cycle-count:" +
+                        NatureSurvivalRules.TreeRegrowthCycleCount.ToString(
+                            CultureInfo.InvariantCulture),
+                    }.Concat(RegenerationOriginCommandReferences(
+                        regeneratedNodeStableIds)).ToArray(),
+                    BeforeWorldRevision = Revision - 1,
+                    AfterWorldRevision = Revision,
+                    AppliedWorldTick = CurrentTick,
+                    RuleRevision =
+                        Simulation세계자원재생Codes.RuleRevision,
+                },
+                progressionPlayerStableId:
+                    natureSurvivalCreationState!.PlayerStableId);
+        }
+
+        private string[] RegenerationOriginCommandReferences(
+            string[] regeneratedNodeStableIds)
+        {
+            if (actionManifestationLedgerState == null)
+                return Array.Empty<string>();
+            var targets = regeneratedNodeStableIds.ToHashSet(StringComparer.Ordinal);
+            return actionManifestationLedgerState.TailRecords
+                .Where(value => value.WorldInteractionId ==
+                                SimulationNatureSurvivalCodes
+                                    .BeginHarvestWorldInteractionId
+                                && value.PrimaryOutcomeCode == "HarvestCompleted"
+                                && value.TargetStableIds.Any(target =>
+                                    targets.Contains(target)))
+                .Select(value => value.CommandId.EndsWith(":completed",
+                        StringComparison.Ordinal)
+                    ? value.CommandId[..^":completed".Length]
+                    : value.CommandId)
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .Select(value => "origin-command:" + value)
+                .ToArray();
         }
 
         private void TryTriggerFirstDuskEncounter(

@@ -21,6 +21,13 @@ public sealed class SimulationNatureSurvivalController(
     public ActionResult<SimulationNatureSurvivalStateSnapshot> Get(string sessionStableId)
         => Execute(() => service.Get(sessionStableId));
 
+    [HttpGet("observation")]
+    [ProducesResponseType(typeof(SimulationNature표현관측Snapshot),
+        StatusCodes.Status200OK)]
+    public ActionResult<SimulationNature표현관측Snapshot> GetObservation(
+        string sessionStableId)
+        => Execute(() => service.GetObservation(sessionStableId));
+
     [HttpGet("player-opportunities")]
     [ProducesResponseType(typeof(Simulation플레이어기회Snapshot[]),
         StatusCodes.Status200OK)]

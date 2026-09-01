@@ -7,6 +7,8 @@ namespace Ssalddel.Simulation.Contracts
     {
         public const string WorldInteractionId = "WI-WORLD-RESOURCE-REGENERATE";
         public const string RuleRevision = "resource-regeneration.r1";
+        public const string PlayerProgressionNotApplicableReason = "WorldDerivedResourceRegeneration";
+        public const string ResourceAvailabilityChanged = "ResourceAvailabilityChanged";
         public const string 식물 = "Plant", 환경묶음 = "Loose";
         public const string 자연 = "Natural", 평탄화 = "Flattened", 건설 = "Construction", 도로 = "Road";
     }
@@ -100,5 +102,7 @@ namespace Ssalddel.Simulation.Contracts
     {
         public bool Reused { get; set; }
         public Simulation세계자원재생Snapshot State { get; set; } = new Simulation세계자원재생Snapshot();
+        public Simulation분야성장적용Snapshot 분야성장적용 { get; set; }
+            = new Simulation분야성장적용Snapshot();
     }
 }

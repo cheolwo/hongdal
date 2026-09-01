@@ -6,7 +6,7 @@ $manager = Join-Path $repositoryRoot `
     "eng/execution-ledgers/manage-playable-loop-synty-expression-modules.ps1"
 $result = @(& $manager -Mode Validate)
 if (($result -join "`n") -notlike
-    "*PlayableLoopSyntyModulesValid:Loops=4;Shared=4;Slots=23;Families=31*") {
+    "*PlayableLoopSyntyModulesValid:Loops=4;Shared=4;Slots=25;Families=31*") {
     throw "PlayableLoopSyntyModuleManagerFailed:$($result -join ';')"
 }
 
@@ -24,10 +24,20 @@ $night = @($catalog.loopModules | Where-Object {
     [string] $_.loopStableId -eq "playable-loop:nature-night-day2.v1"
 })
 if ($night.Count -ne 1 -or
-    @($night[0].worldInteractionIds).Count -ne 3 -or
+    @($night[0].worldInteractionIds).Count -ne 6 -or
     @($night[0].slots | Where-Object {
         [string] $_.placementRoleCode -eq "interior-fixture"
-    }).Count -lt 2) {
+    }).Count -lt 2 -or
+    @($night[0].notApplicableWorldInteractions | Where-Object {
+        [string] $_.worldInteractionId -eq "WI-ACTOR-PLAN-SET" -and
+        -not [string]::IsNullOrWhiteSpace([string] $_.reason)
+    }).Count -ne 1 -or
+    @($night[0].slots | Where-Object {
+        [string] $_.worldInteractionId -eq "WI-HEAT-SOURCE-STATE-CHANGE"
+    }).Count -ne 1 -or
+    @($night[0].slots | Where-Object {
+        [string] $_.worldInteractionId -eq "WI-WORLD-RESOURCE-REGENERATE"
+    }).Count -ne 1) {
     throw "NatureNightDay2SyntyModuleIncomplete"
 }
 
