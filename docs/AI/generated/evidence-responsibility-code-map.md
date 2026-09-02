@@ -2,8 +2,8 @@
 
 > 이 문서는 C# E 책임 Attribute와 현재 E 책임 모듈 대장에서 자동 생성된다. 직접 수정하지 않는다.
 
-- 후보 타입: `771`
-- 책임 지정: `768`
+- 후보 타입: `772`
+- 책임 지정: `769`
 - 사유 있는 제외: `3`
 - 미분류: `0`
 - 메서드 책임: `17`
@@ -12,7 +12,7 @@
 
 | E | G | 모듈 | 대표 | 보조 |
 | --- | --- | --- | ---: | ---: |
-| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 104 | 0 |
+| `E1` | `G1` | `E1핵심계약Module` 핵심 계약 | 105 | 0 |
 | `E2` | `G1` | `E2실행경계Module` 실행 경계 | 241 | 0 |
 | `E3` | `G1` | `E3회귀증거Module` 회귀 증거 | 246 | 1 |
 | `E4` | `G1` | `E4실행문맥결속Module` 실행 문맥 결속 | 51 | 0 |
@@ -33,7 +33,7 @@
 | `E1` | `E1저장재생계약Module` 저장·재생 계약 | `E1.SaveReplayContract` | Save schema·Command Log·Replay hash의 호환 계약을 정의한다. | 2 | 0 |
 | `E1` | `E1세션권위계약Module` 세션 권위 계약 | `E1.SessionAuthorityContract` | Session 식별자·Revision·시간과 상태 권위의 불변 경계를 정의한다. | 4 | 0 |
 | `E1` | `E1공간계약Module` 공간 계약 | `E1.SpatialContract` | H·AreaSet·Graph·Handover의 안정 식별자와 구조 계약을 정의한다. | 11 | 0 |
-| `E1` | `E1세계상호작용계약Module` 세계 상호작용 계약 | `E1.WorldInteractionContract` | WI 목적·StableId·허용 발생원과 Preview·Confirm 계약을 정의한다. | 28 | 0 |
+| `E1` | `E1세계상호작용계약Module` 세계 상호작용 계약 | `E1.WorldInteractionContract` | WI 목적·StableId·허용 발생원과 Preview·Confirm 계약을 정의한다. | 29 | 0 |
 | `E2` | `E2로컬권위AdapterModule` 로컬 권위 Adapter | `E2.LocalAuthorityAdapter` | Solo LocalProcess에서 공통 Simulation Core를 실행한다. | 1 | 0 |
 | `E2` | `E2원격HostAdapterModule` 원격 Host Adapter | `E2.RemoteHostAdapter` | Hosted Server에서 같은 Core를 HTTP 경계로 노출한다. | 11 | 0 |
 | `E2` | `E2세션실행Module` 세션 실행 | `E2.SessionExecution` | Session 생성·조회·Tick·Save/Load의 공통 실행 포트를 제공한다. | 4 | 0 |
@@ -314,6 +314,7 @@
 | `Ssalddel.Simulation.Contracts.Simulation열원InitialState` | `E1` | `` | `` | `WI-HEAT-SOURCE-STATE-CHANGE` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.Simulation용기내용물Snapshot` | `E1` | `` | `` | `WI-ACTOR-CONSUME,WI-CRAFT-BREW` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.Simulation작업참여PolicyCatalogSnapshot` | `E1` | `` | `` | `` | `Annotated` |
+| `Ssalddel.Simulation.Contracts.Simulation첫벌목성찰SeedSnapshot` | `E1` | `E1.WorldInteractionContract` | `` | `WI-NATURE-06` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.Simulation파티공명잔향CandidateSnapshot` | `E1` | `E1.WorldInteractionContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.Simulation파티공명중첩CandidateSnapshot` | `E1` | `E1.WorldInteractionContract` | `` | `` | `Annotated` |
 | `Ssalddel.Simulation.Contracts.Simulation파티공명회복CandidateSnapshot` | `E1` | `E1.WorldInteractionContract` | `` | `` | `Annotated` |

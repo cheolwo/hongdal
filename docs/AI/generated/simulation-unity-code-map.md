@@ -81,6 +81,7 @@ Simulation·Unity
 │  ├─ 023 contract.gwangbok-self-recovery-action-candidate · Contract · Definition
 │  ├─ 023 domain.nature-expert-threat-candidate-readiness · Domain · Query
 │  ├─ 023 domain.nature-sleep-protection-spatial-layer-candidate · Domain · Query
+│  ├─ 024 contract.first-logging-reflection-seed · Contract · Definition
 │  ├─ 024 contract.gwangbok-resonance-maintenance-candidate · Contract · Definition
 │  ├─ 024 domain.meditation-focus-access-candidate-readiness · Domain · Query
 │  ├─ 025 contract.personal-recovery-decay-candidate · Contract · Definition
@@ -533,6 +534,11 @@ Simulation·Unity
   - 읽기/쓰기: `SimulationState → None`
   - 부수효과: `None`
   - 경계: 공간층 근거 준비도만 판정하며 H 정의·배치·Collider·Graph·보호 상태를 변경하지 않는다.
+- **024 contract.first-logging-reflection-seed** — [Simulation첫벌목성찰SeedSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFirstLoggingReflectionContracts.cs) · 실제 첫 벌목 행위 기록과 한스 집 안전 휴식 근거에서 관찰·원인·개선 성찰 씨앗을 준비한다.
+  - 계층/단계: `Contract / Definition`
+  - 읽기/쓰기: `SimulationState → None`
+  - 부수효과: `None`
+  - 경계: ActionRecord와 안전 휴식 근거를 읽을 뿐 벌목·휴식·보상·편린을 새로 만들지 않는다.
 - **024 contract.gwangbok-resonance-maintenance-candidate** — [Simulation광복기공명유지CandidateSnapshot](../../../Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureMindContracts.cs) · 자기 행위로 진입한 광복기에서 공명·잔향은 감쇠를 늦추지만 영구 유지하지 못하고 주기적 자기 회복 행위를 요구한다.
   - 계층/단계: `Contract / Definition`
   - 읽기/쓰기: `SimulationState → None`

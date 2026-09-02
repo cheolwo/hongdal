@@ -1,6 +1,6 @@
 {
   "schemaVersion": "codex-playable-loop-goals.v4",
-  "revision": "codex-playable-loop-goals.r140",
+  "revision": "codex-playable-loop-goals.r141",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "worldInteractionDeliveryPriorityPath": "eng/execution-ledgers/world-interaction-delivery-priorities.json",
   "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
@@ -886,6 +886,44 @@
         "designRevision": "nature-herbal-tea.hb01-addendum.r1",
         "designHashSha256": "745BFB5519B0C9BD545B2687130AFA92549B807ACF85C2BEE73762F6EE4A87B6",
         "approvalEvidenceRef": "docs/AI/야간개발-분야별시각진척-2026-08-31.md"
+      }
+    },
+    {
+      "workItemId": "work:nature-shelter:first-logging-reflection-seed",
+      "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+      "worldInteractionId": "WI-NATURE-06",
+      "trackCode": "Logic",
+      "targetEvidenceStageCode": "E3",
+      "statusCode": "Integrated",
+      "integrationReceiptRef": "artifacts/local/validation/first-logging-reflection-p0/integration-receipt.json",
+      "integrationReceiptSha256": "AD2CF74D287BFDCA7DEC62150DC980A25069185648693CA963E23F9EF9773FF9",
+      "ownerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+      "worktreePath": "C:/Users/user/source/repos/Hongdal",
+      "writePaths": [
+        "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFirstLoggingReflectionContracts.cs",
+        "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFirstLoggingReflection.cs",
+        "Ssalddel.Simulation.Tests/SimulationFocusMeditationTests.cs",
+        "eng/execution-ledgers/work-orders/nature-logging-focus-meditation.e7-work-order.json",
+        "docs/Reports/한스집-첫벌목명상-P0-개발통합-2026-09-02.md"
+      ],
+      "sharedContractKeys": [
+        "first-logging-reflection-seed"
+      ],
+      "dependsOnWorkItemIds": [],
+      "baselineFiles": [
+        {
+          "path": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md",
+          "sha256": "1B0BDA2D9859372CF6D4E4F42C358BE18F7CD5512B9F8C61515C7F49311FFA7D"
+        }
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/nature-logging-focus-meditation.e7-work-order.json",
+      "workOrderSha256": "3EF0D631CB0E1FEE47E178AC664ECCD9B3DD403FCB9DD0A7F4CD066ECE1094E5",
+      "planningGate": {
+        "statusCode": "Approved",
+        "designDocumentRef": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md",
+        "designRevision": "dual-possession-alchemist-succession.r63",
+        "designHashSha256": "1B0BDA2D9859372CF6D4E4F42C358BE18F7CD5512B9F8C61515C7F49311FFA7D",
+        "approvalEvidenceRef": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md"
       }
     }
   ],

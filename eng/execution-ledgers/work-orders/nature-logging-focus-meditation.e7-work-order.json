@@ -13,6 +13,48 @@
     "currentPass": "StableOrExplicitlyBlocked",
     "nextReopenCondition": "현재 nature-night-day2 Goal 완료 뒤 같은 PlayableUnit의 승인 기획 판본으로 활성화하고 Unity 실제 입력·표현 궤적을 연다."
   },
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md",
+    "designRevision": "dual-possession-alchemist-succession.r65",
+    "designHashSha256": "9FAE03C1CF38A2A73D2B4E29E3E1C34ACEBA97B9AC9784D56D2B16CFEAFA7EA9",
+    "approvalEvidenceRef": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md"
+  },
+  "firstLoggingReflectionP0": {
+    "revision": "first-logging-reflection-seed.r1",
+    "scope": "플레이어 본인의 실제 첫 WI-NATURE-06 완료 ActionRecord와 한스 집 첫날밤의 검증된 안전 휴식을 입력으로 결정적 성찰 씨앗을 준비하고 관찰→원인→개선 진행·중단 재개·기존 성장 계보의 한 번 적용을 검증한다.",
+    "sourcePlanIds": [
+      "PLAN-STORY-DUAL-PROTAGONIST-001",
+      "PLAN-GAMEPLAY-MEDITATION-ACTION-001"
+    ],
+    "writePaths": [
+      "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFirstLoggingReflectionContracts.cs",
+      "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFirstLoggingReflection.cs",
+      "Ssalddel.Simulation.Tests/SimulationFocusMeditationTests.cs",
+      "docs/Reports/한스집-첫벌목명상-P0-개발통합-2026-09-02.md"
+    ],
+    "reuseApis": [
+      "Simulation행위발현LedgerEngine",
+      "Simulation플레이어분야Engine.ApplyMeditation",
+      "SimulationStateSchemaVersion.V29"
+    ],
+    "validation": "플레이어 최초 벌목/NPC 제외/안전 휴식 판본/결정적 씨앗/편린 접두부/중단 재개/기존 양수 집중 근거/동일 씨앗 1회/v29 재계산과 중복 방지",
+    "focusedTests": {
+      "total": 13,
+      "failed": 0,
+      "skipped": 0,
+      "resultRef": "artifacts/local/validation/first-logging-reflection-p0/first-logging-reflection.trx"
+    },
+    "remainingProductGaps": [
+      "실제 한스 집 안전 휴식 공급자",
+      "성찰 진행 상태의 제품 Save 소비 경로",
+      "명상 UI·Unity 실제 입력"
+    ],
+    "p1Excluded": true,
+    "newGrowthAmountAllowed": false,
+    "editorAllowed": false,
+    "automaticPromotionAllowed": false
+  },
   "changeImpactReviewRef": "docs/Architecture/벌목집중과명상숙련체계.md",
   "additionalApprovals": [
     {
@@ -33,14 +75,14 @@
         { "code": "E6", "disposition": "Affected", "summary": "성공·실패·취소·다음 행동 설명과 회복 경로를 검증한다." },
         { "code": "E5", "disposition": "ReusedWithVerification", "summary": "공통 실행 파이프라인에서 벌목 완료 행위 기록과 현장·명상·개인 회복 효과를 같은 개정 계보로 결속한 구현을 재검증한다." },
         { "code": "E4", "disposition": "ReusedWithVerification", "summary": "WI-NATURE-06 Task와 선택적 FocusTiming Challenge 결속을 재검증한다." },
-        { "code": "E3", "disposition": "ReusedWithVerification", "summary": "정수 판정, 작은 Milli 기여, 중복 방지, v29 Save/Replay 시험을 재검증한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "첫 벌목 ActionRecord·한스 집 안전 휴식·결정적 성찰 씨앗·관찰→원인→개선 진행과 기존 명상 기여의 중복 방지/v29 재계산을 검증한다." },
         { "code": "E2", "disposition": "ReusedWithVerification", "summary": "LocalProcess 서비스와 RemoteHost HTTP 입력 경계를 재검증한다." },
         { "code": "E1", "disposition": "Defined", "summary": "기본 벌목 성공과 집중 수행 품질을 분리한다." }
       ],
       "upwardValidation": [
         { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/Architecture/벌목집중과명상숙련체계.md"] },
         { "code": "E2", "status": "Passed", "evidenceRefs": ["SimulationNatureSurvivalService.SubmitFocusTiming"] },
-        { "code": "E3", "status": "Passed", "evidenceRefs": ["test:SimulationFocusMeditationTests"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["test:SimulationFocusMeditationTests:13/13", "docs/Reports/한스집-첫벌목명상-P0-개발통합-2026-09-02.md"] },
         { "code": "E4", "status": "Passed", "evidenceRefs": ["WI-NATURE-06"] },
         { "code": "E5", "status": "Passed", "evidenceRefs": ["test:SimulationNatureSurvivalTests.벌목집중은_완료때만_현장과명상을지급하고_v29재생을보존한다"] },
         { "code": "E6", "status": "Blocked", "evidenceRefs": [] },

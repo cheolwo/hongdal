@@ -231,6 +231,167 @@ public sealed class SimulationFocusMeditationTests
         }
     }
 
+    [Fact]
+    public void 첫벌목성찰은_실제플레이어벌목과_한스집안전휴식이_모두필요하다()
+    {
+        var npcLedger = new Simulation행위발현Ledger("world:nature");
+        var npcRecord = FirstLoggingRecord(npcLedger, "npc:worker", "Npc",
+            SimulationWorldInteractionTriggerSourceCodes.NpcDriven);
+        var missingPlayerAction = Simulation첫벌목성찰SeedEngine.Prepare(new()
+        {
+            PlayerStableId = "player:one",
+            ActionHistoryComplete = true,
+            ActionRecords = new[] { npcRecord },
+            SafeRestEvidence = HansSafeRest(4),
+        });
+
+        Assert.Equal(Simulation첫벌목성찰Codes.NotReady,
+            missingPlayerAction.StatusCode);
+        Assert.Equal(Simulation첫벌목성찰Codes.FirstPlayerLoggingRequired,
+            Assert.Single(missingPlayerAction.ReasonCodes));
+
+        var playerLedger = new Simulation행위발현Ledger("world:nature");
+        var playerRecord = FirstLoggingRecord(playerLedger);
+        var missingRest = Simulation첫벌목성찰SeedEngine.Prepare(new()
+        {
+            PlayerStableId = "player:one",
+            ActionHistoryComplete = true,
+            ActionRecords = new[] { playerRecord },
+        });
+        Assert.Equal(Simulation첫벌목성찰Codes.HansHouseSafeRestRequired,
+            Assert.Single(missingRest.ReasonCodes));
+
+        var ready = Simulation첫벌목성찰SeedEngine.Prepare(new()
+        {
+            PlayerStableId = "player:one",
+            ActionHistoryComplete = true,
+            ActionRecords = new[] { playerRecord },
+            SafeRestEvidence = HansSafeRest(4),
+        });
+        Assert.Equal(Simulation첫벌목성찰Codes.Ready, ready.StatusCode);
+        Assert.Equal(playerRecord.행위기록StableId,
+            ready.SourceActionRecordStableId);
+        Assert.Equal(new[]
+        {
+            Simulation첫벌목성찰Codes.Observation,
+            Simulation첫벌목성찰Codes.Cause,
+            Simulation첫벌목성찰Codes.Improvement,
+        }, ready.OrderedFragmentCodes);
+        Assert.False(ready.CreatesActionRecord);
+        Assert.False(ready.ChangesWorldState);
+    }
+
+    [Fact]
+    public void 첫벌목성찰은_중단후_같은씨앗과_관찰진행으로재개한다()
+    {
+        var ledger = new Simulation행위발현Ledger("world:nature");
+        var record = FirstLoggingRecord(ledger);
+        var request = new Simulation첫벌목성찰SeedRequest
+        {
+            PlayerStableId = "player:one",
+            ActionHistoryComplete = true,
+            ActionRecords = new[] { record },
+            SafeRestEvidence = HansSafeRest(4),
+        };
+        var first = Simulation첫벌목성찰SeedEngine.Prepare(request);
+        request.PreviousProgress = Simulation첫벌목성찰SeedEngine.CreateProgress(
+            first.SeedStableId, first.SourceActionRecordStableId,
+            new[] { Simulation첫벌목성찰Codes.Observation }, true);
+
+        var resumed = Simulation첫벌목성찰SeedEngine.Prepare(request);
+
+        Assert.Equal(first.SeedStableId, resumed.SeedStableId);
+        Assert.Equal(Simulation첫벌목성찰Codes.Interrupted,
+            resumed.StatusCode);
+        Assert.Equal(new[] { Simulation첫벌목성찰Codes.Observation },
+            resumed.Progress.ConnectedFragmentCodes);
+        Assert.Throws<SimulationContractException>(() =>
+            Simulation첫벌목성찰SeedEngine.CreateProgress(first.SeedStableId,
+                first.SourceActionRecordStableId,
+                new[] { Simulation첫벌목성찰Codes.Cause }, true));
+    }
+
+    [Fact]
+    public void 첫벌목성찰보상은_기존집중값만사용하고_같은씨앗에한번만_v29로복원된다()
+    {
+        var ledger = new Simulation행위발현Ledger("world:nature");
+        var record = FirstLoggingRecord(ledger);
+        var seedRequest = new Simulation첫벌목성찰SeedRequest
+        {
+            PlayerStableId = "player:one",
+            ActionHistoryComplete = true,
+            ActionRecords = new[] { record },
+            SafeRestEvidence = HansSafeRest(4),
+        };
+        var seed = Simulation첫벌목성찰SeedEngine.Prepare(seedRequest);
+        var focus = Simulation집중판정Policy.Evaluate(
+            Challenge(Simulation집중판정Codes.Standard), 500);
+        focus.SourceActionRecordStableId = record.행위기록StableId;
+        focus.AppliedWorldRevision = record.AfterWorldRevision;
+        var proficiency = new Simulation플레이어분야Engine("player:one");
+        var reward = Simulation첫벌목성찰SeedEngine.PrepareReward(new()
+        {
+            Seed = seed,
+            ConnectedFragmentCodes = seed.OrderedFragmentCodes,
+            SourceActionRecord = record,
+            ApprovedFocusResult = focus,
+            PlayerDomainProfile = proficiency.Snapshot(),
+        });
+
+        Assert.Equal(Simulation첫벌목성찰Codes.RewardReady,
+            reward.RewardStatusCode);
+        Assert.False(reward.CreatesNewRewardAmount);
+        Assert.Equal(focus.명상경험증가Milli,
+            reward.MeditationProgressionRequest!.집중판정결과.명상경험증가Milli);
+        var profile = proficiency.ApplyMeditation(
+            reward.MeditationProgressionRequest);
+        var alreadyApplied = Simulation첫벌목성찰SeedEngine.PrepareReward(new()
+        {
+            Seed = seed,
+            ConnectedFragmentCodes = seed.OrderedFragmentCodes,
+            SourceActionRecord = record,
+            ApprovedFocusResult = focus,
+            PlayerDomainProfile = profile,
+        });
+        Assert.Equal(Simulation첫벌목성찰Codes.RewardAlreadyApplied,
+            alreadyApplied.RewardStatusCode);
+        Assert.Single(profile.명상기여기록들);
+
+        var session = CreateSession();
+        var save = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:first-logging-reflection:v29",
+            ExpectedRevision = session.Revision,
+            ActionManifestationLedger = ledger.Snapshot(),
+            PlayerDomainProfile = profile,
+        });
+        var restored = SimulationSessionReplay.Restore(save);
+        var savedAgain = restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = save.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        });
+        var restoredRecord = Assert.Single(
+            savedAgain.ActionManifestationLedger!.TailRecords);
+        seedRequest.ActionRecords = new[] { restoredRecord };
+        var restoredSeed = Simulation첫벌목성찰SeedEngine.Prepare(seedRequest);
+        var restoredReward = Simulation첫벌목성찰SeedEngine.PrepareReward(new()
+        {
+            Seed = restoredSeed,
+            ConnectedFragmentCodes = restoredSeed.OrderedFragmentCodes,
+            SourceActionRecord = restoredRecord,
+            ApprovedFocusResult = focus,
+            PlayerDomainProfile = savedAgain.PlayerDomainProfile!,
+        });
+
+        Assert.Equal(SimulationSaveSchemaVersions.V29, save.SchemaVersion);
+        Assert.Equal(save.ReplayHash, savedAgain.ReplayHash);
+        Assert.Equal(seed.SeedStableId, restoredSeed.SeedStableId);
+        Assert.Equal(Simulation첫벌목성찰Codes.RewardAlreadyApplied,
+            restoredReward.RewardStatusCode);
+        Assert.Single(savedAgain.PlayerDomainProfile!.명상기여기록들);
+    }
+
     private static Simulation집중판정ChallengeSnapshot Challenge(string mode)
         => new()
         {
@@ -242,6 +403,53 @@ public sealed class SimulationFocusMeditationTests
             분야StableId = Simulation플레이어분야Codes.채집자원,
             세부숙련StableId = Simulation집중판정Codes.Logging,
             Policy = Simulation집중판정Policy.Create(mode),
+        };
+
+    private static Simulation행위발현Record FirstLoggingRecord(
+        Simulation행위발현Ledger ledger,
+        string actorStableId = "player:one", string actorKindCode = "Player",
+        string triggerSourceCode = SimulationWorldInteractionTriggerSourceCodes.PlayerDriven)
+        => ledger.Append(new Simulation행위발현Record
+        {
+            WorldStableId = "world:nature",
+            SessionStableId = "session:nature",
+            PlayableLoopStableId = "playable-loop:nature-shelter-foundation.v1",
+            WorldInteractionId = Simulation첫벌목성찰Codes.WorldInteractionId,
+            CommandId = "command:first-logging:complete:" + actorStableId,
+            TriggerSourceCode = triggerSourceCode,
+            InitiatorStableId = actorStableId,
+            ActorStableId = actorStableId,
+            ActorKindCode = actorKindCode,
+            TargetStableIds = new[] { "resource:nature-tree:first" },
+            OutcomeStableId = "outcome:first-logging:complete:" + actorStableId,
+            PrimaryOutcomeCode = Simulation첫벌목성찰Codes.HarvestCompleted,
+            결과분류Code = Simulation행위결과분류Codes.성공,
+            EffectBatchStableId = "effect-batch:first-logging:" + actorStableId,
+            EffectReceiptStableIds = new[]
+            {
+                "effect-receipt:first-logging:" + actorStableId,
+            },
+            변화의미Codes = new[]
+            {
+                Simulation행위변화의미Codes.세계객체생성,
+                Simulation행위변화의미Codes.플레이어진척변경,
+            },
+            BeforeWorldRevision = 2,
+            AfterWorldRevision = 3,
+            AppliedWorldTick = 3,
+            RuleRevision = "fixture.first-logging.r1",
+        });
+
+    private static Simulation안전휴식근거Snapshot HansSafeRest(
+        long worldRevision)
+        => new()
+        {
+            EvidenceStableId = "safe-rest-evidence:hans-house:first-night",
+            PlayerStableId = "player:one",
+            PlaceStableId = Simulation첫벌목성찰Codes.HansHouseSafeRest,
+            SafeRestConfirmed = true,
+            AppliedWorldRevision = worldRevision,
+            RuleRevision = "fixture.hans-safe-rest.r1",
         };
 
     private static 경영SimulationSessionAggregate CreateSession()

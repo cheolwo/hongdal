@@ -8,7 +8,7 @@
       "managementSystem": "G1",
       "koreanName": "\uD575\uC2EC \uACC4\uC57D",
       "technicalName": "E1\uD575\uC2EC\uACC4\uC57DModule",
-      "primaryCount": 104,
+      "primaryCount": 105,
       "secondaryCount": 0
     },
     {
@@ -127,7 +127,7 @@
       "koreanName": "\uC138\uACC4 \uC0C1\uD638\uC791\uC6A9 \uACC4\uC57D",
       "technicalName": "E1\uC138\uACC4\uC0C1\uD638\uC791\uC6A9\uACC4\uC57DModule",
       "responsibility": "WI \uBAA9\uC801\u00B7StableId\u00B7\uD5C8\uC6A9 \uBC1C\uC0DD\uC6D0\uACFC Preview\u00B7Confirm \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
-      "primaryCount": 28,
+      "primaryCount": 29,
       "secondaryCount": 0
     },
     {
@@ -4813,8 +4813,8 @@
       "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNature\uD45C\uD604\uAD00\uCE21Contracts.cs",
       "coverageState": "Annotated",
       "primaryEvidenceStage": "E1",
-      "responsibility": "Nature \uC0C1\uD0DC\uC640 \uC644\uB8CC \uD589\uC704 \uC6D0\uC7A5\uC744 \uB3D9\uC77C \uAD8C\uC704 \uC77D\uAE30 \uAD6C\uAC04\uC73C\uB85C \uBB36\uB294\uB2E4.",
-      "boundary": "\uC77D\uAE30 \uC0AC\uBCF8\uC774\uBA70 \uAD8C\uC704 \uBA85\uB839\u00B7Save \uD615\uC2DD\u00B7Remote API\u00B7\uC2E4\uC81C \uD45C\uD604 \uC644\uB8CC\uB97C \uCD94\uAC00\uD558\uC9C0 \uC54A\uB294\uB2E4.",
+      "responsibility": "Nature \uC0C1\uD0DC\u00B7\uC644\uB8CC \uD589\uC704 \uC6D0\uC7A5\u00B7\uB2E4\uC74C \uC120\uD0DD\uC744 \uB3D9\uC77C \uAD8C\uC704 \uC77D\uAE30 \uAD6C\uAC04\uC73C\uB85C \uBB36\uB294\uB2E4.",
+      "boundary": "\uC77D\uAE30 \uC0AC\uBCF8\uC774\uBA70 \uAD8C\uC704 \uBA85\uB839\u00B7Save \uD615\uC2DD\u00B7\uC2E4\uC81C \uD45C\uD604 \uC644\uB8CC\uB97C \uCD94\uAC00\uD558\uC9C0 \uC54A\uB294\uB2E4.",
       "primarySubmoduleKey": "",
       "secondaryEvidenceStages": [],
       "secondarySubmoduleKeys": [],
@@ -5532,6 +5532,31 @@
       "workOrderIds": [],
       "featureKeys": [],
       "stepKeys": []
+    },
+    {
+      "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.Simulation\uCCAB\uBC8C\uBAA9\uC131\uCC30SeedSnapshot",
+      "isCoverageCandidate": true,
+      "assemblyName": "Ssalddel.Simulation.Contracts",
+      "componentName": "Ssalddel.Simulation.Contracts.Simulation\uCCAB\uBC8C\uBAA9\uC131\uCC30SeedSnapshot",
+      "memberKind": "Type",
+      "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFirstLoggingReflectionContracts.cs",
+      "coverageState": "Annotated",
+      "primaryEvidenceStage": "E1",
+      "responsibility": "\uD55C\uC2A4 \uC9D1 \uCCAB \uBC8C\uBAA9 \uBA85\uC0C1\uC758 \uC131\uCC30 \uC528\uC557\u00B7\uC911\uB2E8\u00B7\uC7AC\uAC1C\u00B7\uD55C \uBC88 \uBCF4\uC0C1 \uC900\uBE44 \uACC4\uC57D\uC744 \uC815\uC758\uD55C\uB2E4.",
+      "boundary": "Logic \uC900\uBE44 \uACC4\uC57D\uC774\uBA70 \uD55C\uC2A4 \uC9D1 \uC2E4\uC81C \uD734\uC2DD \uC5F0\uACB0\u00B7Unity \uD654\uBA74\u00B7\uC774\uB370\uC544 \uD3B8\uB9B0 \uD68D\uB4DD \uC99D\uAC70\uAC00 \uC544\uB2C8\uB2E4.",
+      "primarySubmoduleKey": "E1.WorldInteractionContract",
+      "secondaryEvidenceStages": [],
+      "secondarySubmoduleKeys": [],
+      "worldInteractionIds": [
+        "WI-NATURE-06"
+      ],
+      "workOrderIds": [],
+      "featureKeys": [
+        "simulation-world-derivation"
+      ],
+      "stepKeys": [
+        "contract.first-logging-reflection-seed"
+      ]
     },
     {
       "componentId": "Ssalddel.Simulation.Contracts:Ssalddel.Simulation.Contracts.Simulation\uD30C\uD2F0\uACF5\uBA85\uC794\uD5A5CandidateSnapshot",
@@ -17098,8 +17123,8 @@
     }
   ],
   "coverage": {
-    "candidateTypeCount": 771,
-    "annotatedTypeCount": 768,
+    "candidateTypeCount": 772,
+    "annotatedTypeCount": 769,
     "excludedTypeCount": 3,
     "uncoveredTypeCount": 0,
     "annotatedMethodCount": 17

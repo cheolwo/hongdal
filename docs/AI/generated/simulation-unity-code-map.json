@@ -1440,6 +1440,23 @@
         },
         {
           "flowOrder": 24,
+          "stepKey": "contract.first-logging-reflection-seed",
+          "dependsOnStepKeys": [],
+          "executionStage": "Definition",
+          "layer": "Contract",
+          "componentType": "Ssalddel.Simulation.Contracts.Simulation\uCCAB\uBC8C\uBAA9\uC131\uCC30SeedSnapshot",
+          "assembly": "Ssalddel.Simulation.Contracts",
+          "sourcePath": "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFirstLoggingReflectionContracts.cs",
+          "responsibility": "\uC2E4\uC81C \uCCAB \uBC8C\uBAA9 \uD589\uC704 \uAE30\uB85D\uACFC \uD55C\uC2A4 \uC9D1 \uC548\uC804 \uD734\uC2DD \uADFC\uAC70\uC5D0\uC11C \uAD00\uCC30\u00B7\uC6D0\uC778\u00B7\uAC1C\uC120 \uC131\uCC30 \uC528\uC557\uC744 \uC900\uBE44\uD55C\uB2E4.",
+          "effects": [],
+          "readsFrom": [
+            "SimulationState"
+          ],
+          "writesTo": [],
+          "boundary": "ActionRecord\uC640 \uC548\uC804 \uD734\uC2DD \uADFC\uAC70\uB97C \uC77D\uC744 \uBFD0 \uBC8C\uBAA9\u00B7\uD734\uC2DD\u00B7\uBCF4\uC0C1\u00B7\uD3B8\uB9B0\uC744 \uC0C8\uB85C \uB9CC\uB4E4\uC9C0 \uC54A\uB294\uB2E4."
+        },
+        {
+          "flowOrder": 24,
           "stepKey": "contract.gwangbok-resonance-maintenance-candidate",
           "dependsOnStepKeys": [],
           "executionStage": "Definition",

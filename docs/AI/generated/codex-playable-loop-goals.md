@@ -2,7 +2,7 @@
 
 > 이 문서는 `eng/execution-ledgers/codex-playable-loop-goals.json`에서 자동 생성된다. 직접 수정하지 않는다.
 
-- Goal 원장 개정: `codex-playable-loop-goals.r140`
+- Goal 원장 개정: `codex-playable-loop-goals.r141`
 - Goal WIP: `5/상한 없음`
 - WI WIP: `6/상한 없음`
 - 담당별 강제 상한 없음. 승인·의존성·쓰기 소유권으로 실행 가능 여부를 판정한다.
@@ -75,6 +75,7 @@ E7 PlayClosed까지 닫는다.
 | work:nature-camp-visitor-stay:e5-logic | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
 | work:nature-camp-visitor-stay:local-npc-dialogue | playable-loop:nature-camp-visitor-stay.v1<br>WI-COMMUNITY-VISITOR-STAY | Presentation / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | ReadyForIntegration |  |
 | work:nature-resource-regeneration:logic | playable-loop:nature-night-day2.v1<br>WI-WORLD-RESOURCE-REGENERATE | Logic / E5 | 01a02198-8b2a-7491-ac93-366b30ff474c | ReadyForIntegration |  |
+| work:nature-shelter:first-logging-reflection-seed | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Logic / E3 | 01a02198-8b2a-7491-ac93-366b30ff474c | Integrated | IntegrationReceiptInvalid |
 | work:nature-shelter:locomotion-comparison-preparation | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a04676-8d10-7480-b851-707fbd655d46 | Active |  |
 | work:nature-shelter:locomotion-synchronous-render-preparation | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a04fb7-7c73-75a3-b7c2-a29c64766c26 | Active |  |
 | work:nature-shelter:woodcutting-animation-integration | playable-loop:nature-shelter-foundation.v1<br>WI-NATURE-06 | Presentation / E4 | 01a02198-8b2a-7491-ac93-366b30ff474c | Active |  |
