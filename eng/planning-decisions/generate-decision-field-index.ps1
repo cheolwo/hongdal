@@ -162,6 +162,7 @@ function Resolve-DecisionField([int]$Id, [string]$Title) {
     if ($Id -eq 553) { return @('GAMEPLAY', 'COMBAT-DIVIDE-CONQUER') }
     if ($Id -eq 554) { return @('PRESENTATION', 'SYNTY-SURVEY-HANDOFF') }
     if ($Id -eq 555) { return @('PRESENTATION', 'FARM-BOUNDARY-BEAST') }
+    if ($Id -eq 556) { return @('GAMEPLAY', 'FIVE-ELEMENT-RECOVERY-PURPOSE') }
 
     throw "분류되지 않은 결정: D-$('{0:D3}' -f $Id) $Title"
 }

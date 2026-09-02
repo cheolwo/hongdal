@@ -11,7 +11,7 @@
 
 ## 전수 요약
 
-- 결정 **552개**, 공식 WI **105개**, 명시 관계 **76쌍**
+- 결정 **553개**, 공식 WI **105개**, 명시 관계 **76쌍**
 - WI가 명시된 결정 **26개**, 결정을 명시적으로 연결한 WI **40개**
 - 비정규 WI 표기 **2종 / 3건**
 - WI 대장 판본: `simulation-world-interactions.r43`
@@ -572,6 +572,7 @@
 | [D-553](../DECISIONS.md#L5342) | `D-GAMEPLAY-COMBAT-DIVIDE-CONQUER-001` | `GAMEPLAY` / `COMBAT-DIVIDE-CONQUER` | 강대한 적의 종합 역량은 구성 노드와 지원 연결을 실제로 분리해 낮출 수 있다 | 미명시 | `NoExplicitCanonicalLink` |
 | [D-554](../DECISIONS.md#L5352) | `D-PRESENTATION-SYNTY-SURVEY-HANDOFF-001` | `PRESENTATION` / `SYNTY-SURVEY-HANDOFF` | 최근 확정 기획의 Synty 표현 요구를 선별해 개발·전문 조사로 인계한다 | 미명시 | `NoExplicitCanonicalLink` |
 | [D-555](../DECISIONS.md#L5361) | `D-PRESENTATION-FARM-BOUNDARY-BEAST-001` | `PRESENTATION` / `FARM-BOUNDARY-BEAST` | 첫 경계 마수는 동물형·야수형 의미를 유지하고 현재 사람형 후보는 미확보 보류한다 | 미명시 | `NoExplicitCanonicalLink` |
+| [D-556](../DECISIONS.md#L5369) | `D-GAMEPLAY-FIVE-ELEMENT-RECOVERY-PURPOSE-001` | `GAMEPLAY` / `FIVE-ELEMENT-RECOVERY-PURPOSE` | 게임의 상위 목적은 나와 상대의 오행 순환을 회복시켜 광복기 가능성을 넓히는 것이다 | 미명시 | `NoExplicitCanonicalLink` |
 
 ## WI에서 결정 보기
 

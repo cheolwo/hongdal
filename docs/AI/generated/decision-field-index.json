@@ -1,16 +1,16 @@
 {
   "schemaVersion": "decision-field-index.v1",
   "sourceRef": "docs/AI/DECISIONS.md",
-  "sourceSha256": "3882A789087DD77230AD2F66D32F43D82C85FF15D5FAAF9DA86CE95A52F5C5F8",
+  "sourceSha256": "B226600FB00E7545D726333A54E8A99ADB9A3457149594824DAB6A01C3716FE2",
   "classificationMethod": "ExhaustiveHeadingInventoryWithManualFieldRanges",
   "reviewDepthMeaning": {
     "TitleReviewed": "결정 제목과 주변 결정군을 전수 대조한 1차 분야 분류",
     "BodyReviewed": "결정 본문까지 현재 기획에서 직접 재검토한 분류"
   },
   "inventory": {
-    "headingCount": 552,
-    "uniqueGlobalIdCount": 551,
-    "maximumGlobalId": "D-555",
+    "headingCount": 553,
+    "uniqueGlobalIdCount": 552,
+    "maximumGlobalId": "D-556",
     "missingGlobalIds": [
       "D-422",
       "D-423",
@@ -21,7 +21,7 @@
       "D-096"
     ],
     "primaryAreaCount": 11,
-    "topicCount": 91
+    "topicCount": 92
   },
   "areaSummary": [
     {
@@ -51,9 +51,9 @@
     {
       "primaryAreaCode": "GAMEPLAY",
       "primaryAreaName": "게임플레이",
-      "decisionCount": 177,
-      "topicCount": 30,
-      "bodyReviewedCount": 23,
+      "decisionCount": 178,
+      "topicCount": 31,
+      "bodyReviewedCount": 24,
       "titleReviewedCount": 154
     },
     {
@@ -555,16 +555,6 @@
       "lastGlobalDecisionId": "D-554"
     },
     {
-      "primaryAreaCode": "WORLD",
-      "primaryAreaName": "월드·공간",
-      "topicCode": "SPATIAL-DATA-PRESENTATION",
-      "decisionCount": 14,
-      "bodyReviewedCount": 0,
-      "titleReviewedCount": 14,
-      "firstGlobalDecisionId": "D-100",
-      "lastGlobalDecisionId": "D-113"
-    },
-    {
       "primaryAreaCode": "INTERACTION",
       "primaryAreaName": "상호작용·UI",
       "topicCode": "EMBODIED-STORY-CHOICE",
@@ -573,6 +563,16 @@
       "titleReviewedCount": 0,
       "firstGlobalDecisionId": "D-503",
       "lastGlobalDecisionId": "D-534"
+    },
+    {
+      "primaryAreaCode": "INTERACTION",
+      "primaryAreaName": "상호작용·UI",
+      "topicCode": "COMBAT-FOCUS-TRIGGER",
+      "decisionCount": 1,
+      "bodyReviewedCount": 1,
+      "titleReviewedCount": 0,
+      "firstGlobalDecisionId": "D-552",
+      "lastGlobalDecisionId": "D-552"
     },
     {
       "primaryAreaCode": "INTERACTION",
@@ -785,14 +785,14 @@
       "lastGlobalDecisionId": "D-357"
     },
     {
-      "primaryAreaCode": "INTERACTION",
-      "primaryAreaName": "상호작용·UI",
-      "topicCode": "COMBAT-FOCUS-TRIGGER",
+      "primaryAreaCode": "GAMEPLAY",
+      "primaryAreaName": "게임플레이",
+      "topicCode": "FIVE-ELEMENT-RECOVERY-PURPOSE",
       "decisionCount": 1,
       "bodyReviewedCount": 1,
       "titleReviewedCount": 0,
-      "firstGlobalDecisionId": "D-552",
-      "lastGlobalDecisionId": "D-552"
+      "firstGlobalDecisionId": "D-556",
+      "lastGlobalDecisionId": "D-556"
     },
     {
       "primaryAreaCode": "GAMEPLAY",
@@ -807,12 +807,12 @@
     {
       "primaryAreaCode": "GAMEPLAY",
       "primaryAreaName": "게임플레이",
-      "topicCode": "HERBAL-TEA",
-      "decisionCount": 8,
+      "topicCode": "HERBAL-CONTENT",
+      "decisionCount": 11,
       "bodyReviewedCount": 0,
-      "titleReviewedCount": 8,
-      "firstGlobalDecisionId": "D-326",
-      "lastGlobalDecisionId": "D-333"
+      "titleReviewedCount": 11,
+      "firstGlobalDecisionId": "D-346",
+      "lastGlobalDecisionId": "D-356"
     },
     {
       "primaryAreaCode": "GAMEPLAY",
@@ -905,6 +905,16 @@
       "lastGlobalDecisionId": "D-502"
     },
     {
+      "primaryAreaCode": "WORLD",
+      "primaryAreaName": "월드·공간",
+      "topicCode": "SPATIAL-DATA-PRESENTATION",
+      "decisionCount": 14,
+      "bodyReviewedCount": 0,
+      "titleReviewedCount": 14,
+      "firstGlobalDecisionId": "D-100",
+      "lastGlobalDecisionId": "D-113"
+    },
+    {
       "primaryAreaCode": "GAMEPLAY",
       "primaryAreaName": "게임플레이",
       "topicCode": "SEASON-TECH-TREE",
@@ -913,16 +923,6 @@
       "titleReviewedCount": 7,
       "firstGlobalDecisionId": "D-399",
       "lastGlobalDecisionId": "D-405"
-    },
-    {
-      "primaryAreaCode": "GAMEPLAY",
-      "primaryAreaName": "게임플레이",
-      "topicCode": "PLAYER-RECOVERY-RESOURCES",
-      "decisionCount": 33,
-      "bodyReviewedCount": 0,
-      "titleReviewedCount": 33,
-      "firstGlobalDecisionId": "D-287",
-      "lastGlobalDecisionId": "D-319"
     },
     {
       "primaryAreaCode": "GAMEPLAY",
@@ -1007,12 +1007,22 @@
     {
       "primaryAreaCode": "GAMEPLAY",
       "primaryAreaName": "게임플레이",
-      "topicCode": "HERBAL-CONTENT",
-      "decisionCount": 11,
+      "topicCode": "HERBAL-TEA",
+      "decisionCount": 8,
       "bodyReviewedCount": 0,
-      "titleReviewedCount": 11,
-      "firstGlobalDecisionId": "D-346",
-      "lastGlobalDecisionId": "D-356"
+      "titleReviewedCount": 8,
+      "firstGlobalDecisionId": "D-326",
+      "lastGlobalDecisionId": "D-333"
+    },
+    {
+      "primaryAreaCode": "GAMEPLAY",
+      "primaryAreaName": "게임플레이",
+      "topicCode": "PLAYER-RECOVERY-RESOURCES",
+      "decisionCount": 33,
+      "bodyReviewedCount": 0,
+      "titleReviewedCount": 33,
+      "firstGlobalDecisionId": "D-287",
+      "lastGlobalDecisionId": "D-319"
     },
     {
       "primaryAreaCode": "WORLD",
@@ -8201,6 +8211,19 @@
       "title": "첫 경계 마수는 동물형·야수형 의미를 유지하고 현재 사람형 후보는 미확보 보류한다",
       "reviewDepth": "BodyReviewed",
       "sourceLine": 5361
+    },
+    {
+      "globalKey": "D-556",
+      "globalDecisionId": "D-556",
+      "globalOccurrence": 1,
+      "fieldDecisionId": "D-GAMEPLAY-FIVE-ELEMENT-RECOVERY-PURPOSE-001",
+      "primaryAreaCode": "GAMEPLAY",
+      "primaryAreaName": "게임플레이",
+      "topicCode": "FIVE-ELEMENT-RECOVERY-PURPOSE",
+      "topicOrdinal": 1,
+      "title": "게임의 상위 목적은 나와 상대의 오행 순환을 회복시켜 광복기 가능성을 넓히는 것이다",
+      "reviewDepth": "BodyReviewed",
+      "sourceLine": 5369
     }
   ]
 }

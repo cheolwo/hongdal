@@ -3,9 +3,9 @@
   "authority": "DerivedPlanningLookupOnly",
   "decisionSource": {
     "path": "docs/AI/DECISIONS.md",
-    "sha256": "3882A789087DD77230AD2F66D32F43D82C85FF15D5FAAF9DA86CE95A52F5C5F8",
+    "sha256": "B226600FB00E7545D726333A54E8A99ADB9A3457149594824DAB6A01C3716FE2",
     "fieldIndexPath": "docs/AI/generated/decision-field-index.json",
-    "fieldIndexSha256": "F547585A4343D37C4AA2FDC5B08740957036086040652BC861278E2E0C581566"
+    "fieldIndexSha256": "20618FA6DEF4F2043BF9D23ED265FBB23D08C0F3CC17720291E9009BAB63E4A2"
   },
   "wiSource": {
     "path": "eng/execution-ledgers/world-interactions.json",
@@ -25,7 +25,7 @@
     ]
   },
   "inventory": {
-    "decisionCount": 552,
+    "decisionCount": 553,
     "wiCount": 105,
     "explicitRelationshipCount": 76,
     "linkedDecisionCount": 26,
@@ -8023,6 +8023,19 @@
       "topicCode": "FARM-BOUNDARY-BEAST",
       "title": "첫 경계 마수는 동물형·야수형 의미를 유지하고 현재 사람형 후보는 미확보 보류한다",
       "sourceLine": 5361,
+      "relationStateCode": "NoExplicitCanonicalLink",
+      "explicitCanonicalWiIds": [],
+      "nonCanonicalWiTokens": []
+    },
+    {
+      "globalKey": "D-556",
+      "globalDecisionId": "D-556",
+      "fieldDecisionId": "D-GAMEPLAY-FIVE-ELEMENT-RECOVERY-PURPOSE-001",
+      "primaryAreaCode": "GAMEPLAY",
+      "primaryAreaName": "게임플레이",
+      "topicCode": "FIVE-ELEMENT-RECOVERY-PURPOSE",
+      "title": "게임의 상위 목적은 나와 상대의 오행 순환을 회복시켜 광복기 가능성을 넓히는 것이다",
+      "sourceLine": 5369,
       "relationStateCode": "NoExplicitCanonicalLink",
       "explicitCanonicalWiIds": [],
       "nonCanonicalWiTokens": []

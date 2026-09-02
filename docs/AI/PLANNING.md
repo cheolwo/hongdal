@@ -14,6 +14,7 @@
 
 | 기획 ID | 현재 문서 | 상태 | 역할 |
 | --- | --- | --- | --- |
+| `PLAN-GAME-COMMON-PURPOSE-001` | [나·상대 오행 순환과 광복기 상위 목적](../Architecture/게임기획통합기준.md#나와-상대의-오행-순환이-회복역량을-높인다) | `ApprovedPlanningBaseline / ScopedContributionModelDefined / ExactProfilesPending` | 사람·사물·환경인 상대와 나의 순환 회복, Actor·직접 대상·영향 범위별 상충 결과, 대상별 회복역량 기여와 개인·공동체 광복기 경계 |
 | `PLAN-PLANNING-PLAYER-CONTEXT-001` | [시간·공간·플레이어·대상 WI 기획](시간공간플레이어대상-WI기획정리-2026-08-31.md) | `ApprovedPlanningBaseline` | 지금·여기·나·너·이렇게와 WI를 함께 읽는 기준 |
 | `PLAN-PLANNING-WI-GWAE-001` | [WI 괘성 분류 체계](../Architecture/WI괘성분류체계.md) | `ReviewedMetadata` | 행위 주체의 행위괘·작용괘·대상괘·보조괘로 기존 WI를 탐색하는 비권위 메타데이터 |
 | `PLAN-PLANNING-MIGRATION-001` | [전체 기획 네 관점 순환 이관](전체기획-네관점순환이관-2026-08-31.md) | `InProgress` | 기존 문답을 공통 관점으로 재정리 |

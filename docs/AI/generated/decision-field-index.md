@@ -11,11 +11,11 @@
 
 ## 전수성 점검
 
-- 결정 제목: **552개**
-- 고유 전역 번호: **551개** / 최댓값 `D-555`
+- 결정 제목: **553개**
+- 고유 전역 번호: **552개** / 최댓값 `D-556`
 - 비어 있는 전역 번호: `D-422, D-423, D-424, D-425`
 - 중복 전역 번호: `D-096`
-- 주분야: **11개**, 세부주제: **91개**
+- 주분야: **11개**, 세부주제: **92개**
 
 ## 주분야 요약
 
@@ -24,7 +24,7 @@
 | 아키텍처 (`ARCHITECTURE`) | 4 | 46 | 0 | 46 |
 | 데이터·공공자료 (`DATA`) | 4 | 36 | 0 | 36 |
 | 증거·성숙도 (`EVIDENCE`) | 5 | 51 | 0 | 51 |
-| 게임플레이 (`GAMEPLAY`) | 30 | 177 | 23 | 154 |
+| 게임플레이 (`GAMEPLAY`) | 31 | 178 | 24 | 154 |
 | 상호작용·UI (`INTERACTION`) | 5 | 23 | 13 | 10 |
 | 운영·개발 운영 (`OPERATIONS`) | 2 | 10 | 0 | 10 |
 | 기획·업무 방법 (`PLANNING`) | 12 | 41 | 6 | 35 |
@@ -81,8 +81,8 @@
 | Simulation 규칙·권위 | `LOGISTICS-TRADE` | 20 | 0 | `D-052` ~ `D-071` |
 | 표현·시각 | `WORLD-REGION-ASSET` | 3 | 0 | `D-033` ~ `D-035` |
 | 표현·시각 | `SYNTY-SURVEY-HANDOFF` | 1 | 1 | `D-554` ~ `D-554` |
-| 월드·공간 | `SPATIAL-DATA-PRESENTATION` | 14 | 0 | `D-100` ~ `D-113` |
 | 상호작용·UI | `EMBODIED-STORY-CHOICE` | 7 | 7 | `D-503` ~ `D-534` |
+| 상호작용·UI | `COMBAT-FOCUS-TRIGGER` | 1 | 1 | `D-552` ~ `D-552` |
 | 상호작용·UI | `COMBAT-COMMAND` | 2 | 2 | `D-483` ~ `D-484` |
 | 게임플레이 | `CREDIT-MULTIPLAYER` | 6 | 0 | `D-340` ~ `D-345` |
 | 게임플레이 | `CONSTRUCTION-CANCEL` | 5 | 0 | `D-320` ~ `D-324` |
@@ -104,9 +104,9 @@
 | 아키텍처 | `REFACTOR-DATA-ASSET` | 6 | 0 | `D-139` ~ `D-144` |
 | 아키텍처 | `PLAYABLE-DEVELOPMENT` | 17 | 0 | `D-214` ~ `D-230` |
 | 게임플레이 | `FARM-DELEGATION` | 1 | 0 | `D-357` ~ `D-357` |
-| 상호작용·UI | `COMBAT-FOCUS-TRIGGER` | 1 | 1 | `D-552` ~ `D-552` |
+| 게임플레이 | `FIVE-ELEMENT-RECOVERY-PURPOSE` | 1 | 1 | `D-556` ~ `D-556` |
 | 게임플레이 | `FOCUS-RESEARCH` | 2 | 0 | `D-365` ~ `D-366` |
-| 게임플레이 | `HERBAL-TEA` | 8 | 0 | `D-326` ~ `D-333` |
+| 게임플레이 | `HERBAL-CONTENT` | 11 | 0 | `D-346` ~ `D-356` |
 | 게임플레이 | `YODONG-CRISIS` | 1 | 1 | `D-493` ~ `D-493` |
 | 게임플레이 | `YODONG` | 4 | 4 | `D-476` ~ `D-479` |
 | 게임플레이 | `WINTER-LOGISTICS` | 1 | 1 | `D-494` ~ `D-494` |
@@ -116,8 +116,8 @@
 | 게임플레이 | `TAROT-REALITY-SPATIAL` | 3 | 0 | `D-211` ~ `D-213` |
 | 게임플레이 | `TAROT` | 4 | 0 | `D-096` ~ `D-099` |
 | 게임플레이 | `SETTLEMENT-SUPPLY` | 6 | 6 | `D-497` ~ `D-502` |
+| 월드·공간 | `SPATIAL-DATA-PRESENTATION` | 14 | 0 | `D-100` ~ `D-113` |
 | 게임플레이 | `SEASON-TECH-TREE` | 7 | 0 | `D-399` ~ `D-405` |
-| 게임플레이 | `PLAYER-RECOVERY-RESOURCES` | 33 | 0 | `D-287` ~ `D-319` |
 | 게임플레이 | `PERSPECTIVE-FOCUS` | 6 | 0 | `D-416` ~ `D-421` |
 | 게임플레이 | `NATURE-THREAT-RECOVERY` | 16 | 0 | `D-161` ~ `D-176` |
 | 게임플레이 | `MEDITATION-RECOVERY-LOOP` | 1 | 1 | `D-550` ~ `D-550` |
@@ -126,7 +126,8 @@
 | 게임플레이 | `HUB-RECOVERY-MEDITATION` | 1 | 1 | `D-548` ~ `D-548` |
 | 게임플레이 | `HUB-REALITY-LOGISTICS` | 6 | 0 | `D-449` ~ `D-454` |
 | 게임플레이 | `HUB-INFERENCE-QUEST` | 1 | 1 | `D-547` ~ `D-547` |
-| 게임플레이 | `HERBAL-CONTENT` | 11 | 0 | `D-346` ~ `D-356` |
+| 게임플레이 | `HERBAL-TEA` | 8 | 0 | `D-326` ~ `D-333` |
+| 게임플레이 | `PLAYER-RECOVERY-RESOURCES` | 33 | 0 | `D-287` ~ `D-319` |
 | 월드·공간 | `WORLDMAP-PROPOSAL` | 2 | 0 | `D-406` ~ `D-407` |
 
 ## 전체 결정 대응표
@@ -685,3 +686,4 @@
 | [D-553](../DECISIONS.md#d-553-강대한-적의-종합-역량은-구성-노드와-지원-연결을-실제로-분리해-낮출-수-있다) | `D-GAMEPLAY-COMBAT-DIVIDE-CONQUER-001` | 강대한 적의 종합 역량은 구성 노드와 지원 연결을 실제로 분리해 낮출 수 있다 | `BodyReviewed` |
 | [D-554](../DECISIONS.md#d-554-최근-확정-기획의-synty-표현-요구를-선별해-개발전문-조사로-인계한다) | `D-PRESENTATION-SYNTY-SURVEY-HANDOFF-001` | 최근 확정 기획의 Synty 표현 요구를 선별해 개발·전문 조사로 인계한다 | `BodyReviewed` |
 | [D-555](../DECISIONS.md#d-555-첫-경계-마수는-동물형야수형-의미를-유지하고-현재-사람형-후보는-미확보-보류한다) | `D-PRESENTATION-FARM-BOUNDARY-BEAST-001` | 첫 경계 마수는 동물형·야수형 의미를 유지하고 현재 사람형 후보는 미확보 보류한다 | `BodyReviewed` |
+| [D-556](../DECISIONS.md#d-556-게임의-상위-목적은-나와-상대의-오행-순환을-회복시켜-광복기-가능성을-넓히는-것이다) | `D-GAMEPLAY-FIVE-ELEMENT-RECOVERY-PURPOSE-001` | 게임의 상위 목적은 나와 상대의 오행 순환을 회복시켜 광복기 가능성을 넓히는 것이다 | `BodyReviewed` |
