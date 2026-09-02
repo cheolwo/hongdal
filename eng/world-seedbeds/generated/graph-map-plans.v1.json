@@ -3,17 +3,20 @@
   "revision": "mirror-graph-map-plan-output.r3",
   "generatedAtRuleCode": "DeterministicNoWallClock",
   "sourcePlanRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
-  "sourcePlanHashSha256": "665b1b34ca6545d1b34a69af5fec8c6470da01eae836b4c0f65de053e0eb2e0b",
+  "sourcePlanHashSha256": "b2f1288125e4974371e808a8ae59b2cde4d5a9222fe3a8c43bcbd4e0686b8adc",
   "federationSnapshot": {
     "partitionCatalogRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.partitions.v1.json",
-    "partitionCatalogRevision": "mirror-graph-map-partition-catalog.r1",
-    "partitionCatalogHashSha256": "27a4742900da5b1482823bb4bdd02a980445f6b7f134ce6853921fc05b672c5a",
+    "partitionCatalogRevision": "mirror-graph-map-partition-catalog.r7",
+    "partitionCatalogHashSha256": "43fd4c27aecd4a2e82bf9809b305b7c0b84510e9f373836e4f0a070476eb20d6",
     "overlayCatalogRef": "eng/world-seedbeds/graph-maps/graph-map-overlays.v1.json",
-    "overlayCatalogRevision": "mirror-graph-map-overlay-catalog.r1",
-    "overlayCatalogHashSha256": "96f647c1ce7ff638bb6f71ea630ff221786bb4392332b57289f35c1cb7a82721",
+    "overlayCatalogRevision": "mirror-graph-map-overlay-catalog.r5",
+    "overlayCatalogHashSha256": "f24192a305bac241e40db1b06f0d69ddd9bb0ec7f8dc674b87c2d2410f338c51",
     "codeBindingCatalogRef": "eng/world-seedbeds/graph-maps/unity-code-bindings.v1.json",
     "codeBindingCatalogRevision": "mirror-graph-map-code-binding-catalog.r1",
-    "codeBindingCatalogHashSha256": "c1a2360271bbcfd76f0b29ea2291894625cb57050cf8b97d16582a4b62b1a0b0"
+    "codeBindingCatalogHashSha256": "c1a2360271bbcfd76f0b29ea2291894625cb57050cf8b97d16582a4b62b1a0b0",
+    "placementRuleCatalogRef": "eng/world-seedbeds/graph-maps/placement-rule-bindings.v1.json",
+    "placementRuleCatalogRevision": "mirror-graph-map-placement-rule-catalog.r5",
+    "placementRuleCatalogHashSha256": "83753a076df00d761f9d3af0d8d69086fd8a03341b81abad22035d2b70c252c5"
   },
   "sourceCatalogSnapshot": {
     "actualE5Revision": "simulation-world-actual-e5-spatial-output.r6",
@@ -28,27 +31,38 @@
   },
   "counts": {
     "plans": 1,
-    "nodes": 11,
-    "edges": 10,
-    "constraints": 9,
+    "nodes": 34,
+    "edges": 34,
+    "constraints": 28,
+    "placementRuleProfiles": 5,
+    "placementRules": 21,
+    "placementRuleBindings": 5,
+    "placementRuleBoundConstraints": 3,
+    "governanceOnlyConstraints": 25,
     "traversalProfiles": 6,
-    "subgraphs": 5,
-    "ports": 8,
-    "connectors": 4,
-    "overlays": 2,
+    "subgraphs": 6,
+    "ports": 12,
+    "connectors": 6,
+    "layers": 6,
+    "overlays": 9,
+    "overlayEdgeEffects": 4,
+    "planningAssessments": 21,
     "codeBindings": 6,
     "sourceCodeFiles": 13,
     "codeBoundLevel1Targets": 19,
-    "unboundLevel1Targets": 2,
-    "unresolvedNodes": 1,
-    "unresolvedEdges": 1
+    "unboundLevel1Targets": 48,
+    "unresolvedNodes": 23,
+    "unresolvedEdges": 25,
+    "normalizedElements": 9,
+    "normalizedRelations": 7,
+    "normalizationBlocked": 1
   },
   "plan": {
     "schemaVersion": "mirror-graph-map-plan.v3",
-    "revision": "mirror-graph-map-plan.northern-life-hub-discovery.r3",
+    "revision": "mirror-graph-map-plan.northern-life-hub-discovery.r10",
     "graphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
     "title": "북부 생활권 발견·생산·물류 첫 그래프 맵",
-    "summary": "춘분의 Nature 접근, Farm 생산·집하, Hub 입출고, Town 수령을 기존 실제 E5 공간 사본 위에서 함께 읽고 요동성은 미해결 외부 관문으로 남기는 계획 그래프다.",
+    "summary": "기존 실제 E5 공간 사본과 안정 ID를 유지하면서 현행 기획 21건의 Graph Map 영향을 전수 판정하고, 한스의 개인 손도끼와 별도 정밀 작업 도끼 계보, Farm 순찰·Hub 미도착 화물·Town 공방·요동성 관문, 계절 및 장거리 경로 레이어를 계획 관계로 통합한다.",
     "purposeCode": "PreWorldE5E6Planning",
     "sourceCatalogs": [
       {
@@ -65,6 +79,11 @@
         "kindCode": "DecisionCatalog",
         "path": "docs/AI/DECISIONS.md",
         "expectedRevision": "HeadingIdentityOnly"
+      },
+      {
+        "kindCode": "PlanningCatalog",
+        "path": "docs/AI/PLANNING.md",
+        "expectedRevision": "PlanIdentityTable"
       },
       {
         "kindCode": "HistoricalPlanningSeedbed",
@@ -85,14 +104,245 @@
       "scaleLayerCode": "PartitionedGraphMap",
       "partitionCatalogRef": {
         "path": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.partitions.v1.json",
-        "expectedRevision": "mirror-graph-map-partition-catalog.r1"
+        "expectedRevision": "mirror-graph-map-partition-catalog.r7"
       },
       "overlayCatalogRef": {
         "path": "eng/world-seedbeds/graph-maps/graph-map-overlays.v1.json",
-        "expectedRevision": "mirror-graph-map-overlay-catalog.r1"
+        "expectedRevision": "mirror-graph-map-overlay-catalog.r5"
       },
       "splitPolicyMeaning": "Level 1~3의 의미는 유지하고 규모가 커질 때 Area 책임별 하위 맵과 명시 port·connector로 분할한다."
     },
+    "planningImpactAssessments": [
+      {
+        "planId": "PLAN-PLANNING-PLAYER-CONTEXT-001",
+        "sourceRef": "docs/AI/시간공간플레이어대상-WI기획정리-2026-08-31.md",
+        "sourceExpectedSha256": "4DA06BE2AECCE97353E24A21C65DE1637012DA65E923562242498AF59F1ADCE7",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [],
+        "reason": "공통 읽기 관점이며 공간 topology나 실행 계약을 직접 추가하지 않는다."
+      },
+      {
+        "planId": "PLAN-PLANNING-WI-GWAE-001",
+        "sourceRef": "docs/Architecture/WI괘성분류체계.md",
+        "sourceExpectedSha256": "4282D2F0FBE963A2634DA5BE8C841E0E217519F4E1B61A3341BA1D37AC83AB0C",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [],
+        "reason": "WI 탐색 메타데이터이며 Graph Map 권위 관계가 아니다."
+      },
+      {
+        "planId": "PLAN-PLANNING-MIGRATION-001",
+        "sourceRef": "docs/AI/전체기획-네관점순환이관-2026-08-31.md",
+        "sourceExpectedSha256": "A84D5C11CFBF350DCFC439998B8CE56249771FDB81263FE599DBCDAF6607F92B",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [],
+        "reason": "기존 기획 이관 조회이며 개별 공간 관계는 각 승인 기획이 소유한다."
+      },
+      {
+        "planId": "PLAN-PLANNING-DECISION-READING-001",
+        "sourceRef": "docs/AI/결정원장-기획시작점-읽기안내.md",
+        "sourceExpectedSha256": "1CFFAE5FBD5B82AD05186D771ADAD1B0405AB0D91755FA6341AA38050DDB3872",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [],
+        "reason": "과거 결정 읽기 안내이며 새 토폴로지 입력으로 사용하지 않는다."
+      },
+      {
+        "planId": "PLAN-STORY-MIRROR-MAIN-001",
+        "sourceRef": "docs/AI/메인스토리-거울의흐름-기획-2026-09-01.md",
+        "sourceExpectedSha256": "E46D8DA7BC4474772625A0694A6924304B86F4127F2E2E63417D02C749BDB89B",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "Integrated",
+        "impactRefs": [
+          "gm-subgraph:nature-discovery",
+          "gm-subgraph:town-life",
+          "gm-subgraph:yodong-gateway"
+        ],
+        "reason": "기존 한스·Farm 순찰·Town 공방·장기 위협 안정 ID를 최신 이야기 관계로 갱신한다."
+      },
+      {
+        "planId": "PLAN-STORY-DUAL-PROTAGONIST-001",
+        "sourceRef": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md",
+        "sourceExpectedSha256": "9FAE03C1CF38A2A73D2B4E29E3E1C34ACEBA97B9AC9784D56D2B16CFEAFA7EA9",
+        "classificationCode": "CreateSubgraph",
+        "integrationStateCode": "IntegratedPlanningOnly",
+        "impactRefs": [
+          "gm-subgraph:hans-precision-axe"
+        ],
+        "reason": "개인 손도끼 벌목과 별도 부러진 농장 손도끼의 발견·보관·맡김·수리·동일 개체 반환을 분리한다."
+      },
+      {
+        "planId": "PLAN-STORY-YODONG-DEFENSE-001",
+        "sourceRef": "docs/AI/요동성방어-메인스토리기획-2026-09-01.md",
+        "sourceExpectedSha256": "F28A2D6C44AB19165732DB7074EA9332034CB2BF998E40C224DA10819ED24796",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "IntegratedPlanningOnly",
+        "impactRefs": [
+          "gm-subgraph:yodong-gateway",
+          "gm-layer:threat-security",
+          "gm-layer:logistics-supply"
+        ],
+        "reason": "요동성 외부 관문·위협 분할·보급 및 필요 최소 공개 경계를 기존 미해결 관계에 결속한다."
+      },
+      {
+        "planId": "PLAN-STORY-HUB-DISCOVERY-001",
+        "sourceRef": "docs/AI/허브발견-3인칭관찰과광역노드-기획-2026-09-01.md",
+        "sourceExpectedSha256": "37660C56C52F20769E1BF80BCC476F00A1F6B495130E5EB14336A8A4AFB3D301",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "IntegratedPlanningOnly",
+        "impactRefs": [
+          "gm-subgraph:hub-logistics",
+          "gm-layer:logistics-supply"
+        ],
+        "reason": "미도착 화물의 근거·현장 확인·회복·선택 명상 관계를 기존 Hub 노드에 유지한다."
+      },
+      {
+        "planId": "PLAN-GAMEPLAY-FIRST-PERSON-FOCUS-001",
+        "sourceRef": "docs/AI/1인칭-선택형집중타이밍-기획보완-2026-08-31.md",
+        "sourceExpectedSha256": "A791F092CEE3B9337AC4E8F3A47CCD65EA2362A7C76AD7ECEECAD251FC530C7D",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "IntegratedPlanningOnly",
+        "impactRefs": [
+          "gm-overlay:optional-focus-reflection"
+        ],
+        "reason": "공간 노드를 만들지 않고 선택형 상호작용 조회 레이어에만 반영한다."
+      },
+      {
+        "planId": "PLAN-GAMEPLAY-MEDITATION-ACTION-001",
+        "sourceRef": "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md",
+        "sourceExpectedSha256": "14015DFCA69C47BF2B93651B873C10764A5F367ED82BCA67D1EC97CDEDAD33CA",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [
+          "gm-overlay:optional-focus-reflection"
+        ],
+        "reason": "내면 염체 그래프는 월드 공간 Graph Map과 혼합하지 않고 선택 명상 참조만 유지한다."
+      },
+      {
+        "planId": "PLAN-TIME-SEASONAL-001",
+        "sourceRef": "docs/AI/24절기-제철자료-조사와기획연결-2026-08-31.md",
+        "sourceExpectedSha256": "5764EEDB7316524244127D7A54A63FB9313780942911C4D9CF01B0C8AD6A7AD1",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "IntegratedPlanningOnly",
+        "impactRefs": [
+          "gm-layer:weather-time",
+          "gm-overlay:spring-equinox"
+        ],
+        "reason": "절기·계절은 topology가 아니라 시간·경관·위험 조건의 근거 레이어로 반영한다."
+      },
+      {
+        "planId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+        "sourceRef": "docs/AI/북부춘분-굶주린농장발견-기획보완-2026-08-31.md",
+        "sourceExpectedSha256": "40D78EA5A6725F218A80BB2774FA7AAC4ADD922018905F74C44FF92B9A68E62F",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "SupersededReference",
+        "impactRefs": [
+          "gm-subgraph:nature-discovery"
+        ],
+        "reason": "초기 발견 골격은 최신 메인 스토리에 일부 대체되어 새 입력으로 중복 적용하지 않는다."
+      },
+      {
+        "planId": "PLAN-WORLD-FOUR-AREAS-001",
+        "sourceRef": "docs/AI/월드맵-4업무영역-자연경계와자산선정제안-2026-08-31.md",
+        "sourceExpectedSha256": "F4CAEF7BD77ECB6DEC961937A3D28A2AEA9029EBBB5854C3245A68B5C6315A13",
+        "classificationCode": "Blocked",
+        "integrationStateCode": "Blocked",
+        "impactRefs": [],
+        "reason": "ReadyForReview이며 상세 경계·좌표·Prefab이 승인되지 않아 현행 기준 공간을 변경하지 않는다."
+      },
+      {
+        "planId": "PLAN-GRAPH-NORTHERN-LIFE-001",
+        "sourceRef": "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md",
+        "sourceExpectedSha256": "8AC5DEC5109C6BD469C7460F9261B833859C355E0D696AACC61F0EADCB7E24D4",
+        "classificationCode": "Blocked",
+        "integrationStateCode": "StaleRevision",
+        "impactRefs": [],
+        "reason": "r4 제안은 현행 Graph Map보다 오래되어 안정 ID 역사로만 보존한다."
+      },
+      {
+        "planId": "PLAN-GRAPH-NORTHERN-LIFE-REVIEW-001",
+        "sourceRef": "docs/AI/그래프맵-현행검증과구체화-기획-2026-09-01.md",
+        "sourceExpectedSha256": "5F62A6CE0C64BA63EA5617B065B7A1EA857F0F4CC486E54772E6172A6D7EFDFE",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "Integrated",
+        "impactRefs": [
+          "graph-map:mirror:northern-life-hub-discovery.v1"
+        ],
+        "reason": "순환·신선도·작은 사건 그래프 결함을 현행 대장과 검사에서 복구한다."
+      },
+      {
+        "planId": "PLAN-GRAPH-PLANNING-INTEGRATION-001",
+        "sourceRef": "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md",
+        "sourceExpectedSha256": "00AA5495D72F2C9D49EA35CB05457FC863D82C51677F94F87FA6421C6090E86C",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "Integrated",
+        "impactRefs": [
+          "graph-map:mirror:northern-life-hub-discovery.v1"
+        ],
+        "reason": "현행 승인 기획을 안정 ID와 증분 관계로 통합하는 운영 기준을 검사한다."
+      },
+      {
+        "planId": "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+        "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md",
+        "sourceExpectedSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D",
+        "classificationCode": "CreateSubgraph",
+        "integrationStateCode": "BlockedPendingRouteFixture",
+        "impactRefs": [
+          "gm-edge:hub-outbound-to-yodong-gateway",
+          "gm-layer:weather-time",
+          "gm-layer:transport",
+          "gm-layer:threat-security",
+          "gm-layer:logistics-supply",
+          "gm-layer:player-choice"
+        ],
+        "reason": "레이어 계약은 통합하지만 실제 분절·병렬 경로는 좌표·수치·Goal/WI/E7이 없어 생성하지 않는다."
+      },
+      {
+        "planId": "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001",
+        "sourceRef": "docs/AI/GraphMap-레이어중심-설계개발우선순위-2026-09-02.md",
+        "sourceExpectedSha256": "6B0AED4EB98FCC2D23DCCE7AA2704F7E3EB0A8803CCB3CAEA238D53990F006DC",
+        "classificationCode": "UpdateExisting",
+        "integrationStateCode": "Integrated",
+        "impactRefs": [
+          "gm-layer:base-space",
+          "gm-layer:weather-time",
+          "gm-layer:transport",
+          "gm-layer:threat-security",
+          "gm-layer:logistics-supply",
+          "gm-layer:player-choice"
+        ],
+        "reason": "기준 공간을 복제하지 않는 레이어·비용·용량·근거·신선도·중복 방지 구조와 검사를 추가한다."
+      },
+      {
+        "planId": "PLAN-DATA-GAMEOBJECT-ASSET-001",
+        "sourceRef": "docs/AI/농수산품목-시각자산대응-기획과개발인계-2026-08-31.md",
+        "sourceExpectedSha256": "12F7162F4F33AE5D7C6B3B61C079C6745DE3B0D27DCD3E9D313A8D52C7283DF6",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [],
+        "reason": "자산 대응은 표현 후보 자료이며 공간·경로 관계를 확정하지 않는다."
+      },
+      {
+        "planId": "PLAN-DATA-REALITY-MYSQL-001",
+        "sourceRef": "docs/AI/현실자료-서버MySQL축적-기획과개발인계-2026-08-31.md",
+        "sourceExpectedSha256": "4A4D5DAF0B47942C294A72F30305C13009F4625888B5513958513BFD3567670F",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [],
+        "reason": "현실 자료 축적 경계이며 World Graph topology를 변경하지 않는다."
+      },
+      {
+        "planId": "PLAN-PRESENTATION-SYNTY-SURVEY-001",
+        "sourceRef": "docs/AI/최근기획-SyntyPrefab조사-개발인계-2026-09-01.md",
+        "sourceExpectedSha256": "7516713D97FFC9C72F5859402D7D6A06C18A74A23BF96CBF5A2C555F7BB72863",
+        "classificationCode": "NoImpact",
+        "integrationStateCode": "PlanningReference",
+        "impactRefs": [],
+        "reason": "후보 조사 결과는 실제 채택·배치 전까지 Graph Map 요소로 승격하지 않는다."
+      }
+    ],
     "traversalProfiles": [
       {
         "profileId": "gm-capability:walk-discovery",
@@ -201,6 +451,10 @@
     ],
     "level1": {
       "meaning": "플레이어가 어느 상황에서 어떤 대상과 어떤 WI를 수행하고 어디로 이어지는지 읽는 관계 그래프",
+      "normalizationCatalogRef": {
+        "path": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.normalization.v1.json",
+        "expectedRevision": "mirror-graph-map-normalization.northern-life-hub-discovery.r1"
+      },
       "contextFieldOrder": [
         "time",
         "place",
@@ -302,6 +556,353 @@
             "method": "밭갈이·파종·생육 관리·수확 중 현재 실행 가능한 WI를 선택한다.",
             "result": "작업 결과는 같은 Farm 상태와 revision에서 조회하며 공간 표식이 결과를 대신하지 않는다.",
             "nextChoices": "다음 재배 작업, 수확물 집하, 작업 중단·복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-permitted-tree",
+          "label": "한스 농장 경계의 허용 벌목 나무 후보",
+          "roleCode": "PermittedTimberSource",
+          "realizationCode": "UnresolvedSpatial",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [
+            "WI-NATURE-06",
+            "WI-NATURE-18"
+          ],
+          "sourceDecisionIds": [
+            "D-529",
+            "D-531",
+            "D-532"
+          ],
+          "planningContext": {
+            "time": "춘분 농장의 망가진 울타리를 발견한 뒤이며 정확 시각은 미정이다.",
+            "place": "농장 경계 밖의 가까운 채취 허용 구역이지만 정확 위치와 거리는 미정이다.",
+            "player": "의뢰나 보상을 받기 전에 자발적으로 돕기로 선택한 모험가",
+            "target": "채취 권한이 확인된 나무 한 그루와 벌목으로 생기는 목재",
+            "method": "기존 벌목·통나무 획득 WI를 사용하되 권한과 실제 자원 소비를 보존한다.",
+            "result": "벌목 대상은 소모되고 같은 원인 계보의 목재가 운반 가능한 상태가 된다.",
+            "nextChoices": "목재를 울타리로 운반, 작업 중단·복귀, 권한 미확인 시 벌목 보류"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-broken-fence",
+          "label": "한스 농장의 망가진 울타리",
+          "roleCode": "UnpaidFenceRepair",
+          "realizationCode": "UnresolvedSpatial",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [
+            "WI-WORLD-04"
+          ],
+          "sourceDecisionIds": [
+            "D-529",
+            "D-531"
+          ],
+          "planningContext": {
+            "time": "허용 나무 벌목과 목재 획득 뒤이며 수리 시간·횟수는 미정이다.",
+            "place": "Nature와 Farm이 맞닿는 망가진 울타리 구간이며 정확 구간은 미정이다.",
+            "player": "시간·체력·도구 내구도·목재 비용을 부담해 무보수로 수리하는 모험가",
+            "target": "망가진 울타리, 운반한 목재, 수리에 필요한 도구",
+            "method": "기존 시설 수리 WI 후보를 재사용하되 벌목 목재와 수리 결과를 같은 원인 계보로 잇는다.",
+            "result": "울타리의 회복 가능한 손상이 실제로 수리되고 별도 의뢰 보수는 생성되지 않는다.",
+            "nextChoices": "한스의 목격 결과 확인, 침입 흔적 공동 조사, 다른 생활 행동으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-first-trust",
+          "label": "한스의 직접 목격과 첫 신뢰",
+          "roleCode": "WitnessedFirstTrust",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [
+            "D-529",
+            "D-531"
+          ],
+          "planningContext": {
+            "time": "벌목·운반·수리 과정이 끝나기 전후이며 별도 즉시 호감 보상 시점이 아니다.",
+            "place": "한스가 벌목부터 울타리 수리까지 직접 볼 수 있는 Farm 경계",
+            "player": "대가를 요구하지 않고 생활 위험을 줄인 행동을 완료한 모험가",
+            "target": "행동 전 과정을 목격한 한스와 첫 신뢰 관계",
+            "method": "결과 전달만이 아니라 동일 원인 계보의 벌목·목재·수리 기록과 한스의 직접 목격을 대조한다.",
+            "result": "첫 신뢰의 시작을 기록하되 즉시 호감 수치·선물·의뢰 보상을 만들지 않는다.",
+            "nextChoices": "한스와 침입 흔적 공동 조사, 반복 협력, 생활 정보·증언으로 이어짐"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-broken-farm-axe-storage",
+          "label": "부러진 농장 손도끼 발견·보관",
+          "roleCode": "BrokenPrecisionAxeStorage",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001",
+            "PLAN-STORY-DUAL-PROTAGONIST-001"
+          ],
+          "planningContext": {
+            "time": "첫 Farm 경계 행동 중 발견할 수 있으나 한스 관계와 집 접근이 열리기 전에는 수리 맡김으로 이어지지 않는다.",
+            "place": "한스 농장 울타리 부근의 미확정 발견 지점이며 정확 좌표·Prefab은 승인되지 않았다.",
+            "player": "나무꾼 몸의 개인 손도끼와 부러진 농장 손도끼를 구분해 조사·보관하는 모험가",
+            "target": "수리 전 장착·벌목·전투에 사용할 수 없는 동일한 부러진 농장 손도끼 개체",
+            "method": "조사와 보관만 허용하고 개인 손도끼의 첫 벌목·울타리 수리 계보를 대체하지 않는다.",
+            "result": "도구 개체와 손상 상태가 보존되며 새 도끼·즉시 수리·즉시 호감 보상은 생기지 않는다.",
+            "nextChoices": "보관 유지, 관계와 집 접근 진전 뒤 명시적 맡김 검토, 다른 생활 행동으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-precision-axe-repair-handoff",
+          "label": "한스에게 정밀 작업 도끼 수리 맡김",
+          "roleCode": "PrecisionAxeRepairHandoff",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-DUAL-PROTAGONIST-001",
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "planningContext": {
+            "time": "실제 공동 행동으로 한스 관계와 집 접근이 열린 뒤 재료·시간 조건을 확인하는 시점",
+            "place": "한스의 승인된 생활·작업 거점 후보이며 실제 H·Anchor·Scene은 미결속이다.",
+            "player": "동일한 부러진 도끼를 소지하고 명시적으로 수리를 맡길지 선택하는 모험가",
+            "target": "부러진 농장 손도끼, 필요한 재료·시간, 한스의 수리 가능 상태",
+            "method": "소유·관계·집 접근·재료·시간을 확인한 뒤 명시적 맡김을 기록한다.",
+            "result": "조건이 충족된 경우에만 동일 개체가 수리 중 후보가 되며 무상 반복 수리나 새 도끼 생성은 없다.",
+            "nextChoices": "조건 부족으로 보관, 수리 경과 대기, 다른 생활 행동으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-repaired-precision-axe-return",
+          "label": "수리된 정밀 작업 도끼 반환",
+          "roleCode": "RepairedPrecisionAxeReturn",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-DUAL-PROTAGONIST-001",
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "planningContext": {
+            "time": "승인되지 않은 정확 수리 시간이 경과하고 같은 맡김 계보의 반환 조건을 확인한 뒤",
+            "place": "한스의 승인된 생활·작업 거점 후보이며 실제 반환 상호작용 위치는 미정이다.",
+            "player": "수리 결과와 동일 개체 여부를 확인하고 반환을 받는 모험가",
+            "target": "가볍고 정밀한 목공·수리 작업용으로 복원된 같은 농장 손도끼",
+            "method": "맡긴 개체·재료·시간·수리 결과를 대조해 같은 도구를 반환한다.",
+            "result": "개인 손도끼의 단순 상위 장비가 아닌 별도 정밀 작업 도구 후보가 반환되며 한스의 과거 이유는 확정하지 않는다.",
+            "nextChoices": "승인된 목공·수리 작업에서 사용 검토, 보관, 한스의 선택형 과거 단서 보류"
+          }
+        },
+        {
+          "nodeId": "gm-node:first-logging-reflection-preparation",
+          "label": "첫 벌목 성찰 씨앗 준비",
+          "roleCode": "FirstLoggingReflectionPreparation",
+          "realizationCode": "ExistingPartialGraphRef",
+          "stateCode": "Planned",
+          "actualRef": null,
+          "worldInteractionIds": [
+            "WI-NATURE-06"
+          ],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-DUAL-PROTAGONIST-001",
+            "PLAN-GAMEPLAY-MEDITATION-ACTION-001"
+          ],
+          "planningContext": {
+            "time": "플레이어 본인의 실제 첫 벌목 완료 ActionRecord 뒤, 한스 집 첫날밤의 검증된 안전 휴식 시점",
+            "place": "한스 집의 안전한 명상 문맥이며 실제 휴식 공급자와 제품 UI 연결은 아직 미확인이다.",
+            "player": "첫 벌목을 직접 완료하고 안전한 휴식에서 해당 경험을 성찰하는 모험가",
+            "target": "WI-NATURE-06 완료 ActionRecord, 한스 집 안전 휴식 근거, 관찰·원인·개선 편린 진행 상태",
+            "method": "행위 기록과 휴식 판본을 검증해 결정적 성찰 씨앗을 만들고, 중단된 동일 씨앗의 순서 접두부를 보존하며 기존 승인 집중 성장 근거만 재사용한다.",
+            "result": "같은 씨앗 판본의 성찰 보상은 한 번만 준비되고 새 성장량·벌목 결과·휴식 상태를 만들지 않는다.",
+            "nextChoices": "중단된 씨앗을 재개, 관찰→원인→개선 완료, 다른 안전 행동으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-house-timber-stockpile",
+          "label": "한스 집 옆 선택적 여분 목재 적재",
+          "roleCode": "OptionalTimberStockpile",
+          "realizationCode": "UnresolvedSpatial",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [
+            "WI-NATURE-06",
+            "WI-NATURE-18"
+          ],
+          "sourceDecisionIds": [
+            "D-532",
+            "D-533"
+          ],
+          "planningContext": {
+            "time": "첫 울타리 수리와 신뢰가 성립한 뒤의 별도 선택이며 한스의 발견은 플레이어가 떠난 뒤다.",
+            "place": "한스 집 옆의 통행·화재·출입구를 침범하지 않는 지정 적재 후보 지점이며 정확 위치는 미정이다.",
+            "player": "추가 보상이나 반복 신뢰를 요구하지 않고 허용 나무를 더 베어 운반할지 선택하는 모험가",
+            "target": "실제로 남아 있는 여분 목재와 한스의 생활 동선",
+            "method": "추가 벌목·운반·적재를 직접 수행하고 떠난 뒤, 한스가 해당 지점에 접근해 남은 목재를 발견한다.",
+            "result": "목재의 실제 종류·수량·상태만 후속 생활 재료 후보가 되며 원격 인지나 즉시 호감은 생기지 않는다.",
+            "nextChoices": "추가 적재 없이 떠남, 한스의 사후 발견·사용, 다른 생활 행동으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-house-repair",
+          "label": "한스 집 수리 전·중·후 변화",
+          "roleCode": "ObservedHouseRepairState",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [
+            "D-533",
+            "D-534",
+            "D-535",
+            "D-536"
+          ],
+          "planningContext": {
+            "time": "한스가 여분 목재를 실제 발견·사용하고 수리 경과가 진행된 뒤이며 정확 작업 시간은 미정이다.",
+            "place": "한스의 생활공간인 Farmhouse와 주변 통행·적재·공사 구역",
+            "player": "재방문 이동 중 변화된 지붕·벽·문·비계·목재를 먼저 관찰하고 후속 표식을 선택할 수 있는 모험가",
+            "target": "수리 필요→목재 확보→수리 중→수리됨 상태의 한스 집과 !/? 표식",
+            "method": "권위 수리 상태를 표현 판본으로 읽고, 실제로 열린 의미에 맞는 표식만 선택한다.",
+            "result": "집의 큰 외형 변화와 목재 소비 계보를 읽지만 표현이나 표식이 수리·보상·관계를 만들지 않는다.",
+            "nextChoices": "한스의 ! 확인 대화, 실제로 열린 일반·메인 의뢰, 계속 이동"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-mission-life-base",
+          "label": "수리된 한스 집의 경비대 임무 생활 거점",
+          "roleCode": "ConditionalMissionLifeBase",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [
+            "D-537"
+          ],
+          "planningContext": {
+            "time": "수리된 집 관찰과 한스의 ! 확인 대화에서 이용 허락이 성립한 뒤",
+            "place": "Nature·Farm 인근 한스 생활공간 안의 허용된 휴식·소량 물자·준비 범위",
+            "player": "경비대 임무 전후에 잠시 쉬고 정보를 확인하며 다음 이동을 준비하는 모험가",
+            "target": "안전 판정, 한스의 허락, 제한된 생활공간·재고와 주변 임무 정보",
+            "method": "허용 범위에서 휴식·기본 회복·소량 정리·동행대 준비를 하고 임무 승인·완료·보급은 별도 권위 기록에서 확인한다.",
+            "result": "첫 작은 생활 거점이 열리지만 경비대 지휘소·무제한 창고·무료 치료소·플레이어 소유 주택이 되지 않는다.",
+            "nextChoices": "Nature·Farm 경비 임무로 출발, 한스와 생활 대화, 다른 거점·지역으로 이동"
+          }
+        },
+        {
+          "nodeId": "gm-node:farm-boundary-patrol-preparation",
+          "label": "Farm 경계 첫 순찰 준비",
+          "roleCode": "PatrolPreparation",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "planningContext": {
+            "time": "한스 집의 제한 생활 거점이 열린 뒤 첫 경계 순찰을 떠나기 전",
+            "place": "Farm 외곽과 Nature 경계로 나가는 준비 지점이며 정확 위치는 미정이다.",
+            "player": "휴식·장비·동행 상태를 확인하고 출발 또는 보류를 선택하는 모험가",
+            "target": "순찰 범위, 복귀 가능성, 동행 상태와 미확인 위험",
+            "method": "현재 준비 상태를 확인하고 첫 순찰을 시작하거나 생활 거점에 남는다.",
+            "result": "출발 선택만 경계 사건의 입력이 되며 준비 화면이 임무 성공을 만들지 않는다.",
+            "nextChoices": "첫 순찰 출발, 준비 보완, 한스 생활 거점으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:farm-boundary-beast-encounter",
+          "label": "Farm 경계 동물형·야수형 마수 조우",
+          "roleCode": "BeastEncounter",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "planningContext": {
+            "time": "첫 경계 순찰 중 마수 무리를 발견한 시점",
+            "place": "Farm 외곽과 더 깊은 Nature 사이의 미정 순찰 구간",
+            "player": "상대 역량과 복귀 가능성을 보고 대응 또는 이탈을 선택하는 모험가",
+            "target": "사람형 대체가 아닌 동물형·야수형 마수 무리와 주변 흔적",
+            "method": "현재 역량으로 대응하거나 교전을 피하고 생활 거점으로 귀환한다.",
+            "result": "대응 결과 또는 안전 귀환이 기록되며 조우만으로 배후 조직이 확정되지 않는다.",
+            "nextChoices": "제한 대응, 이탈·귀환, 안전 확보 뒤 흔적 조사"
+          }
+        },
+        {
+          "nodeId": "gm-node:farm-boundary-trace-investigation",
+          "label": "비정상 이동·상처·영역 흔적 조사",
+          "roleCode": "ThreatTraceInvestigation",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "planningContext": {
+            "time": "조우 뒤 현장이 안전하고 조사할 여유가 생긴 때",
+            "place": "마수의 이동·상처·영역 흔적이 남은 Farm 경계 후보 구간",
+            "player": "단서를 관찰하되 첫 가설을 정답으로 확정하지 않는 모험가",
+            "target": "비정상 이동 방향, 상처, 밀려 내려온 흔적과 영역 변화",
+            "method": "확인한 흔적과 미확인 해석을 분리해 기록하고 다음 조사 범위를 고른다.",
+            "result": "더 깊은 위협을 조사할 근거 후보가 생기지만 조직·거대 마수의 정체는 미확정이다.",
+            "nextChoices": "한스에게 알림, 생활 거점으로 귀환, 더 깊은 위협 관문을 후속 조사"
+          }
+        },
+        {
+          "nodeId": "gm-node:farm-deeper-threat-gateway",
+          "label": "Farm 경계 더 깊은 위협 관문",
+          "roleCode": "FutureThreatGateway",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001",
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "planningContext": {
+            "time": "흔적 조사로 후속 탐색 근거가 생긴 뒤",
+            "place": "첫 Farm 순찰 바깥의 더 깊은 Nature·장기 위협 관계 관문",
+            "player": "즉시 진입하지 않고 준비·지원·귀환 조건을 다시 판단하는 플레이어",
+            "target": "거대 마수와 적대 조직으로 이어질 수 있으나 아직 미확정인 위협망",
+            "method": "후속 기획과 승인된 공간이 생길 때까지 관문으로만 보존한다.",
+            "result": "첫 순찰을 조직 전체 전개로 확대하지 않으면서 장기 위협 하위 맵 연결점을 남긴다.",
+            "nextChoices": "생활 거점 복귀, 추가 정보 수집, 장기 위협 하위 맵으로 후속 인계"
+          }
+        },
+        {
+          "nodeId": "gm-node:hans-managed-sword-clue",
+          "label": "한스 집의 관리된 검 단서",
+          "roleCode": "OptionalIdentityClue",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "planningContext": {
+            "time": "한스 집을 생활 거점으로 이용하며 주변을 관찰할 수 있을 때",
+            "place": "한스 집 안팎의 허용된 관찰 범위이며 정확 검 위치는 미정이다.",
+            "player": "한스의 정체를 단정하지 않고 관리 상태만 알아차리는 모험가",
+            "target": "실전 사용 흔적이 있으나 첫 순찰에서는 사용되지 않는 한스의 검",
+            "method": "선택적으로 관찰하고 정체 의심을 후보로만 기록한다.",
+            "result": "한스의 은둔 실력에 대한 장기 단서가 남지만 능력·소유권·전투 결과는 열리지 않는다.",
+            "nextChoices": "단서를 보류, 한스와 일상 대화, 이후 진짜 위기에서 재확인"
           }
         },
         {
@@ -458,6 +1059,95 @@
           }
         },
         {
+          "nodeId": "gm-node:hub-missing-cargo-investigation",
+          "label": "Hub 미도착 화물·단서 조사",
+          "roleCode": "MissingCargoInvestigation",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-HUB-DISCOVERY-001"
+          ],
+          "planningContext": {
+            "time": "도착 예정 시각이 지났지만 입고 기록이 없는 때",
+            "place": "Hub 입고 접점과 기록·기사·도로·날씨 정보를 확인할 수 있는 범위",
+            "player": "미도착 사실을 알아차리고 단서와 추정을 분리하는 플레이어",
+            "target": "예정 기록, 기사 진술, 도로·날씨·몬스터 단서와 미도착 화물",
+            "method": "확인된 근거를 모으고 플레이어 가설과 근거를 명시적으로 선택한다.",
+            "result": "현장 확인 가능한 가설이 생기지만 기록 자체가 정답이나 화물 위치를 계산하지 않는다.",
+            "nextChoices": "현장 확인, 추가 단서 수집, 조사를 보류하고 Hub 활동으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:hub-missing-cargo-field-confirmation",
+          "label": "미도착 화물 현장 확인",
+          "roleCode": "HypothesisFieldConfirmation",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-HUB-DISCOVERY-001"
+          ],
+          "planningContext": {
+            "time": "가설과 근거를 고르고 현장 접근 조건이 성립한 뒤",
+            "place": "선택한 가설을 확인할 수 있는 미정 도로·접점·사건 현장",
+            "player": "예상과 실제를 비교하고 틀린 가설도 기록하는 플레이어",
+            "target": "화물·기사·도로 장애·날씨·몬스터 등 실제 원인 후보",
+            "method": "현장에서 관찰·상호작용해 선택한 근거와 실제 상태를 대조한다.",
+            "result": "문제 예방 또는 피해 완화 여부와 확인된 원인이 분리되어 남는다.",
+            "nextChoices": "화물·NPC 지원, Hub에 결과 보고, 다른 가설 재검토"
+          }
+        },
+        {
+          "nodeId": "gm-node:hub-cargo-relief-recovery",
+          "label": "화물 문제 예방·NPC 안도·회복",
+          "roleCode": "CargoReliefAndRecovery",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-HUB-DISCOVERY-001"
+          ],
+          "planningContext": {
+            "time": "현장 원인과 대응 결과가 확인된 뒤",
+            "place": "사건 현장 또는 Hub 결과 보고 접점",
+            "player": "자신의 판단이 실제 문제를 줄였는지 확인하는 플레이어",
+            "target": "화물 손실, NPC 불안, 개인·공동체 회복에 영향을 주는 실제 결과",
+            "method": "확인된 결과를 보고하고 같은 원인의 회복 적용을 한 번만 기록한다.",
+            "result": "문제를 예방했다면 NPC 안도와 개인 회복 후보가 생기며 실패도 원인·다음 변경점으로 남는다.",
+            "nextChoices": "선택적 명상, Hub 업무 복귀, 후속 개선 행동"
+          }
+        },
+        {
+          "nodeId": "gm-node:hub-optional-meditation",
+          "label": "Hub 사건 뒤 선택적 명상",
+          "roleCode": "OptionalMeditationReflection",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-HUB-DISCOVERY-001",
+            "PLAN-GAMEPLAY-FIRST-PERSON-FOCUS-001"
+          ],
+          "planningContext": {
+            "time": "회복 결과가 적용된 뒤 플레이어가 명상을 선택한 때",
+            "place": "명상 가능한 안전 접점이며 정확 공간은 미정이다.",
+            "player": "사건을 되짚고 영감·편린 획득 조건을 확인하는 플레이어",
+            "target": "이미 적용된 회복 결과와 실제 획득 조건을 통과한 영감·이데아의 편린",
+            "method": "선택적으로 명상하고 기존 결과를 복제하지 않은 채 획득 조건만 평가한다.",
+            "result": "조건을 통과한 경우에만 영감·편린 증폭 후보가 생기며 명상은 게임 진행 필수가 아니다.",
+            "nextChoices": "Hub 활동 복귀, 새로운 단서 탐색, 명상 없이 이동"
+          }
+        },
+        {
           "nodeId": "gm-node:town-market-receiving",
           "label": "Town 시장 입고 접점",
           "roleCode": "TownMarketInbound",
@@ -520,6 +1210,95 @@
           }
         },
         {
+          "nodeId": "gm-node:town-apprentice-workshop-failure",
+          "label": "Town 견습 공방 실패 작업대 관찰",
+          "roleCode": "WorkshopFailureDiagnosis",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "planningContext": {
+            "time": "Town 생활 중 견습의 작업 실패를 관찰할 수 있을 때",
+            "place": "Town 견습 NPC 공방의 실패한 작업대 후보 공간",
+            "player": "재료·가열·투입 순서에서 원인 후보를 직관하되 대신 완성하지 않는 플레이어",
+            "target": "실패한 작업대, 재료 상태, 가열 조건과 투입 순서",
+            "method": "관찰 근거를 바탕으로 원인 후보를 고르고 견습에게 작은 시험을 제안한다.",
+            "result": "시험 가능한 원인 후보가 생기며 완제품·Recipe·숙련·공방 소유권은 지급되지 않는다.",
+            "nextChoices": "작은 시험 batch, 추가 관찰, 공방을 떠나 Town 활동으로 복귀"
+          }
+        },
+        {
+          "nodeId": "gm-node:town-apprentice-small-test-batch",
+          "label": "Town 견습과 작은 시험 batch",
+          "roleCode": "WorkshopSmallTestBatch",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "planningContext": {
+            "time": "견습이 원인 후보 시험에 동의하고 소량 재료가 준비된 뒤",
+            "place": "원인 하나를 비교할 수 있는 공방의 제한 시험 작업대",
+            "player": "견습과 함께 결과를 비교하고 원인·다음 변경점을 확인하는 플레이어",
+            "target": "소량 시험 재료, 한 번의 조건 변경, 전후 결과",
+            "method": "작은 batch로 후보 하나를 시험하고 성공·실패 원인을 기록한다.",
+            "result": "원인 확인과 다음 학습 방향만 남으며 대량 생산·자동 Recipe 해금은 일어나지 않는다.",
+            "nextChoices": "다음 학습, 다른 후보 시험은 후속으로 보류, 공방을 떠남"
+          }
+        },
+        {
+          "nodeId": "gm-node:hostile-threat-network",
+          "label": "거대 마수·적대 조직 위협망",
+          "roleCode": "HostileThreatNetwork",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-YODONG-DEFENSE-001",
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "planningContext": {
+            "time": "Farm의 더 깊은 위협 단서가 누적되고 장기 대응 국면이 열린 뒤",
+            "place": "첫 순찰 밖의 지휘·호위·지원·증원·회복·보급 관계망이며 정확 공간은 미정이다.",
+            "player": "직접 전투뿐 아니라 지원·보급·분리를 통해 위협 구조에 개입하는 플레이어",
+            "target": "거대 마수와 그 영향 아래 움직이는 적대 조직·하위 무리의 관계",
+            "method": "연결과 역할을 조사하고 실제로 차단 가능한 관계를 구분한다.",
+            "result": "위협망 후보가 드러나지만 조직 전체의 정답·수치·공간은 자동 확정되지 않는다.",
+            "nextChoices": "연결 분리 시도, 지원·보급 준비, 요동성 방비 관문으로 정보 인계"
+          }
+        },
+        {
+          "nodeId": "gm-node:hostile-divided-response",
+          "label": "위협망 분할 대응",
+          "roleCode": "DivideAndRespond",
+          "realizationCode": "PlanningGateway",
+          "stateCode": "Unresolved",
+          "actualRef": null,
+          "worldInteractionIds": [],
+          "sourceDecisionIds": [],
+          "sourcePlanIds": [
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "planningContext": {
+            "time": "위협망의 실제 연결·지원·증원 중 하나를 차단할 조건이 성립한 때",
+            "place": "분리 대상 관계와 대응 전장이 만나는 미정 하위 맵",
+            "player": "강대한 적을 한 번에 상대하지 않고 실제 연결을 끊어 종합 역량을 낮추려는 플레이어",
+            "target": "지휘·호위·지원·증원·회복·보급 중 검증된 연결",
+            "method": "실제 행동으로 연결을 차단하거나 분리하고 그 결과 뒤 종합 역량을 다시 판정한다.",
+            "result": "실제 분리 성공 때만 상대 종합 역량 재판정 후보가 생기며 문서상 분할만으로 약화되지 않는다.",
+            "nextChoices": "분리된 무리 대응, 추가 연결 차단, 철수·지원 요청, 요동성 방비 준비"
+          }
+        },
+        {
           "nodeId": "gm-node:yodong-defense-gateway",
           "label": "요동성 방비 외부 관문",
           "roleCode": "FutureStoryGateway",
@@ -577,6 +1356,186 @@
             "edge:actual-e5:highland-farm:h2:forest-edge-farm:92045c602acedb73"
           ],
           "reason": "Farm을 발견해도 반드시 진입하거나 소유할 필요는 없다.",
+          "capabilityProfileRef": "gm-capability:discovery-sightline"
+        },
+        {
+          "edgeId": "gm-edge:farm-edge-to-hans-permitted-tree",
+          "fromNodeId": "gm-node:nature-farm-edge",
+          "toNodeId": "gm-node:hans-permitted-tree",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "망가진 울타리를 발견해도 벌목은 자동 시작되지 않으며 가까운 나무의 채취 권한을 먼저 확인한다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:hans-timber-to-fence-repair",
+          "fromNodeId": "gm-node:hans-permitted-tree",
+          "toNodeId": "gm-node:hans-broken-fence",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Required",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "벌목한 나무·생성 목재·운반·울타리 수리를 같은 원인 계보로 잇고 자원을 연출로 대체하지 않는다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:hans-fence-repair-to-first-trust",
+          "fromNodeId": "gm-node:hans-broken-fence",
+          "toNodeId": "gm-node:hans-first-trust",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Required",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "첫 신뢰는 수리 결과만 전해 듣는 것으로 성립하지 않고 한스가 벌목부터 무보수 수리까지 직접 목격해야 한다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:hans-broken-fence-to-broken-farm-axe-storage",
+          "fromNodeId": "gm-node:hans-broken-fence",
+          "toNodeId": "gm-node:hans-broken-farm-axe-storage",
+          "kindCode": "DiscoverySightline",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "울타리 부근의 별도 부러진 농장 손도끼는 조사·보관할 수 있지만 개인 손도끼의 첫 벌목·울타리 수리를 대체하지 않는다.",
+          "capabilityProfileRef": "gm-capability:discovery-sightline"
+        },
+        {
+          "edgeId": "gm-edge:broken-farm-axe-storage-to-repair-handoff",
+          "fromNodeId": "gm-node:hans-broken-farm-axe-storage",
+          "toNodeId": "gm-node:hans-precision-axe-repair-handoff",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "한스 관계와 집 접근·도구 소지·재료·시간·명시적 맡김이 모두 확인될 때만 수리 후보를 연다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:precision-axe-repair-handoff-to-return",
+          "fromNodeId": "gm-node:hans-precision-axe-repair-handoff",
+          "toNodeId": "gm-node:hans-repaired-precision-axe-return",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "수리 경과와 동일 개체 계보를 확인한 뒤 같은 정밀 작업 도끼만 반환하며 새 도끼·무상 반복 수리를 만들지 않는다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:hans-first-trust-to-house-stockpile",
+          "fromNodeId": "gm-node:hans-first-trust",
+          "toNodeId": "gm-node:hans-house-timber-stockpile",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "여분 목재 적재는 첫 수리·신뢰와 분리된 선택이며 수행하지 않아도 이미 성립한 결과를 취소하지 않는다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:hans-house-stockpile-to-repair",
+          "fromNodeId": "gm-node:hans-house-timber-stockpile",
+          "toNodeId": "gm-node:hans-house-repair",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "플레이어가 떠난 뒤 남아 있는 목재를 한스가 생활 동선에서 발견·사용하고 작업 경과가 있어야 집 표현이 바뀐다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:hans-house-repair-to-life-base",
+          "fromNodeId": "gm-node:hans-house-repair",
+          "toNodeId": "gm-node:hans-mission-life-base",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "수리된 집을 관찰한 뒤 한스의 ! 확인 대화와 이용 허락이 있어야 제한된 생활 거점이 열린다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:hans-life-base-to-patrol-preparation",
+          "fromNodeId": "gm-node:hans-mission-life-base",
+          "toNodeId": "gm-node:farm-boundary-patrol-preparation",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "생활 거점은 순찰 준비와 귀환을 지원하지만 순찰 참여를 강제하지 않는다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:patrol-preparation-to-beast-encounter",
+          "fromNodeId": "gm-node:farm-boundary-patrol-preparation",
+          "toNodeId": "gm-node:farm-boundary-beast-encounter",
+          "kindCode": "Traversal",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "출발 뒤 실제 경계 경로와 조우 조건이 성립해야 하며 준비 선택만으로 마수가 생성되지 않는다.",
+          "capabilityProfileRef": "gm-capability:walk-discovery"
+        },
+        {
+          "edgeId": "gm-edge:beast-encounter-to-trace-investigation",
+          "fromNodeId": "gm-node:farm-boundary-beast-encounter",
+          "toNodeId": "gm-node:farm-boundary-trace-investigation",
+          "kindCode": "DiscoverySightline",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "현장이 안전하고 흔적이 실제 남은 경우에만 조사로 이어지며 조우 결과가 배후 정답을 만들지 않는다.",
+          "capabilityProfileRef": "gm-capability:discovery-sightline"
+        },
+        {
+          "edgeId": "gm-edge:beast-encounter-return-to-life-base",
+          "fromNodeId": "gm-node:farm-boundary-beast-encounter",
+          "toNodeId": "gm-node:hans-mission-life-base",
+          "kindCode": "Traversal",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "대응을 포기하거나 중단해도 가능한 조건에서는 한스 생활 거점으로 안전 귀환할 선택을 보존한다.",
+          "capabilityProfileRef": "gm-capability:walk-discovery"
+        },
+        {
+          "edgeId": "gm-edge:trace-investigation-to-deeper-threat-gateway",
+          "fromNodeId": "gm-node:farm-boundary-trace-investigation",
+          "toNodeId": "gm-node:farm-deeper-threat-gateway",
+          "kindCode": "ExternalGateway",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "확인된 흔적만 장기 위협 조사 후보로 넘기며 첫 순찰 안에서 조직 전체를 펼치지 않는다.",
+          "capabilityProfileRef": "gm-capability:unresolved-external"
+        },
+        {
+          "edgeId": "gm-edge:hans-life-base-to-sword-clue",
+          "fromNodeId": "gm-node:hans-mission-life-base",
+          "toNodeId": "gm-node:hans-managed-sword-clue",
+          "kindCode": "DiscoverySightline",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "검은 선택형 장기 단서이며 첫 순찰에서 한스가 사용하거나 정체를 공개하는 기능으로 연결하지 않는다.",
           "capabilityProfileRef": "gm-capability:discovery-sightline"
         },
         {
@@ -655,6 +1614,54 @@
           "capabilityProfileRef": "gm-capability:work-handoff"
         },
         {
+          "edgeId": "gm-edge:hub-receiving-to-missing-cargo-investigation",
+          "fromNodeId": "gm-node:hub-receiving-storage",
+          "toNodeId": "gm-node:hub-missing-cargo-investigation",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "예정과 실제 입고의 불일치가 확인될 때만 별도 사건 조사가 열리며 Hub 기본 입고 업무는 독립 실행을 유지한다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:missing-cargo-investigation-to-field-confirmation",
+          "fromNodeId": "gm-node:hub-missing-cargo-investigation",
+          "toNodeId": "gm-node:hub-missing-cargo-field-confirmation",
+          "kindCode": "Traversal",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "플레이어가 고른 가설과 근거를 현장 상태에 대조하며 틀린 가설이면 조사로 돌아갈 수 있다.",
+          "capabilityProfileRef": "gm-capability:walk-discovery"
+        },
+        {
+          "edgeId": "gm-edge:field-confirmation-to-relief-recovery",
+          "fromNodeId": "gm-node:hub-missing-cargo-field-confirmation",
+          "toNodeId": "gm-node:hub-cargo-relief-recovery",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "확인된 원인과 실제 대응 결과만 NPC 안도·회복 후보에 인계한다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:relief-recovery-to-optional-meditation",
+          "fromNodeId": "gm-node:hub-cargo-relief-recovery",
+          "toNodeId": "gm-node:hub-optional-meditation",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "명상은 회복 뒤의 선택이며 같은 결과를 다시 지급하거나 게임 진행을 막지 않는다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
           "edgeId": "gm-edge:hub-outbound-to-town-receiving",
           "fromNodeId": "gm-node:hub-outbound-staging",
           "toNodeId": "gm-node:town-market-receiving",
@@ -685,6 +1692,66 @@
           "capabilityProfileRef": "gm-capability:work-handoff"
         },
         {
+          "edgeId": "gm-edge:town-living-square-to-apprentice-workshop-failure",
+          "fromNodeId": "gm-node:town-living-square",
+          "toNodeId": "gm-node:town-apprentice-workshop-failure",
+          "kindCode": "DiscoverySightline",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "Town 생활에서 공방 사건을 선택적으로 발견하며 Hub·Farm 완료를 입장 조건으로 만들지 않는다.",
+          "capabilityProfileRef": "gm-capability:discovery-sightline"
+        },
+        {
+          "edgeId": "gm-edge:workshop-failure-to-small-test-batch",
+          "fromNodeId": "gm-node:town-apprentice-workshop-failure",
+          "toNodeId": "gm-node:town-apprentice-small-test-batch",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "원인 후보 하나와 견습의 동의·소량 재료가 있을 때만 작은 시험으로 이어진다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:deeper-threat-gateway-to-hostile-network",
+          "fromNodeId": "gm-node:farm-deeper-threat-gateway",
+          "toNodeId": "gm-node:hostile-threat-network",
+          "kindCode": "ExternalGateway",
+          "intentionCode": "Unknown",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "첫 Farm 순찰의 흔적이 장기 위협망과 실제로 연결되는지는 후속 기획·공간 증거 전까지 관문으로 남긴다.",
+          "capabilityProfileRef": "gm-capability:unresolved-external"
+        },
+        {
+          "edgeId": "gm-edge:hostile-network-to-divided-response",
+          "fromNodeId": "gm-node:hostile-threat-network",
+          "toNodeId": "gm-node:hostile-divided-response",
+          "kindCode": "WorkHandoff",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": true,
+          "sourceRelationRefs": [],
+          "reason": "지휘·호위·지원·증원·회복·보급 중 실제 차단할 연결을 확인했을 때만 분할 대응을 선택한다.",
+          "capabilityProfileRef": "gm-capability:work-handoff"
+        },
+        {
+          "edgeId": "gm-edge:divided-response-to-yodong-gateway",
+          "fromNodeId": "gm-node:hostile-divided-response",
+          "toNodeId": "gm-node:yodong-defense-gateway",
+          "kindCode": "ExternalGateway",
+          "intentionCode": "Optional",
+          "stateCode": "Unresolved",
+          "bidirectional": false,
+          "sourceRelationRefs": [],
+          "reason": "실제 분리·대응 결과만 요동성 장기 방비 판단의 후보 입력이 되며 자동 승리나 E 승격을 만들지 않는다.",
+          "capabilityProfileRef": "gm-capability:unresolved-external"
+        },
+        {
           "edgeId": "gm-edge:hub-outbound-to-yodong-gateway",
           "fromNodeId": "gm-node:hub-outbound-staging",
           "toNodeId": "gm-node:yodong-defense-gateway",
@@ -699,7 +1766,11 @@
       ]
     },
     "level2": {
-      "meaning": "레벨 1의 관계를 실제 후보 배치 전에 검사하기 위한 제약과 증거 경계",
+      "meaning": "레벨 1의 관계를 실제 후보 배치 전에 검사하고 기존 배치 구조·제약 규칙의 출처와 적용 범위를 추적하는 계층",
+      "placementRuleCatalogRef": {
+        "path": "eng/world-seedbeds/graph-maps/placement-rule-bindings.v1.json",
+        "expectedRevision": "mirror-graph-map-placement-rule-catalog.r5"
+      },
       "constraints": [
         {
           "constraintId": "gm-constraint:actual-reference-identity",
@@ -809,6 +1880,361 @@
             "TargetRevisionChanged",
             "SourceReferenceChanged",
             "ConstraintDefinitionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:first-logging-reflection-lineage",
+          "categoryCode": "StateAndRewardLineage",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:first-logging-reflection-preparation"
+          ],
+          "stateCode": "Required",
+          "rule": "플레이어 본인의 첫 WI-NATURE-06 완료 ActionRecord와 한스 집 안전 휴식의 판본을 같은 성찰 씨앗에 결속하고, 관찰→원인→개선 순서·중단 재개·씨앗 판본당 한 번의 기존 승인 성장 근거를 보존하며 새 성장량이나 제품 상태를 만들지 않는다.",
+          "sourceRefs": [
+            "PLAN-STORY-DUAL-PROTAGONIST-001",
+            "PLAN-GAMEPLAY-MEDITATION-ACTION-001",
+            "WI-NATURE-06"
+          ],
+          "enforcementCode": "Static",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator",
+            "SimulationFocusMeditationTests"
+          ],
+          "failureCode": "FirstLoggingReflectionLineageInvalid",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "ActionRecordContractChanged",
+            "SafeRestEvidenceChanged",
+            "MeditationRewardLineageChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-first-trust-causal-lineage",
+          "categoryCode": "WorkAndRelationship",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-permitted-tree",
+            "gm-node:hans-broken-fence",
+            "gm-node:hans-first-trust",
+            "gm-edge:hans-timber-to-fence-repair",
+            "gm-edge:hans-fence-repair-to-first-trust"
+          ],
+          "stateCode": "Required",
+          "rule": "허용 나무 벌목, 목재 획득·운반, 실제 울타리 수리, 한스의 직접 목격을 같은 원인 계보로 보존하고 의뢰 보수·선물·즉시 호감 수치를 만들지 않는다.",
+          "sourceRefs": [
+            "D-529",
+            "D-531",
+            "WI-NATURE-06",
+            "WI-NATURE-18",
+            "WI-WORLD-04"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansFirstTrustCausalLineageMissing",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "WorldInteractionContractChanged",
+            "WitnessOrRewardMeaningChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-first-trust-spatial-values-unresolved",
+          "categoryCode": "SpatialPlanningBoundary",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-permitted-tree",
+            "gm-node:hans-broken-fence",
+            "gm-node:hans-first-trust"
+          ],
+          "stateCode": "Required",
+          "rule": "정확 나무 종류·거리·울타리 구간·수리 도구·관계 단계가 승인되기 전 실제 AreaSet·H·Scene 배치나 ReferenceAvailable 상태로 승격하지 않는다.",
+          "sourceRefs": [
+            "D-529",
+            "D-531"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansFirstTrustSpatialValueInvented",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "ApprovedSpatialValueAdded",
+            "TargetAreaChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-axe-choice-and-optional-stockpile",
+          "categoryCode": "ChoiceAndResourceLineage",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-permitted-tree",
+            "gm-node:hans-broken-fence",
+            "gm-node:hans-first-trust",
+            "gm-node:hans-broken-farm-axe-storage",
+            "gm-node:hans-house-timber-stockpile",
+            "gm-edge:hans-broken-fence-to-broken-farm-axe-storage",
+            "gm-edge:hans-first-trust-to-house-stockpile"
+          ],
+          "stateCode": "Required",
+          "rule": "첫 벌목·울타리 수리는 나무꾼 몸의 낡았지만 사용 가능한 개인 손도끼를 사용한다. 별도 부러진 농장 손도끼는 조사·보관만 가능하고 수리 전 장착·벌목·전투에 사용할 수 없다. 여분 목재 적재는 별도 선택이며 미수행·이탈이 첫 신뢰를 취소하지 않는다.",
+          "sourceRefs": [
+            "D-531",
+            "D-532"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansOptionalStockpileChoiceCollapsed",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "ToolOwnershipRuleChanged",
+            "OptionalActionMeaningChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-precision-axe-repair-lineage",
+          "categoryCode": "OwnershipAndRepairLineage",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-broken-farm-axe-storage",
+            "gm-node:hans-precision-axe-repair-handoff",
+            "gm-node:hans-repaired-precision-axe-return",
+            "gm-edge:broken-farm-axe-storage-to-repair-handoff",
+            "gm-edge:precision-axe-repair-handoff-to-return"
+          ],
+          "stateCode": "Required",
+          "rule": "실제 공동 행동으로 한스 관계와 집 접근이 열린 뒤 같은 부러진 도끼를 소지하고 재료·시간·명시적 맡김을 충족해야 수리 후보가 된다. 맡긴 동일 개체만 반환하며 새 도끼·즉시 호감 보상·무상 반복 수리를 만들지 않는다.",
+          "sourceRefs": [
+            "PLAN-STORY-DUAL-PROTAGONIST-001",
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansPrecisionAxeRepairLineageInvalid",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "ToolOwnershipRuleChanged",
+            "RepairContractApproved"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-precision-axe-role-separation",
+          "categoryCode": "ToolRoleSeparation",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-permitted-tree",
+            "gm-node:hans-repaired-precision-axe-return"
+          ],
+          "stateCode": "Required",
+          "rule": "수리된 농장 손도끼는 개인 손도끼의 단순 상위 장비가 아니라 가볍고 정밀한 목공·수리 작업용 별도 도구다. 정확 성능과 한스의 손재주 과거는 별도 승인 전 확정하지 않는다.",
+          "sourceRefs": [
+            "PLAN-STORY-DUAL-PROTAGONIST-001",
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansPrecisionAxeRoleCollapsed",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "ToolRoleRuleChanged",
+            "HansBackstoryApproved"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:route-layer-evidence-freshness",
+          "categoryCode": "LayerEvidenceAndFreshness",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-edge:farm-loading-to-hub-receiving",
+            "gm-edge:hub-outbound-to-town-receiving",
+            "gm-edge:hub-outbound-to-yodong-gateway"
+          ],
+          "stateCode": "Required",
+          "rule": "경로 보정은 안정 엣지, 기준 판본, 근거, 관측 시각, 적용 범위와 신선도를 가지며 오래되거나 충돌한 값은 현재 사실로 승격하지 않고 Unknown 또는 Conditional로 남긴다.",
+          "sourceRefs": [
+            "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+            "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001"
+          ],
+          "enforcementCode": "Static",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "RouteLayerEvidenceOrFreshnessInvalid",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "LayerContractChanged",
+            "EvidenceRevisionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:route-cost-contribution-no-double-count",
+          "categoryCode": "LayerCostComposition",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-edge:farm-loading-to-hub-receiving",
+            "gm-edge:hub-outbound-to-town-receiving",
+            "gm-edge:hub-outbound-to-yodong-gateway"
+          ],
+          "stateCode": "Required",
+          "rule": "거리·시간·금전·자원·위험 비용은 원자료 차원을 보존하고 contributionKey와 합성 정책을 가져야 하며 같은 원인을 여러 레이어에서 중복 합산하지 않는다.",
+          "sourceRefs": [
+            "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+            "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001"
+          ],
+          "enforcementCode": "Static",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "RouteCostContributionDuplicated",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "LayerContractChanged",
+            "CostDimensionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:route-network-state-and-capacity-separation",
+          "categoryCode": "RouteNetworkState",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-edge:hub-outbound-to-yodong-gateway"
+          ],
+          "stateCode": "Required",
+          "rule": "엣지 Open·Degraded·Blocked·Unknown과 보급망 전체 Blocked를 구분하고, 경로는 있지만 기한 내 용량이 부족한 InsufficientCapacity를 별도 결과로 유지한다. 실제 화물·기한·용량 없이 값을 확정하지 않는다.",
+          "sourceRefs": [
+            "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "RouteNetworkStateOrCapacityCollapsed",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "RouteFixtureApproved",
+            "CapacityRuleApproved"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:route-encounter-authority-and-return",
+          "categoryCode": "EncounterAuthorityAndReturn",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-edge:hub-outbound-to-yodong-gateway",
+            "gm-node:yodong-defense-gateway"
+          ],
+          "stateCode": "Required",
+          "rule": "실제 경로 이동, 서식지·침입·최근 사건 위험 원천, 시간·날씨·경비·통행·정찰 조건이 함께 있어야 조우 후보를 열며 거점 출입구 즉시 생성·연속 강제 전투를 금지하고 우회·중간 안전점·귀환을 보존한다.",
+          "sourceRefs": [
+            "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "RouteEncounterAuthorityOrReturnInvalid",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "RouteFixtureApproved",
+            "EncounterAuthorityChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-house-repair-state-and-marker",
+          "categoryCode": "StateAndPresentationLineage",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-house-timber-stockpile",
+            "gm-node:hans-house-repair",
+            "gm-edge:hans-house-stockpile-to-repair"
+          ],
+          "stateCode": "Required",
+          "rule": "플레이어 이탈·실재 목재·한스 접근·발견·소비·수리 경과를 보존하고 수리 필요→목재 확보→수리 중→수리됨을 구분하며 !/? 표식은 실제로 열린 상호작용 의미만 표시한다.",
+          "sourceRefs": [
+            "D-533",
+            "D-534",
+            "D-535"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansHouseRepairLineageOrMarkerInvalid",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "RepairStateContractChanged",
+            "MarkerMeaningChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-house-damage-candidate-tool-blocked",
+          "categoryCode": "PresentationCandidate",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-house-repair"
+          ],
+          "stateCode": "Required",
+          "rule": "손상 집은 원본 Synty 자산을 수정하지 않는 프로젝트 전용 Blender 복사본 후보이며 Blender 환경·정확 Farmhouse·손상 부위·충돌·Bounds 검증 전 제작 명령이나 E5 할당으로 승격하지 않는다.",
+          "sourceRefs": [
+            "D-536"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansHouseDamageCandidatePromoted",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "ToolAvailabilityChanged",
+            "AssetCandidateFrozen"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-life-base-boundary-unresolved",
+          "categoryCode": "ConditionalLifeBase",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-house-repair",
+            "gm-node:hans-mission-life-base",
+            "gm-edge:hans-house-repair-to-life-base"
+          ],
+          "stateCode": "Required",
+          "rule": "생활 거점은 수리 관찰·한스 확인 대화·이용 허락 뒤 제한적으로 열리며 경비대 지휘소·무제한 창고·무료 치료소·플레이어 소유 주택으로 확대하지 않고 정확 회복·보관·폐쇄 값은 미정으로 남긴다.",
+          "sourceRefs": [
+            "D-537"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansLifeBaseBoundaryInvented",
+          "invalidationConditions": [
+            "PlanningRevisionChanged",
+            "LifeBaseContractApproved",
+            "HansPermissionMeaningChanged"
           ]
         },
         {
@@ -945,6 +2371,162 @@
             "SourceReferenceChanged",
             "ConstraintDefinitionChanged"
           ]
+        },
+        {
+          "constraintId": "gm-constraint:farm-patrol-return-and-ambiguity",
+          "categoryCode": "PatrolAndThreat",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:farm-boundary-patrol-preparation",
+            "gm-node:farm-boundary-beast-encounter",
+            "gm-node:farm-boundary-trace-investigation",
+            "gm-edge:beast-encounter-return-to-life-base"
+          ],
+          "stateCode": "Required",
+          "rule": "첫 순찰은 대응·중단·귀환을 보존하고 동물형·야수형 마수 흔적을 사람형 자산이나 배후 조직 정답으로 바꾸지 않는다.",
+          "sourceRefs": [
+            "PLAN-STORY-MIRROR-MAIN-001",
+            "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "FarmPatrolMeaningOrReturnInvalid",
+          "invalidationConditions": [
+            "TargetRevisionChanged",
+            "SourceReferenceChanged",
+            "ConstraintDefinitionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hans-sword-delayed-reveal",
+          "categoryCode": "StoryClue",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hans-managed-sword-clue",
+            "gm-edge:hans-life-base-to-sword-clue"
+          ],
+          "stateCode": "Required",
+          "rule": "한스의 검은 첫 순찰에서 사용·정체 공개·능력 지급으로 연결하지 않고 이후 실제 위기 전까지 선택형 단서로 보존한다.",
+          "sourceRefs": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HansSwordRevealTooEarly",
+          "invalidationConditions": [
+            "TargetRevisionChanged",
+            "SourceReferenceChanged",
+            "ConstraintDefinitionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hub-evidence-not-answer",
+          "categoryCode": "Investigation",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hub-missing-cargo-investigation",
+            "gm-node:hub-missing-cargo-field-confirmation"
+          ],
+          "stateCode": "Required",
+          "rule": "예정 기록·기사·도로·날씨·몬스터 단서는 가설의 근거일 뿐 정답을 계산하지 않으며 현장 확인과 틀린 가설의 복귀를 보존한다.",
+          "sourceRefs": [
+            "PLAN-STORY-HUB-DISCOVERY-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HubEvidencePromotedToAnswer",
+          "invalidationConditions": [
+            "TargetRevisionChanged",
+            "SourceReferenceChanged",
+            "ConstraintDefinitionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hub-recovery-meditation-no-duplication",
+          "categoryCode": "RecoveryAndMeditation",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hub-cargo-relief-recovery",
+            "gm-node:hub-optional-meditation",
+            "gm-edge:relief-recovery-to-optional-meditation"
+          ],
+          "stateCode": "Required",
+          "rule": "문제 예방·NPC 안도·개인 회복·명상·영감·편린은 같은 원인 결과를 중복 복제하지 않고 각각의 실제 획득 조건을 통과할 때만 적용한다.",
+          "sourceRefs": [
+            "PLAN-STORY-HUB-DISCOVERY-001",
+            "PLAN-GAMEPLAY-FIRST-PERSON-FOCUS-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HubRecoveryMeditationDuplicated",
+          "invalidationConditions": [
+            "TargetRevisionChanged",
+            "SourceReferenceChanged",
+            "ConstraintDefinitionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:town-workshop-small-test-boundary",
+          "categoryCode": "WorkshopLearning",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:town-apprentice-workshop-failure",
+            "gm-node:town-apprentice-small-test-batch"
+          ],
+          "stateCode": "Required",
+          "rule": "공방 실패 진단은 견습과 작은 시험 batch로 원인을 확인하며 완제품 대리 제작·Recipe·편린·숙련·공방 소유를 자동 지급하지 않는다.",
+          "sourceRefs": [
+            "PLAN-STORY-MIRROR-MAIN-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "WorkshopSmallTestBoundaryInvalid",
+          "invalidationConditions": [
+            "TargetRevisionChanged",
+            "SourceReferenceChanged",
+            "ConstraintDefinitionChanged"
+          ]
+        },
+        {
+          "constraintId": "gm-constraint:hostile-division-requires-actual-separation",
+          "categoryCode": "ThreatNetwork",
+          "severityCode": "Blocking",
+          "targetRefs": [
+            "gm-node:hostile-threat-network",
+            "gm-node:hostile-divided-response",
+            "gm-edge:hostile-network-to-divided-response"
+          ],
+          "stateCode": "Required",
+          "rule": "지휘·호위·지원·증원·회복·보급 연결을 실제로 차단하거나 분리한 뒤에만 적 종합 역량 재판정 후보를 만들며 그래프 표기만으로 약화하지 않는다.",
+          "sourceRefs": [
+            "PLAN-STORY-YODONG-DEFENSE-001"
+          ],
+          "enforcementCode": "StaticAndHumanReview",
+          "requiredAtEvidence": "E4",
+          "validatorRefs": [
+            "GraphMapPlanValidator"
+          ],
+          "failureCode": "HostileDivisionWithoutActualSeparation",
+          "invalidationConditions": [
+            "TargetRevisionChanged",
+            "SourceReferenceChanged",
+            "ConstraintDefinitionChanged"
+          ]
         }
       ]
     },
@@ -1004,6 +2586,66 @@
       ],
       "unboundTargets": [
         {
+          "targetRef": "gm-node:hans-permitted-tree",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "기존 벌목·통나무 WI는 있으나 D-529의 정확 허용 나무·거리·Farm 경계 배치와 복합 원인 계보가 승인되지 않았다."
+        },
+        {
+          "targetRef": "gm-node:hans-broken-fence",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "기존 시설 수리 WI 후보는 있으나 정확 울타리 구간·도구·목재 소비 결속과 실제 H/Scene 배치가 승인되지 않았다."
+        },
+        {
+          "targetRef": "gm-node:hans-first-trust",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "한스의 직접 목격·첫 신뢰를 소유하는 승인된 WI·관계 계약·Unity 표현 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:farm-edge-to-hans-permitted-tree",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "울타리 발견에서 허용 나무 선택으로 이어지는 실제 공간·입력·권한 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-timber-to-fence-repair",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "벌목 결과 목재를 한스 울타리 수리에 인계하는 승인된 복합 계약과 Runtime 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-fence-repair-to-first-trust",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "수리·직접 목격·첫 신뢰를 같은 revision에서 잇는 승인된 관계 계약과 Runtime 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hans-house-timber-stockpile",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "선택적 추가 벌목·운반·적재와 플레이어 이탈 뒤 한스 발견을 소유하는 승인 WI·상태 계약·정확 배치가 없다."
+        },
+        {
+          "targetRef": "gm-node:hans-house-repair",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "수리 상태 권위·표식 소비·정확 Farmhouse/Construction 후보·Blender 가공 환경이 동결되지 않았고 실제 Prefab·Scene 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hans-mission-life-base",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "한스 이용 허락·안전·휴식·회복·소량 보관·임무 정보의 승인 WI·상태 계약·Save 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-first-trust-to-house-stockpile",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "첫 신뢰 이후의 선택적 여분 목재 흐름을 활성화하는 승인 계약과 입력 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-house-stockpile-to-repair",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "플레이어 이탈·한스 접근·목재 발견/소비·수리 경과를 같은 revision에서 잇는 승인 계약이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-house-repair-to-life-base",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "수리 관찰·! 확인 대화·이용 허락에서 제한 생활 거점으로 이어지는 승인 계약과 Runtime 결속이 없다."
+        },
+        {
           "targetRef": "gm-node:yodong-defense-gateway",
           "reasonCode": "NoApprovedUnityBinding",
           "reason": "요동성 방비 관문은 기획 방향만 있고 승인된 AreaSet·H·Unity Controller 결속이 없다."
@@ -1012,6 +2654,176 @@
           "targetRef": "gm-edge:hub-outbound-to-yodong-gateway",
           "reasonCode": "NoApprovedUnityBinding",
           "reason": "Hub에서 요동성으로 이어지는 실제 경로·이동 능력·Unity 소비 코드가 아직 승인되지 않았다."
+        },
+        {
+          "targetRef": "gm-node:farm-boundary-patrol-preparation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "첫 경계 순찰의 준비 상태·정확 공간·입력 계약과 Unity 결속이 승인되지 않았다."
+        },
+        {
+          "targetRef": "gm-node:farm-boundary-beast-encounter",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "동물형·야수형 마수 무리의 승인 WI·자산·공간·전투 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:farm-boundary-trace-investigation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "이동·상처·영역 흔적의 상태 계약과 조사 표현 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:farm-deeper-threat-gateway",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "더 깊은 위협 관문의 승인된 AreaSet·H·WI·Unity 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hans-managed-sword-clue",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "한스의 검 후보·정확 위치·관찰 상태·지연 공개 표현 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-life-base-to-patrol-preparation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "생활 거점에서 순찰 준비로 이어지는 승인 계약과 Runtime 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:patrol-preparation-to-beast-encounter",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "순찰 출발·실제 경로·조우 조건을 잇는 승인 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:beast-encounter-to-trace-investigation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "조우 결과에서 안전한 흔적 조사로 이어지는 승인 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:beast-encounter-return-to-life-base",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "조우 중단·이탈·생활 거점 귀환의 실제 경로와 입력 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:trace-investigation-to-deeper-threat-gateway",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "확인된 흔적을 장기 위협 관문으로 넘기는 승인 계약이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-life-base-to-sword-clue",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "생활 거점에서 선택형 검 단서를 관찰하는 Unity 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hub-missing-cargo-investigation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "미도착 판정·단서·가설 선택의 승인 상태 계약과 Unity 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hub-missing-cargo-field-confirmation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "가설과 현장 상태를 대조하는 승인 공간·입력·결과 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hub-cargo-relief-recovery",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "화물 문제 예방·NPC 안도·개인 회복을 같은 원인으로 잇는 승인 계약이 없다."
+        },
+        {
+          "targetRef": "gm-node:hub-optional-meditation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "선택적 명상과 영감·편린 획득 조건의 Unity 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hub-receiving-to-missing-cargo-investigation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "Hub 입고 불일치에서 사건 조사를 여는 승인 계약이 없다."
+        },
+        {
+          "targetRef": "gm-edge:missing-cargo-investigation-to-field-confirmation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "가설 선택과 현장 확인·재검토를 잇는 승인 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:field-confirmation-to-relief-recovery",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "현장 결과를 안도·회복 후보로 넘기는 승인 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:relief-recovery-to-optional-meditation",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "회복 뒤 선택적 명상으로 이어지는 중복 방지 계약이 없다."
+        },
+        {
+          "targetRef": "gm-node:town-apprentice-workshop-failure",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "견습 공방·실패 작업대·원인 후보의 승인 WI·공간·표현 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:town-apprentice-small-test-batch",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "소량 시험 batch와 전후 결과를 잇는 승인 제작 계약이 없다."
+        },
+        {
+          "targetRef": "gm-edge:town-living-square-to-apprentice-workshop-failure",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "Town 생활에서 공방 사건을 발견·복귀하는 승인 공간 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:workshop-failure-to-small-test-batch",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "원인 후보·견습 동의·소량 시험을 잇는 승인 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hostile-threat-network",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "거대 마수·적대 조직 관계망의 승인 AreaSet·WI·자산·Unity 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hostile-divided-response",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "실제 연결 차단·분리·종합 역량 재판정의 승인 계약이 없다."
+        },
+        {
+          "targetRef": "gm-edge:deeper-threat-gateway-to-hostile-network",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "Farm 단서 관문과 장기 위협망을 잇는 승인 공간·상태 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hostile-network-to-divided-response",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "위협망 연결 확인에서 실제 분할 대응으로 이어지는 승인 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:divided-response-to-yodong-gateway",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "분할 대응 결과를 요동성 방비 입력으로 넘기는 승인 계약이 없다."
+        },
+        {
+          "targetRef": "gm-node:hans-broken-farm-axe-storage",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "부러진 농장 손도끼의 동일 개체·손상·보관을 소유하는 승인 인벤토리·World 결속이 없다."
+        },
+        {
+          "targetRef": "gm-node:hans-precision-axe-repair-handoff",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "한스 관계·집 접근·재료·시간·명시적 맡김을 잇는 승인 수리 계약이 없다."
+        },
+        {
+          "targetRef": "gm-node:hans-repaired-precision-axe-return",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "동일 개체 반환과 정밀 목공·수리 역할을 소유하는 승인 장비 계약이 없다."
+        },
+        {
+          "targetRef": "gm-edge:hans-broken-fence-to-broken-farm-axe-storage",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "울타리 부근 발견 위치·조사 입력·보관 경계를 잇는 승인 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:broken-farm-axe-storage-to-repair-handoff",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "관계·집 접근·재료·시간 조건을 확인하는 승인 수리 맡김 결속이 없다."
+        },
+        {
+          "targetRef": "gm-edge:precision-axe-repair-handoff-to-return",
+          "reasonCode": "NoApprovedUnityBinding",
+          "reason": "수리 경과·동일 개체·반환을 잇는 승인 계약이 없다."
         }
       ],
       "evidenceBoundary": {
@@ -1025,7 +2837,7 @@
   },
   "partitionCatalog": {
     "schemaVersion": "mirror-graph-map-partition-catalog.v1",
-    "revision": "mirror-graph-map-partition-catalog.r1",
+    "revision": "mirror-graph-map-partition-catalog.r7",
     "federationStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
     "title": "북부 생활권 Graph Map 하위 맵·포트 대장",
     "meaning": "레벨 1~3의 의미는 각 하위 맵에서 유지하고, World 규모에서는 하위 맵과 명시 포트·connector만 조합한다.",
@@ -1045,7 +2857,7 @@
     },
     "sourceElementCatalogRef": {
       "path": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
-      "expectedRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r3"
+      "expectedRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r10"
     },
     "subgraphs": [
       {
@@ -1059,12 +2871,46 @@
         ],
         "nodeRefs": [
           "gm-node:nature-trailhead",
-          "gm-node:nature-farm-edge"
+          "gm-node:nature-farm-edge",
+          "gm-node:hans-permitted-tree",
+          "gm-node:hans-broken-fence",
+          "gm-node:hans-first-trust",
+          "gm-node:first-logging-reflection-preparation",
+          "gm-node:hans-house-timber-stockpile",
+          "gm-node:hans-house-repair",
+          "gm-node:hans-mission-life-base",
+          "gm-node:farm-boundary-patrol-preparation",
+          "gm-node:farm-boundary-beast-encounter",
+          "gm-node:farm-boundary-trace-investigation",
+          "gm-node:farm-deeper-threat-gateway",
+          "gm-node:hans-managed-sword-clue"
         ],
         "internalEdgeRefs": [
-          "gm-edge:nature-trail-to-farm-edge"
+          "gm-edge:nature-trail-to-farm-edge",
+          "gm-edge:farm-edge-to-hans-permitted-tree",
+          "gm-edge:hans-timber-to-fence-repair",
+          "gm-edge:hans-fence-repair-to-first-trust",
+          "gm-edge:hans-first-trust-to-house-stockpile",
+          "gm-edge:hans-house-stockpile-to-repair",
+          "gm-edge:hans-house-repair-to-life-base",
+          "gm-edge:hans-life-base-to-patrol-preparation",
+          "gm-edge:patrol-preparation-to-beast-encounter",
+          "gm-edge:beast-encounter-to-trace-investigation",
+          "gm-edge:beast-encounter-return-to-life-base",
+          "gm-edge:trace-investigation-to-deeper-threat-gateway",
+          "gm-edge:hans-life-base-to-sword-clue"
         ],
-        "constraintRefs": [],
+        "constraintRefs": [
+          "gm-constraint:hans-first-trust-causal-lineage",
+          "gm-constraint:hans-first-trust-spatial-values-unresolved",
+          "gm-constraint:first-logging-reflection-lineage",
+          "gm-constraint:hans-axe-choice-and-optional-stockpile",
+          "gm-constraint:hans-house-repair-state-and-marker",
+          "gm-constraint:hans-house-damage-candidate-tool-blocked",
+          "gm-constraint:hans-life-base-boundary-unresolved",
+          "gm-constraint:farm-patrol-return-and-ambiguity",
+          "gm-constraint:hans-sword-delayed-reveal"
+        ],
         "ports": [
           {
             "portId": "gm-port:nature-farm-edge:to-farm",
@@ -1075,6 +2921,57 @@
               "Walker"
             ],
             "meaning": "숲 가장자리에서 Farm 생산 구역을 발견·접근하는 경계 포트"
+          },
+          {
+            "portId": "gm-port:farm-deeper-threat:to-hostile-network",
+            "nodeRef": "gm-node:farm-deeper-threat-gateway",
+            "directionCode": "Outbound",
+            "capabilityCodes": [
+              "ExternalUnresolved"
+            ],
+            "meaning": "첫 Farm 순찰의 확인된 흔적을 장기 위협망 후보로 넘기는 미해결 포트"
+          },
+          {
+            "portId": "gm-port:hans-broken-fence:to-precision-axe",
+            "nodeRef": "gm-node:hans-broken-fence",
+            "directionCode": "Outbound",
+            "capabilityCodes": [
+              "Discovery"
+            ],
+            "meaning": "울타리 부근의 별도 부러진 농장 손도끼 조사·보관으로 이어지는 선택형 포트"
+          }
+        ]
+      },
+      {
+        "subgraphId": "gm-subgraph:hans-precision-axe",
+        "label": "한스 정밀 작업 도끼 발견·수리·반환",
+        "scopeCode": "OptionalItemLineage",
+        "ownerCode": "NatureStoryPlanning",
+        "areaSetRefs": [
+          "area-set:sim:pyeongchang:farm-production.v1"
+        ],
+        "nodeRefs": [
+          "gm-node:hans-broken-farm-axe-storage",
+          "gm-node:hans-precision-axe-repair-handoff",
+          "gm-node:hans-repaired-precision-axe-return"
+        ],
+        "internalEdgeRefs": [
+          "gm-edge:broken-farm-axe-storage-to-repair-handoff",
+          "gm-edge:precision-axe-repair-handoff-to-return"
+        ],
+        "constraintRefs": [
+          "gm-constraint:hans-precision-axe-repair-lineage",
+          "gm-constraint:hans-precision-axe-role-separation"
+        ],
+        "ports": [
+          {
+            "portId": "gm-port:hans-broken-farm-axe:from-fence",
+            "nodeRef": "gm-node:hans-broken-farm-axe-storage",
+            "directionCode": "Inbound",
+            "capabilityCodes": [
+              "Discovery"
+            ],
+            "meaning": "Farm 경계에서 별도 부러진 농장 손도끼의 동일 개체 계보를 여는 입력 포트"
           }
         ]
       },
@@ -1132,14 +3029,24 @@
         "nodeRefs": [
           "gm-node:hub-receiving-storage",
           "gm-node:hub-vehicle-yard",
-          "gm-node:hub-outbound-staging"
+          "gm-node:hub-outbound-staging",
+          "gm-node:hub-missing-cargo-investigation",
+          "gm-node:hub-missing-cargo-field-confirmation",
+          "gm-node:hub-cargo-relief-recovery",
+          "gm-node:hub-optional-meditation"
         ],
         "internalEdgeRefs": [
           "gm-edge:hub-receiving-to-vehicle-yard",
-          "gm-edge:hub-vehicle-yard-to-outbound"
+          "gm-edge:hub-vehicle-yard-to-outbound",
+          "gm-edge:hub-receiving-to-missing-cargo-investigation",
+          "gm-edge:missing-cargo-investigation-to-field-confirmation",
+          "gm-edge:field-confirmation-to-relief-recovery",
+          "gm-edge:relief-recovery-to-optional-meditation"
         ],
         "constraintRefs": [
-          "gm-constraint:hub-entry-contact-exit"
+          "gm-constraint:hub-entry-contact-exit",
+          "gm-constraint:hub-evidence-not-answer",
+          "gm-constraint:hub-recovery-meditation-no-duplication"
         ],
         "ports": [
           {
@@ -1183,12 +3090,18 @@
         ],
         "nodeRefs": [
           "gm-node:town-market-receiving",
-          "gm-node:town-living-square"
+          "gm-node:town-living-square",
+          "gm-node:town-apprentice-workshop-failure",
+          "gm-node:town-apprentice-small-test-batch"
         ],
         "internalEdgeRefs": [
-          "gm-edge:town-receiving-to-living-square"
+          "gm-edge:town-receiving-to-living-square",
+          "gm-edge:town-living-square-to-apprentice-workshop-failure",
+          "gm-edge:workshop-failure-to-small-test-batch"
         ],
-        "constraintRefs": [],
+        "constraintRefs": [
+          "gm-constraint:town-workshop-small-test-boundary"
+        ],
         "ports": [
           {
             "portId": "gm-port:town-market:from-hub",
@@ -1209,11 +3122,27 @@
         "ownerCode": "YodongPlanning",
         "areaSetRefs": [],
         "nodeRefs": [
+          "gm-node:hostile-threat-network",
+          "gm-node:hostile-divided-response",
           "gm-node:yodong-defense-gateway"
         ],
-        "internalEdgeRefs": [],
-        "constraintRefs": [],
+        "internalEdgeRefs": [
+          "gm-edge:hostile-network-to-divided-response",
+          "gm-edge:divided-response-to-yodong-gateway"
+        ],
+        "constraintRefs": [
+          "gm-constraint:hostile-division-requires-actual-separation"
+        ],
         "ports": [
+          {
+            "portId": "gm-port:hostile-network:from-farm-threat",
+            "nodeRef": "gm-node:hostile-threat-network",
+            "directionCode": "Inbound",
+            "capabilityCodes": [
+              "ExternalUnresolved"
+            ],
+            "meaning": "Farm의 더 깊은 위협 관문과 장기 위협망을 잇는 미해결 입력 포트"
+          },
           {
             "portId": "gm-port:yodong:from-hub",
             "nodeRef": "gm-node:yodong-defense-gateway",
@@ -1259,6 +3188,26 @@
         "stateCode": "ReferenceAvailable"
       },
       {
+        "connectorId": "gm-connector:farm-threat-hostile-network",
+        "edgeRef": "gm-edge:deeper-threat-gateway-to-hostile-network",
+        "fromPortRef": "gm-port:farm-deeper-threat:to-hostile-network",
+        "toPortRef": "gm-port:hostile-network:from-farm-threat",
+        "requiredCapabilityCodes": [
+          "ExternalUnresolved"
+        ],
+        "stateCode": "Unresolved"
+      },
+      {
+        "connectorId": "gm-connector:hans-fence-precision-axe",
+        "edgeRef": "gm-edge:hans-broken-fence-to-broken-farm-axe-storage",
+        "fromPortRef": "gm-port:hans-broken-fence:to-precision-axe",
+        "toPortRef": "gm-port:hans-broken-farm-axe:from-fence",
+        "requiredCapabilityCodes": [
+          "Discovery"
+        ],
+        "stateCode": "Unresolved"
+      },
+      {
         "connectorId": "gm-connector:hub-yodong",
         "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway",
         "fromPortRef": "gm-port:hub-outbound:to-yodong",
@@ -1276,17 +3225,96 @@
       "gm-constraint:route-capability-separation",
       "gm-constraint:season-does-not-rewrite-topology",
       "gm-constraint:asset-candidate-not-assignment",
-      "gm-constraint:no-whole-map-prerequisite"
+      "gm-constraint:no-whole-map-prerequisite",
+      "gm-constraint:route-layer-evidence-freshness",
+      "gm-constraint:route-cost-contribution-no-double-count",
+      "gm-constraint:route-network-state-and-capacity-separation",
+      "gm-constraint:route-encounter-authority-and-return"
     ]
   },
   "overlayCatalog": {
     "schemaVersion": "mirror-graph-map-overlay-catalog.v1",
-    "revision": "mirror-graph-map-overlay-catalog.r1",
-    "title": "Mirror Graph Map 시간·날씨 오버레이 대장",
-    "meaning": "절기·날씨·시간대는 기본 노드·엣지 토폴로지를 복제하거나 조용히 변경하지 않고 발견 난도·표현 후보·통행 조건을 별도 판본으로 덧씌운다.",
+    "revision": "mirror-graph-map-overlay-catalog.r5",
+    "title": "Mirror Graph Map 레이어·오버레이 대장",
+    "meaning": "기준 공간 topology를 한 번만 유지하고 기상·시간, 운송, 위협·경비, 물류·보급, 플레이어 선택을 안정 노드·엣지 위의 판본화된 조회 레이어로 합성한다.",
+    "compositionOrder": [
+      "gm-layer:base-space",
+      "gm-layer:weather-time",
+      "gm-layer:transport",
+      "gm-layer:threat-security",
+      "gm-layer:logistics-supply",
+      "gm-layer:player-choice"
+    ],
+    "layers": [
+      {
+        "layerId": "gm-layer:base-space",
+        "label": "기준 공간",
+        "layerKindCode": "BaseSpace",
+        "compositionOrder": 0,
+        "authorityBoundary": "기존 안정 노드·엣지·방향·기준점을 제공하며 다른 레이어가 topology를 복제하거나 변경할 수 없다.",
+        "sourceRefs": [
+          "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json"
+        ]
+      },
+      {
+        "layerId": "gm-layer:weather-time",
+        "label": "기상·시간",
+        "layerKindCode": "WeatherTime",
+        "compositionOrder": 1,
+        "authorityBoundary": "절기·시간·날씨 관측은 통행·가시성·위험 후보를 보정하지만 기준 길을 삭제하거나 권위 결과를 만들지 않는다.",
+        "sourceRefs": [
+          "docs/AI/24절기-제철자료-조사와기획연결-2026-08-31.md",
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"
+        ]
+      },
+      {
+        "layerId": "gm-layer:transport",
+        "label": "운송",
+        "layerKindCode": "Transport",
+        "compositionOrder": 2,
+        "authorityBoundary": "수단별 통과 가능성·비용·용량 후보를 표현하며 출발·계약·비용 차감·도착을 확정하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"
+        ]
+      },
+      {
+        "layerId": "gm-layer:threat-security",
+        "label": "위협·경비",
+        "layerKindCode": "ThreatSecurity",
+        "compositionOrder": 3,
+        "authorityBoundary": "실제 서식지·침입·사건·경비 근거가 있을 때만 위험·조우·차단 후보를 보정하며 거리나 몬스터 존재만으로 차단하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md",
+          "docs/AI/요동성방어-메인스토리기획-2026-09-01.md"
+        ]
+      },
+      {
+        "layerId": "gm-layer:logistics-supply",
+        "label": "물류·보급",
+        "layerKindCode": "LogisticsSupply",
+        "compositionOrder": 4,
+        "authorityBoundary": "화물·기한·처리 용량으로 대체 경로·병목·부족 후보를 계산하며 엣지 차단만으로 재고나 납품 결과를 확정하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md",
+          "docs/AI/허브발견-3인칭관찰과광역노드-기획-2026-09-01.md"
+        ]
+      },
+      {
+        "layerId": "gm-layer:player-choice",
+        "label": "플레이어 선택·조회",
+        "layerKindCode": "PlayerChoice",
+        "compositionOrder": 5,
+        "authorityBoundary": "빠름·안전·저렴·대량·균형 후보와 근거를 보여 주며 숨은 정답·자동 Confirm·권위 변경을 만들지 않는다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-레이어중심-설계개발우선순위-2026-09-02.md",
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"
+        ]
+      }
+    ],
     "overlays": [
       {
         "overlayId": "gm-overlay:spring-equinox",
+        "layerRef": "gm-layer:weather-time",
         "label": "춘분 기본 검토 오버레이",
         "triggerKindCode": "SeasonalTerm",
         "stateCode": "PlanningReference",
@@ -1294,6 +3322,7 @@
           "gm-subgraph:nature-discovery",
           "gm-subgraph:farm-production"
         ],
+        "targetEdgeRefs": [],
         "topologyMutationAllowed": false,
         "authorityMutationAllowed": false,
         "effectCategories": [
@@ -1311,12 +3340,14 @@
       },
       {
         "overlayId": "gm-overlay:weather-discovery-visibility",
+        "layerRef": "gm-layer:weather-time",
         "label": "날씨에 따른 발견 판독 오버레이",
         "triggerKindCode": "WeatherState",
         "stateCode": "ConfirmedDirection",
         "targetSubgraphRefs": [
           "gm-subgraph:nature-discovery"
         ],
+        "targetEdgeRefs": [],
         "topologyMutationAllowed": false,
         "authorityMutationAllowed": false,
         "effectCategories": [
@@ -1329,9 +3360,792 @@
           "D-409"
         ],
         "valueBoundary": "날씨는 발견 난도와 표현에 영향을 줄 수 있지만 승인된 WI·경로·권위 결과를 자동으로 추가·삭제하지 않는다."
+      },
+      {
+        "overlayId": "gm-overlay:decision-card-authority-time",
+        "layerRef": "gm-layer:player-choice",
+        "label": "선택 카드 권위 시간 정책 오버레이",
+        "triggerKindCode": "DecisionCardOpenState",
+        "stateCode": "ConfirmedDirection",
+        "targetSubgraphRefs": [
+          "gm-subgraph:nature-discovery"
+        ],
+        "targetEdgeRefs": [],
+        "topologyMutationAllowed": false,
+        "authorityMutationAllowed": false,
+        "effectCategories": [
+          "SafeContextPause",
+          "TimeSensitiveSlowProgress",
+          "CurrentStateRefresh"
+        ],
+        "sourceDecisionIds": [
+          "D-527",
+          "D-530",
+          "D-531",
+          "D-532"
+        ],
+        "valueBoundary": "안전 판정에서는 카드 열람 중 권위 시간을 정지하고 이미 시작된 시간 민감 사건에서는 느리게 계속 진행한다. 감속 배율·전환·UI·Hosted 동기화는 만들지 않으며 반복 개폐로 진행을 고정·초기화·되감지 않는다."
+      },
+      {
+        "overlayId": "gm-overlay:optional-focus-reflection",
+        "layerRef": "gm-layer:player-choice",
+        "label": "선택형 집중·명상 반영 오버레이",
+        "triggerKindCode": "OptionalFocusedInteraction",
+        "stateCode": "PlanningReference",
+        "targetSubgraphRefs": [
+          "gm-subgraph:nature-discovery",
+          "gm-subgraph:hub-logistics"
+        ],
+        "targetEdgeRefs": [],
+        "topologyMutationAllowed": false,
+        "authorityMutationAllowed": false,
+        "effectCategories": [
+          "FocusedTimingCandidate",
+          "MeditationReflectionCandidate",
+          "ResultReadability"
+        ],
+        "sourceDecisionIds": [],
+        "sourcePlanIds": [
+          "PLAN-GAMEPLAY-FIRST-PERSON-FOCUS-001",
+          "PLAN-STORY-HUB-DISCOVERY-001"
+        ],
+        "valueBoundary": "집중·명상은 플레이어가 선택한 상호작용에서만 검토하며 토폴로지·권위 결과·회복·영감·편린을 생성하거나 중복 지급하지 않는다."
+      },
+      {
+        "overlayId": "gm-overlay:long-route-weather-time",
+        "layerRef": "gm-layer:weather-time",
+        "label": "장거리 경로 기상·시간 조건",
+        "triggerKindCode": "RouteConditionSnapshot",
+        "stateCode": "PlanningReference",
+        "targetSubgraphRefs": [
+          "gm-subgraph:hub-logistics",
+          "gm-subgraph:yodong-gateway"
+        ],
+        "targetEdgeRefs": [
+          "gm-edge:hub-outbound-to-yodong-gateway"
+        ],
+        "topologyMutationAllowed": false,
+        "authorityMutationAllowed": false,
+        "effectCategories": [
+          "RouteStateCandidate",
+          "TravelTimeInput",
+          "VisibilityInput"
+        ],
+        "sourceDecisionIds": [],
+        "sourcePlanIds": [
+          "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001"
+        ],
+        "edgeEffects": [
+          {
+            "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway",
+            "routeStateCode": "Unknown",
+            "scopeCode": "PlanningOnlyUnresolvedRoute",
+            "costComponents": [
+              {
+                "dimensionCode": "Time",
+                "valueStateCode": "Unknown",
+                "value": null,
+                "unitCode": "Unknown",
+                "contributionKey": "weather-time:travel-time",
+                "combinationPolicyCode": "Annotation"
+              }
+            ],
+            "capacity": {
+              "valueStateCode": "Unknown",
+              "value": null,
+              "unitCode": "Unknown"
+            },
+            "evidence": {
+              "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md",
+              "sourceRevision": "long-route-encounter-planning.r3",
+              "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D",
+              "observedAt": "NotObserved",
+              "validUntil": "NotEstablished",
+              "freshnessStateCode": "PlanningCurrent"
+            }
+          }
+        ],
+        "valueBoundary": "실제 시간·날씨 상태 사본과 상한이 없으므로 현재 경로 상태와 시간 값은 Unknown이다."
+      },
+      {
+        "overlayId": "gm-overlay:long-route-transport",
+        "layerRef": "gm-layer:transport",
+        "label": "장거리 경로 운송 수단·비용·용량",
+        "triggerKindCode": "TransportModeCandidate",
+        "stateCode": "PlanningReference",
+        "targetSubgraphRefs": [
+          "gm-subgraph:hub-logistics",
+          "gm-subgraph:yodong-gateway"
+        ],
+        "targetEdgeRefs": [
+          "gm-edge:hub-outbound-to-yodong-gateway"
+        ],
+        "topologyMutationAllowed": false,
+        "authorityMutationAllowed": false,
+        "effectCategories": [
+          "TransportFeasibility",
+          "RouteCostCandidate",
+          "RouteCapacityCandidate"
+        ],
+        "sourceDecisionIds": [],
+        "sourcePlanIds": [
+          "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001"
+        ],
+        "edgeEffects": [
+          {
+            "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway",
+            "routeStateCode": "Unknown",
+            "scopeCode": "PlanningOnlyUnresolvedRoute",
+            "costComponents": [
+              {
+                "dimensionCode": "Distance",
+                "valueStateCode": "Unknown",
+                "value": null,
+                "unitCode": "Unknown",
+                "contributionKey": "transport:distance",
+                "combinationPolicyCode": "Annotation"
+              },
+              {
+                "dimensionCode": "Money",
+                "valueStateCode": "Unknown",
+                "value": null,
+                "unitCode": "Unknown",
+                "contributionKey": "transport:money",
+                "combinationPolicyCode": "Annotation"
+              }
+            ],
+            "capacity": {
+              "valueStateCode": "Unknown",
+              "value": null,
+              "unitCode": "Unknown"
+            },
+            "evidence": {
+              "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md",
+              "sourceRevision": "long-route-encounter-planning.r3",
+              "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D",
+              "observedAt": "NotObserved",
+              "validUntil": "NotEstablished",
+              "freshnessStateCode": "PlanningCurrent"
+            }
+          }
+        ],
+        "valueBoundary": "승인된 수단·거리·비용·용량 값과 실제 경로가 없으므로 값을 만들지 않는다."
+      },
+      {
+        "overlayId": "gm-overlay:long-route-threat-security",
+        "layerRef": "gm-layer:threat-security",
+        "label": "장거리 경로 위협·경비 조건",
+        "triggerKindCode": "ThreatSecuritySnapshot",
+        "stateCode": "PlanningReference",
+        "targetSubgraphRefs": [
+          "gm-subgraph:hub-logistics",
+          "gm-subgraph:yodong-gateway"
+        ],
+        "targetEdgeRefs": [
+          "gm-edge:hub-outbound-to-yodong-gateway"
+        ],
+        "topologyMutationAllowed": false,
+        "authorityMutationAllowed": false,
+        "effectCategories": [
+          "ThreatCostCandidate",
+          "EscortNeedCandidate",
+          "EncounterEligibilityCandidate"
+        ],
+        "sourceDecisionIds": [],
+        "sourcePlanIds": [
+          "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+          "PLAN-STORY-YODONG-DEFENSE-001"
+        ],
+        "edgeEffects": [
+          {
+            "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway",
+            "routeStateCode": "Unknown",
+            "scopeCode": "PlanningOnlyUnresolvedRoute",
+            "costComponents": [
+              {
+                "dimensionCode": "Risk",
+                "valueStateCode": "Unknown",
+                "value": null,
+                "unitCode": "Unknown",
+                "contributionKey": "threat-security:risk",
+                "combinationPolicyCode": "Constraint"
+              }
+            ],
+            "capacity": {
+              "valueStateCode": "Unknown",
+              "value": null,
+              "unitCode": "Unknown"
+            },
+            "evidence": {
+              "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md",
+              "sourceRevision": "long-route-encounter-planning.r3",
+              "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D",
+              "observedAt": "NotObserved",
+              "validUntil": "NotEstablished",
+              "freshnessStateCode": "PlanningCurrent"
+            }
+          }
+        ],
+        "valueBoundary": "실제 서식지·침입·최근 사건·경비 상태가 없으므로 거리만으로 조우나 차단을 만들지 않는다."
+      },
+      {
+        "overlayId": "gm-overlay:long-route-logistics-supply",
+        "layerRef": "gm-layer:logistics-supply",
+        "label": "장거리 경로 물류·보급 적합성",
+        "triggerKindCode": "CargoDemandWindow",
+        "stateCode": "PlanningReference",
+        "targetSubgraphRefs": [
+          "gm-subgraph:hub-logistics",
+          "gm-subgraph:yodong-gateway"
+        ],
+        "targetEdgeRefs": [
+          "gm-edge:hub-outbound-to-yodong-gateway"
+        ],
+        "topologyMutationAllowed": false,
+        "authorityMutationAllowed": false,
+        "effectCategories": [
+          "SupplyRouteCandidate",
+          "NetworkBlockedCandidate",
+          "InsufficientCapacityCandidate"
+        ],
+        "sourceDecisionIds": [],
+        "sourcePlanIds": [
+          "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+          "PLAN-STORY-HUB-DISCOVERY-001"
+        ],
+        "edgeEffects": [
+          {
+            "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway",
+            "routeStateCode": "Unknown",
+            "scopeCode": "PlanningOnlyUnresolvedRoute",
+            "costComponents": [
+              {
+                "dimensionCode": "Resource",
+                "valueStateCode": "Unknown",
+                "value": null,
+                "unitCode": "Unknown",
+                "contributionKey": "logistics-supply:resource",
+                "combinationPolicyCode": "Annotation"
+              }
+            ],
+            "capacity": {
+              "valueStateCode": "Unknown",
+              "value": null,
+              "unitCode": "Unknown"
+            },
+            "evidence": {
+              "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md",
+              "sourceRevision": "long-route-encounter-planning.r3",
+              "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D",
+              "observedAt": "NotObserved",
+              "validUntil": "NotEstablished",
+              "freshnessStateCode": "PlanningCurrent"
+            }
+          }
+        ],
+        "valueBoundary": "한 엣지 차단과 망 전체 Blocked, 경로 존재와 InsufficientCapacity를 분리하며 실제 화물·기한·용량 없이 결과를 확정하지 않는다."
+      },
+      {
+        "overlayId": "gm-overlay:long-route-player-choice",
+        "layerRef": "gm-layer:player-choice",
+        "label": "장거리 경로 후보 비교·명시 선택",
+        "triggerKindCode": "RouteCandidateReview",
+        "stateCode": "PlanningReference",
+        "targetSubgraphRefs": [
+          "gm-subgraph:hub-logistics",
+          "gm-subgraph:yodong-gateway"
+        ],
+        "targetEdgeRefs": [
+          "gm-edge:hub-outbound-to-yodong-gateway"
+        ],
+        "topologyMutationAllowed": false,
+        "authorityMutationAllowed": false,
+        "effectCategories": [
+          "FastSafeCheapCapacityBalancedCandidates",
+          "TradeoffExplanation",
+          "ExplicitSelectionRequired"
+        ],
+        "sourceDecisionIds": [],
+        "sourcePlanIds": [
+          "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+          "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001"
+        ],
+        "valueBoundary": "조회 레이어 토글이나 후보 정렬은 권위 비용·경로·운송 결과를 바꾸지 않으며 다른 후보를 숨기거나 자동 Confirm하지 않는다."
       }
     ]
   },
+  "placementRuleCatalog": {
+    "schemaVersion": "mirror-graph-map-placement-rule-catalog.v1",
+    "revision": "mirror-graph-map-placement-rule-catalog.r5",
+    "graphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+    "title": "북부 생활권 Graph Map 배치 구조·제약 규칙 결속",
+    "sourceRefs": [
+      {
+        "kindCode": "H5WorldLayoutPolicy",
+        "path": "eng/world-seedbeds/h5-world-layout-policy.v1.json",
+        "expectedRevision": "simulation-world-h5-layout-policy.r4"
+      },
+      {
+        "kindCode": "SpatialHierarchy",
+        "path": "eng/world-seedbeds/spatial-hierarchy-levels.json",
+        "expectedRevision": "simulation-world-spatial-hierarchy.r1"
+      },
+      {
+        "kindCode": "SpatialFormationModes",
+        "path": "eng/world-seedbeds/spatial-formation-modes.v1.json",
+        "expectedRevision": "simulation-spatial-formation-modes.r1"
+      }
+    ],
+    "authorityBoundary": {
+      "declarativePreflightOnly": true,
+      "formsHInstances": false,
+      "calculatesPlacementPlan": false,
+      "appliesUnityObjects": false,
+      "changesSimulationAuthority": false,
+      "runtimeVerified": false,
+      "gameViewVerified": false,
+      "meaning": "Graph Map은 기존 배치 구조·제약 규칙의 출처와 적용 범위를 추적한다. 수치 규칙을 새로 만들거나 H 성립·배치 계획·Unity 적용을 대신하지 않는다."
+    },
+    "hierarchyConsumption": {
+      "expectedHLevelCodes": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "expectedFormationModeCodes": [
+        "LhComposed",
+        "PlayerComposed",
+        "HybridEvolving"
+      ],
+      "constraintAxisCode": "WorldAreaHEnvelopeToObject",
+      "formationAxisCode": "H1ToH4BottomUp",
+      "meaning": "하향식 물리 제약과 상향식 H 성립을 구분하고, Graph Map 노드·엣지는 두 축의 입력 관계만 참조한다."
+    },
+    "areaRuleProfiles": [
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+        "canonicalAreaRoleCode": "NatureHome",
+        "graphPresenceCode": "Present",
+        "rules": [
+          {
+            "ruleRef": "gm-placement-rule:nature:irregular-terrain",
+            "sourceRuleCode": "IrregularTerrain",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "현재 Graph Map은 지형 불규칙성의 수치·실측 제약을 아직 선택하지 않았다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:nature:low-building-density",
+            "sourceRuleCode": "LowBuildingDensity",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "현재 노드는 건물 밀도 계산보다 발견·귀환 관계를 우선한다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:nature:threat-outer-ring",
+            "sourceRuleCode": "ThreatOuterRing",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "위협 외곽의 실제 거리·대상 규칙은 현재 Graph Map 제약에 아직 결속되지 않았다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:nature:woodland-clearing-core",
+            "sourceRuleCode": "WoodlandClearingCore",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "숲 빈터 핵의 실측 범위가 현재 계획 판본에 없다."
+          }
+        ]
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+        "canonicalAreaRoleCode": "Farm",
+        "graphPresenceCode": "Present",
+        "rules": [
+          {
+            "ruleRef": "gm-placement-rule:farm:crossroad-four-fields",
+            "sourceRuleCode": "CrossroadFourFields",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "현재 Graph Map은 네 필지의 실제 기하를 아직 표현하지 않는다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:farm:fence-continuity-with-entrances",
+            "sourceRuleCode": "FenceContinuityWithEntrances",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "울타리·출입구 객체와 실측 간격이 현재 노드·엣지에 결속되지 않았다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:farm:gentle-work-slope",
+            "sourceRuleCode": "GentleWorkSlope",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "실제 지지면과 경사 표본은 Play Mode 전 별도 검증이 필요하다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:farm:no-ridge-building",
+            "sourceRuleCode": "NoRidgeBuilding",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "건물 후보와 능선 지형의 실제 교차 정보가 아직 없다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:farm:production-processing-separation",
+            "sourceRuleCode": "ProductionProcessingSeparation",
+            "usageCode": "BoundToGraphConstraint",
+            "constraintRefs": [
+              "gm-constraint:farm-flow-separation"
+            ],
+            "reason": "Farm 생산·작업마당·상차 역할 분리 제약이 기존 H5 규칙을 직접 소비한다."
+          }
+        ]
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+        "canonicalAreaRoleCode": "Hub",
+        "graphPresenceCode": "Present",
+        "rules": [
+          {
+            "ruleRef": "gm-placement-rule:hub:flat-hardscape",
+            "sourceRuleCode": "FlatHardscape",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "평탄 포장의 실측 지지 조건은 현재 그래프 관계만으로 판정하지 않는다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:hub:vehicle-turning-radius",
+            "sourceRuleCode": "VehicleTurningRadius",
+            "usageCode": "BoundToGraphConstraint",
+            "constraintRefs": [
+              "gm-constraint:route-capability-separation"
+            ],
+            "reason": "차량 접근을 보행·화물과 분리하는 제약이 기존 회전 반경 규칙을 참조한다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:hub:inbound-inspection-putaway-sequence",
+            "sourceRuleCode": "InboundInspectionPutawaySequence",
+            "usageCode": "BoundToGraphConstraint",
+            "constraintRefs": [
+              "gm-constraint:hub-entry-contact-exit"
+            ],
+            "reason": "Hub 입구·접점·출구 판독 제약이 입고·검수·적치 순서를 참조한다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:hub:outbound-staging-separation",
+            "sourceRuleCode": "OutboundStagingSeparation",
+            "usageCode": "BoundToGraphConstraint",
+            "constraintRefs": [
+              "gm-constraint:hub-entry-contact-exit"
+            ],
+            "reason": "Hub 출고 준비를 입고 접점과 분리하는 제약에 직접 결속한다."
+          }
+        ]
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+        "canonicalAreaRoleCode": "Town",
+        "graphPresenceCode": "Present",
+        "rules": [
+          {
+            "ruleRef": "gm-placement-rule:town:low-rise-mixed-use",
+            "sourceRuleCode": "LowRiseMixedUse",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "Town 상세 건축 밀도와 용도 혼합은 현재 그래프 범위를 넘는다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:town:pedestrian-market-spine",
+            "sourceRuleCode": "PedestrianMarketSpine",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "시장 보행 중심축의 실제 노드·통로가 아직 세분화되지 않았다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:town:resident-need-return-route",
+            "sourceRuleCode": "ResidentNeedReturnRoute",
+            "usageCode": "AvailableNotSelected",
+            "constraintRefs": [],
+            "reason": "현재 필수 귀환 제약의 대상은 Nature와 Hub이며 Town 주민 경로를 대신 연결하지 않는다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:town:service-traffic-control",
+            "sourceRuleCode": "ServiceTrafficControl",
+            "usageCode": "BoundToGraphConstraint",
+            "constraintRefs": [
+              "gm-constraint:route-capability-separation"
+            ],
+            "reason": "Hub→Town 연결에서 서비스 차량과 보행·화물 능력을 분리하는 제약이 이 규칙을 참조한다."
+          }
+        ]
+      },
+      {
+        "areaSetStableId": "area-set:sim:pyeongchang:city-service.v1",
+        "canonicalAreaRoleCode": "City",
+        "graphPresenceCode": "OutsideCurrentGraph",
+        "rules": [
+          {
+            "ruleRef": "gm-placement-rule:city:dense-service-grid",
+            "sourceRuleCode": "DenseServiceGrid",
+            "usageCode": "OutsideCurrentGraph",
+            "constraintRefs": [],
+            "reason": "City는 현재 Graph Map에 실제 노드가 없다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:city:large-service-facilities",
+            "sourceRuleCode": "LargeServiceFacilities",
+            "usageCode": "OutsideCurrentGraph",
+            "constraintRefs": [],
+            "reason": "City는 현재 Graph Map에 실제 노드가 없다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:city:public-space-network",
+            "sourceRuleCode": "PublicSpaceNetwork",
+            "usageCode": "OutsideCurrentGraph",
+            "constraintRefs": [],
+            "reason": "City는 현재 Graph Map에 실제 노드가 없다."
+          },
+          {
+            "ruleRef": "gm-placement-rule:city:reserved-until-actual-e5",
+            "sourceRuleCode": "ReservedUntilActualE5",
+            "usageCode": "OutsideCurrentGraph",
+            "constraintRefs": [],
+            "reason": "City는 H5 정책에서 Reserved이며 현재 Graph Map 실제 참조가 없다."
+          }
+        ]
+      }
+    ],
+    "governanceOnlyConstraints": [
+      {
+        "constraintRef": "gm-constraint:actual-reference-identity",
+        "reason": "실제 참조 계보 검사이며 장소별 H5 배치 규칙을 적용하는 제약이 아니다.",
+        "sourceRefs": [
+          "docs/Architecture/상향식배치성립통제계층.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:required-traversal-return",
+        "reason": "필수 이동의 귀환 토폴로지를 검사하며 특정 Area의 배치 코드로 대체하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:unresolved-never-verified",
+        "reason": "미해결 증거의 승격을 막는 관리 제약이다.",
+        "sourceRefs": [
+          "docs/Architecture/플레이폐루프논리시각이중순환체계.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:season-does-not-rewrite-topology",
+        "reason": "시간·표현이 권위 토폴로지를 바꾸지 못하게 하는 경계다.",
+        "sourceRefs": [
+          "docs/Architecture/지도구성과세계자산배치분리.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:asset-candidate-not-assignment",
+        "reason": "자산 후보와 실제 할당의 증거 단계를 구분하는 표현 관문이다.",
+        "sourceRefs": [
+          "docs/Architecture/플레이폐루프Synty표현모듈체계.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:no-whole-map-prerequisite",
+        "reason": "영역 독립 개발 원칙이며 장소별 배치 규칙을 새 선행 조건으로 만들지 않는다.",
+        "sourceRefs": [
+          "docs/Architecture/FarmHubCity독립영역우선개발정책.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-first-trust-causal-lineage",
+        "reason": "벌목·목재·수리·목격·첫 신뢰의 원인 계보를 보존하는 기획 제약이며 장소별 H5 배치 수치를 만들지 않는다.",
+        "sourceRefs": [
+          "docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:first-logging-reflection-lineage",
+        "reason": "첫 벌목 ActionRecord·한스 집 안전 휴식·성찰 진행·기존 성장 근거의 계보를 검사하는 상태 관문이며 장소별 H5 배치 수치를 만들지 않는다.",
+        "sourceRefs": [
+          "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-first-trust-spatial-values-unresolved",
+        "reason": "미정 나무·거리·울타리·도구·관계 값을 실제 배치로 승격하지 못하게 하는 기획 관문이다.",
+        "sourceRefs": [
+          "docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-axe-choice-and-optional-stockpile",
+        "reason": "손도끼 사용과 여분 목재 적재를 별도 선택·원인 계보로 보존하는 기획 제약이며 장소별 H5 수치를 만들지 않는다.",
+        "sourceRefs": [
+          "docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-house-repair-state-and-marker",
+        "reason": "한스의 사후 발견·목재 소비·수리 상태·표식 의미를 보존하는 기획·표현 관문이며 배치 규칙을 새로 정의하지 않는다.",
+        "sourceRefs": [
+          "docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-house-damage-candidate-tool-blocked",
+        "reason": "원본 불변 Blender 복사본 후보와 현재 도구 차단을 E4 후보 경계로 남기며 실제 자산 제작·배치 규칙이 아니다.",
+        "sourceRefs": [
+          "docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-life-base-boundary-unresolved",
+        "reason": "한스 허락 뒤 제한 생활 거점의 역할과 미정 값을 보존하며 경비대 지휘소나 플레이어 소유 주택 배치 규칙을 만들지 않는다.",
+        "sourceRefs": [
+          "docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:farm-patrol-return-and-ambiguity",
+        "reason": "첫 순찰의 귀환과 위협 의미를 보존하며 아직 정해지지 않은 경로·거리·마수 배치를 만들지 않는다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-sword-delayed-reveal",
+        "reason": "한스의 검을 지연 공개 단서로 보존하는 이야기 제약이며 실제 소품 배치 규칙이 아니다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hub-evidence-not-answer",
+        "reason": "단서·가설·현장 확인의 인과를 보존하며 공간 배치나 정답 계산을 수행하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hub-recovery-meditation-no-duplication",
+        "reason": "회복·명상·영감 결과 중복을 막는 권위 경계이며 장소별 배치 규칙이 아니다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:town-workshop-small-test-boundary",
+        "reason": "작은 시험의 학습·보상 경계를 보존하며 공방 작업대나 자산을 자동 배치하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hostile-division-requires-actual-separation",
+        "reason": "실제 관계 차단 전 종합 역량 재판정을 막는 기획 제약이며 전장 배치 규칙이 아니다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-precision-axe-repair-lineage",
+        "reason": "부러진 농장 손도끼의 동일 개체·관계·재료·시간·맡김·반환 계보를 보존하는 기획 제약이며 실제 수리 기능이나 배치 규칙이 아니다.",
+        "sourceRefs": [
+          "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:hans-precision-axe-role-separation",
+        "reason": "개인 손도끼와 정밀 목공·수리 도구의 역할을 분리하는 기획 제약이며 성능·Prefab·한스 과거를 확정하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:route-layer-evidence-freshness",
+        "reason": "경로 레이어의 근거·판본·관측·신선도를 검사하는 비배치 거버넌스 제약이다.",
+        "sourceRefs": [
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:route-cost-contribution-no-double-count",
+        "reason": "레이어 비용 원인의 중복 합산을 막는 비배치 조합 제약이다.",
+        "sourceRefs": [
+          "docs/AI/GraphMap-레이어중심-설계개발우선순위-2026-09-02.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:route-network-state-and-capacity-separation",
+        "reason": "엣지 상태·망 차단·용량 부족을 분리하는 계획 제약이며 실제 경로 값을 만들지 않는다.",
+        "sourceRefs": [
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"
+        ]
+      },
+      {
+        "constraintRef": "gm-constraint:route-encounter-authority-and-return",
+        "reason": "실제 위험 원천과 우회·귀환을 요구하는 계획 제약이며 몬스터나 경로를 배치하지 않는다.",
+        "sourceRefs": [
+          "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"
+        ]
+      }
+    ]
+  },
+  "resolvedPlacementRuleBindings": [
+    {
+      "ruleRef": "gm-placement-rule:farm:production-processing-separation",
+      "sourceRuleCode": "ProductionProcessingSeparation",
+      "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+      "canonicalAreaRoleCode": "Farm",
+      "constraintRefs": [
+        "gm-constraint:farm-flow-separation"
+      ],
+      "reason": "Farm 생산·작업마당·상차 역할 분리 제약이 기존 H5 규칙을 직접 소비한다."
+    },
+    {
+      "ruleRef": "gm-placement-rule:hub:vehicle-turning-radius",
+      "sourceRuleCode": "VehicleTurningRadius",
+      "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "canonicalAreaRoleCode": "Hub",
+      "constraintRefs": [
+        "gm-constraint:route-capability-separation"
+      ],
+      "reason": "차량 접근을 보행·화물과 분리하는 제약이 기존 회전 반경 규칙을 참조한다."
+    },
+    {
+      "ruleRef": "gm-placement-rule:hub:inbound-inspection-putaway-sequence",
+      "sourceRuleCode": "InboundInspectionPutawaySequence",
+      "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "canonicalAreaRoleCode": "Hub",
+      "constraintRefs": [
+        "gm-constraint:hub-entry-contact-exit"
+      ],
+      "reason": "Hub 입구·접점·출구 판독 제약이 입고·검수·적치 순서를 참조한다."
+    },
+    {
+      "ruleRef": "gm-placement-rule:hub:outbound-staging-separation",
+      "sourceRuleCode": "OutboundStagingSeparation",
+      "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "canonicalAreaRoleCode": "Hub",
+      "constraintRefs": [
+        "gm-constraint:hub-entry-contact-exit"
+      ],
+      "reason": "Hub 출고 준비를 입고 접점과 분리하는 제약에 직접 결속한다."
+    },
+    {
+      "ruleRef": "gm-placement-rule:town:service-traffic-control",
+      "sourceRuleCode": "ServiceTrafficControl",
+      "areaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+      "canonicalAreaRoleCode": "Town",
+      "constraintRefs": [
+        "gm-constraint:route-capability-separation"
+      ],
+      "reason": "Hub→Town 연결에서 서비스 차량과 보행·화물 능력을 분리하는 제약이 이 규칙을 참조한다."
+    }
+  ],
   "resolvedCodeBindings": [
     {
       "bindingId": "gm-code:actual-e5-network-pipeline",
@@ -1649,5 +4463,453 @@
         }
       ]
     }
-  ]
+  ],
+  "normalizationCatalog": {
+    "schemaVersion": "mirror-graph-map-normalization.v1",
+    "revision": "mirror-graph-map-normalization.northern-life-hub-discovery.r1",
+    "graphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+    "sampleStableId": "graph-map-normalization-sample:hans-farm.v1",
+    "title": "한스 농장 하위 그래프 노드·관계 정규화 표본",
+    "meaning": "현행 레벨 1 요소를 삭제하거나 재번호화하지 않고 안정 대상과 동사형 관계를 비교 조회하는 단일 Graph Map 확장이다.",
+    "sourcePlanRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r10",
+    "contextFieldOrder": [
+      "time",
+      "place",
+      "player",
+      "target",
+      "method",
+      "result",
+      "nextChoices"
+    ],
+    "actorPolicy": {
+      "persistentActorRule": "여러 사건에서 고유 정체·상태·관계·권한이 이어지는 NPC만 안정 Actor 노드로 둔다.",
+      "anonymousRoleRule": "이름 없는 작업자·경비병·운송 인력은 actorRoleRef로 유지하며 개별 Actor 노드를 만들지 않는다.",
+      "promotionRule": "고유 상태나 장기 관계가 생기면 기존 actorRoleRef 계보를 보존해 Actor 노드로 승격할 수 있다."
+    },
+    "elements": [
+      {
+        "elementRef": "gm-node:hans-permitted-tree",
+        "identityModeCode": "ReuseLevel1Node",
+        "normalizedKindCode": "WorldObject",
+        "migrationStateCode": "Retained",
+        "sourceElementRefs": [
+          "gm-node:hans-permitted-tree"
+        ],
+        "compatibilityTargetRefs": []
+      },
+      {
+        "elementRef": "gm-node:hans-broken-fence",
+        "identityModeCode": "ReuseLevel1Node",
+        "normalizedKindCode": "WorldObject",
+        "migrationStateCode": "Retained",
+        "sourceElementRefs": [
+          "gm-node:hans-broken-fence"
+        ],
+        "compatibilityTargetRefs": []
+      },
+      {
+        "elementRef": "gm-node:hans",
+        "identityModeCode": "NewCanonicalNode",
+        "normalizedKindCode": "Actor",
+        "migrationStateCode": "Reclassified",
+        "actorIdentityCode": "PersistentNamedActor",
+        "sourceElementRefs": [
+          "gm-node:hans-first-trust",
+          "gm-node:hans-house-repair",
+          "gm-node:hans-mission-life-base"
+        ],
+        "compatibilityTargetRefs": []
+      },
+      {
+        "elementRef": "gm-node:hans-house-timber-stockpile",
+        "identityModeCode": "ReuseLevel1Node",
+        "normalizedKindCode": "Resource",
+        "migrationStateCode": "Reclassified",
+        "sourceElementRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "compatibilityTargetRefs": []
+      },
+      {
+        "elementRef": "gm-node:hans-house",
+        "identityModeCode": "NewCanonicalNode",
+        "normalizedKindCode": "WorldObject",
+        "migrationStateCode": "Reclassified",
+        "sourceElementRefs": [
+          "gm-node:hans-house-repair"
+        ],
+        "compatibilityTargetRefs": []
+      },
+      {
+        "elementRef": "gm-node:hans-mission-life-base",
+        "identityModeCode": "ReuseLevel1Node",
+        "normalizedKindCode": "Place",
+        "migrationStateCode": "Reclassified",
+        "sourceElementRefs": [
+          "gm-node:hans-mission-life-base"
+        ],
+        "compatibilityTargetRefs": []
+      },
+      {
+        "elementRef": "gm-node:hans-first-trust",
+        "identityModeCode": "ReuseLevel1Node",
+        "normalizedKindCode": "CompatibilityAlias",
+        "migrationStateCode": "CompatibilityAlias",
+        "sourceElementRefs": [
+          "gm-node:hans-first-trust"
+        ],
+        "compatibilityTargetRefs": [
+          "gm-node:hans",
+          "gm-edge:hans-normalized-witnesses-fence-repair"
+        ]
+      },
+      {
+        "elementRef": "gm-node:hans-house-repair",
+        "identityModeCode": "ReuseLevel1Node",
+        "normalizedKindCode": "CompatibilityAlias",
+        "migrationStateCode": "CompatibilityAlias",
+        "sourceElementRefs": [
+          "gm-node:hans-house-repair"
+        ],
+        "compatibilityTargetRefs": [
+          "gm-node:hans-house",
+          "gm-edge:hans-normalized-repairs-house"
+        ]
+      },
+      {
+        "elementRef": "gm-node:hans-managed-sword-clue",
+        "identityModeCode": "ReuseLevel1Node",
+        "normalizedKindCode": "WorldObject",
+        "migrationStateCode": "Blocked",
+        "sourceElementRefs": [
+          "gm-node:hans-managed-sword-clue"
+        ],
+        "compatibilityTargetRefs": [],
+        "blockedReason": "정확 검 후보·위치·관찰 상태와 지연 공개 계약이 없어 안정 객체와 관찰 관계로 손실 없이 분리할 수 없다."
+      }
+    ],
+    "relations": [
+      {
+        "relationRef": "gm-edge:hans-normalized-harvests-permitted-tree",
+        "normalizedKindCode": "Work",
+        "migrationStateCode": "RelationExtracted",
+        "intentionCode": "Optional",
+        "actorNodeRef": null,
+        "actorRoleRef": "Player",
+        "targetRefs": [
+          "gm-node:hans-permitted-tree"
+        ],
+        "worldInteractionIds": [
+          "WI-NATURE-06",
+          "WI-NATURE-18"
+        ],
+        "guardRefs": [
+          "gm-constraint:hans-first-trust-spatial-values-unresolved"
+        ],
+        "inputRefs": [
+          "gm-node:nature-farm-edge"
+        ],
+        "effectRefs": [
+          "gm-node:hans-permitted-tree"
+        ],
+        "observationRefs": [
+          "gm-node:hans-first-trust"
+        ],
+        "failureReturnRef": "gm-node:nature-farm-edge",
+        "interruptReturnRef": "gm-node:nature-farm-edge",
+        "sourceElementRefs": [
+          "gm-node:hans-permitted-tree",
+          "gm-edge:farm-edge-to-hans-permitted-tree"
+        ],
+        "sourceDecisionIds": [
+          "D-529",
+          "D-531",
+          "D-532"
+        ],
+        "sourcePlanIds": [],
+        "constraintRefs": [
+          "gm-constraint:hans-first-trust-spatial-values-unresolved"
+        ],
+        "level3TargetRefs": [
+          "gm-node:hans-permitted-tree",
+          "gm-edge:farm-edge-to-hans-permitted-tree"
+        ],
+        "contextSourceNodeRef": "gm-node:hans-permitted-tree"
+      },
+      {
+        "relationRef": "gm-edge:hans-normalized-repairs-broken-fence",
+        "normalizedKindCode": "Work",
+        "migrationStateCode": "RelationExtracted",
+        "intentionCode": "Required",
+        "actorNodeRef": null,
+        "actorRoleRef": "Player",
+        "targetRefs": [
+          "gm-node:hans-broken-fence"
+        ],
+        "worldInteractionIds": [
+          "WI-WORLD-04"
+        ],
+        "guardRefs": [
+          "gm-constraint:hans-first-trust-causal-lineage"
+        ],
+        "inputRefs": [
+          "gm-node:hans-permitted-tree"
+        ],
+        "effectRefs": [
+          "gm-node:hans-broken-fence"
+        ],
+        "observationRefs": [
+          "gm-node:hans-first-trust"
+        ],
+        "failureReturnRef": "gm-node:nature-farm-edge",
+        "interruptReturnRef": "gm-node:hans-broken-fence",
+        "sourceElementRefs": [
+          "gm-node:hans-broken-fence",
+          "gm-edge:hans-timber-to-fence-repair"
+        ],
+        "sourceDecisionIds": [
+          "D-529",
+          "D-531"
+        ],
+        "sourcePlanIds": [],
+        "constraintRefs": [
+          "gm-constraint:hans-first-trust-causal-lineage"
+        ],
+        "level3TargetRefs": [
+          "gm-node:hans-broken-fence",
+          "gm-edge:hans-timber-to-fence-repair"
+        ],
+        "contextSourceNodeRef": "gm-node:hans-broken-fence"
+      },
+      {
+        "relationRef": "gm-edge:hans-normalized-witnesses-fence-repair",
+        "normalizedKindCode": "Observation",
+        "migrationStateCode": "RelationExtracted",
+        "intentionCode": "Required",
+        "actorNodeRef": "gm-node:hans",
+        "actorRoleRef": null,
+        "targetRefs": [
+          "gm-node:hans-broken-fence"
+        ],
+        "worldInteractionIds": [],
+        "guardRefs": [
+          "gm-constraint:hans-first-trust-causal-lineage"
+        ],
+        "inputRefs": [
+          "gm-edge:hans-normalized-repairs-broken-fence"
+        ],
+        "effectRefs": [
+          "gm-node:hans-first-trust"
+        ],
+        "observationRefs": [
+          "gm-node:hans-first-trust"
+        ],
+        "failureReturnRef": "gm-node:hans-broken-fence",
+        "interruptReturnRef": "gm-node:hans-broken-fence",
+        "sourceElementRefs": [
+          "gm-node:hans-first-trust",
+          "gm-edge:hans-fence-repair-to-first-trust"
+        ],
+        "sourceDecisionIds": [
+          "D-529",
+          "D-531"
+        ],
+        "sourcePlanIds": [],
+        "constraintRefs": [
+          "gm-constraint:hans-first-trust-causal-lineage"
+        ],
+        "level3TargetRefs": [
+          "gm-node:hans-first-trust",
+          "gm-edge:hans-fence-repair-to-first-trust"
+        ],
+        "contextSourceNodeRef": "gm-node:hans-first-trust"
+      },
+      {
+        "relationRef": "gm-edge:hans-normalized-places-house-stockpile",
+        "normalizedKindCode": "ResourcePlacement",
+        "migrationStateCode": "RelationExtracted",
+        "intentionCode": "Optional",
+        "actorNodeRef": null,
+        "actorRoleRef": "Player",
+        "targetRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "worldInteractionIds": [
+          "WI-NATURE-06",
+          "WI-NATURE-18"
+        ],
+        "guardRefs": [
+          "gm-constraint:hans-axe-choice-and-optional-stockpile"
+        ],
+        "inputRefs": [
+          "gm-node:hans-permitted-tree"
+        ],
+        "effectRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "observationRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "failureReturnRef": "gm-node:hans-mission-life-base",
+        "interruptReturnRef": "gm-node:hans-first-trust",
+        "sourceElementRefs": [
+          "gm-node:hans-house-timber-stockpile",
+          "gm-edge:hans-first-trust-to-house-stockpile"
+        ],
+        "sourceDecisionIds": [
+          "D-532",
+          "D-533"
+        ],
+        "sourcePlanIds": [],
+        "constraintRefs": [
+          "gm-constraint:hans-axe-choice-and-optional-stockpile"
+        ],
+        "level3TargetRefs": [
+          "gm-node:hans-house-timber-stockpile",
+          "gm-edge:hans-first-trust-to-house-stockpile"
+        ],
+        "contextSourceNodeRef": "gm-node:hans-house-timber-stockpile"
+      },
+      {
+        "relationRef": "gm-edge:hans-normalized-discovers-house-stockpile",
+        "normalizedKindCode": "Observation",
+        "migrationStateCode": "RelationExtracted",
+        "intentionCode": "Optional",
+        "actorNodeRef": "gm-node:hans",
+        "actorRoleRef": null,
+        "targetRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "worldInteractionIds": [
+          "WI-NATURE-06",
+          "WI-NATURE-18"
+        ],
+        "guardRefs": [
+          "gm-constraint:hans-house-repair-state-and-marker"
+        ],
+        "inputRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "effectRefs": [
+          "gm-node:hans-house-repair"
+        ],
+        "observationRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "failureReturnRef": "gm-node:hans-mission-life-base",
+        "interruptReturnRef": "gm-node:hans-house-timber-stockpile",
+        "sourceElementRefs": [
+          "gm-node:hans-house-timber-stockpile",
+          "gm-edge:hans-house-stockpile-to-repair"
+        ],
+        "sourceDecisionIds": [
+          "D-532",
+          "D-533"
+        ],
+        "sourcePlanIds": [],
+        "constraintRefs": [
+          "gm-constraint:hans-house-repair-state-and-marker"
+        ],
+        "level3TargetRefs": [
+          "gm-node:hans-house-timber-stockpile",
+          "gm-edge:hans-house-stockpile-to-repair"
+        ],
+        "contextSourceNodeRef": "gm-node:hans-house-timber-stockpile"
+      },
+      {
+        "relationRef": "gm-edge:hans-normalized-repairs-house",
+        "normalizedKindCode": "StateTransition",
+        "migrationStateCode": "RelationExtracted",
+        "intentionCode": "Optional",
+        "actorNodeRef": "gm-node:hans",
+        "actorRoleRef": null,
+        "targetRefs": [
+          "gm-node:hans-house"
+        ],
+        "worldInteractionIds": [],
+        "guardRefs": [
+          "gm-constraint:hans-house-repair-state-and-marker"
+        ],
+        "inputRefs": [
+          "gm-node:hans-house-timber-stockpile"
+        ],
+        "effectRefs": [
+          "gm-node:hans-house-repair"
+        ],
+        "observationRefs": [
+          "gm-node:hans-house-repair"
+        ],
+        "failureReturnRef": "gm-node:hans-house-timber-stockpile",
+        "interruptReturnRef": "gm-node:hans-house-timber-stockpile",
+        "sourceElementRefs": [
+          "gm-node:hans-house-repair",
+          "gm-edge:hans-house-stockpile-to-repair"
+        ],
+        "sourceDecisionIds": [
+          "D-533",
+          "D-534",
+          "D-535",
+          "D-536"
+        ],
+        "sourcePlanIds": [],
+        "constraintRefs": [
+          "gm-constraint:hans-house-repair-state-and-marker",
+          "gm-constraint:hans-house-damage-candidate-tool-blocked"
+        ],
+        "level3TargetRefs": [
+          "gm-node:hans-house-repair",
+          "gm-edge:hans-house-stockpile-to-repair"
+        ],
+        "contextSourceNodeRef": "gm-node:hans-house-repair"
+      },
+      {
+        "relationRef": "gm-edge:hans-normalized-grants-life-base-permission",
+        "normalizedKindCode": "PermissionGrant",
+        "migrationStateCode": "RelationExtracted",
+        "intentionCode": "Optional",
+        "actorNodeRef": "gm-node:hans",
+        "actorRoleRef": null,
+        "targetRefs": [
+          "gm-node:hans-mission-life-base"
+        ],
+        "worldInteractionIds": [],
+        "guardRefs": [
+          "gm-constraint:hans-life-base-boundary-unresolved"
+        ],
+        "inputRefs": [
+          "gm-node:hans-house"
+        ],
+        "effectRefs": [
+          "gm-node:hans-mission-life-base"
+        ],
+        "observationRefs": [
+          "gm-node:hans-house-repair"
+        ],
+        "failureReturnRef": "gm-node:hans-house-repair",
+        "interruptReturnRef": "gm-node:hans-house-repair",
+        "sourceElementRefs": [
+          "gm-node:hans-mission-life-base",
+          "gm-edge:hans-house-repair-to-life-base"
+        ],
+        "sourceDecisionIds": [
+          "D-537"
+        ],
+        "sourcePlanIds": [],
+        "constraintRefs": [
+          "gm-constraint:hans-life-base-boundary-unresolved"
+        ],
+        "level3TargetRefs": [
+          "gm-node:hans-mission-life-base",
+          "gm-edge:hans-house-repair-to-life-base"
+        ],
+        "contextSourceNodeRef": "gm-node:hans-mission-life-base"
+      }
+    ],
+    "evidenceBoundary": {
+      "graphMapMeaningOnly": true,
+      "unitySceneChanged": false,
+      "runtimeBindingVerified": false,
+      "eStagePromoted": false
+    }
+  }
 }

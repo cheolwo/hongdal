@@ -1,6 +1,6 @@
 {
   "schemaVersion": "mirror-graph-map-partition-catalog.v1",
-  "revision": "mirror-graph-map-partition-catalog.r1",
+  "revision": "mirror-graph-map-partition-catalog.r7",
   "federationStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
   "title": "북부 생활권 Graph Map 하위 맵·포트 대장",
   "meaning": "레벨 1~3의 의미는 각 하위 맵에서 유지하고, World 규모에서는 하위 맵과 명시 포트·connector만 조합한다.",
@@ -20,7 +20,7 @@
   },
   "sourceElementCatalogRef": {
     "path": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
-    "expectedRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r3"
+    "expectedRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r10"
   },
   "subgraphs": [
     {
@@ -34,12 +34,46 @@
       ],
       "nodeRefs": [
         "gm-node:nature-trailhead",
-        "gm-node:nature-farm-edge"
+        "gm-node:nature-farm-edge",
+        "gm-node:hans-permitted-tree",
+        "gm-node:hans-broken-fence",
+        "gm-node:hans-first-trust",
+        "gm-node:first-logging-reflection-preparation",
+        "gm-node:hans-house-timber-stockpile",
+        "gm-node:hans-house-repair",
+        "gm-node:hans-mission-life-base",
+        "gm-node:farm-boundary-patrol-preparation",
+        "gm-node:farm-boundary-beast-encounter",
+        "gm-node:farm-boundary-trace-investigation",
+        "gm-node:farm-deeper-threat-gateway",
+        "gm-node:hans-managed-sword-clue"
       ],
       "internalEdgeRefs": [
-        "gm-edge:nature-trail-to-farm-edge"
+        "gm-edge:nature-trail-to-farm-edge",
+        "gm-edge:farm-edge-to-hans-permitted-tree",
+        "gm-edge:hans-timber-to-fence-repair",
+        "gm-edge:hans-fence-repair-to-first-trust",
+        "gm-edge:hans-first-trust-to-house-stockpile",
+        "gm-edge:hans-house-stockpile-to-repair",
+        "gm-edge:hans-house-repair-to-life-base",
+        "gm-edge:hans-life-base-to-patrol-preparation",
+        "gm-edge:patrol-preparation-to-beast-encounter",
+        "gm-edge:beast-encounter-to-trace-investigation",
+        "gm-edge:beast-encounter-return-to-life-base",
+        "gm-edge:trace-investigation-to-deeper-threat-gateway",
+        "gm-edge:hans-life-base-to-sword-clue"
       ],
-      "constraintRefs": [],
+      "constraintRefs": [
+        "gm-constraint:hans-first-trust-causal-lineage",
+        "gm-constraint:hans-first-trust-spatial-values-unresolved",
+        "gm-constraint:first-logging-reflection-lineage",
+        "gm-constraint:hans-axe-choice-and-optional-stockpile",
+        "gm-constraint:hans-house-repair-state-and-marker",
+        "gm-constraint:hans-house-damage-candidate-tool-blocked",
+        "gm-constraint:hans-life-base-boundary-unresolved",
+        "gm-constraint:farm-patrol-return-and-ambiguity",
+        "gm-constraint:hans-sword-delayed-reveal"
+      ],
       "ports": [
         {
           "portId": "gm-port:nature-farm-edge:to-farm",
@@ -50,6 +84,57 @@
             "Walker"
           ],
           "meaning": "숲 가장자리에서 Farm 생산 구역을 발견·접근하는 경계 포트"
+        },
+        {
+          "portId": "gm-port:farm-deeper-threat:to-hostile-network",
+          "nodeRef": "gm-node:farm-deeper-threat-gateway",
+          "directionCode": "Outbound",
+          "capabilityCodes": [
+            "ExternalUnresolved"
+          ],
+          "meaning": "첫 Farm 순찰의 확인된 흔적을 장기 위협망 후보로 넘기는 미해결 포트"
+        },
+        {
+          "portId": "gm-port:hans-broken-fence:to-precision-axe",
+          "nodeRef": "gm-node:hans-broken-fence",
+          "directionCode": "Outbound",
+          "capabilityCodes": [
+            "Discovery"
+          ],
+          "meaning": "울타리 부근의 별도 부러진 농장 손도끼 조사·보관으로 이어지는 선택형 포트"
+        }
+      ]
+    },
+    {
+      "subgraphId": "gm-subgraph:hans-precision-axe",
+      "label": "한스 정밀 작업 도끼 발견·수리·반환",
+      "scopeCode": "OptionalItemLineage",
+      "ownerCode": "NatureStoryPlanning",
+      "areaSetRefs": [
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
+      "nodeRefs": [
+        "gm-node:hans-broken-farm-axe-storage",
+        "gm-node:hans-precision-axe-repair-handoff",
+        "gm-node:hans-repaired-precision-axe-return"
+      ],
+      "internalEdgeRefs": [
+        "gm-edge:broken-farm-axe-storage-to-repair-handoff",
+        "gm-edge:precision-axe-repair-handoff-to-return"
+      ],
+      "constraintRefs": [
+        "gm-constraint:hans-precision-axe-repair-lineage",
+        "gm-constraint:hans-precision-axe-role-separation"
+      ],
+      "ports": [
+        {
+          "portId": "gm-port:hans-broken-farm-axe:from-fence",
+          "nodeRef": "gm-node:hans-broken-farm-axe-storage",
+          "directionCode": "Inbound",
+          "capabilityCodes": [
+            "Discovery"
+          ],
+          "meaning": "Farm 경계에서 별도 부러진 농장 손도끼의 동일 개체 계보를 여는 입력 포트"
         }
       ]
     },
@@ -107,14 +192,24 @@
       "nodeRefs": [
         "gm-node:hub-receiving-storage",
         "gm-node:hub-vehicle-yard",
-        "gm-node:hub-outbound-staging"
+        "gm-node:hub-outbound-staging",
+        "gm-node:hub-missing-cargo-investigation",
+        "gm-node:hub-missing-cargo-field-confirmation",
+        "gm-node:hub-cargo-relief-recovery",
+        "gm-node:hub-optional-meditation"
       ],
       "internalEdgeRefs": [
         "gm-edge:hub-receiving-to-vehicle-yard",
-        "gm-edge:hub-vehicle-yard-to-outbound"
+        "gm-edge:hub-vehicle-yard-to-outbound",
+        "gm-edge:hub-receiving-to-missing-cargo-investigation",
+        "gm-edge:missing-cargo-investigation-to-field-confirmation",
+        "gm-edge:field-confirmation-to-relief-recovery",
+        "gm-edge:relief-recovery-to-optional-meditation"
       ],
       "constraintRefs": [
-        "gm-constraint:hub-entry-contact-exit"
+        "gm-constraint:hub-entry-contact-exit",
+        "gm-constraint:hub-evidence-not-answer",
+        "gm-constraint:hub-recovery-meditation-no-duplication"
       ],
       "ports": [
         {
@@ -158,12 +253,18 @@
       ],
       "nodeRefs": [
         "gm-node:town-market-receiving",
-        "gm-node:town-living-square"
+        "gm-node:town-living-square",
+        "gm-node:town-apprentice-workshop-failure",
+        "gm-node:town-apprentice-small-test-batch"
       ],
       "internalEdgeRefs": [
-        "gm-edge:town-receiving-to-living-square"
+        "gm-edge:town-receiving-to-living-square",
+        "gm-edge:town-living-square-to-apprentice-workshop-failure",
+        "gm-edge:workshop-failure-to-small-test-batch"
       ],
-      "constraintRefs": [],
+      "constraintRefs": [
+        "gm-constraint:town-workshop-small-test-boundary"
+      ],
       "ports": [
         {
           "portId": "gm-port:town-market:from-hub",
@@ -184,11 +285,27 @@
       "ownerCode": "YodongPlanning",
       "areaSetRefs": [],
       "nodeRefs": [
+        "gm-node:hostile-threat-network",
+        "gm-node:hostile-divided-response",
         "gm-node:yodong-defense-gateway"
       ],
-      "internalEdgeRefs": [],
-      "constraintRefs": [],
+      "internalEdgeRefs": [
+        "gm-edge:hostile-network-to-divided-response",
+        "gm-edge:divided-response-to-yodong-gateway"
+      ],
+      "constraintRefs": [
+        "gm-constraint:hostile-division-requires-actual-separation"
+      ],
       "ports": [
+        {
+          "portId": "gm-port:hostile-network:from-farm-threat",
+          "nodeRef": "gm-node:hostile-threat-network",
+          "directionCode": "Inbound",
+          "capabilityCodes": [
+            "ExternalUnresolved"
+          ],
+          "meaning": "Farm의 더 깊은 위협 관문과 장기 위협망을 잇는 미해결 입력 포트"
+        },
         {
           "portId": "gm-port:yodong:from-hub",
           "nodeRef": "gm-node:yodong-defense-gateway",
@@ -234,6 +351,26 @@
       "stateCode": "ReferenceAvailable"
     },
     {
+      "connectorId": "gm-connector:farm-threat-hostile-network",
+      "edgeRef": "gm-edge:deeper-threat-gateway-to-hostile-network",
+      "fromPortRef": "gm-port:farm-deeper-threat:to-hostile-network",
+      "toPortRef": "gm-port:hostile-network:from-farm-threat",
+      "requiredCapabilityCodes": [
+        "ExternalUnresolved"
+      ],
+      "stateCode": "Unresolved"
+    },
+    {
+      "connectorId": "gm-connector:hans-fence-precision-axe",
+      "edgeRef": "gm-edge:hans-broken-fence-to-broken-farm-axe-storage",
+      "fromPortRef": "gm-port:hans-broken-fence:to-precision-axe",
+      "toPortRef": "gm-port:hans-broken-farm-axe:from-fence",
+      "requiredCapabilityCodes": [
+        "Discovery"
+      ],
+      "stateCode": "Unresolved"
+    },
+    {
       "connectorId": "gm-connector:hub-yodong",
       "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway",
       "fromPortRef": "gm-port:hub-outbound:to-yodong",
@@ -251,6 +388,10 @@
     "gm-constraint:route-capability-separation",
     "gm-constraint:season-does-not-rewrite-topology",
     "gm-constraint:asset-candidate-not-assignment",
-    "gm-constraint:no-whole-map-prerequisite"
+    "gm-constraint:no-whole-map-prerequisite",
+    "gm-constraint:route-layer-evidence-freshness",
+    "gm-constraint:route-cost-contribution-no-double-count",
+    "gm-constraint:route-network-state-and-capacity-separation",
+    "gm-constraint:route-encounter-authority-and-return"
   ]
 }

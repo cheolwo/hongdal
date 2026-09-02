@@ -11,67 +11,9 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $utf8 = [Text.UTF8Encoding]::new($false)
-
-function Require([bool] $condition, [string] $code) {
-    if (-not $condition) { throw "GraphMapHandoffInvalid:$code" }
-}
-
-function Require-Text([object] $value, [string] $code) {
-    Require ($null -ne $value -and -not [string]::IsNullOrWhiteSpace([string] $value)) $code
-}
-
-function Resolve-RepoChild([string] $relativePath, [string] $code) {
-    Require-Text $relativePath "$code`:Empty"
-    Require (-not [IO.Path]::IsPathRooted($relativePath)) "$code`:Rooted"
-    Require (-not (@($relativePath -split '[/\\]') -contains '..')) "$code`:Traversal"
-    $normalizedRoot = [IO.Path]::GetFullPath($repositoryRoot).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
-    $candidate = [IO.Path]::GetFullPath((Join-Path $normalizedRoot ($relativePath -replace '/', [IO.Path]::DirectorySeparatorChar)))
-    $prefix = $normalizedRoot + [IO.Path]::DirectorySeparatorChar
-    Require ($candidate.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) "$code`:OutsideRoot"
-    return $candidate
-}
-
-function Read-Json([string] $relativePath, [string] $code) {
-    $path = Resolve-RepoChild $relativePath $code
-    Require (Test-Path -LiteralPath $path -PathType Leaf) "$code`:Missing:$relativePath"
-    return Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
-}
-
-function File-Hash([string] $relativePath, [string] $code) {
-    $path = Resolve-RepoChild $relativePath $code
-    Require (Test-Path -LiteralPath $path -PathType Leaf) "$code`:Missing:$relativePath"
-    return (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
-}
-
-function Require-Hash([string] $relativePath, [object] $expected, [string] $code) {
-    Require-Text $expected "$code`:ExpectedEmpty"
-    Require ([string] $expected -match '^[0-9a-fA-F]{64}$') "$code`:ExpectedFormat"
-    $actual = File-Hash $relativePath $code
-    Require ($actual -eq ([string] $expected).ToLowerInvariant()) "$code`:HashMismatch"
-    return $actual
-}
-
-function Require-Unique([object[]] $values, [scriptblock] $selector, [string] $code) {
-    $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-    foreach ($value in @($values)) {
-        $key = [string] (& $selector $value)
-        Require-Text $key "$code`:Empty"
-        Require ($seen.Add($key)) "$code`:$key"
-    }
-}
-
-function Stable-Json([object] $value) {
-    return (($value | ConvertTo-Json -Depth 100) -replace "`r`n", "`n") + "`n"
-}
-
-function Normalize-Text([string] $value) {
-    return (($value -replace "`r`n", "`n").TrimEnd()) + "`n"
-}
-
-function Escape-Cell([object] $value) {
-    if ($null -eq $value) { return '' }
-    return ([string] $value).Replace('|', '\|').Replace("`r", '').Replace("`n", '<br>')
-}
+. (Join-Path $PSScriptRoot 'GraphMapTooling.ps1') `
+    -RepositoryRoot $repositoryRoot `
+    -ErrorPrefix 'GraphMapHandoffInvalid'
 
 $ledger = Read-Json $LedgerPath 'Ledger'
 Require ([string] $ledger.schemaVersion -eq 'mirror-graph-map-planning-handoffs.v1') 'SchemaVersion'
@@ -89,8 +31,11 @@ Require (-not [bool] $boundary.automaticUnityExecution) 'AutomaticUnityExecution
 Require (-not [bool] $boundary.automaticEvidencePromotion) 'AutomaticEvidencePromotion'
 
 $decisionText = Get-Content -LiteralPath (Resolve-RepoChild 'docs/AI/DECISIONS.md' 'DecisionCatalog') -Raw -Encoding UTF8
+$planningText = Get-Content -LiteralPath (Resolve-RepoChild 'docs/AI/PLANNING.md' 'PlanningCatalog') -Raw -Encoding UTF8
 $decisionIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 foreach ($match in [regex]::Matches($decisionText, '(?m)^## (D-\d{3})\b')) { $null = $decisionIds.Add($match.Groups[1].Value) }
+$planIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+foreach ($match in [regex]::Matches($planningText, '`(PLAN-[A-Z0-9-]+)`')) { $null = $planIds.Add($match.Groups[1].Value) }
 $wiCatalog = Read-Json 'eng/execution-ledgers/world-interactions.json' 'WorldInteractionCatalog'
 $wiIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 foreach ($wi in @($wiCatalog.items)) { $null = $wiIds.Add([string] $wi.id) }
@@ -116,12 +61,27 @@ foreach ($item in $items) {
     $source = $item.planningSource
     Require-Text $source.revisionCode "PlanningRevision:$id"
     Require ([string] $source.approvalStateCode -eq 'ApprovedForHandoff') "PlanningApproval:$id"
-    $sourceHash = Require-Hash ([string] $source.path) $source.expectedSha256 "PlanningSource:$id"
+    if ($status -eq 'Superseded') {
+        Require-Text $source.expectedSha256 "PlanningSource:$id`:ExpectedEmpty"
+        Require ([string] $source.expectedSha256 -match '^[0-9a-fA-F]{64}$') "PlanningSource:$id`:ExpectedFormat"
+        $historicalSourcePath = Resolve-RepoChild ([string] $source.path) "PlanningSource:$id"
+        Require (Test-Path -LiteralPath $historicalSourcePath -PathType Leaf) "PlanningSource:$id`:Missing:$($source.path)"
+        $sourceHash = ([string] $source.expectedSha256).ToLowerInvariant()
+    }
+    else {
+        $sourceHash = Require-Hash ([string] $source.path) $source.expectedSha256 "PlanningSource:$id"
+    }
     foreach ($decisionId in @($source.sourceDecisionIds)) {
         Require ($decisionIds.Contains([string] $decisionId)) "DecisionUnknown:$id`:$decisionId"
     }
     foreach ($wiId in @($source.sourceWorldInteractionIds)) {
         Require ($wiIds.Contains([string] $wiId)) "WorldInteractionUnknown:$id`:$wiId"
+    }
+    if ($null -ne $source.PSObject.Properties['sourcePlanIds']) {
+        Require (@($source.sourcePlanIds).Count -gt 0) "PlanIdsEmpty:$id"
+        foreach ($planId in @($source.sourcePlanIds)) {
+            Require ($planIds.Contains([string] $planId)) "PlanUnknown:$id`:$planId"
+        }
     }
     foreach ($field in $requiredContext) {
         Require ($null -ne $source.contextRefs.PSObject.Properties[$field]) "ContextMissing:$id`:$field"
@@ -208,6 +168,7 @@ foreach ($item in $items) {
             sha256 = $sourceHash
             sourceDecisionIds = @($source.sourceDecisionIds)
             sourceWorldInteractionIds = @($source.sourceWorldInteractionIds)
+            sourcePlanIds = if ($null -ne $source.PSObject.Properties['sourcePlanIds']) { @($source.sourcePlanIds) } else { @() }
             contextRefs = $source.contextRefs
             exclusionRefs = @($source.exclusionRefs)
         }

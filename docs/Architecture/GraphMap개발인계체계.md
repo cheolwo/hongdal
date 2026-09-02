@@ -2,9 +2,11 @@
 
 ## 목적
 
-Graph Map에서 정리한 노드·엣지·배치 제약·코드 결속을 개발 작업이 검증 가능한 작은 구현 단위로 받도록 한다. Graph Map 전체를 한 번에 구현하지 않고, 기존 PlayableLoop Goal·WI·E7 작업 명세와 맞는 slice 하나를 골라 개발에 인계한다.
+Graph Map에서 정리한 노드·엣지·배치 제약·기존 배치 규칙·코드 결속을 개발 작업이 검증 가능한 작은 구현 단위로 받도록 한다. Graph Map 전체를 한 번에 구현하지 않고, 기존 PlayableLoop Goal·WI·E7 작업 명세와 맞는 slice 하나를 골라 개발에 인계한다.
 
 Graph Map은 개발 명세나 상태 권위가 아니다. 플레이 관계와 구현 진입점을 함께 찾게 하는 계획 자료이며, 개발은 승인된 기획·작업 명세·현재 코드와 실제 파이프라인 차단을 다시 확인한 뒤 구현한다.
+
+Graph Map 계획·기획 인계·개발 인계의 파일 안전과 결정적 출력은 `GraphMapTooling.ps1`을 공통 사용한다. 개발 인계 관리자는 Goal·WI·명세·slice 수용 조건만 추가 검증하고 경로·JSON·해시·중복 검사 구현을 따로 복제하지 않는다.
 
 ## 전체 순환
 
@@ -37,7 +39,7 @@ Graph Map은 개발 명세나 상태 권위가 아니다. 플레이 관계와 �
 한 인계는 다음을 모두 만족해야 한다.
 
 1. 한 PlayableLoop와 대표 WI 하나를 중심으로 한다.
-2. Graph Map 노드·엣지·제약을 정확한 안정 ID로 열거한다.
+2. Graph Map 노드·엣지·제약과 선택한 기존 배치 규칙을 정확한 안정 ID로 열거한다.
 3. 선택한 요소는 `Unresolved`가 아니어야 한다. 미해결 관문은 별도 차단으로 남긴다.
 4. 관련 레벨 3 결속과 미결속 대상을 구분한다.
 5. 기존 Goal과 `Approved` 기획 관문·작업 명세를 참조한다.
@@ -67,7 +69,7 @@ Graph Map의 엣지 하나가 여러 Area나 WI를 잇는다면 각 Area의 독�
 
 ### 레벨 2
 
-제약은 기존 Domain/Application 검증, 배치 엔진, Unity 공간 검증 중 어느 책임이 집행하는지 나눈다. 문서 수치가 미정이면 상수를 추정하지 않고 연구·기획 차단으로 반환한다.
+제약은 기존 Domain/Application 검증, 배치 엔진, Unity 공간 검증 중 어느 책임이 집행하는지 나눈다. `placementRuleRefs`는 현재 제약에 직접 결속된 기존 규칙만 전달하며, `AvailableNotSelected` 규칙을 구현 요구로 자동 승격하지 않는다. 문서 수치가 미정이면 상수를 추정하지 않고 연구·기획 차단으로 반환한다.
 
 ### 레벨 3
 
@@ -132,4 +134,4 @@ Draft
 
 ## 첫 적용
 
-북부 생활권 Graph Map r3의 Farm 생산→작업마당을 첫 `ReadyForDevelopment` 사례로 등록한다. 선택 범위는 Farm 노드 2개, 필수 엣지 1개, 실제 참조·Farm 흐름 분리·자산 후보 비할당 제약과 관련 코드 결속이다. 기존 `work:farm-crop-cycle:landscape-binding-guard`는 재사용 후보이며, 이 인계만으로 그 작업을 재시작하거나 새 Unity 실행을 승인하지 않는다.
+북부 생활권 Graph Map r4의 Farm 생산→작업마당을 첫 `ReadyForDevelopment` 사례로 등록한다. 선택 범위는 Farm 노드 2개, 필수 엣지 1개, 실제 참조·Farm 흐름 분리·자산 후보 비할당 제약, 기존 `ProductionProcessingSeparation` 규칙과 관련 코드 결속이다. 기존 `work:farm-crop-cycle:landscape-binding-guard`는 재사용 후보이며, 이 인계만으로 그 작업을 재시작하거나 새 Unity 실행을 승인하지 않는다.

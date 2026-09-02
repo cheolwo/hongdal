@@ -3,13 +3,13 @@
   "revision": "mirror-graph-map-development-handoff-output.r1",
   "generatedAtRuleCode": "DeterministicNoWallClock",
   "sourceLedgerRef": "eng/world-seedbeds/graph-map-development-handoffs.json",
-  "sourceLedgerSha256": "1531780650f5fa3c1d34af9c731fee8d2f75bd8592ea475c42d6fe6bd1d94c3a",
+  "sourceLedgerSha256": "26044930247241aa1e2c5a2898c733a77a68cef20ef748db26adbe6fb1025847",
   "counts": {
-    "total": 1,
+    "total": 2,
     "readyForDevelopment": 1,
     "acceptedByDevelopment": 0,
     "inProgress": 0,
-    "integrated": 0,
+    "integrated": 1,
     "blocked": 0,
     "deferred": 0
   },
@@ -29,13 +29,13 @@
       "handoffId": "graph-map-development-handoff:farm-production-work-yard:r1",
       "statusCode": "ReadyForDevelopment",
       "source": {
-        "planningHandoffId": "graph-map-handoff:northern-life-hub-discovery:r3",
+        "planningHandoffId": "graph-map-handoff:northern-life-hub-discovery:r10",
         "graphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
-        "graphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r3",
+        "graphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r10",
         "graphMapPlanRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
-        "graphMapPlanSha256": "665b1b34ca6545d1b34a69af5fec8c6470da01eae836b4c0f65de053e0eb2e0b",
+        "graphMapPlanSha256": "b2f1288125e4974371e808a8ae59b2cde4d5a9222fe3a8c43bcbd4e0686b8adc",
         "graphMapOutputRef": "eng/world-seedbeds/generated/graph-map-plans.v1.json",
-        "graphMapOutputSha256": "b70ee5eb75b605afcb70cb25c9637504c2e367aa388f642e62a83686182d5c58"
+        "graphMapOutputSha256": "f0f9ae9eb59aa1be8a46b0f90093b19830de3ce23058330cf647e56bbac78eb7"
       },
       "slice": {
         "sliceStableId": "graph-map-dev-slice:farm-production-work-yard.v1",
@@ -52,6 +52,9 @@
           "gm-constraint:farm-flow-separation",
           "gm-constraint:asset-candidate-not-assignment"
         ],
+        "placementRuleRefs": [
+          "gm-placement-rule:farm:production-processing-separation"
+        ],
         "codeBindingRefs": [
           "gm-code:actual-e5-network-pipeline",
           "gm-code:landscape-runtime-realization",
@@ -60,6 +63,7 @@
           "gm-code:h-spatial-rule-editor"
         ],
         "planningMeaningRefs": [
+          "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md#5-레벨별-통합-규칙",
           "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md#3-첫-graph-map-범위",
           "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md#5-레벨-1--플레이-관계",
           "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md#6-레벨-2--실제-배치-전-제약",
@@ -146,6 +150,138 @@
         "runtimeExecuted": false,
         "gameViewCaptured": false,
         "saveReplayVerified": false,
+        "serverConnected": false,
+        "evidencePromoted": false,
+        "committed": false,
+        "pushed": false
+      }
+    },
+    {
+      "handoffId": "graph-map-development-handoff:first-logging-reflection:r1",
+      "statusCode": "Integrated",
+      "source": {
+        "planningHandoffId": "graph-map-handoff:northern-life-hub-discovery:r10",
+        "graphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "graphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r10",
+        "graphMapPlanRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
+        "graphMapPlanSha256": "b2f1288125e4974371e808a8ae59b2cde4d5a9222fe3a8c43bcbd4e0686b8adc",
+        "graphMapOutputRef": "eng/world-seedbeds/generated/graph-map-plans.v1.json",
+        "graphMapOutputSha256": "f0f9ae9eb59aa1be8a46b0f90093b19830de3ce23058330cf647e56bbac78eb7"
+      },
+      "slice": {
+        "sliceStableId": "graph-map-dev-slice:first-logging-reflection.v1",
+        "title": "한스 집 첫 벌목 성찰 씨앗 P0",
+        "nodeRefs": [
+          "gm-node:first-logging-reflection-preparation"
+        ],
+        "edgeRefs": [],
+        "constraintRefs": [
+          "gm-constraint:first-logging-reflection-lineage"
+        ],
+        "placementRuleRefs": [],
+        "codeBindingRefs": [],
+        "planningMeaningRefs": [
+          "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md#첫-명상-튜토리얼",
+          "docs/Reports/한스집-첫벌목명상-P0-개발통합-2026-09-02.md#범위"
+        ],
+        "scopeSummary": "플레이어 본인의 실제 첫 WI-NATURE-06 완료와 한스 집 안전 휴식에서 결정적 성찰 씨앗·중단 재개·기존 성장 1회 계보를 준비한다.",
+        "excludedScope": [
+          "실제 한스 집 안전 휴식 공급자 연결",
+          "명상 UI·염체 그래프·요동성",
+          "Unity Editor·Scene·Play Mode·Game View",
+          "새 성장량·게임 규칙·E 승격"
+        ]
+      },
+      "developmentTarget": {
+        "loopStableId": "playable-loop:nature-shelter-foundation.v1",
+        "worldInteractionId": "WI-NATURE-06",
+        "trackCode": "Logic",
+        "targetEvidenceStageCode": "E3",
+        "goalStateCode": "Active",
+        "candidateWorkItemId": "work:nature-shelter:first-logging-reflection-seed",
+        "candidateStatusCode": "Integrated",
+        "candidateOwnerThreadId": "01a02198-8b2a-7491-ac93-366b30ff474c",
+        "candidateWritePaths": [
+          "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFirstLoggingReflectionContracts.cs",
+          "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFirstLoggingReflection.cs",
+          "Ssalddel.Simulation.Tests/SimulationFocusMeditationTests.cs",
+          "eng/execution-ledgers/work-orders/nature-logging-focus-meditation.e7-work-order.json",
+          "docs/Reports/한스집-첫벌목명상-P0-개발통합-2026-09-02.md"
+        ],
+        "candidateSharedContractKeys": [
+          "first-logging-reflection-seed"
+        ],
+        "workOrderRef": "eng/execution-ledgers/work-orders/nature-logging-focus-meditation.e7-work-order.json",
+        "workOrderSha256": "3ef0d631cb0e1fee47e178ac664eccd9b3dd403fcb9dd0a7f4cd066ece1094e5",
+        "planningDesignRef": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md",
+        "planningDesignSha256": "9fae03c1cf38a2a73d2b4e29e3e1c34aceba97b9ac9784d56d2b16cfeafa7ea9"
+      },
+      "acceptanceContract": {
+        "requiredBeforeAcceptCodes": [
+          "GraphMapRevisionCurrent",
+          "PlanningGateApproved",
+          "GoalAndWorkOrderCurrent",
+          "ExactWritePathsDeclared",
+          "ValidationUpperBoundDeclared"
+        ],
+        "requiredResultCodes": [
+          "GraphElementConsumptionRecorded",
+          "CodeEvidenceRecorded",
+          "FocusedRegressionRecorded",
+          "OpenFeedbackReturned",
+          "AuthorityBoundaryPreserved"
+        ],
+        "completionEvidenceUpperBoundCode": "LogicE3Preparation",
+        "runtimeRequiredForThisSlice": false,
+        "gameViewRequiredForThisSlice": false,
+        "sceneSaveAllowed": false,
+        "commitAllowed": false,
+        "pushAllowed": false
+      },
+      "readiness": {
+        "readyForDevelopment": true,
+        "developmentAccepted": true,
+        "autoActivated": false,
+        "unresolvedSelectedElementCount": 0,
+        "blockerItems": [],
+        "planningQuestionRequired": false,
+        "nextAction": "제품 한스 집 안전 휴식 공급자와 성찰 진행 Save 소비 경로를 별도 승인 판본에서 연결한다."
+      },
+      "result": {
+        "resultCode": "Integrated",
+        "consumedGraphElementRefs": [
+          "gm-node:first-logging-reflection-preparation",
+          "gm-constraint:first-logging-reflection-lineage"
+        ],
+        "workItemRefs": [
+          "work:nature-shelter:first-logging-reflection-seed"
+        ],
+        "changedPaths": [
+          "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationFirstLoggingReflectionContracts.cs",
+          "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationFirstLoggingReflection.cs",
+          "Ssalddel.Simulation.Tests/SimulationFocusMeditationTests.cs",
+          "eng/execution-ledgers/work-orders/nature-logging-focus-meditation.e7-work-order.json",
+          "docs/Reports/한스집-첫벌목명상-P0-개발통합-2026-09-02.md"
+        ],
+        "verificationRefs": [
+          "artifacts/local/validation/first-logging-reflection-p0/first-logging-reflection.trx",
+          "artifacts/local/validation/first-logging-reflection-p0/integration-receipt.json"
+        ],
+        "openFeedbackItems": [
+          "실제 제품 한스 집 안전 휴식 공급자 미연결",
+          "성찰 진행 상태 제품 Save 소비 경로 미연결",
+          "P1 UI·염체 그래프 별도 관문"
+        ],
+        "returnSummary": "첫 벌목 성찰 P0 계약·도메인·13개 집중 시험을 통합했으며 제품 휴식·진행 저장·UI는 연결하지 않았다."
+      },
+      "evidenceBoundary": {
+        "codeChanged": true,
+        "testsExecuted": true,
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "saveReplayVerified": true,
         "serverConnected": false,
         "evidencePromoted": false,
         "committed": false,

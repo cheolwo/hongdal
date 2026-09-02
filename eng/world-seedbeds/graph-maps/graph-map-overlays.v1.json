@@ -1,53 +1,122 @@
 {
   "schemaVersion": "mirror-graph-map-overlay-catalog.v1",
-  "revision": "mirror-graph-map-overlay-catalog.r1",
-  "title": "Mirror Graph Map 시간·날씨 오버레이 대장",
-  "meaning": "절기·날씨·시간대는 기본 노드·엣지 토폴로지를 복제하거나 조용히 변경하지 않고 발견 난도·표현 후보·통행 조건을 별도 판본으로 덧씌운다.",
+  "revision": "mirror-graph-map-overlay-catalog.r5",
+  "title": "Mirror Graph Map 레이어·오버레이 대장",
+  "meaning": "기준 공간 topology를 한 번만 유지하고 기상·시간, 운송, 위협·경비, 물류·보급, 플레이어 선택을 안정 노드·엣지 위의 판본화된 조회 레이어로 합성한다.",
+  "compositionOrder": [
+    "gm-layer:base-space",
+    "gm-layer:weather-time",
+    "gm-layer:transport",
+    "gm-layer:threat-security",
+    "gm-layer:logistics-supply",
+    "gm-layer:player-choice"
+  ],
+  "layers": [
+    { "layerId": "gm-layer:base-space", "label": "기준 공간", "layerKindCode": "BaseSpace", "compositionOrder": 0, "authorityBoundary": "기존 안정 노드·엣지·방향·기준점을 제공하며 다른 레이어가 topology를 복제하거나 변경할 수 없다.", "sourceRefs": ["eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json"] },
+    { "layerId": "gm-layer:weather-time", "label": "기상·시간", "layerKindCode": "WeatherTime", "compositionOrder": 1, "authorityBoundary": "절기·시간·날씨 관측은 통행·가시성·위험 후보를 보정하지만 기준 길을 삭제하거나 권위 결과를 만들지 않는다.", "sourceRefs": ["docs/AI/24절기-제철자료-조사와기획연결-2026-08-31.md", "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"] },
+    { "layerId": "gm-layer:transport", "label": "운송", "layerKindCode": "Transport", "compositionOrder": 2, "authorityBoundary": "수단별 통과 가능성·비용·용량 후보를 표현하며 출발·계약·비용 차감·도착을 확정하지 않는다.", "sourceRefs": ["docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"] },
+    { "layerId": "gm-layer:threat-security", "label": "위협·경비", "layerKindCode": "ThreatSecurity", "compositionOrder": 3, "authorityBoundary": "실제 서식지·침입·사건·경비 근거가 있을 때만 위험·조우·차단 후보를 보정하며 거리나 몬스터 존재만으로 차단하지 않는다.", "sourceRefs": ["docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md", "docs/AI/요동성방어-메인스토리기획-2026-09-01.md"] },
+    { "layerId": "gm-layer:logistics-supply", "label": "물류·보급", "layerKindCode": "LogisticsSupply", "compositionOrder": 4, "authorityBoundary": "화물·기한·처리 용량으로 대체 경로·병목·부족 후보를 계산하며 엣지 차단만으로 재고나 납품 결과를 확정하지 않는다.", "sourceRefs": ["docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md", "docs/AI/허브발견-3인칭관찰과광역노드-기획-2026-09-01.md"] },
+    { "layerId": "gm-layer:player-choice", "label": "플레이어 선택·조회", "layerKindCode": "PlayerChoice", "compositionOrder": 5, "authorityBoundary": "빠름·안전·저렴·대량·균형 후보와 근거를 보여 주며 숨은 정답·자동 Confirm·권위 변경을 만들지 않는다.", "sourceRefs": ["docs/AI/GraphMap-레이어중심-설계개발우선순위-2026-09-02.md", "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"] }
+  ],
   "overlays": [
     {
-      "overlayId": "gm-overlay:spring-equinox",
-      "label": "춘분 기본 검토 오버레이",
-      "triggerKindCode": "SeasonalTerm",
-      "stateCode": "PlanningReference",
-      "targetSubgraphRefs": [
-        "gm-subgraph:nature-discovery",
-        "gm-subgraph:farm-production"
-      ],
-      "topologyMutationAllowed": false,
-      "authorityMutationAllowed": false,
-      "effectCategories": [
-        "DiscoveryReadability",
-        "LandscapePaletteCandidate",
-        "CropAvailabilityContext"
-      ],
-      "sourceDecisionIds": [
-        "D-399",
-        "D-400",
-        "D-405",
-        "D-409"
-      ],
+      "overlayId": "gm-overlay:spring-equinox", "layerRef": "gm-layer:weather-time", "label": "춘분 기본 검토 오버레이", "triggerKindCode": "SeasonalTerm", "stateCode": "PlanningReference",
+      "targetSubgraphRefs": ["gm-subgraph:nature-discovery", "gm-subgraph:farm-production"], "targetEdgeRefs": [],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["DiscoveryReadability", "LandscapePaletteCandidate", "CropAvailabilityContext"],
+      "sourceDecisionIds": ["D-399", "D-400", "D-405", "D-409"],
       "valueBoundary": "정확 날짜·온도·작물·몬스터·재질 값은 승인된 Simulation 상태나 전문 조사 없이 이 대장에서 생성하지 않는다."
     },
     {
-      "overlayId": "gm-overlay:weather-discovery-visibility",
-      "label": "날씨에 따른 발견 판독 오버레이",
-      "triggerKindCode": "WeatherState",
-      "stateCode": "ConfirmedDirection",
-      "targetSubgraphRefs": [
-        "gm-subgraph:nature-discovery"
-      ],
-      "topologyMutationAllowed": false,
-      "authorityMutationAllowed": false,
-      "effectCategories": [
-        "DiscoveryDifficulty",
-        "SightlineReadability",
-        "SkyAndLandscapePresentation"
-      ],
-      "sourceDecisionIds": [
-        "D-408",
-        "D-409"
-      ],
+      "overlayId": "gm-overlay:weather-discovery-visibility", "layerRef": "gm-layer:weather-time", "label": "날씨에 따른 발견 판독 오버레이", "triggerKindCode": "WeatherState", "stateCode": "ConfirmedDirection",
+      "targetSubgraphRefs": ["gm-subgraph:nature-discovery"], "targetEdgeRefs": [],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["DiscoveryDifficulty", "SightlineReadability", "SkyAndLandscapePresentation"],
+      "sourceDecisionIds": ["D-408", "D-409"],
       "valueBoundary": "날씨는 발견 난도와 표현에 영향을 줄 수 있지만 승인된 WI·경로·권위 결과를 자동으로 추가·삭제하지 않는다."
+    },
+    {
+      "overlayId": "gm-overlay:decision-card-authority-time", "layerRef": "gm-layer:player-choice", "label": "선택 카드 권위 시간 정책 오버레이", "triggerKindCode": "DecisionCardOpenState", "stateCode": "ConfirmedDirection",
+      "targetSubgraphRefs": ["gm-subgraph:nature-discovery"], "targetEdgeRefs": [],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["SafeContextPause", "TimeSensitiveSlowProgress", "CurrentStateRefresh"],
+      "sourceDecisionIds": ["D-527", "D-530", "D-531", "D-532"],
+      "valueBoundary": "안전 판정에서는 카드 열람 중 권위 시간을 정지하고 이미 시작된 시간 민감 사건에서는 느리게 계속 진행한다. 감속 배율·전환·UI·Hosted 동기화는 만들지 않으며 반복 개폐로 진행을 고정·초기화·되감지 않는다."
+    },
+    {
+      "overlayId": "gm-overlay:optional-focus-reflection", "layerRef": "gm-layer:player-choice", "label": "선택형 집중·명상 반영 오버레이", "triggerKindCode": "OptionalFocusedInteraction", "stateCode": "PlanningReference",
+      "targetSubgraphRefs": ["gm-subgraph:nature-discovery", "gm-subgraph:hub-logistics"], "targetEdgeRefs": [],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["FocusedTimingCandidate", "MeditationReflectionCandidate", "ResultReadability"],
+      "sourceDecisionIds": [], "sourcePlanIds": ["PLAN-GAMEPLAY-FIRST-PERSON-FOCUS-001", "PLAN-STORY-HUB-DISCOVERY-001"],
+      "valueBoundary": "집중·명상은 플레이어가 선택한 상호작용에서만 검토하며 토폴로지·권위 결과·회복·영감·편린을 생성하거나 중복 지급하지 않는다."
+    },
+    {
+      "overlayId": "gm-overlay:long-route-weather-time", "layerRef": "gm-layer:weather-time", "label": "장거리 경로 기상·시간 조건", "triggerKindCode": "RouteConditionSnapshot", "stateCode": "PlanningReference",
+      "targetSubgraphRefs": ["gm-subgraph:hub-logistics", "gm-subgraph:yodong-gateway"], "targetEdgeRefs": ["gm-edge:hub-outbound-to-yodong-gateway"],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["RouteStateCandidate", "TravelTimeInput", "VisibilityInput"], "sourceDecisionIds": [], "sourcePlanIds": ["PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001"],
+      "edgeEffects": [
+        { "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway", "routeStateCode": "Unknown", "scopeCode": "PlanningOnlyUnresolvedRoute",
+          "costComponents": [{ "dimensionCode": "Time", "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown", "contributionKey": "weather-time:travel-time", "combinationPolicyCode": "Annotation" }],
+          "capacity": { "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown" },
+          "evidence": { "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md", "sourceRevision": "long-route-encounter-planning.r3", "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D", "observedAt": "NotObserved", "validUntil": "NotEstablished", "freshnessStateCode": "PlanningCurrent" }
+        }
+      ],
+      "valueBoundary": "실제 시간·날씨 상태 사본과 상한이 없으므로 현재 경로 상태와 시간 값은 Unknown이다."
+    },
+    {
+      "overlayId": "gm-overlay:long-route-transport", "layerRef": "gm-layer:transport", "label": "장거리 경로 운송 수단·비용·용량", "triggerKindCode": "TransportModeCandidate", "stateCode": "PlanningReference",
+      "targetSubgraphRefs": ["gm-subgraph:hub-logistics", "gm-subgraph:yodong-gateway"], "targetEdgeRefs": ["gm-edge:hub-outbound-to-yodong-gateway"],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["TransportFeasibility", "RouteCostCandidate", "RouteCapacityCandidate"], "sourceDecisionIds": [], "sourcePlanIds": ["PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001"],
+      "edgeEffects": [
+        { "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway", "routeStateCode": "Unknown", "scopeCode": "PlanningOnlyUnresolvedRoute",
+          "costComponents": [
+            { "dimensionCode": "Distance", "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown", "contributionKey": "transport:distance", "combinationPolicyCode": "Annotation" },
+            { "dimensionCode": "Money", "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown", "contributionKey": "transport:money", "combinationPolicyCode": "Annotation" }
+          ],
+          "capacity": { "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown" },
+          "evidence": { "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md", "sourceRevision": "long-route-encounter-planning.r3", "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D", "observedAt": "NotObserved", "validUntil": "NotEstablished", "freshnessStateCode": "PlanningCurrent" }
+        }
+      ],
+      "valueBoundary": "승인된 수단·거리·비용·용량 값과 실제 경로가 없으므로 값을 만들지 않는다."
+    },
+    {
+      "overlayId": "gm-overlay:long-route-threat-security", "layerRef": "gm-layer:threat-security", "label": "장거리 경로 위협·경비 조건", "triggerKindCode": "ThreatSecuritySnapshot", "stateCode": "PlanningReference",
+      "targetSubgraphRefs": ["gm-subgraph:hub-logistics", "gm-subgraph:yodong-gateway"], "targetEdgeRefs": ["gm-edge:hub-outbound-to-yodong-gateway"],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["ThreatCostCandidate", "EscortNeedCandidate", "EncounterEligibilityCandidate"], "sourceDecisionIds": [], "sourcePlanIds": ["PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001", "PLAN-STORY-YODONG-DEFENSE-001"],
+      "edgeEffects": [
+        { "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway", "routeStateCode": "Unknown", "scopeCode": "PlanningOnlyUnresolvedRoute",
+          "costComponents": [{ "dimensionCode": "Risk", "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown", "contributionKey": "threat-security:risk", "combinationPolicyCode": "Constraint" }],
+          "capacity": { "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown" },
+          "evidence": { "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md", "sourceRevision": "long-route-encounter-planning.r3", "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D", "observedAt": "NotObserved", "validUntil": "NotEstablished", "freshnessStateCode": "PlanningCurrent" }
+        }
+      ],
+      "valueBoundary": "실제 서식지·침입·최근 사건·경비 상태가 없으므로 거리만으로 조우나 차단을 만들지 않는다."
+    },
+    {
+      "overlayId": "gm-overlay:long-route-logistics-supply", "layerRef": "gm-layer:logistics-supply", "label": "장거리 경로 물류·보급 적합성", "triggerKindCode": "CargoDemandWindow", "stateCode": "PlanningReference",
+      "targetSubgraphRefs": ["gm-subgraph:hub-logistics", "gm-subgraph:yodong-gateway"], "targetEdgeRefs": ["gm-edge:hub-outbound-to-yodong-gateway"],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["SupplyRouteCandidate", "NetworkBlockedCandidate", "InsufficientCapacityCandidate"], "sourceDecisionIds": [], "sourcePlanIds": ["PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001", "PLAN-STORY-HUB-DISCOVERY-001"],
+      "edgeEffects": [
+        { "edgeRef": "gm-edge:hub-outbound-to-yodong-gateway", "routeStateCode": "Unknown", "scopeCode": "PlanningOnlyUnresolvedRoute",
+          "costComponents": [{ "dimensionCode": "Resource", "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown", "contributionKey": "logistics-supply:resource", "combinationPolicyCode": "Annotation" }],
+          "capacity": { "valueStateCode": "Unknown", "value": null, "unitCode": "Unknown" },
+          "evidence": { "sourceRef": "docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md", "sourceRevision": "long-route-encounter-planning.r3", "sourceSha256": "548733C312E752A572A9F354F0DFF9CBA23B653D46D30B70F3558E4D986C965D", "observedAt": "NotObserved", "validUntil": "NotEstablished", "freshnessStateCode": "PlanningCurrent" }
+        }
+      ],
+      "valueBoundary": "한 엣지 차단과 망 전체 Blocked, 경로 존재와 InsufficientCapacity를 분리하며 실제 화물·기한·용량 없이 결과를 확정하지 않는다."
+    },
+    {
+      "overlayId": "gm-overlay:long-route-player-choice", "layerRef": "gm-layer:player-choice", "label": "장거리 경로 후보 비교·명시 선택", "triggerKindCode": "RouteCandidateReview", "stateCode": "PlanningReference",
+      "targetSubgraphRefs": ["gm-subgraph:hub-logistics", "gm-subgraph:yodong-gateway"], "targetEdgeRefs": ["gm-edge:hub-outbound-to-yodong-gateway"],
+      "topologyMutationAllowed": false, "authorityMutationAllowed": false,
+      "effectCategories": ["FastSafeCheapCapacityBalancedCandidates", "TradeoffExplanation", "ExplicitSelectionRequired"], "sourceDecisionIds": [], "sourcePlanIds": ["PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001", "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001"],
+      "valueBoundary": "조회 레이어 토글이나 후보 정렬은 권위 비용·경로·운송 결과를 바꾸지 않으며 다른 후보를 숨기거나 자동 Confirm하지 않는다."
     }
   ]
 }

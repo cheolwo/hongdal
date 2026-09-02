@@ -7,6 +7,8 @@ $source = Join-Path $root 'eng/world-seedbeds/graph-maps/northern-life-hub-disco
 $partitionSource = Join-Path $root 'eng/world-seedbeds/graph-maps/northern-life-hub-discovery.partitions.v1.json'
 $overlaySource = Join-Path $root 'eng/world-seedbeds/graph-maps/graph-map-overlays.v1.json'
 $codeSource = Join-Path $root 'eng/world-seedbeds/graph-maps/unity-code-bindings.v1.json'
+$placementRuleSource = Join-Path $root 'eng/world-seedbeds/graph-maps/placement-rule-bindings.v1.json'
+$normalizationSource = Join-Path $root 'eng/world-seedbeds/graph-maps/northern-life-hub-discovery.normalization.v1.json'
 $unityRoot = Join-Path ([Environment]::GetFolderPath('UserProfile')) 'ssalddel'
 $folderRef = 'artifacts/local/validation/graph-map-plans'
 $folder = Join-Path $root $folderRef
@@ -31,6 +33,8 @@ $officialPlan = Read-JsonFile $source
 $officialPartition = Read-JsonFile $partitionSource
 $officialOverlay = Read-JsonFile $overlaySource
 $officialCode = Read-JsonFile $codeSource
+$officialPlacementRules = Read-JsonFile $placementRuleSource
+$officialNormalization = Read-JsonFile $normalizationSource
 
 function New-State {
     return [pscustomobject]@{
@@ -38,6 +42,8 @@ function New-State {
         partition = Clone-Json $officialPartition
         overlay = Clone-Json $officialOverlay
         code = Clone-Json $officialCode
+        placementRules = Clone-Json $officialPlacementRules
+        normalization = Clone-Json $officialNormalization
     }
 }
 
@@ -46,10 +52,14 @@ function Save-State([object] $state, [string] $name) {
     $partitionRef = "$folderRef/$name.partitions.json"
     $overlayRef = "$folderRef/$name.overlays.json"
     $codeRef = "$folderRef/$name.code-bindings.json"
+    $placementRuleRef = "$folderRef/$name.placement-rules.json"
+    $normalizationRef = "$folderRef/$name.normalization.json"
 
     $state.plan.federation.partitionCatalogRef.path = $partitionRef
     $state.plan.federation.overlayCatalogRef.path = $overlayRef
     $state.plan.level3.codeBindingCatalogRef.path = $codeRef
+    $state.plan.level2.placementRuleCatalogRef.path = $placementRuleRef
+    $state.plan.level1.normalizationCatalogRef.path = $normalizationRef
     $state.partition.sourceElementCatalogRef.path = $planRef
     $state.partition.sourceElementCatalogRef.expectedRevision = $state.plan.revision
 
@@ -57,7 +67,9 @@ function Save-State([object] $state, [string] $name) {
         @($planRef, $state.plan),
         @($partitionRef, $state.partition),
         @($overlayRef, $state.overlay),
-        @($codeRef, $state.code)
+        @($codeRef, $state.code),
+        @($placementRuleRef, $state.placementRules),
+        @($normalizationRef, $state.normalization)
     )
     foreach ($item in $items) {
         $path = Join-Path $root ([string] $item[0] -replace '/', [IO.Path]::DirectorySeparatorChar)
@@ -91,6 +103,8 @@ $protected = @(
     'eng/world-seedbeds/graph-maps/northern-life-hub-discovery.partitions.v1.json',
     'eng/world-seedbeds/graph-maps/graph-map-overlays.v1.json',
     'eng/world-seedbeds/graph-maps/unity-code-bindings.v1.json',
+    'eng/world-seedbeds/graph-maps/placement-rule-bindings.v1.json',
+    'eng/world-seedbeds/graph-maps/northern-life-hub-discovery.normalization.v1.json',
     'eng/world-seedbeds/generated/actual-e5-spatial.v1.json',
     'eng/execution-ledgers/world-interactions.json',
     'docs/AI/DECISIONS.md',
@@ -127,7 +141,7 @@ foreach ($relative in $protectedUnity) {
 }
 
 $official = & $manager -Mode Check -UnityProjectRoot $unityRoot -VerifyUnitySources
-Assert ($official -match 'nodes=11, edges=10, constraints=9, subgraphs=5, ports=8, connectors=4, overlays=2, codeBindings=6, sourceFiles=13, unresolved=1/1') 'OfficialCheck'
+Assert ($official -match 'nodes=34, edges=34, constraints=28, placementRules=21, ruleBoundConstraints=3, subgraphs=6, ports=12, connectors=6, overlays=9, codeBindings=6, sourceFiles=13, unresolved=23/25') 'OfficialCheck'
 
 $state = New-State
 $validRef = Save-State $state 'valid'
@@ -136,15 +150,28 @@ Assert ($validResult -match 'Write passed') 'ValidFixture'
 
 $output = Read-JsonFile (Join-Path $folder 'valid.output.json')
 Assert ($output.schemaVersion -eq 'mirror-graph-map-plan-output.v3') 'OutputSchema'
-Assert ($output.counts.nodes -eq 11 -and $output.counts.edges -eq 10 -and $output.counts.constraints -eq 9) 'OutputCounts'
-Assert ($output.counts.subgraphs -eq 5 -and $output.counts.ports -eq 8 -and $output.counts.connectors -eq 4) 'FederationOutputCounts'
-Assert ($output.counts.traversalProfiles -eq 6 -and $output.counts.overlays -eq 2) 'CapabilityOverlayCounts'
+Assert ($output.counts.nodes -eq 34 -and $output.counts.edges -eq 34 -and $output.counts.constraints -eq 28) 'OutputCounts'
+Assert ($output.counts.placementRuleProfiles -eq 5 -and $output.counts.placementRules -eq 21) 'PlacementRuleOutputCounts'
+Assert ($output.counts.placementRuleBindings -eq 5 -and $output.counts.placementRuleBoundConstraints -eq 3 -and $output.counts.governanceOnlyConstraints -eq 25) 'PlacementRuleBindingCounts'
+Assert ($output.counts.subgraphs -eq 6 -and $output.counts.ports -eq 12 -and $output.counts.connectors -eq 6) 'FederationOutputCounts'
+Assert ($output.counts.traversalProfiles -eq 6 -and $output.counts.layers -eq 6 -and $output.counts.overlays -eq 9 -and $output.counts.overlayEdgeEffects -eq 4) 'CapabilityOverlayCounts'
+Assert ($output.counts.planningAssessments -eq 21) 'PlanningAssessmentCount'
 Assert ($output.counts.codeBindings -eq 6 -and $output.counts.sourceCodeFiles -eq 13) 'Level3OutputCounts'
-Assert ($output.counts.codeBoundLevel1Targets -eq 19 -and $output.counts.unboundLevel1Targets -eq 2) 'Level3CoverageCounts'
+Assert ($output.counts.codeBoundLevel1Targets -eq 19 -and $output.counts.unboundLevel1Targets -eq 48) 'Level3CoverageCounts'
+Assert (@($output.resolvedCodeBindings | ForEach-Object targetRefs | Where-Object { $_ -eq 'gm-node:first-logging-reflection-preparation' }).Count -eq 0) 'PlannedNodeNotAutoBound'
+Assert ($output.counts.normalizedElements -eq 9 -and $output.counts.normalizedRelations -eq 7 -and $output.counts.normalizationBlocked -eq 1) 'NormalizationCounts'
 Assert (-not $output.sourceCatalogSnapshot.actualE5RuntimeValidated) 'RuntimeBoundaryPreserved'
 Assert (-not $output.plan.authorityBoundary.worldApplied -and -not $output.plan.authorityBoundary.actualTraversalVerified) 'WorldBoundaryPreserved'
 Assert (-not $output.plan.level3.evidenceBoundary.sceneWiringVerified -and -not $output.plan.level3.evidenceBoundary.runtimeExecutionVerified) 'Level3RuntimeBoundaryPreserved'
-Assert (@($output.partitionCatalog.subgraphs).Count -eq 5 -and @($output.resolvedCodeBindings).Count -eq 6) 'ExpandedCatalogsPresent'
+Assert (@($output.partitionCatalog.subgraphs).Count -eq 6 -and @($output.resolvedCodeBindings).Count -eq 6) 'ExpandedCatalogsPresent'
+Assert (@($output.overlayCatalog.layers).Count -eq 6 -and @($output.overlayCatalog.overlays).Count -eq 9) 'LayeredOverlayCatalogPresent'
+Assert (@($output.plan.planningImpactAssessments | Where-Object classificationCode -eq 'UpdateExisting').Count -eq 8) 'PlanningUpdateExistingCount'
+Assert (@($output.plan.planningImpactAssessments | Where-Object classificationCode -eq 'CreateSubgraph').Count -eq 2) 'PlanningCreateSubgraphCount'
+Assert (@($output.plan.planningImpactAssessments | Where-Object classificationCode -eq 'CreateGraphMap').Count -eq 0) 'PlanningCreateGraphMapCount'
+Assert (@($output.plan.planningImpactAssessments | Where-Object classificationCode -eq 'Blocked').Count -eq 2) 'PlanningBlockedCount'
+Assert (@($output.plan.planningImpactAssessments | Where-Object classificationCode -eq 'NoImpact').Count -eq 9) 'PlanningNoImpactCount'
+Assert (@($output.placementRuleCatalog.areaRuleProfiles).Count -eq 5 -and @($output.resolvedPlacementRuleBindings).Count -eq 5) 'PlacementRuleCatalogPresent'
+Assert ($output.normalizationCatalog.sampleStableId -eq 'graph-map-normalization-sample:hans-farm.v1') 'NormalizationCatalogPresent'
 $maximumLine = (Get-Content -LiteralPath (Join-Path $folder 'valid.output.md') -Encoding UTF8 | ForEach-Object Length | Measure-Object -Maximum).Maximum
 Assert ($maximumLine -le 1200) 'GeneratedMarkdownLineLimit'
 
@@ -166,7 +193,7 @@ $state.plan.level1.nodes[0].worldInteractionIds += @('WI-NOT-REGISTERED')
 Reject { Invoke-Fixture (Save-State $state 'unknown-wi') 'unknown-wi' } 'NodeUnknownWi'
 
 $state = New-State
-$state.plan.level1.nodes[10].stateCode = 'ReferenceAvailable'
+@($state.plan.level1.nodes | Where-Object nodeId -eq 'gm-node:yodong-defense-gateway')[0].stateCode = 'ReferenceAvailable'
 Reject { Invoke-Fixture (Save-State $state 'planning-gateway-promoted') 'planning-gateway-promoted' } 'NodePlanningState'
 
 $state = New-State
@@ -182,7 +209,7 @@ $state.plan.authorityBoundary.worldApplied = $true
 Reject { Invoke-Fixture (Save-State $state 'world-applied') 'world-applied' } 'AuthorityWorldApplied'
 
 $state = New-State
-$state.plan.level1.edges[1].sourceRelationRefs = @()
+@($state.plan.level1.edges | Where-Object edgeId -eq 'gm-edge:farm-edge-to-production')[0].sourceRelationRefs = @()
 Reject { Invoke-Fixture (Save-State $state 'reference-without-source') 'reference-without-source' } 'EdgeReferenceMissing'
 
 $state = New-State
@@ -194,7 +221,7 @@ $state.plan.level2.constraints[0].targetRefs = @('gm-node:not-found')
 Reject { Invoke-Fixture (Save-State $state 'constraint-target') 'constraint-target' } 'ConstraintTargetUnknown'
 
 $state = New-State
-$state.plan.level1.edges[9].stateCode = 'ReferenceAvailable'
+@($state.plan.level1.edges | Where-Object edgeId -eq 'gm-edge:hub-outbound-to-yodong-gateway')[0].stateCode = 'ReferenceAvailable'
 Reject { Invoke-Fixture (Save-State $state 'unresolved-promoted') 'unresolved-promoted' } 'EdgeReferenceMissing'
 
 $state = New-State
@@ -204,6 +231,54 @@ Reject { Invoke-Fixture (Save-State $state 'edge-capability') 'edge-capability' 
 $state = New-State
 $state.plan.level2.constraints[0].enforcementCode = 'Unknown'
 Reject { Invoke-Fixture (Save-State $state 'constraint-enforcement') 'constraint-enforcement' } 'ConstraintEnforcement'
+
+$state = New-State
+$state.normalization.elements += @($state.normalization.elements[0])
+Reject { Invoke-Fixture (Save-State $state 'normalization-element-duplicate') 'normalization-element-duplicate' } 'NormalizationElementDuplicate'
+
+$state = New-State
+@($state.normalization.elements | Where-Object elementRef -eq 'gm-node:hans-first-trust')[0].compatibilityTargetRefs = @('gm-node:hans')
+Reject { Invoke-Fixture (Save-State $state 'normalization-alias-relation-missing') 'normalization-alias-relation-missing' } 'NormalizationAliasRelationMissing'
+
+$state = New-State
+@($state.normalization.elements | Where-Object elementRef -eq 'gm-node:hans')[0].actorIdentityCode = 'AnonymousRole'
+Reject { Invoke-Fixture (Save-State $state 'normalization-anonymous-actor') 'normalization-anonymous-actor' } 'NormalizationAnonymousActorMaterialized'
+
+$state = New-State
+@($state.normalization.relations | Where-Object relationRef -eq 'gm-edge:hans-normalized-witnesses-fence-repair')[0].actorRoleRef = 'FarmWorker'
+Reject { Invoke-Fixture (Save-State $state 'normalization-actor-exclusive') 'normalization-actor-exclusive' } 'NormalizationRelationActorExclusive'
+
+$state = New-State
+@($state.normalization.relations | Where-Object relationRef -eq 'gm-edge:hans-normalized-witnesses-fence-repair')[0].sourceDecisionIds = @('D-529')
+Reject { Invoke-Fixture (Save-State $state 'normalization-decision-lineage') 'normalization-decision-lineage' } 'NormalizationDecisionLineageLost'
+
+$state = New-State
+@($state.normalization.relations | Where-Object relationRef -eq 'gm-edge:hans-normalized-repairs-house')[0].contextSourceNodeRef = 'gm-node:not-found'
+Reject { Invoke-Fixture (Save-State $state 'normalization-context-source') 'normalization-context-source' } 'NormalizationContextSourceUnknown'
+
+$state = New-State
+@($state.normalization.relations | Where-Object relationRef -eq 'gm-edge:hans-normalized-harvests-permitted-tree')[0].level3TargetRefs = @('gm-node:not-found')
+Reject { Invoke-Fixture (Save-State $state 'normalization-level3-target') 'normalization-level3-target' } 'NormalizationLevel3TargetUnknown'
+
+$state = New-State
+$state.placementRules.areaRuleProfiles[1].rules[0].sourceRuleCode = 'InventedFarmRule'
+Reject { Invoke-Fixture (Save-State $state 'placement-source-drift') 'placement-source-drift' } 'PlacementRuleSourceCodeDrift'
+
+$state = New-State
+$state.placementRules.areaRuleProfiles[1].rules[4].constraintRefs[0] = 'gm-constraint:not-found'
+Reject { Invoke-Fixture (Save-State $state 'placement-constraint-unknown') 'placement-constraint-unknown' } 'PlacementRuleConstraintUnknown'
+
+$state = New-State
+$state.placementRules.areaRuleProfiles[3].rules[3].constraintRefs[0] = 'gm-constraint:farm-flow-separation'
+Reject { Invoke-Fixture (Save-State $state 'placement-area-mismatch') 'placement-area-mismatch' } 'PlacementRuleConstraintAreaMismatch'
+
+$state = New-State
+$state.placementRules.governanceOnlyConstraints = @($state.placementRules.governanceOnlyConstraints | Where-Object constraintRef -ne 'gm-constraint:season-does-not-rewrite-topology')
+Reject { Invoke-Fixture (Save-State $state 'placement-coverage-missing') 'placement-coverage-missing' } 'PlacementRuleConstraintCoverage'
+
+$state = New-State
+$state.placementRules.areaRuleProfiles[4].graphPresenceCode = 'Present'
+Reject { Invoke-Fixture (Save-State $state 'placement-presence') 'placement-presence' } 'PlacementRuleAreaPresenceMismatch'
 
 $state = New-State
 $state.partition.subgraphs[1].nodeRefs += @('gm-node:nature-trailhead')
@@ -252,6 +327,43 @@ Reject { Invoke-Fixture (Save-State $state 'overlay-subgraph') 'overlay-subgraph
 $state = New-State
 $state.overlay.overlays[0].sourceDecisionIds[0] = 'D-000'
 Reject { Invoke-Fixture (Save-State $state 'overlay-decision') 'overlay-decision' } 'OverlayDecisionUnknown'
+
+$state = New-State
+$state.overlay.overlays[0].layerRef = 'gm-layer:not-found'
+Reject { Invoke-Fixture (Save-State $state 'overlay-layer') 'overlay-layer' } 'OverlayLayerUnknown'
+
+$state = New-State
+$state.overlay.overlays[0].targetEdgeRefs = @('gm-edge:not-found')
+Reject { Invoke-Fixture (Save-State $state 'overlay-edge') 'overlay-edge' } 'OverlayEdgeUnknown'
+
+$state = New-State
+$effectOverlay = @($state.overlay.overlays | Where-Object { $null -ne $_.PSObject.Properties['edgeEffects'] })[0]
+$effectOverlay.edgeEffects[0].routeStateCode = 'Imagined'
+Reject { Invoke-Fixture (Save-State $state 'overlay-route-state') 'overlay-route-state' } 'OverlayRouteState'
+
+$state = New-State
+$effectOverlay = @($state.overlay.overlays | Where-Object { $null -ne $_.PSObject.Properties['edgeEffects'] })[0]
+$effectOverlay.edgeEffects[0].costComponents[0].value = 1
+Reject { Invoke-Fixture (Save-State $state 'overlay-unknown-cost-value') 'overlay-unknown-cost-value' } 'OverlayUnknownCostHasValue'
+
+$state = New-State
+$effectOverlays = @($state.overlay.overlays | Where-Object { $null -ne $_.PSObject.Properties['edgeEffects'] })
+$effectOverlays[1].edgeEffects[0].costComponents[0].dimensionCode = $effectOverlays[0].edgeEffects[0].costComponents[0].dimensionCode
+$effectOverlays[1].edgeEffects[0].costComponents[0].contributionKey = $effectOverlays[0].edgeEffects[0].costComponents[0].contributionKey
+Reject { Invoke-Fixture (Save-State $state 'overlay-contribution-duplicate') 'overlay-contribution-duplicate' } 'OverlayCostContributionDuplicate'
+
+$state = New-State
+$effectOverlay = @($state.overlay.overlays | Where-Object { $null -ne $_.PSObject.Properties['edgeEffects'] })[0]
+$effectOverlay.edgeEffects[0].evidence.sourceSha256 = ('0' * 64)
+Reject { Invoke-Fixture (Save-State $state 'overlay-evidence-hash') 'overlay-evidence-hash' } 'OverlayEvidenceHashMismatch'
+
+$state = New-State
+$state.plan.planningImpactAssessments = @($state.plan.planningImpactAssessments | Select-Object -Skip 1)
+Reject { Invoke-Fixture (Save-State $state 'planning-assessment-missing') 'planning-assessment-missing' } 'PlanningAssessmentCoverageCount'
+
+$state = New-State
+$state.plan.planningImpactAssessments[0].sourceExpectedSha256 = ('0' * 64)
+Reject { Invoke-Fixture (Save-State $state 'planning-assessment-hash') 'planning-assessment-hash' } 'PlanningAssessmentSourceHash'
 
 $state = New-State
 $state.plan.level3.bindingAssignments = @($state.plan.level3.bindingAssignments | Select-Object -Skip 1)
@@ -333,6 +445,8 @@ $report = [ordered]@{
     partitionCatalogSha256 = (Get-FileHash -LiteralPath $partitionSource).Hash
     overlayCatalogSha256 = (Get-FileHash -LiteralPath $overlaySource).Hash
     codeBindingCatalogSha256 = (Get-FileHash -LiteralPath $codeSource).Hash
+    placementRuleCatalogSha256 = (Get-FileHash -LiteralPath $placementRuleSource).Hash
+    normalizationCatalogSha256 = (Get-FileHash -LiteralPath $normalizationSource).Hash
 }
 [IO.File]::WriteAllText((Join-Path $folder 'results.json'), ($report | ConvertTo-Json), $utf8)
 Write-Output "Graph Map plan tests: $checks passed"

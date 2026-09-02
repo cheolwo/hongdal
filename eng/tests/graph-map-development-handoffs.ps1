@@ -58,7 +58,7 @@ foreach ($relative in $protected) {
 }
 
 $official = & $manager -Mode Check
-Assert ($official -match 'Check passed: items=1, ready=1, integrated=0, blocked=0') 'OfficialCheck'
+Assert ($official -match 'Check passed: items=2, ready=1, integrated=1, blocked=0') 'OfficialCheck'
 
 $state = Clone-Ledger
 $validRef = Save-Ledger $state 'valid'
@@ -66,9 +66,10 @@ $valid = Invoke-Fixture $validRef 'valid'
 Assert ($valid -match 'Write passed') 'ValidFixture'
 $output = Get-Content -LiteralPath (Join-Path $folder 'valid.output.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 Assert ([string] $output.schemaVersion -eq 'mirror-graph-map-development-handoff-output.v1') 'OutputSchema'
-Assert ($output.counts.total -eq 1 -and $output.counts.readyForDevelopment -eq 1) 'OutputCounts'
-Assert ([string] $output.items[0].source.graphMapRevision -eq 'mirror-graph-map-plan.northern-life-hub-discovery.r3') 'GraphMapRevisionOutput'
+Assert ($output.counts.total -eq 2 -and $output.counts.readyForDevelopment -eq 1 -and $output.counts.integrated -eq 1) 'OutputCounts'
+Assert ([string] $output.items[0].source.graphMapRevision -eq 'mirror-graph-map-plan.northern-life-hub-discovery.r10') 'GraphMapRevisionOutput'
 Assert (@($output.items[0].slice.nodeRefs).Count -eq 2 -and @($output.items[0].slice.edgeRefs).Count -eq 1) 'SliceCounts'
+Assert (@($output.items[0].slice.placementRuleRefs).Count -eq 1) 'PlacementRuleSliceCount'
 Assert ([string] $output.items[0].developmentTarget.candidateStatusCode -eq 'Active') 'CandidateStatusOutput'
 Assert (-not [bool] $output.items[0].evidenceBoundary.codeChanged -and -not [bool] $output.items[0].evidenceBoundary.runtimeExecuted) 'EvidenceBoundaryOutput'
 
@@ -116,6 +117,14 @@ Reject { Invoke-Fixture (Save-Ledger $state 'constraint-unknown') 'constraint-un
 $state = Clone-Ledger
 $state.items[0].slice.codeBindingRefs[0] = 'gm-code:missing'
 Reject { Invoke-Fixture (Save-Ledger $state 'binding-unknown') 'binding-unknown' } 'SliceCodeBindingUnknown'
+
+$state = Clone-Ledger
+$state.items[0].slice.placementRuleRefs[0] = 'gm-placement-rule:missing'
+Reject { Invoke-Fixture (Save-Ledger $state 'placement-rule-unknown') 'placement-rule-unknown' } 'SlicePlacementRuleUnknown'
+
+$state = Clone-Ledger
+$state.items[0].slice.placementRuleRefs[0] = 'gm-placement-rule:hub:vehicle-turning-radius'
+Reject { Invoke-Fixture (Save-Ledger $state 'placement-rule-outside') 'placement-rule-outside' } 'SlicePlacementRuleOutsideConstraints'
 
 $state = Clone-Ledger
 $state.items[0].developmentTarget.worldInteractionId = 'WI-NOT-REGISTERED'

@@ -1,0 +1,351 @@
+{
+  "schemaVersion": "mirror-graph-map-placement-rule-catalog.v1",
+  "revision": "mirror-graph-map-placement-rule-catalog.r5",
+  "graphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+  "title": "북부 생활권 Graph Map 배치 구조·제약 규칙 결속",
+  "sourceRefs": [
+    {
+      "kindCode": "H5WorldLayoutPolicy",
+      "path": "eng/world-seedbeds/h5-world-layout-policy.v1.json",
+      "expectedRevision": "simulation-world-h5-layout-policy.r4"
+    },
+    {
+      "kindCode": "SpatialHierarchy",
+      "path": "eng/world-seedbeds/spatial-hierarchy-levels.json",
+      "expectedRevision": "simulation-world-spatial-hierarchy.r1"
+    },
+    {
+      "kindCode": "SpatialFormationModes",
+      "path": "eng/world-seedbeds/spatial-formation-modes.v1.json",
+      "expectedRevision": "simulation-spatial-formation-modes.r1"
+    }
+  ],
+  "authorityBoundary": {
+    "declarativePreflightOnly": true,
+    "formsHInstances": false,
+    "calculatesPlacementPlan": false,
+    "appliesUnityObjects": false,
+    "changesSimulationAuthority": false,
+    "runtimeVerified": false,
+    "gameViewVerified": false,
+    "meaning": "Graph Map은 기존 배치 구조·제약 규칙의 출처와 적용 범위를 추적한다. 수치 규칙을 새로 만들거나 H 성립·배치 계획·Unity 적용을 대신하지 않는다."
+  },
+  "hierarchyConsumption": {
+    "expectedHLevelCodes": ["H1", "H2", "H3", "H4"],
+    "expectedFormationModeCodes": ["LhComposed", "PlayerComposed", "HybridEvolving"],
+    "constraintAxisCode": "WorldAreaHEnvelopeToObject",
+    "formationAxisCode": "H1ToH4BottomUp",
+    "meaning": "하향식 물리 제약과 상향식 H 성립을 구분하고, Graph Map 노드·엣지는 두 축의 입력 관계만 참조한다."
+  },
+  "areaRuleProfiles": [
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:nature-home.v1",
+      "canonicalAreaRoleCode": "NatureHome",
+      "graphPresenceCode": "Present",
+      "rules": [
+        {
+          "ruleRef": "gm-placement-rule:nature:irregular-terrain",
+          "sourceRuleCode": "IrregularTerrain",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "현재 Graph Map은 지형 불규칙성의 수치·실측 제약을 아직 선택하지 않았다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:nature:low-building-density",
+          "sourceRuleCode": "LowBuildingDensity",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "현재 노드는 건물 밀도 계산보다 발견·귀환 관계를 우선한다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:nature:threat-outer-ring",
+          "sourceRuleCode": "ThreatOuterRing",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "위협 외곽의 실제 거리·대상 규칙은 현재 Graph Map 제약에 아직 결속되지 않았다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:nature:woodland-clearing-core",
+          "sourceRuleCode": "WoodlandClearingCore",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "숲 빈터 핵의 실측 범위가 현재 계획 판본에 없다."
+        }
+      ]
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:farm-production.v1",
+      "canonicalAreaRoleCode": "Farm",
+      "graphPresenceCode": "Present",
+      "rules": [
+        {
+          "ruleRef": "gm-placement-rule:farm:crossroad-four-fields",
+          "sourceRuleCode": "CrossroadFourFields",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "현재 Graph Map은 네 필지의 실제 기하를 아직 표현하지 않는다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:farm:fence-continuity-with-entrances",
+          "sourceRuleCode": "FenceContinuityWithEntrances",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "울타리·출입구 객체와 실측 간격이 현재 노드·엣지에 결속되지 않았다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:farm:gentle-work-slope",
+          "sourceRuleCode": "GentleWorkSlope",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "실제 지지면과 경사 표본은 Play Mode 전 별도 검증이 필요하다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:farm:no-ridge-building",
+          "sourceRuleCode": "NoRidgeBuilding",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "건물 후보와 능선 지형의 실제 교차 정보가 아직 없다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:farm:production-processing-separation",
+          "sourceRuleCode": "ProductionProcessingSeparation",
+          "usageCode": "BoundToGraphConstraint",
+          "constraintRefs": ["gm-constraint:farm-flow-separation"],
+          "reason": "Farm 생산·작업마당·상차 역할 분리 제약이 기존 H5 규칙을 직접 소비한다."
+        }
+      ]
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:logistics-hub.v1",
+      "canonicalAreaRoleCode": "Hub",
+      "graphPresenceCode": "Present",
+      "rules": [
+        {
+          "ruleRef": "gm-placement-rule:hub:flat-hardscape",
+          "sourceRuleCode": "FlatHardscape",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "평탄 포장의 실측 지지 조건은 현재 그래프 관계만으로 판정하지 않는다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:hub:vehicle-turning-radius",
+          "sourceRuleCode": "VehicleTurningRadius",
+          "usageCode": "BoundToGraphConstraint",
+          "constraintRefs": ["gm-constraint:route-capability-separation"],
+          "reason": "차량 접근을 보행·화물과 분리하는 제약이 기존 회전 반경 규칙을 참조한다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:hub:inbound-inspection-putaway-sequence",
+          "sourceRuleCode": "InboundInspectionPutawaySequence",
+          "usageCode": "BoundToGraphConstraint",
+          "constraintRefs": ["gm-constraint:hub-entry-contact-exit"],
+          "reason": "Hub 입구·접점·출구 판독 제약이 입고·검수·적치 순서를 참조한다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:hub:outbound-staging-separation",
+          "sourceRuleCode": "OutboundStagingSeparation",
+          "usageCode": "BoundToGraphConstraint",
+          "constraintRefs": ["gm-constraint:hub-entry-contact-exit"],
+          "reason": "Hub 출고 준비를 입고 접점과 분리하는 제약에 직접 결속한다."
+        }
+      ]
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:town-market.v1",
+      "canonicalAreaRoleCode": "Town",
+      "graphPresenceCode": "Present",
+      "rules": [
+        {
+          "ruleRef": "gm-placement-rule:town:low-rise-mixed-use",
+          "sourceRuleCode": "LowRiseMixedUse",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "Town 상세 건축 밀도와 용도 혼합은 현재 그래프 범위를 넘는다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:town:pedestrian-market-spine",
+          "sourceRuleCode": "PedestrianMarketSpine",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "시장 보행 중심축의 실제 노드·통로가 아직 세분화되지 않았다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:town:resident-need-return-route",
+          "sourceRuleCode": "ResidentNeedReturnRoute",
+          "usageCode": "AvailableNotSelected",
+          "constraintRefs": [],
+          "reason": "현재 필수 귀환 제약의 대상은 Nature와 Hub이며 Town 주민 경로를 대신 연결하지 않는다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:town:service-traffic-control",
+          "sourceRuleCode": "ServiceTrafficControl",
+          "usageCode": "BoundToGraphConstraint",
+          "constraintRefs": ["gm-constraint:route-capability-separation"],
+          "reason": "Hub→Town 연결에서 서비스 차량과 보행·화물 능력을 분리하는 제약이 이 규칙을 참조한다."
+        }
+      ]
+    },
+    {
+      "areaSetStableId": "area-set:sim:pyeongchang:city-service.v1",
+      "canonicalAreaRoleCode": "City",
+      "graphPresenceCode": "OutsideCurrentGraph",
+      "rules": [
+        {
+          "ruleRef": "gm-placement-rule:city:dense-service-grid",
+          "sourceRuleCode": "DenseServiceGrid",
+          "usageCode": "OutsideCurrentGraph",
+          "constraintRefs": [],
+          "reason": "City는 현재 Graph Map에 실제 노드가 없다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:city:large-service-facilities",
+          "sourceRuleCode": "LargeServiceFacilities",
+          "usageCode": "OutsideCurrentGraph",
+          "constraintRefs": [],
+          "reason": "City는 현재 Graph Map에 실제 노드가 없다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:city:public-space-network",
+          "sourceRuleCode": "PublicSpaceNetwork",
+          "usageCode": "OutsideCurrentGraph",
+          "constraintRefs": [],
+          "reason": "City는 현재 Graph Map에 실제 노드가 없다."
+        },
+        {
+          "ruleRef": "gm-placement-rule:city:reserved-until-actual-e5",
+          "sourceRuleCode": "ReservedUntilActualE5",
+          "usageCode": "OutsideCurrentGraph",
+          "constraintRefs": [],
+          "reason": "City는 H5 정책에서 Reserved이며 현재 Graph Map 실제 참조가 없다."
+        }
+      ]
+    }
+  ],
+  "governanceOnlyConstraints": [
+    {
+      "constraintRef": "gm-constraint:actual-reference-identity",
+      "reason": "실제 참조 계보 검사이며 장소별 H5 배치 규칙을 적용하는 제약이 아니다.",
+      "sourceRefs": ["docs/Architecture/상향식배치성립통제계층.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:required-traversal-return",
+      "reason": "필수 이동의 귀환 토폴로지를 검사하며 특정 Area의 배치 코드로 대체하지 않는다.",
+      "sourceRefs": ["docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:unresolved-never-verified",
+      "reason": "미해결 증거의 승격을 막는 관리 제약이다.",
+      "sourceRefs": ["docs/Architecture/플레이폐루프논리시각이중순환체계.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:season-does-not-rewrite-topology",
+      "reason": "시간·표현이 권위 토폴로지를 바꾸지 못하게 하는 경계다.",
+      "sourceRefs": ["docs/Architecture/지도구성과세계자산배치분리.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:asset-candidate-not-assignment",
+      "reason": "자산 후보와 실제 할당의 증거 단계를 구분하는 표현 관문이다.",
+      "sourceRefs": ["docs/Architecture/플레이폐루프Synty표현모듈체계.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:no-whole-map-prerequisite",
+      "reason": "영역 독립 개발 원칙이며 장소별 배치 규칙을 새 선행 조건으로 만들지 않는다.",
+      "sourceRefs": ["docs/Architecture/FarmHubCity독립영역우선개발정책.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-first-trust-causal-lineage",
+      "reason": "벌목·목재·수리·목격·첫 신뢰의 원인 계보를 보존하는 기획 제약이며 장소별 H5 배치 수치를 만들지 않는다.",
+      "sourceRefs": ["docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:first-logging-reflection-lineage",
+      "reason": "첫 벌목 ActionRecord·한스 집 안전 휴식·성찰 진행·기존 성장 근거의 계보를 검사하는 상태 관문이며 장소별 H5 배치 수치를 만들지 않는다.",
+      "sourceRefs": ["docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-first-trust-spatial-values-unresolved",
+      "reason": "미정 나무·거리·울타리·도구·관계 값을 실제 배치로 승격하지 못하게 하는 기획 관문이다.",
+      "sourceRefs": ["docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-axe-choice-and-optional-stockpile",
+      "reason": "손도끼 사용과 여분 목재 적재를 별도 선택·원인 계보로 보존하는 기획 제약이며 장소별 H5 수치를 만들지 않는다.",
+      "sourceRefs": ["docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-house-repair-state-and-marker",
+      "reason": "한스의 사후 발견·목재 소비·수리 상태·표식 의미를 보존하는 기획·표현 관문이며 배치 규칙을 새로 정의하지 않는다.",
+      "sourceRefs": ["docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-house-damage-candidate-tool-blocked",
+      "reason": "원본 불변 Blender 복사본 후보와 현재 도구 차단을 E4 후보 경계로 남기며 실제 자산 제작·배치 규칙이 아니다.",
+      "sourceRefs": ["docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-life-base-boundary-unresolved",
+      "reason": "한스 허락 뒤 제한 생활 거점의 역할과 미정 값을 보존하며 경비대 지휘소나 플레이어 소유 주택 배치 규칙을 만들지 않는다.",
+      "sourceRefs": ["docs/Reports/GraphMap-결정연계전수감사-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:farm-patrol-return-and-ambiguity",
+      "reason": "첫 순찰의 귀환과 위협 의미를 보존하며 아직 정해지지 않은 경로·거리·마수 배치를 만들지 않는다.",
+      "sourceRefs": ["docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-sword-delayed-reveal",
+      "reason": "한스의 검을 지연 공개 단서로 보존하는 이야기 제약이며 실제 소품 배치 규칙이 아니다.",
+      "sourceRefs": ["docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hub-evidence-not-answer",
+      "reason": "단서·가설·현장 확인의 인과를 보존하며 공간 배치나 정답 계산을 수행하지 않는다.",
+      "sourceRefs": ["docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hub-recovery-meditation-no-duplication",
+      "reason": "회복·명상·영감 결과 중복을 막는 권위 경계이며 장소별 배치 규칙이 아니다.",
+      "sourceRefs": ["docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:town-workshop-small-test-boundary",
+      "reason": "작은 시험의 학습·보상 경계를 보존하며 공방 작업대나 자산을 자동 배치하지 않는다.",
+      "sourceRefs": ["docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hostile-division-requires-actual-separation",
+      "reason": "실제 관계 차단 전 종합 역량 재판정을 막는 기획 제약이며 전장 배치 규칙이 아니다.",
+      "sourceRefs": ["docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-precision-axe-repair-lineage",
+      "reason": "부러진 농장 손도끼의 동일 개체·관계·재료·시간·맡김·반환 계보를 보존하는 기획 제약이며 실제 수리 기능이나 배치 규칙이 아니다.",
+      "sourceRefs": ["docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:hans-precision-axe-role-separation",
+      "reason": "개인 손도끼와 정밀 목공·수리 도구의 역할을 분리하는 기획 제약이며 성능·Prefab·한스 과거를 확정하지 않는다.",
+      "sourceRefs": ["docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:route-layer-evidence-freshness",
+      "reason": "경로 레이어의 근거·판본·관측·신선도를 검사하는 비배치 거버넌스 제약이다.",
+      "sourceRefs": ["docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:route-cost-contribution-no-double-count",
+      "reason": "레이어 비용 원인의 중복 합산을 막는 비배치 조합 제약이다.",
+      "sourceRefs": ["docs/AI/GraphMap-레이어중심-설계개발우선순위-2026-09-02.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:route-network-state-and-capacity-separation",
+      "reason": "엣지 상태·망 차단·용량 부족을 분리하는 계획 제약이며 실제 경로 값을 만들지 않는다.",
+      "sourceRefs": ["docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"]
+    },
+    {
+      "constraintRef": "gm-constraint:route-encounter-authority-and-return",
+      "reason": "실제 위험 원천과 우회·귀환을 요구하는 계획 제약이며 몬스터나 경로를 배치하지 않는다.",
+      "sourceRefs": ["docs/AI/거점간장거리경로-위험조우-기획-2026-09-02.md"]
+    }
+  ]
+}

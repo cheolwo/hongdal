@@ -13,37 +13,9 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $utf8 = [Text.UTF8Encoding]::new($false)
-
-function Resolve-RepoPath([string] $relativePath) {
-    return Join-Path $repositoryRoot ($relativePath -replace '/', [IO.Path]::DirectorySeparatorChar)
-}
-
-function Read-Json([string] $relativePath) {
-    $path = Resolve-RepoPath $relativePath
-    if (-not (Test-Path -LiteralPath $path)) { throw "GraphMapInvalid:JsonMissing:$relativePath" }
-    return Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
-}
-
-function Require([bool] $condition, [string] $code) {
-    if (-not $condition) { throw "GraphMapInvalid:$code" }
-}
-
-function Require-Text([object] $value, [string] $code) {
-    Require ($null -ne $value -and -not [string]::IsNullOrWhiteSpace([string] $value)) $code
-}
-
-function Require-Unique([object[]] $values, [scriptblock] $selector, [string] $code) {
-    $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-    foreach ($value in @($values)) {
-        $key = [string] (& $selector $value)
-        Require-Text $key "$code`:Empty"
-        Require ($seen.Add($key)) "$code`:$key"
-    }
-}
-
-function File-Hash([string] $relativePath) {
-    return (Get-FileHash -LiteralPath (Resolve-RepoPath $relativePath) -Algorithm SHA256).Hash.ToLowerInvariant()
-}
+. (Join-Path $PSScriptRoot 'GraphMapTooling.ps1') `
+    -RepositoryRoot $repositoryRoot `
+    -ErrorPrefix 'GraphMapInvalid'
 
 function Absolute-Hash([string] $path) {
     return (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()
@@ -72,19 +44,6 @@ function Resolve-ExternalChild([string] $root, [string] $relativePath, [string] 
     return $candidate
 }
 
-function Stable-Json([object] $value) {
-    return (($value | ConvertTo-Json -Depth 100) -replace "`r`n", "`n") + "`n"
-}
-
-function Normalize-Text([string] $value) {
-    return (($value -replace "`r`n", "`n").TrimEnd()) + "`n"
-}
-
-function Escape-Cell([object] $value) {
-    if ($null -eq $value) { return '' }
-    return ([string] $value).Replace('|', '\|').Replace("`r", '').Replace("`n", '<br>')
-}
-
 $plan = Read-Json $PlanPath
 Require ([string] $plan.schemaVersion -eq 'mirror-graph-map-plan.v3') 'PlanSchema'
 Require-Text $plan.revision 'PlanRevision'
@@ -102,14 +61,18 @@ foreach ($catalog in $catalogs) {
 $actualCatalogRef = @($catalogs | Where-Object kindCode -eq 'ActualE5SpatialSnapshot')
 $wiCatalogRef = @($catalogs | Where-Object kindCode -eq 'WorldInteractionCatalog')
 $decisionCatalogRef = @($catalogs | Where-Object kindCode -eq 'DecisionCatalog')
+$planningCatalogRef = @($catalogs | Where-Object kindCode -eq 'PlanningCatalog')
 Require ($actualCatalogRef.Count -eq 1) 'ActualCatalogReference'
 Require ($wiCatalogRef.Count -eq 1) 'WiCatalogReference'
 Require ($decisionCatalogRef.Count -eq 1) 'DecisionCatalogReference'
+Require ($planningCatalogRef.Count -eq 1) 'PlanningCatalogReference'
 
 $actual = Read-Json ([string] $actualCatalogRef[0].path)
 $wiCatalog = Read-Json ([string] $wiCatalogRef[0].path)
 $decisionPath = Resolve-RepoPath ([string] $decisionCatalogRef[0].path)
 $decisionText = Get-Content -LiteralPath $decisionPath -Raw -Encoding UTF8
+$planningPath = Resolve-RepoPath ([string] $planningCatalogRef[0].path)
+$planningText = Get-Content -LiteralPath $planningPath -Raw -Encoding UTF8
 Require ([string] $actual.revision -eq [string] $actualCatalogRef[0].expectedRevision) 'ActualCatalogRevision'
 Require ([string] $wiCatalog.revision -eq [string] $wiCatalogRef[0].expectedRevision) 'WiCatalogRevision'
 
@@ -122,8 +85,32 @@ $decisionIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordi
 foreach ($match in [regex]::Matches($decisionText, '(?m)^## (D-\d{3})\b')) {
     $null = $decisionIds.Add($match.Groups[1].Value)
 }
+$planIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+foreach ($match in [regex]::Matches($planningText, '`(PLAN-[A-Z0-9-]+)`')) {
+    $null = $planIds.Add($match.Groups[1].Value)
+}
 $wiIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 foreach ($wi in @($wiCatalog.items)) { $null = $wiIds.Add([string] $wi.id) }
+
+$planningAssessments = @($plan.planningImpactAssessments)
+Require ($planningAssessments.Count -eq $planIds.Count) 'PlanningAssessmentCoverageCount'
+Require-Unique $planningAssessments { param($x) $x.planId } 'PlanningAssessmentDuplicate'
+$assessmentPlanIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+$allowedPlanningClassification = @('UpdateExisting', 'CreateSubgraph', 'CreateGraphMap', 'NoImpact', 'Blocked')
+foreach ($assessment in $planningAssessments) {
+    $planId = [string] $assessment.planId
+    Require ($planIds.Contains($planId)) "PlanningAssessmentUnknown:$planId"
+    $null = $assessmentPlanIds.Add($planId)
+    Require ($allowedPlanningClassification -contains [string] $assessment.classificationCode) "PlanningAssessmentClassification:$planId"
+    Require-Text $assessment.integrationStateCode "PlanningAssessmentState:$planId"
+    Require-Text $assessment.sourceRef "PlanningAssessmentSource:$planId"
+    Require-Text $assessment.sourceExpectedSha256 "PlanningAssessmentHash:$planId"
+    Require-Text $assessment.reason "PlanningAssessmentReason:$planId"
+    $assessmentSourcePath = Resolve-RepoPath ([string] $assessment.sourceRef)
+    Require (Test-Path -LiteralPath $assessmentSourcePath -PathType Leaf) "PlanningAssessmentSourceMissing:$planId"
+    Require ((Absolute-Hash $assessmentSourcePath) -eq ([string] $assessment.sourceExpectedSha256).ToUpperInvariant()) "PlanningAssessmentSourceHash:$planId"
+}
+foreach ($planId in $planIds) { Require ($assessmentPlanIds.Contains($planId)) "PlanningAssessmentMissing:$planId" }
 
 $areaIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 $graphIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -216,6 +203,11 @@ foreach ($node in $nodes) {
     foreach ($decisionId in @($node.sourceDecisionIds)) {
         Require ($decisionIds.Contains([string] $decisionId)) "NodeUnknownDecision:$nodeId`:$decisionId"
     }
+    if ($null -ne $node.PSObject.Properties['sourcePlanIds']) {
+        foreach ($planId in @($node.sourcePlanIds)) {
+            Require ($planIds.Contains([string] $planId)) "NodeUnknownPlan:$nodeId`:$planId"
+        }
+    }
 
     if ([string] $node.realizationCode -eq 'ExistingActualGraphRef') {
         Require ($null -ne $node.actualRef) "NodeActualRefMissing:$nodeId"
@@ -294,12 +286,188 @@ foreach ($constraint in $constraints) {
     }
     foreach ($source in @($constraint.sourceRefs)) {
         $sourceText = [string] $source
-        $validSource = $decisionIds.Contains($sourceText) -or $wiIds.Contains($sourceText)
+        $validSource = $decisionIds.Contains($sourceText) -or $wiIds.Contains($sourceText) -or $planIds.Contains($sourceText)
         if (-not $validSource -and ($sourceText -match '^(docs|eng|Ssalddel\.)/')) {
             $validSource = Test-Path -LiteralPath (Resolve-RepoPath $sourceText)
         }
         Require $validSource "ConstraintSourceUnknown:$constraintId`:$sourceText"
     }
+}
+
+$placementRuleRef = $plan.level2.placementRuleCatalogRef
+Require ($null -ne $placementRuleRef) 'PlacementRuleCatalogRefMissing'
+$placementRuleCatalog = Read-Json ([string] $placementRuleRef.path)
+Require ([string] $placementRuleCatalog.schemaVersion -eq 'mirror-graph-map-placement-rule-catalog.v1') 'PlacementRuleCatalogSchema'
+Require ([string] $placementRuleCatalog.revision -eq [string] $placementRuleRef.expectedRevision) 'PlacementRuleCatalogRevision'
+Require ([string] $placementRuleCatalog.graphMapStableId -eq [string] $plan.graphMapStableId) 'PlacementRuleGraphIdentity'
+
+$placementBoundary = $placementRuleCatalog.authorityBoundary
+Require ([bool] $placementBoundary.declarativePreflightOnly) 'PlacementRulePreflightBoundary'
+Require (-not [bool] $placementBoundary.formsHInstances) 'PlacementRuleFormsHInstances'
+Require (-not [bool] $placementBoundary.calculatesPlacementPlan) 'PlacementRuleCalculatesPlan'
+Require (-not [bool] $placementBoundary.appliesUnityObjects) 'PlacementRuleAppliesUnity'
+Require (-not [bool] $placementBoundary.changesSimulationAuthority) 'PlacementRuleChangesAuthority'
+Require (-not [bool] $placementBoundary.runtimeVerified) 'PlacementRuleRuntimeBoundary'
+Require (-not [bool] $placementBoundary.gameViewVerified) 'PlacementRuleGameViewBoundary'
+Require-Text $placementBoundary.meaning 'PlacementRuleBoundaryMeaning'
+
+$placementSourceRefs = @($placementRuleCatalog.sourceRefs)
+Require ($placementSourceRefs.Count -eq 3) 'PlacementRuleSourceCount'
+Require-Unique $placementSourceRefs { param($x) $x.kindCode } 'PlacementRuleSourceDuplicate'
+foreach ($sourceRef in $placementSourceRefs) {
+    Require-Text $sourceRef.path "PlacementRuleSourcePath:$($sourceRef.kindCode)"
+    Require-Text $sourceRef.expectedRevision "PlacementRuleSourceRevision:$($sourceRef.kindCode)"
+    Require (Test-Path -LiteralPath (Resolve-RepoPath ([string] $sourceRef.path)) -PathType Leaf) "PlacementRuleSourceMissing:$($sourceRef.kindCode)"
+}
+
+$h5PolicyRef = @($placementSourceRefs | Where-Object kindCode -eq 'H5WorldLayoutPolicy')
+$hierarchyRef = @($placementSourceRefs | Where-Object kindCode -eq 'SpatialHierarchy')
+$formationRef = @($placementSourceRefs | Where-Object kindCode -eq 'SpatialFormationModes')
+Require ($h5PolicyRef.Count -eq 1) 'PlacementRuleH5Source'
+Require ($hierarchyRef.Count -eq 1) 'PlacementRuleHierarchySource'
+Require ($formationRef.Count -eq 1) 'PlacementRuleFormationSource'
+$h5Policy = Read-Json ([string] $h5PolicyRef[0].path)
+$hierarchyCatalog = Read-Json ([string] $hierarchyRef[0].path)
+$formationCatalog = Read-Json ([string] $formationRef[0].path)
+Require ([string] $h5Policy.schemaVersion -eq 'simulation-world-h5-layout-policy.v1') 'PlacementRuleH5Schema'
+Require ([string] $h5Policy.revision -eq [string] $h5PolicyRef[0].expectedRevision) 'PlacementRuleH5Revision'
+Require ([string] $hierarchyCatalog.schemaVersion -eq 'simulation-world-spatial-hierarchy.v1') 'PlacementRuleHierarchySchema'
+Require ([string] $hierarchyCatalog.revision -eq [string] $hierarchyRef[0].expectedRevision) 'PlacementRuleHierarchyRevision'
+Require ([string] $formationCatalog.schemaVersion -eq 'simulation-spatial-formation-modes.v1') 'PlacementRuleFormationSchema'
+Require ([string] $formationCatalog.revision -eq [string] $formationRef[0].expectedRevision) 'PlacementRuleFormationRevision'
+
+$hierarchyConsumption = $placementRuleCatalog.hierarchyConsumption
+$expectedHLevels = @($hierarchyConsumption.expectedHLevelCodes)
+$expectedFormationModes = @($hierarchyConsumption.expectedFormationModeCodes)
+Require (($expectedHLevels -join '|') -ceq 'H1|H2|H3|H4') 'PlacementRuleExpectedHLevels'
+Require ((@($hierarchyCatalog.levels | ForEach-Object code) -join '|') -ceq ($expectedHLevels -join '|')) 'PlacementRuleHierarchyLevelDrift'
+Require ((@($formationCatalog.formationModes | ForEach-Object code) -join '|') -ceq ($expectedFormationModes -join '|')) 'PlacementRuleFormationModeDrift'
+Require-Text $hierarchyConsumption.constraintAxisCode 'PlacementRuleConstraintAxis'
+Require-Text $hierarchyConsumption.formationAxisCode 'PlacementRuleFormationAxis'
+Require-Text $hierarchyConsumption.meaning 'PlacementRuleHierarchyMeaning'
+
+$constraintById = @{}
+foreach ($constraint in $constraints) { $constraintById[[string] $constraint.constraintId] = $constraint }
+$nodeById = @{}
+foreach ($node in $nodes) { $nodeById[[string] $node.nodeId] = $node }
+$edgeById = @{}
+foreach ($edge in $edges) { $edgeById[[string] $edge.edgeId] = $edge }
+$presentGraphAreas = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+foreach ($node in $nodes) {
+    if ($null -ne $node.actualRef) { $null = $presentGraphAreas.Add([string] $node.actualRef.areaSetStableId) }
+}
+
+$constraintTargetAreas = @{}
+foreach ($constraint in $constraints) {
+    $targetAreas = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($target in @($constraint.targetRefs)) {
+        $targetText = [string] $target
+        $targetNodes = @()
+        if ($targetText -eq 'gm-node:*') { $targetNodes = @($nodes) }
+        elseif ($targetText -eq 'gm-edge:*') {
+            foreach ($edge in $edges) {
+                $targetNodes += @($nodeById[[string] $edge.fromNodeId], $nodeById[[string] $edge.toNodeId])
+            }
+        }
+        elseif ($nodeById.ContainsKey($targetText)) { $targetNodes = @($nodeById[$targetText]) }
+        elseif ($edgeById.ContainsKey($targetText)) {
+            $edge = $edgeById[$targetText]
+            $targetNodes = @($nodeById[[string] $edge.fromNodeId], $nodeById[[string] $edge.toNodeId])
+        }
+        foreach ($targetNode in $targetNodes) {
+            if ($null -ne $targetNode.actualRef) { $null = $targetAreas.Add([string] $targetNode.actualRef.areaSetStableId) }
+        }
+    }
+    $constraintTargetAreas[[string] $constraint.constraintId] = $targetAreas
+}
+
+$h5AnchorByArea = @{}
+foreach ($anchor in @($h5Policy.areaAnchors)) { $h5AnchorByArea[[string] $anchor.areaSetStableId] = $anchor }
+$areaRuleProfiles = @($placementRuleCatalog.areaRuleProfiles)
+Require ($areaRuleProfiles.Count -eq @($h5Policy.areaAnchors).Count) 'PlacementRuleAreaProfileCount'
+Require-Unique $areaRuleProfiles { param($x) $x.areaSetStableId } 'PlacementRuleAreaProfileDuplicate'
+$allowedRuleUsage = @('BoundToGraphConstraint', 'AvailableNotSelected', 'OutsideCurrentGraph')
+$allPlacementRuleRefs = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+$placementBoundConstraintIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+$resolvedPlacementRuleBindings = [Collections.Generic.List[object]]::new()
+$placementRuleCount = 0
+
+foreach ($profile in $areaRuleProfiles) {
+    $areaSetId = [string] $profile.areaSetStableId
+    Require ($h5AnchorByArea.ContainsKey($areaSetId)) "PlacementRuleAreaUnknown:$areaSetId"
+    $anchor = $h5AnchorByArea[$areaSetId]
+    Require ([string] $profile.canonicalAreaRoleCode -eq [string] $anchor.canonicalAreaRoleCode) "PlacementRuleAreaRoleMismatch:$areaSetId"
+    $expectedPresence = if ($presentGraphAreas.Contains($areaSetId)) { 'Present' } else { 'OutsideCurrentGraph' }
+    Require ([string] $profile.graphPresenceCode -eq $expectedPresence) "PlacementRuleAreaPresenceMismatch:$areaSetId"
+    $rules = @($profile.rules)
+    Require ($rules.Count -gt 0) "PlacementRuleAreaRulesEmpty:$areaSetId"
+    Require-Unique $rules { param($x) $x.sourceRuleCode } "PlacementRuleSourceCodeDuplicate:$areaSetId"
+    $sourceCodes = @($rules | ForEach-Object sourceRuleCode | Sort-Object)
+    $anchorCodes = @($anchor.placementRuleCodes | Sort-Object)
+    Require (($sourceCodes -join '|') -ceq ($anchorCodes -join '|')) "PlacementRuleSourceCodeDrift:$areaSetId"
+
+    foreach ($rule in $rules) {
+        $ruleRef = [string] $rule.ruleRef
+        $usageCode = [string] $rule.usageCode
+        Require-Text $ruleRef "PlacementRuleRef:$areaSetId"
+        Require ($allPlacementRuleRefs.Add($ruleRef)) "PlacementRuleRefDuplicate:$ruleRef"
+        Require ($allowedRuleUsage -contains $usageCode) "PlacementRuleUsage:$ruleRef"
+        Require-Text $rule.reason "PlacementRuleReason:$ruleRef"
+        $placementRuleCount++
+        $ruleConstraintRefs = @($rule.constraintRefs)
+        if ($usageCode -eq 'BoundToGraphConstraint') {
+            Require ([string] $profile.graphPresenceCode -eq 'Present') "PlacementRuleBoundOutsideGraph:$ruleRef"
+            Require ($ruleConstraintRefs.Count -gt 0) "PlacementRuleConstraintRefsEmpty:$ruleRef"
+            Require-Unique $ruleConstraintRefs { param($x) [string] $x } "PlacementRuleConstraintRefDuplicate:$ruleRef"
+            foreach ($constraintRef in $ruleConstraintRefs) {
+                $constraintText = [string] $constraintRef
+                Require ($constraintById.ContainsKey($constraintText)) "PlacementRuleConstraintUnknown:$ruleRef`:$constraintText"
+                Require ($constraintTargetAreas[$constraintText].Contains($areaSetId)) "PlacementRuleConstraintAreaMismatch:$ruleRef`:$constraintText"
+                $null = $placementBoundConstraintIds.Add($constraintText)
+            }
+            $resolvedPlacementRuleBindings.Add([pscustomobject][ordered]@{
+                ruleRef = $ruleRef
+                sourceRuleCode = [string] $rule.sourceRuleCode
+                areaSetStableId = $areaSetId
+                canonicalAreaRoleCode = [string] $profile.canonicalAreaRoleCode
+                constraintRefs = @($ruleConstraintRefs)
+                reason = [string] $rule.reason
+            })
+        }
+        else {
+            Require ($ruleConstraintRefs.Count -eq 0) "PlacementRuleUnexpectedConstraintRef:$ruleRef"
+            if ($usageCode -eq 'OutsideCurrentGraph') {
+                Require ([string] $profile.graphPresenceCode -eq 'OutsideCurrentGraph') "PlacementRuleOutsidePresentGraph:$ruleRef"
+            }
+            else {
+                Require ([string] $profile.graphPresenceCode -eq 'Present') "PlacementRuleAvailableOutsideGraph:$ruleRef"
+            }
+        }
+    }
+}
+foreach ($anchor in @($h5Policy.areaAnchors)) {
+    Require (@($areaRuleProfiles | Where-Object areaSetStableId -eq $anchor.areaSetStableId).Count -eq 1) "PlacementRuleAreaCoverageMissing:$($anchor.areaSetStableId)"
+}
+
+$governanceConstraints = @($placementRuleCatalog.governanceOnlyConstraints)
+Require-Unique $governanceConstraints { param($x) $x.constraintRef } 'PlacementRuleGovernanceConstraintDuplicate'
+$governanceConstraintIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+foreach ($governance in $governanceConstraints) {
+    $constraintRef = [string] $governance.constraintRef
+    Require ($constraintById.ContainsKey($constraintRef)) "PlacementRuleGovernanceConstraintUnknown:$constraintRef"
+    Require (-not $placementBoundConstraintIds.Contains($constraintRef)) "PlacementRuleConstraintDoubleClassified:$constraintRef"
+    Require-Text $governance.reason "PlacementRuleGovernanceReason:$constraintRef"
+    Require (@($governance.sourceRefs).Count -gt 0) "PlacementRuleGovernanceSourcesEmpty:$constraintRef"
+    foreach ($sourceRef in @($governance.sourceRefs)) {
+        Require (Test-Path -LiteralPath (Resolve-RepoPath ([string] $sourceRef)) -PathType Leaf) "PlacementRuleGovernanceSourceMissing:$constraintRef`:$sourceRef"
+    }
+    $null = $governanceConstraintIds.Add($constraintRef)
+}
+foreach ($constraint in $constraints) {
+    $constraintId = [string] $constraint.constraintId
+    $isPlacementBound = $placementBoundConstraintIds.Contains($constraintId)
+    $isGovernanceOnly = $governanceConstraintIds.Contains($constraintId)
+    Require ($isPlacementBound -xor $isGovernanceOnly) "PlacementRuleConstraintCoverage:$constraintId"
 }
 
 $federation = $plan.federation
@@ -409,11 +577,38 @@ $overlayRef = $federation.overlayCatalogRef
 $overlayCatalog = Read-Json ([string] $overlayRef.path)
 Require ([string] $overlayCatalog.schemaVersion -eq 'mirror-graph-map-overlay-catalog.v1') 'OverlayCatalogSchema'
 Require ([string] $overlayCatalog.revision -eq [string] $overlayRef.expectedRevision) 'OverlayCatalogRevision'
+$layers = @($overlayCatalog.layers)
+Require ($layers.Count -eq 6) 'LayerCount'
+Require-Unique $layers { param($x) $x.layerId } 'LayerDuplicate'
+$layerIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+$layerOrder = [Collections.Generic.HashSet[int]]::new()
+$allowedLayerKinds = @('BaseSpace', 'WeatherTime', 'Transport', 'ThreatSecurity', 'LogisticsSupply', 'PlayerChoice')
+foreach ($layer in $layers) {
+    $layerId = [string] $layer.layerId
+    Require ($layerIds.Add($layerId)) "LayerDuplicate:$layerId"
+    Require-Text $layer.label "LayerLabel:$layerId"
+    Require ($allowedLayerKinds -contains [string] $layer.layerKindCode) "LayerKind:$layerId"
+    Require ($layerOrder.Add([int] $layer.compositionOrder)) "LayerOrderDuplicate:$layerId"
+    Require-Text $layer.authorityBoundary "LayerAuthorityBoundary:$layerId"
+    Require (@($layer.sourceRefs).Count -gt 0) "LayerSourcesEmpty:$layerId"
+}
+Require (@($overlayCatalog.compositionOrder).Count -eq $layers.Count) 'LayerCompositionCount'
+for ($layerIndex = 0; $layerIndex -lt $layers.Count; $layerIndex++) {
+    Require ([string] $overlayCatalog.compositionOrder[$layerIndex] -eq [string] (@($layers | Sort-Object compositionOrder)[$layerIndex].layerId)) "LayerCompositionOrder:$layerIndex"
+}
 $overlays = @($overlayCatalog.overlays)
 Require ($overlays.Count -gt 0) 'OverlaysEmpty'
 Require-Unique $overlays { param($x) $x.overlayId } 'OverlayDuplicate'
+$routeContributionKeys = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+$allowedRouteStates = @('Open', 'Degraded', 'Blocked', 'Unknown')
+$allowedCostDimensions = @('Distance', 'Time', 'Money', 'Resource', 'Risk')
+$allowedValueStates = @('Observed', 'Derived', 'Unknown')
+$allowedCombinationPolicies = @('Annotation', 'Constraint', 'Delta', 'Override')
+$allowedFreshnessStates = @('Current', 'Stale', 'Unknown', 'PlanningCurrent')
+$edgeEffectCount = 0
 foreach ($overlay in $overlays) {
     $overlayId = [string] $overlay.overlayId
+    Require ($layerIds.Contains([string] $overlay.layerRef)) "OverlayLayerUnknown:$overlayId"
     Require-Text $overlay.label "OverlayLabel:$overlayId"
     Require-Text $overlay.triggerKindCode "OverlayTrigger:$overlayId"
     Require-Text $overlay.stateCode "OverlayState:$overlayId"
@@ -424,8 +619,68 @@ foreach ($overlay in $overlays) {
     foreach ($subgraphRef in @($overlay.targetSubgraphRefs)) {
         Require ($subgraphIds.Contains([string] $subgraphRef)) "OverlaySubgraphUnknown:$($overlayId):$subgraphRef"
     }
+    foreach ($edgeRef in @($overlay.targetEdgeRefs)) {
+        Require ($planEdgeIds.Contains([string] $edgeRef)) "OverlayEdgeUnknown:$($overlayId):$edgeRef"
+    }
     foreach ($sourceDecisionId in @($overlay.sourceDecisionIds)) {
         Require ($decisionIds.Contains([string] $sourceDecisionId)) "OverlayDecisionUnknown:$($overlayId):$sourceDecisionId"
+    }
+    if ($null -ne $overlay.PSObject.Properties['sourcePlanIds']) {
+        foreach ($sourcePlanId in @($overlay.sourcePlanIds)) {
+            Require ($planIds.Contains([string] $sourcePlanId)) "OverlayPlanUnknown:$($overlayId):$sourcePlanId"
+        }
+    }
+    if ($null -ne $overlay.PSObject.Properties['edgeEffects']) {
+        foreach ($effect in @($overlay.edgeEffects)) {
+            $edgeEffectCount++
+            $edgeRef = [string] $effect.edgeRef
+            Require ($planEdgeIds.Contains($edgeRef)) "OverlayEffectEdgeUnknown:$($overlayId):$edgeRef"
+            Require (@($overlay.targetEdgeRefs) -contains $edgeRef) "OverlayEffectEdgeNotTargeted:$($overlayId):$edgeRef"
+            Require ($allowedRouteStates -contains [string] $effect.routeStateCode) "OverlayRouteState:$($overlayId):$edgeRef"
+            Require-Text $effect.scopeCode "OverlayEffectScope:$($overlayId):$edgeRef"
+            foreach ($component in @($effect.costComponents)) {
+                $dimension = [string] $component.dimensionCode
+                $valueState = [string] $component.valueStateCode
+                $key = [string] $component.contributionKey
+                Require ($allowedCostDimensions -contains $dimension) "OverlayCostDimension:$($overlayId):$edgeRef"
+                Require ($allowedValueStates -contains $valueState) "OverlayCostValueState:$($overlayId):$($edgeRef):$dimension"
+                Require-Text $component.unitCode "OverlayCostUnit:$($overlayId):$($edgeRef):$dimension"
+                Require-Text $key "OverlayCostContributionKey:$($overlayId):$($edgeRef):$dimension"
+                Require ($allowedCombinationPolicies -contains [string] $component.combinationPolicyCode) "OverlayCostCombination:$($overlayId):$($edgeRef):$dimension"
+                Require ($routeContributionKeys.Add("$edgeRef|$dimension|$key")) "OverlayCostContributionDuplicate:$($edgeRef):$($dimension):$key"
+                if ($valueState -eq 'Unknown') { Require ($null -eq $component.value) "OverlayUnknownCostHasValue:$($overlayId):$($edgeRef):$dimension" }
+                else { Require ($null -ne $component.value) "OverlayKnownCostMissingValue:$($overlayId):$($edgeRef):$dimension" }
+            }
+            $capacity = $effect.capacity
+            Require ($allowedValueStates -contains [string] $capacity.valueStateCode) "OverlayCapacityValueState:$($overlayId):$edgeRef"
+            Require-Text $capacity.unitCode "OverlayCapacityUnit:$($overlayId):$edgeRef"
+            if ([string] $capacity.valueStateCode -eq 'Unknown') { Require ($null -eq $capacity.value) "OverlayUnknownCapacityHasValue:$($overlayId):$edgeRef" }
+            else { Require ($null -ne $capacity.value) "OverlayKnownCapacityMissingValue:$($overlayId):$edgeRef" }
+            $evidence = $effect.evidence
+            Require-Text $evidence.sourceRef "OverlayEvidenceSource:$($overlayId):$edgeRef"
+            Require-Text $evidence.sourceRevision "OverlayEvidenceRevision:$($overlayId):$edgeRef"
+            Require-Text $evidence.sourceSha256 "OverlayEvidenceHash:$($overlayId):$edgeRef"
+            Require-Text $evidence.observedAt "OverlayEvidenceObservedAt:$($overlayId):$edgeRef"
+            Require-Text $evidence.validUntil "OverlayEvidenceValidUntil:$($overlayId):$edgeRef"
+            Require ($allowedFreshnessStates -contains [string] $evidence.freshnessStateCode) "OverlayEvidenceFreshness:$($overlayId):$edgeRef"
+            $evidencePath = Resolve-RepoPath ([string] $evidence.sourceRef)
+            Require (Test-Path -LiteralPath $evidencePath -PathType Leaf) "OverlayEvidenceSourceMissing:$($overlayId):$edgeRef"
+            Require ((Absolute-Hash $evidencePath) -eq ([string] $evidence.sourceSha256).ToUpperInvariant()) "OverlayEvidenceHashMismatch:$($overlayId):$edgeRef"
+        }
+    }
+}
+
+$allImpactRefs = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+foreach ($value in $planNodeIds) { $null = $allImpactRefs.Add($value) }
+foreach ($value in $planEdgeIds) { $null = $allImpactRefs.Add($value) }
+foreach ($value in $subgraphIds) { $null = $allImpactRefs.Add($value) }
+foreach ($value in $layerIds) { $null = $allImpactRefs.Add($value) }
+foreach ($value in @($overlays | ForEach-Object overlayId)) { $null = $allImpactRefs.Add([string] $value) }
+$null = $allImpactRefs.Add([string] $plan.graphMapStableId)
+$null = $allImpactRefs.Add([string] $overlayRef.path)
+foreach ($assessment in $planningAssessments) {
+    foreach ($impactRef in @($assessment.impactRefs)) {
+        Require ($allImpactRefs.Contains([string] $impactRef)) "PlanningAssessmentImpactUnknown:$($assessment.planId):$impactRef"
     }
 }
 
@@ -475,11 +730,11 @@ foreach ($catalogBinding in $catalogBindings) {
     switch ($selector) {
         'AllResolvedNodesAndEdges' {
             Require (@($assignment[0].explicitTargetRefs).Count -eq 0) "Level3SelectorExplicitTargets:$bindingId"
-            $targetRefs = @($nodes | Where-Object stateCode -ne 'Unresolved' | ForEach-Object nodeId) + @($edges | Where-Object stateCode -ne 'Unresolved' | ForEach-Object edgeId)
+            $targetRefs = @($nodes | Where-Object stateCode -eq 'ReferenceAvailable' | ForEach-Object nodeId) + @($edges | Where-Object stateCode -eq 'ReferenceAvailable' | ForEach-Object edgeId)
         }
         'AllResolvedNodes' {
             Require (@($assignment[0].explicitTargetRefs).Count -eq 0) "Level3SelectorExplicitTargets:$bindingId"
-            $targetRefs = @($nodes | Where-Object stateCode -ne 'Unresolved' | ForEach-Object nodeId)
+            $targetRefs = @($nodes | Where-Object stateCode -eq 'ReferenceAvailable' | ForEach-Object nodeId)
         }
         'ExplicitRefs' {
             $targetRefs = @($assignment[0].explicitTargetRefs)
@@ -592,6 +847,155 @@ foreach ($unbound in $unboundTargets) {
 foreach ($unresolvedTarget in $unresolvedLevel1) { Require ($unboundSet.Contains($unresolvedTarget)) "Level3UnboundCoverageMissing:$unresolvedTarget" }
 foreach ($node in $nodes | Where-Object stateCode -eq 'ReferenceAvailable') { Require ($boundLevel1.Contains([string] $node.nodeId)) "Level3NodeBindingMissing:$($node.nodeId)" }
 foreach ($edge in $edges | Where-Object stateCode -eq 'ReferenceAvailable') { Require ($boundLevel1.Contains([string] $edge.edgeId)) "Level3EdgeBindingMissing:$($edge.edgeId)" }
+
+$normalizationCatalog = $null
+$normalizationElements = @()
+$normalizationRelations = @()
+$normalizationBlockedCount = 0
+if ($null -ne $plan.level1.PSObject.Properties['normalizationCatalogRef']) {
+    $normalizationRef = $plan.level1.normalizationCatalogRef
+    Require-Text $normalizationRef.path 'NormalizationCatalogPath'
+    Require-Text $normalizationRef.expectedRevision 'NormalizationCatalogExpectedRevision'
+    $normalizationCatalog = Read-Json ([string] $normalizationRef.path)
+    Require ([string] $normalizationCatalog.schemaVersion -eq 'mirror-graph-map-normalization.v1') 'NormalizationCatalogSchema'
+    Require ([string] $normalizationCatalog.revision -eq [string] $normalizationRef.expectedRevision) 'NormalizationCatalogRevision'
+    Require ([string] $normalizationCatalog.graphMapStableId -eq [string] $plan.graphMapStableId) 'NormalizationGraphIdentity'
+    Require ([string] $normalizationCatalog.sourcePlanRevision -eq [string] $plan.revision) 'NormalizationSourcePlanRevision'
+    Require-Text $normalizationCatalog.sampleStableId 'NormalizationSampleStableId'
+    Require (-not [bool] $normalizationCatalog.evidenceBoundary.unitySceneChanged) 'NormalizationSceneChanged'
+    Require (-not [bool] $normalizationCatalog.evidenceBoundary.runtimeBindingVerified) 'NormalizationRuntimeBindingClaimed'
+    Require (-not [bool] $normalizationCatalog.evidenceBoundary.eStagePromoted) 'NormalizationEStagePromoted'
+    Require ([bool] $normalizationCatalog.evidenceBoundary.graphMapMeaningOnly) 'NormalizationMeaningBoundary'
+    Require (@($normalizationCatalog.contextFieldOrder).Count -eq $requiredContext.Count) 'NormalizationContextFieldCount'
+    for ($i = 0; $i -lt $requiredContext.Count; $i++) {
+        Require ([string] $normalizationCatalog.contextFieldOrder[$i] -eq $requiredContext[$i]) "NormalizationContextFieldOrder:$i"
+    }
+
+    $normalizationElements = @($normalizationCatalog.elements)
+    $normalizationRelations = @($normalizationCatalog.relations)
+    Require ($normalizationElements.Count -gt 0) 'NormalizationElementsEmpty'
+    Require ($normalizationRelations.Count -gt 0) 'NormalizationRelationsEmpty'
+    Require-Unique $normalizationElements { param($x) $x.elementRef } 'NormalizationElementDuplicate'
+    Require-Unique $normalizationRelations { param($x) $x.relationRef } 'NormalizationRelationDuplicate'
+
+    $allowedMigrationState = @('Retained', 'Reclassified', 'RelationExtracted', 'CompatibilityAlias', 'Blocked')
+    $allowedNormalizedNodeKind = @('Place', 'Actor', 'WorldObject', 'Resource', 'Gateway', 'CompatibilityAlias')
+    $allowedNormalizedRelationKind = @('Movement', 'Work', 'Observation', 'Witness', 'StateTransition', 'PermissionGrant', 'ResourcePlacement')
+    $allowedIdentityMode = @('ReuseLevel1Node', 'NewCanonicalNode')
+    $normalizedElementIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $normalizedElementById = @{}
+    foreach ($element in $normalizationElements) {
+        $elementRef = [string] $element.elementRef
+        $null = $normalizedElementIds.Add($elementRef)
+        $normalizedElementById[$elementRef] = $element
+        Require ($allowedIdentityMode -contains [string] $element.identityModeCode) "NormalizationIdentityMode:$elementRef"
+        Require ($allowedNormalizedNodeKind -contains [string] $element.normalizedKindCode) "NormalizationNodeKind:$elementRef"
+        Require ($allowedMigrationState -contains [string] $element.migrationStateCode) "NormalizationMigrationState:$elementRef"
+        Require (@($element.sourceElementRefs).Count -gt 0) "NormalizationElementSourcesEmpty:$elementRef"
+        foreach ($sourceRef in @($element.sourceElementRefs)) {
+            $sourceText = [string] $sourceRef
+            Require ($planNodeIds.Contains($sourceText) -or $planEdgeIds.Contains($sourceText)) "NormalizationElementSourceUnknown:$elementRef`:$sourceText"
+        }
+        if ([string] $element.identityModeCode -eq 'ReuseLevel1Node') {
+            Require ($planNodeIds.Contains($elementRef)) "NormalizationReusedNodeUnknown:$elementRef"
+        }
+        else {
+            Require (-not $planNodeIds.Contains($elementRef) -and -not $planEdgeIds.Contains($elementRef)) "NormalizationCanonicalIdCollision:$elementRef"
+        }
+        if ([string] $element.normalizedKindCode -eq 'Actor') {
+            Require ([string] $element.actorIdentityCode -eq 'PersistentNamedActor') "NormalizationAnonymousActorMaterialized:$elementRef"
+        }
+        if ([string] $element.migrationStateCode -eq 'CompatibilityAlias') {
+            Require ([string] $element.normalizedKindCode -eq 'CompatibilityAlias') "NormalizationAliasKind:$elementRef"
+            Require (@($element.compatibilityTargetRefs).Count -gt 0) "NormalizationAliasTargetsEmpty:$elementRef"
+        }
+        if ([string] $element.migrationStateCode -eq 'Blocked') {
+            Require-Text $element.blockedReason "NormalizationBlockedReason:$elementRef"
+            $normalizationBlockedCount++
+        }
+    }
+
+    $normalizedRelationIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($relation in $normalizationRelations) {
+        $relationRef = [string] $relation.relationRef
+        Require (-not $planEdgeIds.Contains($relationRef) -and -not $planNodeIds.Contains($relationRef) -and -not $normalizedElementIds.Contains($relationRef)) "NormalizationRelationIdCollision:$relationRef"
+        $null = $normalizedRelationIds.Add($relationRef)
+    }
+    $normalizedSemanticIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($nodeId in $planNodeIds) { $null = $normalizedSemanticIds.Add($nodeId) }
+    foreach ($edgeId in $planEdgeIds) { $null = $normalizedSemanticIds.Add($edgeId) }
+    foreach ($elementId in $normalizedElementIds) { $null = $normalizedSemanticIds.Add($elementId) }
+    foreach ($relationId in $normalizedRelationIds) { $null = $normalizedSemanticIds.Add($relationId) }
+
+    $persistentActorCount = 0
+    foreach ($element in $normalizationElements) {
+        $elementRef = [string] $element.elementRef
+        if ([string] $element.normalizedKindCode -eq 'Actor') { $persistentActorCount++ }
+        if ([string] $element.migrationStateCode -eq 'CompatibilityAlias') {
+            $hasExtractedRelation = $false
+            foreach ($targetRef in @($element.compatibilityTargetRefs)) {
+                $targetText = [string] $targetRef
+                Require ($normalizedSemanticIds.Contains($targetText)) "NormalizationAliasTargetUnknown:$elementRef`:$targetText"
+                if ($normalizedRelationIds.Contains($targetText)) { $hasExtractedRelation = $true }
+            }
+            Require $hasExtractedRelation "NormalizationAliasRelationMissing:$elementRef"
+        }
+    }
+    Require ($persistentActorCount -gt 0) 'NormalizationPersistentActorMissing'
+
+    foreach ($relation in $normalizationRelations) {
+        $relationRef = [string] $relation.relationRef
+        Require ($allowedNormalizedRelationKind -contains [string] $relation.normalizedKindCode) "NormalizationRelationKind:$relationRef"
+        Require ([string] $relation.migrationStateCode -eq 'RelationExtracted') "NormalizationRelationState:$relationRef"
+        Require ($allowedIntention -contains [string] $relation.intentionCode) "NormalizationRelationIntention:$relationRef"
+        $actorNodeRef = [string] $relation.actorNodeRef
+        $actorRoleRef = [string] $relation.actorRoleRef
+        Require (([string]::IsNullOrWhiteSpace($actorNodeRef)) -xor ([string]::IsNullOrWhiteSpace($actorRoleRef))) "NormalizationRelationActorExclusive:$relationRef"
+        if (-not [string]::IsNullOrWhiteSpace($actorNodeRef)) {
+            Require ($normalizedElementIds.Contains($actorNodeRef)) "NormalizationActorNodeUnknown:$relationRef`:$actorNodeRef"
+            Require ([string] $normalizedElementById[$actorNodeRef].normalizedKindCode -eq 'Actor') "NormalizationActorNodeKind:$relationRef`:$actorNodeRef"
+        }
+        else { Require-Text $actorRoleRef "NormalizationActorRoleEmpty:$relationRef" }
+        foreach ($field in @('targetRefs', 'guardRefs', 'inputRefs', 'effectRefs', 'observationRefs', 'sourceElementRefs', 'constraintRefs', 'level3TargetRefs')) {
+            Require (@($relation.$field).Count -gt 0) "NormalizationRelationFieldEmpty:$relationRef`:$field"
+        }
+        foreach ($targetRef in @($relation.targetRefs)) { Require ($normalizedSemanticIds.Contains([string] $targetRef)) "NormalizationTargetUnknown:$relationRef`:$targetRef" }
+        foreach ($semanticField in @('inputRefs', 'effectRefs', 'observationRefs')) {
+            foreach ($semanticRef in @($relation.$semanticField)) { Require ($normalizedSemanticIds.Contains([string] $semanticRef)) "NormalizationSemanticRefUnknown:$relationRef`:$semanticField`:$semanticRef" }
+        }
+        foreach ($returnField in @('failureReturnRef', 'interruptReturnRef')) {
+            Require-Text $relation.$returnField "NormalizationReturnRefEmpty:$relationRef`:$returnField"
+            Require ($normalizedSemanticIds.Contains([string] $relation.$returnField)) "NormalizationReturnRefUnknown:$relationRef`:$returnField"
+        }
+        foreach ($wiId in @($relation.worldInteractionIds)) { Require ($wiIds.Contains([string] $wiId)) "NormalizationUnknownWi:$relationRef`:$wiId" }
+        foreach ($decisionId in @($relation.sourceDecisionIds)) { Require ($decisionIds.Contains([string] $decisionId)) "NormalizationUnknownDecision:$relationRef`:$decisionId" }
+        foreach ($planId in @($relation.sourcePlanIds)) { Require ($planIds.Contains([string] $planId)) "NormalizationUnknownPlan:$relationRef`:$planId" }
+        foreach ($constraintRef in @($relation.constraintRefs) + @($relation.guardRefs)) { Require (@($constraints | Where-Object { [string] $_.constraintId -eq [string] $constraintRef }).Count -eq 1) "NormalizationConstraintUnknown:$relationRef`:$constraintRef" }
+        foreach ($targetRef in @($relation.level3TargetRefs)) { Require ($allCodeTargetIds.Contains([string] $targetRef)) "NormalizationLevel3TargetUnknown:$relationRef`:$targetRef" }
+        foreach ($sourceRef in @($relation.sourceElementRefs)) { Require ($planNodeIds.Contains([string] $sourceRef) -or $planEdgeIds.Contains([string] $sourceRef)) "NormalizationRelationSourceUnknown:$relationRef`:$sourceRef" }
+        $contextSourceRef = [string] $relation.contextSourceNodeRef
+        Require ($planNodeIds.Contains($contextSourceRef)) "NormalizationContextSourceUnknown:$relationRef`:$contextSourceRef"
+        $contextNode = @($nodes | Where-Object { [string] $_.nodeId -eq $contextSourceRef })[0]
+        foreach ($field in $requiredContext) { Require-Text $contextNode.planningContext.$field "NormalizationContextRestoreMissing:$relationRef`:$field" }
+
+        $relationWi = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+        foreach ($value in @($relation.worldInteractionIds)) { $null = $relationWi.Add([string] $value) }
+        $relationDecision = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+        foreach ($value in @($relation.sourceDecisionIds)) { $null = $relationDecision.Add([string] $value) }
+        $relationPlan = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+        foreach ($value in @($relation.sourcePlanIds)) { $null = $relationPlan.Add([string] $value) }
+        foreach ($sourceRef in @($relation.sourceElementRefs)) {
+            $sourceNode = @($nodes | Where-Object { [string] $_.nodeId -eq [string] $sourceRef })
+            if ($sourceNode.Count -eq 1) {
+                foreach ($value in @($sourceNode[0].worldInteractionIds)) { Require ($relationWi.Contains([string] $value)) "NormalizationWiLineageLost:$relationRef`:$value" }
+                foreach ($value in @($sourceNode[0].sourceDecisionIds)) { Require ($relationDecision.Contains([string] $value)) "NormalizationDecisionLineageLost:$relationRef`:$value" }
+                if ($null -ne $sourceNode[0].PSObject.Properties['sourcePlanIds']) {
+                    foreach ($value in @($sourceNode[0].sourcePlanIds)) { Require ($relationPlan.Contains([string] $value)) "NormalizationPlanLineageLost:$relationRef`:$value" }
+                }
+            }
+        }
+    }
+}
 $unresolvedNodeCount = @($nodes | Where-Object stateCode -eq 'Unresolved').Count
 $unresolvedEdgeCount = @($edges | Where-Object stateCode -eq 'Unresolved').Count
 $output = [ordered]@{
@@ -610,6 +1014,9 @@ $output = [ordered]@{
         codeBindingCatalogRef = [string] $codeCatalogRef.path
         codeBindingCatalogRevision = [string] $codeCatalog.revision
         codeBindingCatalogHashSha256 = File-Hash ([string] $codeCatalogRef.path)
+        placementRuleCatalogRef = [string] $placementRuleRef.path
+        placementRuleCatalogRevision = [string] $placementRuleCatalog.revision
+        placementRuleCatalogHashSha256 = File-Hash ([string] $placementRuleRef.path)
     }
     sourceCatalogSnapshot = [ordered]@{
         actualE5Revision = [string] $actual.revision
@@ -627,22 +1034,36 @@ $output = [ordered]@{
         nodes = $nodes.Count
         edges = $edges.Count
         constraints = $constraints.Count
+        placementRuleProfiles = $areaRuleProfiles.Count
+        placementRules = $placementRuleCount
+        placementRuleBindings = $resolvedPlacementRuleBindings.Count
+        placementRuleBoundConstraints = $placementBoundConstraintIds.Count
+        governanceOnlyConstraints = $governanceConstraintIds.Count
         traversalProfiles = $traversalProfiles.Count
         subgraphs = $subgraphs.Count
         ports = $portsById.Count
         connectors = $connectors.Count
+        layers = $layers.Count
         overlays = $overlays.Count
+        overlayEdgeEffects = $edgeEffectCount
+        planningAssessments = $planningAssessments.Count
         codeBindings = $codeBindings.Count
         sourceCodeFiles = $uniqueSourceFiles.Count
         codeBoundLevel1Targets = $boundLevel1.Count
         unboundLevel1Targets = $unboundTargets.Count
         unresolvedNodes = $unresolvedNodeCount
         unresolvedEdges = $unresolvedEdgeCount
+        normalizedElements = $normalizationElements.Count
+        normalizedRelations = $normalizationRelations.Count
+        normalizationBlocked = $normalizationBlockedCount
     }
     plan = $plan
     partitionCatalog = $partitionCatalog
     overlayCatalog = $overlayCatalog
+    placementRuleCatalog = $placementRuleCatalog
+    resolvedPlacementRuleBindings = @($resolvedPlacementRuleBindings)
     resolvedCodeBindings = @($codeBindings)
+    normalizationCatalog = $normalizationCatalog
 }
 
 $json = Stable-Json $output
@@ -660,9 +1081,53 @@ $markdownLines.Add("- 기준 공간 사본: $($actual.revision) / AreaSet $($act
 $markdownLines.Add("- 기준 WI: $($wiCatalog.revision) / $(@($wiCatalog.items).Count)개")
 $markdownLines.Add("- federation: 하위 맵 $($subgraphs.Count) / port $($portsById.Count) / connector $($connectors.Count)")
 $markdownLines.Add("- 이동 능력 프로필: $($traversalProfiles.Count) / 오버레이 $($overlays.Count)")
+$markdownLines.Add("- 레이어: $($layers.Count) / 엣지 효과 $edgeEffectCount / 현행 기획 판정 $($planningAssessments.Count)")
+$markdownLines.Add("- 배치 규칙: Area 프로필 $($areaRuleProfiles.Count) / 기존 규칙 $placementRuleCount / 직접 결속 $($resolvedPlacementRuleBindings.Count) / 규칙 결속 제약 $($placementBoundConstraintIds.Count)")
 $markdownLines.Add("- 레벨 3 코드 결속: $($codeBindings.Count) / 소스 파일 $($uniqueSourceFiles.Count) / 실제 결속 미검증 대상 $($unboundTargets.Count)")
+$markdownLines.Add("- 정규화 표본: 대상 $($normalizationElements.Count) / 관계 $($normalizationRelations.Count) / 차단 $normalizationBlockedCount")
 $markdownLines.Add("- 이번 실제 Runtime 검증: false")
 $markdownLines.Add('')
+if ($null -ne $normalizationCatalog) {
+    $markdownLines.Add('## 한스 표본 — 기존 요소와 정규화 노드·엣지 비교')
+    $markdownLines.Add('')
+    $markdownLines.Add('> 정규화 조회는 현행 레벨 1 요소를 삭제하지 않는다. CompatibilityAlias는 기존 안정 ID를 보존한 채 추출 관계를 가리키며, Blocked는 근거 부족을 숨기지 않는다.')
+    $markdownLines.Add('')
+    $markdownLines.Add('| 기존 요소 | 정규화 대상 | 종류 | 이관 상태 | 호환 대상 |')
+    $markdownLines.Add('| --- | --- | --- | --- | --- |')
+    foreach ($element in $normalizationElements) {
+        $markdownLines.Add("| $(Escape-Cell (@($element.sourceElementRefs) -join ', ')) | $(Escape-Cell $element.elementRef) | $(Escape-Cell $element.normalizedKindCode) | $(Escape-Cell $element.migrationStateCode) | $(Escape-Cell (@($element.compatibilityTargetRefs) -join ', ')) |")
+    }
+    $markdownLines.Add('')
+    $markdownLines.Add('| 정규화 엣지 | Actor | 대상 | WI | 상태 |')
+    $markdownLines.Add('| --- | --- | --- | --- | --- |')
+    foreach ($relation in $normalizationRelations) {
+        $actor = if ([string]::IsNullOrWhiteSpace([string] $relation.actorNodeRef)) { "role:$($relation.actorRoleRef)" } else { [string] $relation.actorNodeRef }
+        $markdownLines.Add("| $(Escape-Cell $relation.relationRef)<br>$(Escape-Cell $relation.normalizedKindCode) | $(Escape-Cell $actor) | $(Escape-Cell (@($relation.targetRefs) -join ', ')) | $(Escape-Cell (@($relation.worldInteractionIds) -join ', ')) | $(Escape-Cell $relation.migrationStateCode) |")
+    }
+    $markdownLines.Add('')
+    $markdownLines.Add('### 일곱 칸 복원')
+    $markdownLines.Add('')
+    $markdownLines.Add('| 관계 | 지금 | 여기 | 나 | 너 | 이렇게 | 결과 | 다음 선택 |')
+    $markdownLines.Add('| --- | --- | --- | --- | --- | --- | --- | --- |')
+    foreach ($relation in $normalizationRelations) {
+        $contextNode = @($nodes | Where-Object { [string] $_.nodeId -eq [string] $relation.contextSourceNodeRef })[0]
+        $context = $contextNode.planningContext
+        $markdownLines.Add("| $(Escape-Cell $relation.relationRef) | $(Escape-Cell $context.time) | $(Escape-Cell $context.place) | $(Escape-Cell $context.player) | $(Escape-Cell $context.target) | $(Escape-Cell $context.method) | $(Escape-Cell $context.result) | $(Escape-Cell $context.nextChoices) |")
+    }
+    $markdownLines.Add('')
+    $markdownLines.Add('### 레벨 2 제약과 레벨 3 결속·미결속')
+    $markdownLines.Add('')
+    $markdownLines.Add('| 관계 | 레벨 2 제약 | 레벨 3 대상 | 현재 결속 상태 |')
+    $markdownLines.Add('| --- | --- | --- | --- |')
+    foreach ($relation in $normalizationRelations) {
+        $bindingStates = @()
+        foreach ($targetRef in @($relation.level3TargetRefs)) {
+            $bindingStates += if ($unboundSet.Contains([string] $targetRef)) { "$targetRef=NoApprovedUnityBinding" } else { "$targetRef=SourceAndSymbolVerified" }
+        }
+        $markdownLines.Add("| $(Escape-Cell $relation.relationRef) | $(Escape-Cell (@($relation.constraintRefs) -join ', ')) | $(Escape-Cell (@($relation.level3TargetRefs) -join ', ')) | $(Escape-Cell ($bindingStates -join ', ')) |")
+    }
+    $markdownLines.Add('')
+}
 $markdownLines.Add('## 규모 계층 — 하위 맵과 연결 포트')
 $markdownLines.Add('')
 $markdownLines.Add('| 하위 맵 | 책임 | 노드 | 내부 엣지 | 제약 | 포트 |')
@@ -675,6 +1140,32 @@ $markdownLines.Add('| connector | from → to | Graph Map 엣지 | 필요 능력
 $markdownLines.Add('| --- | --- | --- | --- | --- |')
 foreach ($connector in $connectors) {
     $markdownLines.Add("| $(Escape-Cell $connector.connectorId) | $(Escape-Cell $connector.fromPortRef) → $(Escape-Cell $connector.toPortRef) | $(Escape-Cell $connector.edgeRef) | $(Escape-Cell (@($connector.requiredCapabilityCodes) -join ', ')) | $(Escape-Cell $connector.stateCode) |")
+}
+$markdownLines.Add('')
+$markdownLines.Add('## 레벨 2 — 기존 배치 구조·제약 규칙 결속')
+$markdownLines.Add('')
+$markdownLines.Add('> 아래 규칙은 기존 H5 배치 정책을 판본째 참조한다. AvailableNotSelected는 규칙이 존재하지만 현재 Graph Map의 노드·엣지 제약에 아직 선택되지 않았다는 뜻이며, 통과나 실제 배치를 의미하지 않는다.')
+$markdownLines.Add('')
+$markdownLines.Add('| Area | Graph 포함 | 규칙 | 사용 상태 | Graph 제약 |')
+$markdownLines.Add('| --- | --- | --- | --- | --- |')
+foreach ($profile in $areaRuleProfiles) {
+    foreach ($rule in @($profile.rules)) {
+        $markdownLines.Add("| $(Escape-Cell $profile.canonicalAreaRoleCode)<br>$(Escape-Cell $profile.areaSetStableId) | $(Escape-Cell $profile.graphPresenceCode) | $(Escape-Cell $rule.ruleRef)<br>$(Escape-Cell $rule.sourceRuleCode) | $(Escape-Cell $rule.usageCode) | $(Escape-Cell (@($rule.constraintRefs) -join ', ')) |")
+    }
+}
+$markdownLines.Add('')
+$markdownLines.Add('| Graph 제약 | 분류 | 기존 배치 규칙 | 경계 |')
+$markdownLines.Add('| --- | --- | --- | --- |')
+foreach ($constraint in $constraints) {
+    $constraintId = [string] $constraint.constraintId
+    $ruleRefs = @($resolvedPlacementRuleBindings | Where-Object { @($_.constraintRefs) -contains $constraintId } | ForEach-Object ruleRef)
+    if ($ruleRefs.Count -gt 0) {
+        $markdownLines.Add("| $(Escape-Cell $constraintId) | PlacementRuleBound | $(Escape-Cell ($ruleRefs -join ', ')) | 기존 H5 규칙의 식별·적용 범위만 결속 |")
+    }
+    else {
+        $governance = @($governanceConstraints | Where-Object constraintRef -eq $constraintId)[0]
+        $markdownLines.Add("| $(Escape-Cell $constraintId) | GovernanceOnly | 없음 | $(Escape-Cell $governance.reason) |")
+    }
 }
 $markdownLines.Add('')
 $markdownLines.Add('## 레벨 1 — 플레이 관계')
@@ -725,12 +1216,44 @@ foreach ($constraint in $constraints) {
     $markdownLines.Add("| $(Escape-Cell $constraint.constraintId) | $(Escape-Cell $constraint.categoryCode) | $(Escape-Cell $constraint.severityCode) | $(Escape-Cell $constraint.enforcementCode) | $(Escape-Cell $constraint.requiredAtEvidence) | $(Escape-Cell $constraint.failureCode) | $(Escape-Cell $constraint.rule) |")
 }
 $markdownLines.Add('')
-$markdownLines.Add('### 시간·날씨 오버레이')
+$markdownLines.Add('### Graph Map 레이어')
 $markdownLines.Add('')
-$markdownLines.Add('| 오버레이 | 계기 | 대상 하위 맵 | 효과 범주 | 토폴로지·권위 변경 |')
+$markdownLines.Add('| 순서 | 레이어 | 종류 | 권위 경계 |')
+$markdownLines.Add('| --- | --- | --- | --- |')
+foreach ($layer in @($layers | Sort-Object compositionOrder)) {
+    $markdownLines.Add("| $($layer.compositionOrder) | $(Escape-Cell $layer.layerId)<br>$(Escape-Cell $layer.label) | $(Escape-Cell $layer.layerKindCode) | $(Escape-Cell $layer.authorityBoundary) |")
+}
+$markdownLines.Add('')
+$markdownLines.Add('### 레이어 오버레이')
+$markdownLines.Add('')
+$markdownLines.Add('| 오버레이 | 레이어·계기 | 대상 하위 맵·엣지 | 효과 범주 | 토폴로지·권위 변경 |')
 $markdownLines.Add('| --- | --- | --- | --- | --- |')
 foreach ($overlay in $overlays) {
-    $markdownLines.Add("| $(Escape-Cell $overlay.overlayId)<br>$(Escape-Cell $overlay.label) | $(Escape-Cell $overlay.triggerKindCode) | $(Escape-Cell (@($overlay.targetSubgraphRefs) -join ', ')) | $(Escape-Cell (@($overlay.effectCategories) -join ', ')) | false / false |")
+    $targets = @(@($overlay.targetSubgraphRefs) + @($overlay.targetEdgeRefs)) -join ', '
+    $markdownLines.Add("| $(Escape-Cell $overlay.overlayId)<br>$(Escape-Cell $overlay.label) | $(Escape-Cell $overlay.layerRef)<br>$(Escape-Cell $overlay.triggerKindCode) | $(Escape-Cell $targets) | $(Escape-Cell (@($overlay.effectCategories) -join ', ')) | false / false |")
+}
+$markdownLines.Add('')
+$markdownLines.Add('### 경로 레이어 엣지 효과')
+$markdownLines.Add('')
+$markdownLines.Add('| 오버레이·엣지 | 경로 상태 | 비용 차원·상태·기여 키 | 용량 | 근거·신선도 |')
+$markdownLines.Add('| --- | --- | --- | --- | --- |')
+foreach ($overlay in $overlays) {
+    if ($null -ne $overlay.PSObject.Properties['edgeEffects']) {
+        foreach ($effect in @($overlay.edgeEffects)) {
+            $costText = @($effect.costComponents | ForEach-Object { "$($_.dimensionCode):$($_.valueStateCode):$($_.contributionKey):$($_.combinationPolicyCode)" }) -join ', '
+            $markdownLines.Add("| $(Escape-Cell $overlay.overlayId)<br>$(Escape-Cell $effect.edgeRef) | $(Escape-Cell $effect.routeStateCode) | $(Escape-Cell $costText) | $(Escape-Cell $effect.capacity.valueStateCode) / $(Escape-Cell $effect.capacity.unitCode) | $(Escape-Cell $effect.evidence.sourceRevision)<br>$(Escape-Cell $effect.evidence.freshnessStateCode) |")
+        }
+    }
+}
+$markdownLines.Add('')
+$markdownLines.Add('## 현행 기획 Graph Map 영향 판정')
+$markdownLines.Add('')
+$markdownLines.Add('> NoImpact는 누락이 아니라 공통 방법론·메타데이터·자료·대체 이력을 공간 Graph Map에 중복 투입하지 않는 명시적 판정이다. Blocked는 현재 E나 구현 상태를 올리지 않는다.')
+$markdownLines.Add('')
+$markdownLines.Add('| 기획 ID | 판정 | 통합 상태 | 영향 대상 | 근거 |')
+$markdownLines.Add('| --- | --- | --- | --- | --- |')
+foreach ($assessment in $planningAssessments) {
+    $markdownLines.Add("| $(Escape-Cell $assessment.planId) | $(Escape-Cell $assessment.classificationCode) | $(Escape-Cell $assessment.integrationStateCode) | $(Escape-Cell (@($assessment.impactRefs) -join ', ')) | $(Escape-Cell $assessment.reason) |")
 }
 $markdownLines.Add('')
 $markdownLines.Add('## 레벨 3 — Unity 코드·Component 결속')
@@ -790,4 +1313,4 @@ else {
     Require ($existingMarkdown -ceq $markdown) 'GeneratedMarkdownStale'
 }
 
-Write-Output "Graph Map plan $Mode passed: nodes=$($nodes.Count), edges=$($edges.Count), constraints=$($constraints.Count), subgraphs=$($subgraphs.Count), ports=$($portsById.Count), connectors=$($connectors.Count), overlays=$($overlays.Count), codeBindings=$($codeBindings.Count), sourceFiles=$($uniqueSourceFiles.Count), unresolved=$unresolvedNodeCount/$unresolvedEdgeCount"
+Write-Output "Graph Map plan $Mode passed: nodes=$($nodes.Count), edges=$($edges.Count), constraints=$($constraints.Count), placementRules=$placementRuleCount, ruleBoundConstraints=$($placementBoundConstraintIds.Count), subgraphs=$($subgraphs.Count), ports=$($portsById.Count), connectors=$($connectors.Count), overlays=$($overlays.Count), codeBindings=$($codeBindings.Count), sourceFiles=$($uniqueSourceFiles.Count), unresolved=$unresolvedNodeCount/$unresolvedEdgeCount, normalization=$($normalizationElements.Count)/$($normalizationRelations.Count)/$normalizationBlockedCount"

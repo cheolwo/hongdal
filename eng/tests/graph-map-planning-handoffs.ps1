@@ -56,7 +56,7 @@ foreach ($relative in $protected) {
 }
 
 $officialCheck = & $manager -Mode Check
-Assert ($officialCheck -match 'Check passed: items=1, integrated=1, blocked=0, noImpact=0') 'OfficialCheck'
+Assert ($officialCheck -match 'Check passed: items=7, integrated=1, blocked=0, noImpact=0') 'OfficialCheck'
 
 $state = Clone-Ledger
 $validRef = Save-Ledger $state 'valid'
@@ -64,10 +64,10 @@ $valid = Invoke-Fixture $validRef 'valid'
 Assert ($valid -match 'Write passed') 'ValidFixture'
 $output = Get-Content -LiteralPath (Join-Path $folder 'valid.output.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 Assert ([string] $output.schemaVersion -eq 'mirror-graph-map-planning-handoff-output.v1') 'OutputSchema'
-Assert ($output.counts.total -eq 1 -and $output.counts.integrated -eq 1) 'OutputCounts'
-Assert ([string] $output.items[0].planningSource.revisionCode -eq 'northern-life-hub-discovery-graph-map-proposal.r3') 'PlanningRevisionOutput'
-Assert ([string] $output.items[0].graphMapResult.revision -eq 'mirror-graph-map-plan.northern-life-hub-discovery.r3') 'GraphMapRevisionOutput'
-Assert (-not [bool] $output.items[0].evidenceBoundary.unitySceneChanged -and -not [bool] $output.items[0].evidenceBoundary.evidencePromoted) 'EvidenceBoundaryOutput'
+Assert ($output.counts.total -eq 7 -and $output.counts.integrated -eq 1 -and $output.counts.superseded -eq 6) 'OutputCounts'
+Assert ([string] $output.items[6].planningSource.revisionCode -eq 'planning-index.current-2026-09-02') 'PlanningRevisionOutput'
+Assert ([string] $output.items[6].graphMapResult.revision -eq 'mirror-graph-map-plan.northern-life-hub-discovery.r10') 'GraphMapRevisionOutput'
+Assert (-not [bool] $output.items[6].evidenceBoundary.unitySceneChanged -and -not [bool] $output.items[6].evidenceBoundary.evidencePromoted) 'EvidenceBoundaryOutput'
 
 $second = Invoke-Fixture $validRef 'valid-second'
 Assert ($second -match 'Write passed') 'SecondWrite'
@@ -75,58 +75,64 @@ Assert ((Get-FileHash (Join-Path $folder 'valid.output.json')).Hash -eq (Get-Fil
 Assert ((Get-FileHash (Join-Path $folder 'valid.output.md')).Hash -eq (Get-FileHash (Join-Path $folder 'valid-second.output.md')).Hash) 'DeterministicMarkdown'
 
 $state = Clone-Ledger
-$state.items += @($state.items[0])
+$state.items += @($state.items[6])
 Reject { Invoke-Fixture (Save-Ledger $state 'duplicate-id') 'duplicate-id' } 'HandoffDuplicate'
 
 $state = Clone-Ledger
-$state.items[0].planningSource.expectedSha256 = ('0' * 64)
-Reject { Invoke-Fixture (Save-Ledger $state 'stale-source') 'stale-source' } 'PlanningSource:graph-map-handoff:northern-life-hub-discovery:r3:HashMismatch'
+$state.items[6].planningSource.expectedSha256 = ('0' * 64)
+Reject { Invoke-Fixture (Save-Ledger $state 'stale-source') 'stale-source' } 'PlanningSource:graph-map-handoff:northern-life-hub-discovery:r10:HashMismatch'
 
 $state = Clone-Ledger
-$state.items[0].planningSource.sourceDecisionIds[0] = 'D-000'
+$state.items[1].planningSource.expectedSha256 = ('0' * 64)
+$historical = Invoke-Fixture (Save-Ledger $state 'historical-source-hash') 'historical-source-hash'
+Assert ($historical -match 'Write passed') 'SupersededHistoricalHashNotRevalidated'
+
+$state = Clone-Ledger
+$state.items[2].planningSource.sourceDecisionIds[0] = 'D-000'
 Reject { Invoke-Fixture (Save-Ledger $state 'unknown-decision') 'unknown-decision' } 'DecisionUnknown'
 
 $state = Clone-Ledger
-$state.items[0].planningSource.sourceWorldInteractionIds[0] = 'WI-NOT-REGISTERED'
+$state.items[2].planningSource.sourceWorldInteractionIds[0] = 'WI-NOT-REGISTERED'
 Reject { Invoke-Fixture (Save-Ledger $state 'unknown-wi') 'unknown-wi' } 'WorldInteractionUnknown'
 
 $state = Clone-Ledger
-$state.items[0].planningSource.contextRefs.PSObject.Properties.Remove('result')
+$state.items[6].planningSource.contextRefs.PSObject.Properties.Remove('result')
 Reject { Invoke-Fixture (Save-Ledger $state 'missing-context') 'missing-context' } 'ContextMissing'
 
 $state = Clone-Ledger
-$state.items[0].request.requestedLevelCodes[0] = 'Level9'
+$state.items[6].request.requestedLevelCodes[0] = 'Level9'
 Reject { Invoke-Fixture (Save-Ledger $state 'unknown-level') 'unknown-level' } 'RequestedLevelUnknown'
 
 $state = Clone-Ledger
-$state.items[0].request.targetGraphMapRevision = 'mirror-graph-map-plan.northern-life-hub-discovery.r999'
+$state.items[6].request.targetGraphMapRevision = 'mirror-graph-map-plan.northern-life-hub-discovery.r999'
 Reject { Invoke-Fixture (Save-Ledger $state 'target-revision') 'target-revision' } 'TargetRevisionMismatch'
 
 $state = Clone-Ledger
-$state.items[0].result.graphMapPlanExpectedSha256 = ('F' * 64)
-Reject { Invoke-Fixture (Save-Ledger $state 'plan-hash') 'plan-hash' } 'GraphMapPlan:graph-map-handoff:northern-life-hub-discovery:r3:HashMismatch'
+$state.items[6].result.graphMapPlanExpectedSha256 = ('F' * 64)
+Reject { Invoke-Fixture (Save-Ledger $state 'plan-hash') 'plan-hash' } 'GraphMapPlan:graph-map-handoff:northern-life-hub-discovery:r10:HashMismatch'
 
 $state = Clone-Ledger
-$state.items[0].result.mappedRefs = @()
+$state.items[6].result.mappedRefs = @()
 Reject { Invoke-Fixture (Save-Ledger $state 'integrated-empty') 'integrated-empty' } 'IntegratedMappedRefsEmpty'
 
 $state = Clone-Ledger
-$state.items[0].statusCode = 'Blocked'
-$state.items[0].returnToPlanning.terminalResultCode = 'Blocked'
+$state.items[6].statusCode = 'Blocked'
+$state.items[6].returnToPlanning.terminalResultCode = 'Blocked'
+$state.items[6].result.blockerItems = @()
 Reject { Invoke-Fixture (Save-Ledger $state 'blocked-empty') 'blocked-empty' } 'BlockedWithoutBlocker'
 
 $state = Clone-Ledger
-$state.items[0].statusCode = 'NoImpact'
-$state.items[0].impactCode = 'NoImpact'
-$state.items[0].returnToPlanning.terminalResultCode = 'NoImpact'
+$state.items[6].statusCode = 'NoImpact'
+$state.items[6].impactCode = 'NoImpact'
+$state.items[6].returnToPlanning.terminalResultCode = 'NoImpact'
 Reject { Invoke-Fixture (Save-Ledger $state 'no-impact-levels') 'no-impact-levels' } 'NoImpactHasLevels'
 
 $state = Clone-Ledger
-$state.items[0].returnToPlanning.terminalResultCode = 'Blocked'
+$state.items[6].returnToPlanning.terminalResultCode = 'Blocked'
 Reject { Invoke-Fixture (Save-Ledger $state 'return-status') 'return-status' } 'ReturnStatusMismatch'
 
 $state = Clone-Ledger
-$state.items[0].evidenceBoundary.gameViewCaptured = $true
+$state.items[6].evidenceBoundary.gameViewCaptured = $true
 Reject { Invoke-Fixture (Save-Ledger $state 'evidence-raised') 'evidence-raised' } 'EvidenceBoundaryRaised'
 
 foreach ($relative in $protected) {

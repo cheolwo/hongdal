@@ -3,16 +3,16 @@
   "revision": "mirror-graph-map-planning-handoff-output.r1",
   "generatedAtRuleCode": "DeterministicNoWallClock",
   "sourceLedgerRef": "eng/world-seedbeds/graph-map-planning-handoffs.json",
-  "sourceLedgerSha256": "8c831b473cecb75933b4c6a4111ed526c5eefc6a8551aca2eeb98ab5bc4bd652",
+  "sourceLedgerSha256": "21c5f52e846d121334b5d7972e2eb43e96b993e53e1a054bc4c6f0db69aec92d",
   "counts": {
-    "total": 1,
+    "total": 7,
     "draft": 0,
     "approvedForHandoff": 0,
     "acceptedByGraphMap": 0,
     "integrated": 1,
     "blocked": 0,
     "noImpact": 0,
-    "superseded": 0
+    "superseded": 6
   },
   "ownershipBoundary": {
     "planningOwnerCode": "Planning",
@@ -26,13 +26,13 @@
   },
   "items": [
     {
-      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r3",
-      "statusCode": "Integrated",
+      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r4",
+      "statusCode": "Superseded",
       "impactCode": "UpdateExisting",
       "planningSource": {
         "path": "docs/AI/북부생활권-첫그래프맵-상세제안-2026-09-01.md",
-        "revisionCode": "northern-life-hub-discovery-graph-map-proposal.r3",
-        "sha256": "1d28414b3fae2dc090ebd4c2a8b19af3148a189294d25e90783eea582f56ad8d",
+        "revisionCode": "northern-life-hub-discovery-graph-map-proposal.r4",
+        "sha256": "8ac5dec5109c6bd469c7460f9261b833859c355e0d696aacc61f0eadcb7e24d4",
         "sourceDecisionIds": [
           "D-442",
           "D-443",
@@ -47,6 +47,7 @@
           "WI-HUB-03",
           "WI-MARKET-01"
         ],
+        "sourcePlanIds": null,
         "contextRefs": {
           "time": "proposal.section5.context.time",
           "place": "proposal.section5.context.place",
@@ -69,26 +70,20 @@
           "Level3"
         ],
         "level1Intent": "Nature 발견에서 Farm 생산, Hub 물류, Town 생활로 이어지는 선택형 플레이 관계와 요동성 미해결 외부 관문을 연결한다.",
-        "level2Intent": "실제 월드 적용 전에 통행·귀환·간격·지지·역할 분리·실제 참조 동일성을 검사한다.",
+        "level2Intent": "실제 월드 적용 전에 통행·귀환·간격·지지·역할 분리·실제 참조 동일성을 검사하고 기존 H5 배치 규칙의 적용·미선택 상태를 결속한다.",
         "level3Intent": "관련 Unity 파일·assembly·심볼·hash를 공용 대장으로 연결하되 Scene wiring과 Runtime 실행은 별도 증거로 남긴다.",
         "targetGraphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
-        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r3"
+        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r4"
       },
-      "graphMapResult": {
-        "stableId": "graph-map:mirror:northern-life-hub-discovery.v1",
-        "revision": "mirror-graph-map-plan.northern-life-hub-discovery.r3",
-        "planRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
-        "planSha256": "665b1b34ca6545d1b34a69af5fec8c6470da01eae836b4c0f65de053e0eb2e0b",
-        "generatedRef": "eng/world-seedbeds/generated/graph-map-plans.v1.json",
-        "generatedSha256": "b70ee5eb75b605afcb70cb25c9637504c2e367aa388f642e62a83686182d5c58",
-        "reportRef": "docs/Reports/그래프맵-프로젝트재검토와첫구현-2026-09-01.md",
-        "reportSha256": "7fe222af01740c89ccb407a0cc21a3d16977f62537a0ce593a1dc6ab721b04f3"
-      },
+      "graphMapResult": null,
       "mappedRefs": [
         "federation:graph-map:mirror:northern-life-hub-discovery.v1",
         "level1:nodes:11",
         "level1:edges:10",
         "level2:constraints:9",
+        "level2:placement-rule-profiles:5",
+        "level2:placement-rules:21",
+        "level2:placement-rule-bound-constraints:3",
         "level3:bindings:6"
       ],
       "unmappedItems": [
@@ -97,14 +92,546 @@
       "blockerItems": [],
       "verificationCodes": [
         "GraphMapCheckPassed",
-        "GraphMapRegression130Passed",
+        "GraphMapRegression144Passed",
         "ScopedFastPassed"
+      ],
+      "returnToPlanning": {
+        "terminalResultCode": "Superseded",
+        "planningQuestionRequired": false,
+        "summary": "r4 결과는 역사로 보존하며 D-529·D-530을 반영한 r5 인계가 현재 Graph Map 판본을 대체한다.",
+        "nextPlanningFocus": "현행 결과는 r5 인계에서 읽는다."
+      },
+      "evidenceBoundary": {
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "actualTraversalVerified": false,
+        "evidencePromoted": false,
+        "operationalStateChanged": false
+      }
+    },
+    {
+      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r5",
+      "statusCode": "Superseded",
+      "impactCode": "UpdateExisting",
+      "planningSource": {
+        "path": "docs/AI/메인스토리-거울의흐름-기획-2026-09-01.md",
+        "revisionCode": "main-story-mirror-flow.r58",
+        "sha256": "058e2e3d77c6179d6a4a0b75e8dd53b679a8ce7d0cfd372fa480e0108b02c13e",
+        "sourceDecisionIds": [
+          "D-527",
+          "D-529",
+          "D-530"
+        ],
+        "sourceWorldInteractionIds": [
+          "WI-NATURE-06",
+          "WI-NATURE-18",
+          "WI-WORLD-04"
+        ],
+        "sourcePlanIds": null,
+        "contextRefs": {
+          "time": "main-story-mirror-flow.r51:line43-and-line80.time",
+          "place": "main-story-mirror-flow.r51:line43.farm-boundary",
+          "player": "main-story-mirror-flow.r51:line43.adventurer",
+          "target": "main-story-mirror-flow.r51:line43.tree-fence-hans",
+          "method": "main-story-mirror-flow.r51:line43.voluntary-repair",
+          "result": "main-story-mirror-flow.r51:line43.first-trust",
+          "nextChoices": "main-story-mirror-flow.r51:line43.trace-investigation"
+        },
+        "exclusionRefs": [
+          "graph-map-decision-audit.d529.unknown-spatial-values",
+          "graph-map-decision-audit.d530.unknown-slowdown-and-hosted-policy"
+        ]
+      },
+      "request": {
+        "requestedLevelCodes": [
+          "Federation",
+          "Level1",
+          "Level2",
+          "Level3"
+        ],
+        "level1Intent": "Nature·Farm 경계 안에서 허용 나무 벌목→목재→무보수 울타리 수리→한스 직접 목격·첫 신뢰→침입 흔적 공동 조사 관계를 작은 묶음으로 추가한다.",
+        "level2Intent": "채취 권한·실제 자원/시간/도구 비용·동일 원인 계보·직접 목격·무보수를 보존하고 미정 거리·구간·도구·관계 값을 만들지 않는다.",
+        "level3Intent": "기존 벌목·통나무 획득·시설 수리 WI 재사용 후보와 관찰/신뢰/시간 권위 공백을 분리하고 Scene·Runtime 결속으로 승격하지 않는다.",
+        "targetGraphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r5"
+      },
+      "graphMapResult": null,
+      "mappedRefs": [
+        "level1:gm-node:hans-permitted-tree",
+        "level1:gm-node:hans-broken-fence",
+        "level1:gm-node:hans-first-trust",
+        "level1:gm-edge:farm-edge-to-hans-permitted-tree",
+        "level1:gm-edge:hans-timber-to-fence-repair",
+        "level1:gm-edge:hans-fence-repair-to-first-trust",
+        "level2:gm-constraint:hans-first-trust-causal-lineage",
+        "level2:gm-constraint:hans-first-trust-spatial-values-unresolved",
+        "overlay:gm-overlay:decision-card-authority-time",
+        "level3:unbound:6"
+      ],
+      "unmappedItems": [
+        "D-529 exact tree/distance/fence/tool/relation stage",
+        "D-529 Hans witness/trust approved WI and authority contract",
+        "D-530 slowdown ratio/transition/UI/accessibility/Hosted authority contract"
+      ],
+      "blockerItems": [
+        "Planning: D-529 exact spatial values and relationship stage",
+        "PlanningAndDevelopment: D-530 slowdown and Hosted policy"
+      ],
+      "verificationCodes": [
+        "GraphMapCheckPassed",
+        "GraphMapRegression144Passed",
+        "NoSceneOrEvidencePromotion"
+      ],
+      "returnToPlanning": {
+        "terminalResultCode": "Superseded",
+        "planningQuestionRequired": true,
+        "summary": "r5 결과와 당시 r51 hash는 역사로 보존하며 D-531~D-537과 현행 r58을 반영한 r6 인계가 현재 판본을 대체한다.",
+        "nextPlanningFocus": "현행 결과는 r6 인계에서 읽는다."
+      },
+      "evidenceBoundary": {
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "actualTraversalVerified": false,
+        "evidencePromoted": false,
+        "operationalStateChanged": false
+      }
+    },
+    {
+      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r6",
+      "statusCode": "Superseded",
+      "impactCode": "UpdateExisting",
+      "planningSource": {
+        "path": "docs/AI/메인스토리-거울의흐름-기획-2026-09-01.md",
+        "revisionCode": "main-story-mirror-flow.r58",
+        "sha256": "058e2e3d77c6179d6a4a0b75e8dd53b679a8ce7d0cfd372fa480e0108b02c13e",
+        "sourceDecisionIds": [
+          "D-531",
+          "D-532",
+          "D-533",
+          "D-534",
+          "D-535",
+          "D-536",
+          "D-537"
+        ],
+        "sourceWorldInteractionIds": [
+          "WI-NATURE-06",
+          "WI-NATURE-18",
+          "WI-WORLD-04"
+        ],
+        "sourcePlanIds": null,
+        "contextRefs": {
+          "time": "main-story-mirror-flow.r58:line43-and-line45.time",
+          "place": "main-story-mirror-flow.r58:line43-and-line45.hans-farm-house",
+          "player": "main-story-mirror-flow.r58:line43.adventurer",
+          "target": "main-story-mirror-flow.r58:line43.axe-tree-stockpile-house-hans",
+          "method": "main-story-mirror-flow.r58:line43.direct-actions-and-observation",
+          "result": "main-story-mirror-flow.r58:line43-and-line45.repaired-house-and-permission",
+          "nextChoices": "main-story-mirror-flow.r58:line45.mission-life-base"
+        },
+        "exclusionRefs": [
+          "graph-map-decision-audit.d531-d533.unknown-tool-stockpile-and-schedule",
+          "graph-map-decision-audit.d535-d536.e4-candidate-tool-blocked",
+          "graph-map-decision-audit.d537.unknown-life-base-values"
+        ]
+      },
+      "request": {
+        "requestedLevelCodes": [
+          "Federation",
+          "Level1",
+          "Level2",
+          "Level3"
+        ],
+        "level1Intent": "기존 첫 신뢰 흐름 뒤 선택적 여분 목재 적재→한스의 사후 발견·집 수리→변화 선관찰·확인 대화→제한 생활 거점을 작은 선택형 관계로 추가한다.",
+        "level2Intent": "손도끼 선택과 적재 선택 분리, 플레이어 이탈 뒤 발견, 수리 상태·표식 판독, 원본 불변 E4 후보, 한스 생활구역과 제한 거점 경계를 보존하고 미정 수치를 만들지 않는다.",
+        "level3Intent": "기존 벌목·목재·수리 후보와 새 적재·발견·수리 상태·표식·생활 거점의 승인 계약 공백을 분리하고 Blender·Prefab·Scene·Runtime 결속으로 승격하지 않는다.",
+        "targetGraphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r6"
+      },
+      "graphMapResult": null,
+      "mappedRefs": [
+        "level1:reused:gm-node:hans-permitted-tree",
+        "level1:reused:gm-node:hans-broken-fence",
+        "level1:reused:gm-node:hans-first-trust",
+        "level1:new:gm-node:hans-house-timber-stockpile",
+        "level1:new:gm-node:hans-house-repair",
+        "level1:new:gm-node:hans-mission-life-base",
+        "level1:new-edges:3",
+        "level2:new-constraints:4",
+        "overlay:gm-overlay:decision-card-authority-time",
+        "level3:new-unbound:6"
+      ],
+      "unmappedItems": [
+        "D-531/D-532 exact axe ownership, tree distance/count, stockpile position and inventory contract",
+        "D-533 exact Hans schedule and discovery contract",
+        "D-535/D-536 exact Farmhouse, repair-state assets, Blender environment, collider and bounds",
+        "D-537 exact rest, recovery, storage, companion waiting, danger closure and mission contract"
+      ],
+      "blockerItems": [
+        "PlanningAndDevelopment: exact tool, stockpile, schedule, repair-state and life-base contracts",
+        "PresentationE4: D-536 candidate and Blender tool unavailable"
+      ],
+      "verificationCodes": [
+        "GraphMapCheckPassed",
+        "GraphMapRegressionPassed",
+        "PlanningHandoffRegressionPassed",
+        "DevelopmentHandoffRegressionPassed",
+        "NoSceneOrEvidencePromotion"
+      ],
+      "returnToPlanning": {
+        "terminalResultCode": "Superseded",
+        "planningQuestionRequired": true,
+        "summary": "r6 결과는 역사로 보존하며 분리 기획 ID를 입력으로 통합한 r7 인계가 현행 Graph Map 판본을 대체한다.",
+        "nextPlanningFocus": "현행 결과는 r7 인계에서 읽는다."
+      },
+      "evidenceBoundary": {
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "actualTraversalVerified": false,
+        "evidencePromoted": false,
+        "operationalStateChanged": false
+      }
+    },
+    {
+      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r7",
+      "statusCode": "Superseded",
+      "impactCode": "UpdateExisting",
+      "planningSource": {
+        "path": "docs/AI/GraphMap-분리기획통합-인계-2026-09-01.md",
+        "revisionCode": "graph-map-planning-integration.r1",
+        "sha256": "00aa5495d72f2c9d49ea35cb05457fc863d82c51677f94f87fa6421c6090e86c",
+        "sourceDecisionIds": [],
+        "sourceWorldInteractionIds": [],
+        "sourcePlanIds": [
+          "PLAN-GRAPH-PLANNING-INTEGRATION-001",
+          "PLAN-STORY-MIRROR-MAIN-001",
+          "PLAN-STORY-DUAL-PROTAGONIST-001",
+          "PLAN-STORY-YODONG-DEFENSE-001",
+          "PLAN-STORY-HUB-DISCOVERY-001",
+          "PLAN-GAMEPLAY-FIRST-PERSON-FOCUS-001",
+          "PLAN-TIME-SEASONAL-001",
+          "PLAN-GRAPH-NORTHERN-LIFE-REVIEW-001"
+        ],
+        "contextRefs": {
+          "time": "graph-map-planning-integration.r1:level1.time",
+          "place": "graph-map-planning-integration.r1:level1.place",
+          "player": "graph-map-planning-integration.r1:level1.player",
+          "target": "graph-map-planning-integration.r1:level1.target",
+          "method": "graph-map-planning-integration.r1:level1.method",
+          "result": "graph-map-planning-integration.r1:level1.result",
+          "nextChoices": "graph-map-planning-integration.r1:level1.nextChoices"
+        },
+        "exclusionRefs": [
+          "graph-map-planning-integration.r1:section5.level-boundaries",
+          "graph-map-planning-integration.r1:section7.excluded-scope"
+        ]
+      },
+      "request": {
+        "requestedLevelCodes": [
+          "Federation",
+          "Level1",
+          "Level2",
+          "Level3"
+        ],
+        "level1Intent": "분리된 현행 기획을 기존 안정 ID에 증분 연결하고 Farm 순찰·Hub 화물 조사·Town 견습 공방·장기 위협 하위 관계를 독립 플레이로 보존한다.",
+        "level2Intent": "귀환·위협 의미·단서와 정답·회복 중복·작은 시험·실제 분리 제약을 기존 배치 규칙과 함께 검사하며 미정 수치를 만들지 않는다.",
+        "level3Intent": "확인된 기존 Unity 코드 결속만 유지하고 새 기획 관계는 NoApprovedUnityBinding으로 명시한다.",
+        "targetGraphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r7"
+      },
+      "graphMapResult": null,
+      "mappedRefs": [
+        "level1:nodes:30",
+        "level1:edges:31",
+        "level2:constraints:21",
+        "level2:placement-rules:21",
+        "federation:subgraphs:5",
+        "federation:ports:10",
+        "federation:connectors:5",
+        "overlays:4",
+        "level3:bindings:6",
+        "level3:unbound-nodes:20",
+        "level3:unbound-edges:22"
+      ],
+      "unmappedItems": [
+        "새 13개 기획 노드와 15개 엣지의 승인 Unity 계약·Prefab·Scene·Runtime 결속",
+        "마수·한스 검·공방·화물 사건의 정확 공간·자산·수량·시간"
+      ],
+      "blockerItems": [],
+      "verificationCodes": [
+        "GraphMapCheckPassed",
+        "GraphMapRegressionPassed",
+        "PlanningHandoffRegressionPassed",
+        "DevelopmentHandoffRegressionPassed",
+        "NoUnityOrEvidencePromotion"
+      ],
+      "returnToPlanning": {
+        "terminalResultCode": "Superseded",
+        "planningQuestionRequired": false,
+        "summary": "r7 분리 기획 통합 결과는 역사 판본으로 보존하며 현재 Graph Map은 한스 정규화 표본을 추가한 r8이 대체한다.",
+        "nextPlanningFocus": "새 기획은 PLAN ID·revision·hash와 Graph Map 영향만 후속 인계하고 실제 Unity 결속은 작은 개발 slice로 별도 승인한다."
+      },
+      "evidenceBoundary": {
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "actualTraversalVerified": false,
+        "evidencePromoted": false,
+        "operationalStateChanged": false
+      }
+    },
+    {
+      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r8",
+      "statusCode": "Superseded",
+      "impactCode": "UpdateExisting",
+      "planningSource": {
+        "path": "docs/Architecture/GraphMap기획인계순환체계.md",
+        "revisionCode": "graph-map-normalization-hans.r1",
+        "sha256": "5f6dae8935ba8f48530ab6e472bcd9d3375548ade1598082e9d8b4cd02806c51",
+        "sourceDecisionIds": [],
+        "sourceWorldInteractionIds": [],
+        "sourcePlanIds": null,
+        "contextRefs": {
+          "time": "graph-map-normalization-hans.r1:context.time",
+          "place": "graph-map-normalization-hans.r1:context.place",
+          "player": "graph-map-normalization-hans.r1:context.player",
+          "target": "graph-map-normalization-hans.r1:context.target",
+          "method": "graph-map-normalization-hans.r1:context.method",
+          "result": "graph-map-normalization-hans.r1:context.result",
+          "nextChoices": "graph-map-normalization-hans.r1:context.nextChoices"
+        },
+        "exclusionRefs": [
+          "GraphMap기획인계순환체계.md#기존-graph-map을-통합하는-정규화-리팩토링",
+          "GraphMap기획인계순환체계.md#개발로-이어지는-다음-인계"
+        ]
+      },
+      "request": {
+        "requestedLevelCodes": [
+          "Level1",
+          "Level2",
+          "Level3"
+        ],
+        "level1Intent": "한스 농장 하위 그래프에서 명사형 안정 대상과 동사형 관계를 분리하되 기존 사건형 노드와 일곱 칸을 호환 별칭으로 보존한다.",
+        "level2Intent": "추출 관계마다 기존 제약을 재사용하고 필수·선택·실패·중단·귀환 의미가 사라지지 않았는지 검사한다.",
+        "level3Intent": "추출 관계가 기존 결속 또는 NoApprovedUnityBinding 대상을 역추적하게 하되 새 Runtime·Scene 결속을 만들지 않는다.",
+        "targetGraphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r8"
+      },
+      "graphMapResult": null,
+      "mappedRefs": [
+        "level1:legacy-nodes:30-preserved",
+        "level1:legacy-edges:31-preserved",
+        "normalization:elements:9",
+        "normalization:relations:7",
+        "normalization:compatibility-aliases:2",
+        "normalization:blocked:1",
+        "level2:constraint-lineage-preserved",
+        "level3:binding-lineage-preserved"
+      ],
+      "unmappedItems": [
+        "한스 목격·발견·수리·허락의 승인 Runtime/WI 계약",
+        "정확 허용 나무·울타리·집·적재 지점과 실제 공간 수치",
+        "집 수리 상태의 실제 Prefab·Scene 결속",
+        "한스 검 단서의 정확 대상·위치·관찰 계약"
+      ],
+      "blockerItems": [],
+      "verificationCodes": [
+        "GraphMapCheckPassed",
+        "GraphMapRegressionPassed",
+        "PlanningHandoffRegressionPassed",
+        "DevelopmentHandoffRegressionPassed",
+        "NoUnityOrEvidencePromotion"
+      ],
+      "returnToPlanning": {
+        "terminalResultCode": "Superseded",
+        "planningQuestionRequired": false,
+        "summary": "한스 Actor와 집을 안정 대상으로 분리하고 7개 관계 계약을 추출했으며 기존 사건형 ID와 일곱 칸은 호환 조회로 보존했다.",
+        "nextPlanningFocus": "Runtime/WI·정확 공간·Prefab 결속이 승인된 작은 slice만 별도 개발 인계하고 Blocked 검 단서는 근거가 생길 때 다시 검토한다."
+      },
+      "evidenceBoundary": {
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "actualTraversalVerified": false,
+        "evidencePromoted": false,
+        "operationalStateChanged": false
+      }
+    },
+    {
+      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r9",
+      "statusCode": "Superseded",
+      "impactCode": "UpdateExisting",
+      "planningSource": {
+        "path": "docs/AI/소가주-연금술-가주승계-메인스토리기획-2026-09-01.md",
+        "revisionCode": "dual-possession-alchemist-succession.r63",
+        "sha256": "1b0bda2d9859372cf6d4e4f42c358be18f7cd5512b9f8c61515c7f49311ffa7d",
+        "sourceDecisionIds": [],
+        "sourceWorldInteractionIds": [
+          "WI-NATURE-06"
+        ],
+        "sourcePlanIds": [
+          "PLAN-STORY-DUAL-PROTAGONIST-001",
+          "PLAN-GAMEPLAY-MEDITATION-ACTION-001"
+        ],
+        "contextRefs": {
+          "time": "dual-possession-alchemist-succession.r63:first-tutorial.time",
+          "place": "dual-possession-alchemist-succession.r63:first-tutorial.place",
+          "player": "dual-possession-alchemist-succession.r63:first-tutorial.player",
+          "target": "dual-possession-alchemist-succession.r63:first-tutorial.target",
+          "method": "dual-possession-alchemist-succession.r63:first-tutorial.method",
+          "result": "dual-possession-alchemist-succession.r63:first-tutorial.result",
+          "nextChoices": "dual-possession-alchemist-succession.r63:first-tutorial.nextChoices"
+        },
+        "exclusionRefs": [
+          "player-mind-meditation:후속-P1-염체-그래프",
+          "Unity-UI-Scene-미검증"
+        ]
+      },
+      "request": {
+        "requestedLevelCodes": [
+          "Level1",
+          "Level2",
+          "Level3"
+        ],
+        "level1Intent": "플레이어 본인의 첫 WI-NATURE-06 완료와 한스 집 안전 휴식에서 첫 벌목 성찰 씨앗을 준비하는 P0 관계를 별도 계획 노드로 남긴다.",
+        "level2Intent": "ActionRecord·안전 휴식·편린 순서·중단 재개·기존 성장 근거의 판본 계보와 중복 방지 제약을 결속한다.",
+        "level3Intent": "순수 Simulation 계약·도메인 엔진·독립 시험을 개발 결속으로 추적하되 제품 휴식 공급자·UI·Unity 연결은 만들지 않는다.",
+        "targetGraphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r9"
+      },
+      "graphMapResult": null,
+      "mappedRefs": [
+        "level1:gm-node:first-logging-reflection-preparation",
+        "level2:gm-constraint:first-logging-reflection-lineage",
+        "level3:Simulation첫벌목성찰SeedEngine",
+        "test:SimulationFocusMeditationTests"
+      ],
+      "unmappedItems": [
+        "실제 제품 한스 집 안전 휴식 공급자",
+        "성찰 진행 상태의 제품 Save 소비 경로",
+        "P1 명상 UI·염체 그래프",
+        "Unity Scene·실제 입력·Game View"
+      ],
+      "blockerItems": [],
+      "verificationCodes": [
+        "GraphMapCheckPassed",
+        "FirstLoggingReflectionTestsPassed13Of13",
+        "NoNewGrowthAmount",
+        "NoUnityOrEvidencePromotion"
+      ],
+      "returnToPlanning": {
+        "terminalResultCode": "Superseded",
+        "planningQuestionRequired": false,
+        "summary": "첫 벌목 ActionRecord와 한스 집 안전 휴식을 결속하는 P0 통합 결과는 보존하며, 현행 21기획·레이어 통합 r10이 현재 Graph Map 판본을 대체한다.",
+        "nextPlanningFocus": "현행 Graph Map 결과는 r10 인계에서 읽고 P0 제품 연결 공백은 그대로 유지한다."
+      },
+      "evidenceBoundary": {
+        "unitySceneChanged": false,
+        "prefabApplied": false,
+        "runtimeExecuted": false,
+        "gameViewCaptured": false,
+        "actualTraversalVerified": false,
+        "evidencePromoted": false,
+        "operationalStateChanged": false
+      }
+    },
+    {
+      "handoffId": "graph-map-handoff:northern-life-hub-discovery:r10",
+      "statusCode": "Integrated",
+      "impactCode": "UpdateExisting",
+      "planningSource": {
+        "path": "docs/AI/PLANNING.md",
+        "revisionCode": "planning-index.current-2026-09-02",
+        "sha256": "d9af1bbf5c21d6dca531da4b724153d2c50de78b3cb86eaa0ae3c577faeb7836",
+        "sourceDecisionIds": [],
+        "sourceWorldInteractionIds": [
+          "WI-NATURE-06",
+          "WI-HUB-03",
+          "WI-WORLD-04"
+        ],
+        "sourcePlanIds": [
+          "PLAN-STORY-MIRROR-MAIN-001",
+          "PLAN-STORY-DUAL-PROTAGONIST-001",
+          "PLAN-STORY-YODONG-DEFENSE-001",
+          "PLAN-STORY-HUB-DISCOVERY-001",
+          "PLAN-GRAPH-NORTHERN-LIFE-REVIEW-001",
+          "PLAN-GRAPH-PLANNING-INTEGRATION-001",
+          "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+          "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001"
+        ],
+        "contextRefs": {
+          "time": "PLANNING.current-plans.time-and-season",
+          "place": "PLANNING.current-plans.graph-map-and-area",
+          "player": "PLANNING.current-plans.player-choice",
+          "target": "PLANNING.current-plans.actor-place-route",
+          "method": "PLANNING.current-plans.graph-impact-classification",
+          "result": "PLANNING.current-plans.integrated-r10",
+          "nextChoices": "PLANNING.current-plans.blocked-and-follow-up"
+        },
+        "exclusionRefs": [
+          "GraphMap-layer-integration.no-unity-runtime",
+          "Long-route.no-approved-route-fixture",
+          "No-auto-goal-wi-e-promotion"
+        ]
+      },
+      "request": {
+        "requestedLevelCodes": [
+          "Federation",
+          "Level1",
+          "Level2",
+          "Level3"
+        ],
+        "level1Intent": "현행 21개 기획을 기존 안정 ID에 대조하고 한스 정밀 손도끼 관계와 장거리 경로의 승인된 계획 경계만 증분 반영한다.",
+        "level2Intent": "기준 공간·기상시간·운송·위협경비·물류보급·플레이어선택 레이어와 경로 상태·비용·용량·근거·신선도·중복 방지 제약을 검사한다.",
+        "level3Intent": "기존 코드 결속과 미결속 경계를 보존하며 새 Scene·Runtime·경로 알고리즘·권위 상태를 만들지 않는다.",
+        "targetGraphMapStableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "targetGraphMapRevision": "mirror-graph-map-plan.northern-life-hub-discovery.r10"
+      },
+      "graphMapResult": {
+        "stableId": "graph-map:mirror:northern-life-hub-discovery.v1",
+        "revision": "mirror-graph-map-plan.northern-life-hub-discovery.r10",
+        "planRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
+        "planSha256": "b2f1288125e4974371e808a8ae59b2cde4d5a9222fe3a8c43bcbd4e0686b8adc",
+        "generatedRef": "eng/world-seedbeds/generated/graph-map-plans.v1.json",
+        "generatedSha256": "f0f9ae9eb59aa1be8a46b0f90093b19830de3ce23058330cf647e56bbac78eb7",
+        "reportRef": "docs/Reports/GraphMap-현행기획-레이어통합-2026-09-02.md",
+        "reportSha256": "b3c1212e9104e6d4d7421796be82cf3c658839b28ed123baaa8826b148645889"
+      },
+      "mappedRefs": [
+        "planning-assessments:21",
+        "level1:nodes:34",
+        "level1:edges:34",
+        "level2:constraints:28",
+        "federation:subgraphs:6",
+        "layers:6",
+        "overlays:9",
+        "overlay-edge-effects:4"
+      ],
+      "unmappedItems": [
+        "장거리 경로의 실제 좌표·분절·병렬 경로·비용·용량 fixture",
+        "한스 정밀 손도끼의 실제 아이템·수리·NPC·표현 계약",
+        "4업무영역 상세 경계·좌표·Prefab 승인",
+        "Unity Scene·실제 입력·Game View"
+      ],
+      "blockerItems": [],
+      "verificationCodes": [
+        "GraphMapCheckPassed",
+        "GraphMapRegression185Passed",
+        "PlanningImpactCoverage21Passed",
+        "NoUnityOrEvidencePromotion"
       ],
       "returnToPlanning": {
         "terminalResultCode": "Integrated",
         "planningQuestionRequired": false,
-        "summary": "첫 Graph Map의 레벨 1·2·3과 federation을 구조화했으며 요동성은 미해결 외부 관문으로 보존했다.",
-        "nextPlanningFocus": "새 기획이 공간 관계를 바꾸면 기존 안정 ID와 대조해 별도 인계 판본을 등록한다."
+        "summary": "현행 21기획을 분류하고 기존 Graph Map r10에 한스 정밀 손도끼 하위 그래프와 6레이어 경로 계약을 통합했다.",
+        "nextPlanningFocus": "장거리 경로의 정확 fixture와 한스 정밀 손도끼 실제 계약은 각각 승인된 후속 판본에서 가장 작은 단위로 다시 연다."
       },
       "evidenceBoundary": {
         "unitySceneChanged": false,

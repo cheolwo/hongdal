@@ -11,66 +11,9 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $utf8 = [Text.UTF8Encoding]::new($false)
-
-function Require([bool] $condition, [string] $code) {
-    if (-not $condition) { throw "GraphMapDevelopmentHandoffInvalid:$code" }
-}
-
-function Require-Text([object] $value, [string] $code) {
-    Require ($null -ne $value -and -not [string]::IsNullOrWhiteSpace([string] $value)) $code
-}
-
-function Resolve-RepoChild([string] $relativePath, [string] $code) {
-    Require-Text $relativePath "$code`:Empty"
-    Require (-not [IO.Path]::IsPathRooted($relativePath)) "$code`:Rooted"
-    Require (-not (@($relativePath -split '[/\\]') -contains '..')) "$code`:Traversal"
-    $root = [IO.Path]::GetFullPath($repositoryRoot).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
-    $candidate = [IO.Path]::GetFullPath((Join-Path $root ($relativePath -replace '/', [IO.Path]::DirectorySeparatorChar)))
-    Require ($candidate.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) "$code`:OutsideRoot"
-    return $candidate
-}
-
-function Read-Json([string] $relativePath, [string] $code) {
-    $path = Resolve-RepoChild $relativePath $code
-    Require (Test-Path -LiteralPath $path -PathType Leaf) "$code`:Missing:$relativePath"
-    return Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
-}
-
-function File-Hash([string] $relativePath, [string] $code) {
-    $path = Resolve-RepoChild $relativePath $code
-    Require (Test-Path -LiteralPath $path -PathType Leaf) "$code`:Missing:$relativePath"
-    return (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
-}
-
-function Require-Hash([string] $relativePath, [object] $expected, [string] $code) {
-    Require-Text $expected "$code`:ExpectedEmpty"
-    Require ([string] $expected -match '^[0-9a-fA-F]{64}$') "$code`:ExpectedFormat"
-    $actual = File-Hash $relativePath $code
-    Require ($actual -eq ([string] $expected).ToLowerInvariant()) "$code`:HashMismatch"
-    return $actual
-}
-
-function Require-Unique([object[]] $values, [scriptblock] $selector, [string] $code) {
-    $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-    foreach ($value in @($values)) {
-        $key = [string] (& $selector $value)
-        Require-Text $key "$code`:Empty"
-        Require ($seen.Add($key)) "$code`:$key"
-    }
-}
-
-function Stable-Json([object] $value) {
-    return (($value | ConvertTo-Json -Depth 100) -replace "`r`n", "`n") + "`n"
-}
-
-function Normalize-Text([string] $value) {
-    return (($value -replace "`r`n", "`n").TrimEnd()) + "`n"
-}
-
-function Escape-Cell([object] $value) {
-    if ($null -eq $value) { return '' }
-    return ([string] $value).Replace('|', '\|').Replace("`r", '').Replace("`n", '<br>')
-}
+. (Join-Path $PSScriptRoot 'GraphMapTooling.ps1') `
+    -RepositoryRoot $repositoryRoot `
+    -ErrorPrefix 'GraphMapDevelopmentHandoffInvalid'
 
 $ledger = Read-Json $LedgerPath 'Ledger'
 Require ([string] $ledger.schemaVersion -eq 'mirror-graph-map-development-handoffs.v1') 'SchemaVersion'
@@ -148,6 +91,8 @@ foreach ($item in $items) {
     foreach ($constraint in @($plan.level2.constraints)) { $constraintById[[string] $constraint.constraintId] = $constraint }
     $bindingIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     foreach ($binding in @($plan.level3.bindingAssignments)) { $null = $bindingIds.Add([string] $binding.bindingId) }
+    $placementRuleById = @{}
+    foreach ($ruleBinding in @($graphOutput.resolvedPlacementRuleBindings)) { $placementRuleById[[string] $ruleBinding.ruleRef] = $ruleBinding }
 
     $selectedNodes = @($slice.nodeRefs)
     $selectedEdges = @($slice.edgeRefs)
@@ -156,6 +101,7 @@ foreach ($item in $items) {
     Require-Unique $selectedNodes { param($x) [string] $x } "SliceNodeDuplicate:$id"
     Require-Unique $selectedEdges { param($x) [string] $x } "SliceEdgeDuplicate:$id"
     Require-Unique $selectedConstraints { param($x) [string] $x } "SliceConstraintDuplicate:$id"
+    Require-Unique @($slice.placementRuleRefs) { param($x) [string] $x } "SlicePlacementRuleDuplicate:$id"
     Require-Unique @($slice.codeBindingRefs) { param($x) [string] $x } "SliceCodeBindingDuplicate:$id"
 
     $selectedNodeSet = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -173,6 +119,13 @@ foreach ($item in $items) {
     }
     foreach ($constraintRef in $selectedConstraints) {
         Require ($constraintById.ContainsKey([string] $constraintRef)) "SliceConstraintUnknown:$id`:$constraintRef"
+    }
+    foreach ($placementRuleRef in @($slice.placementRuleRefs)) {
+        $placementRuleText = [string] $placementRuleRef
+        Require ($placementRuleById.ContainsKey($placementRuleText)) "SlicePlacementRuleUnknown:$id`:$placementRuleText"
+        $ruleBinding = $placementRuleById[$placementRuleText]
+        $sharesConstraint = @($ruleBinding.constraintRefs | Where-Object { $selectedConstraints -contains [string] $_ }).Count -gt 0
+        Require $sharesConstraint "SlicePlacementRuleOutsideConstraints:$id`:$placementRuleText"
     }
     foreach ($bindingRef in @($slice.codeBindingRefs)) {
         Require ($bindingIds.Contains([string] $bindingRef)) "SliceCodeBindingUnknown:$id`:$bindingRef"
@@ -337,9 +290,13 @@ foreach ($snapshot in $snapshots) {
     $lines.Add('')
     $lines.Add("- Graph Map: [$($snapshot.source.graphMapPlanRef)](../../../$($snapshot.source.graphMapPlanRef)) / $($snapshot.source.graphMapRevision) / SHA-256 $($snapshot.source.graphMapPlanSha256)")
     $lines.Add("- 선택 노드: $(Escape-Cell (@($snapshot.slice.nodeRefs) -join ', '))")
-    $lines.Add("- 선택 엣지: $(Escape-Cell (@($snapshot.slice.edgeRefs) -join ', '))")
+    $edgeLabel = if (@($snapshot.slice.edgeRefs).Count -eq 0) { '없음' } else { Escape-Cell (@($snapshot.slice.edgeRefs) -join ', ') }
+    $lines.Add("- 선택 엣지: $edgeLabel")
     $lines.Add("- 선택 제약: $(Escape-Cell (@($snapshot.slice.constraintRefs) -join ', '))")
-    $lines.Add("- 코드 결속: $(Escape-Cell (@($snapshot.slice.codeBindingRefs) -join ', '))")
+    $placementLabel = if (@($snapshot.slice.placementRuleRefs).Count -eq 0) { '없음' } else { Escape-Cell (@($snapshot.slice.placementRuleRefs) -join ', ') }
+    $bindingLabel = if (@($snapshot.slice.codeBindingRefs).Count -eq 0) { '없음' } else { Escape-Cell (@($snapshot.slice.codeBindingRefs) -join ', ') }
+    $lines.Add("- 배치 규칙: $placementLabel")
+    $lines.Add("- 코드 결속: $bindingLabel")
     $lines.Add("- 개발 후보: $($snapshot.developmentTarget.candidateWorkItemId) / 현재 $($snapshot.developmentTarget.candidateStatusCode) / 자동 활성화 아님")
     $lines.Add("- 작업 명세: [$($snapshot.developmentTarget.workOrderRef)](../../../$($snapshot.developmentTarget.workOrderRef)) / SHA-256 $($snapshot.developmentTarget.workOrderSha256)")
     $lines.Add("- 현재 결과: $($snapshot.result.returnSummary)")
