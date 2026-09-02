@@ -96,6 +96,72 @@ function Resolve-DecisionField([int]$Id, [string]$Title) {
     if ($Id -eq 487) { return @('PLANNING', 'DECISION-WI-RELATION') }
     if ($Id -eq 488) { return @('PLANNING', 'GRAPH-MAP-HANDOFF') }
     if ($Id -eq 489) { return @('PLANNING', 'GRAPH-MAP-DEVELOPMENT-HANDOFF') }
+    if ($Id -eq 490) { return @('STORY', 'PROTAGONIST') }
+    if ($Id -eq 491) { return @('GAMEPLAY', 'ALCHEMY-ECONOMY') }
+    if ($Id -eq 492) { return @('STORY', 'YODONG-SUCCESSION') }
+    if ($Id -eq 493) { return @('GAMEPLAY', 'YODONG-CRISIS') }
+    if ($Id -eq 494) { return @('GAMEPLAY', 'WINTER-LOGISTICS') }
+    if ($Id -eq 495) { return @('STORY', 'DUAL-PROTAGONIST') }
+    if ($Id -eq 496) { return @('STORY', 'DUAL-PROTAGONIST') }
+    if ($Id -eq 497) { return @('GAMEPLAY', 'SETTLEMENT-SUPPLY') }
+    if ($Id -eq 498) { return @('GAMEPLAY', 'SETTLEMENT-SUPPLY') }
+    if ($Id -eq 499) { return @('GAMEPLAY', 'SETTLEMENT-SUPPLY') }
+    if ($Id -eq 500) { return @('GAMEPLAY', 'SETTLEMENT-SUPPLY') }
+    if ($Id -eq 501) { return @('GAMEPLAY', 'SETTLEMENT-SUPPLY') }
+    if ($Id -eq 502) { return @('GAMEPLAY', 'SETTLEMENT-SUPPLY') }
+    if ($Id -eq 503) { return @('INTERACTION', 'EMBODIED-STORY-CHOICE') }
+    if ($Id -eq 504) { return @('INTERACTION', 'EMBODIED-STORY-CHOICE') }
+    if ($Id -eq 505) { return @('PLANNING', 'AUDIO-REQUIREMENT') }
+    if ($Id -eq 506) { return @('INTERACTION', 'EMBODIED-STORY-CHOICE') }
+    if ($Id -eq 507) { return @('STORY', 'ADVENTURER-POWER-GROWTH') }
+    if ($Id -eq 508) { return @('INTERACTION', 'EMBODIED-STORY-CHOICE') }
+    if ($Id -eq 509) { return @('STORY', 'ADVENTURER-FIRST-MEETING') }
+    if ($Id -eq 510) { return @('STORY', 'ADVENTURER-POWER-GROWTH') }
+    if ($Id -eq 511) { return @('INTERACTION', 'NPC-FIELD-AUTONOMY') }
+    if ($Id -eq 512) { return @('GAMEPLAY', 'COMPANION-PARTY-COMPOSITION') }
+    if ($Id -eq 513) { return @('STORY', 'ADVENTURER-IDEA-SIGHT') }
+    if ($Id -eq 514) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 515) { return @('INTERACTION', 'NPC-FIELD-AUTONOMY') }
+    if ($Id -eq 516) { return @('GAMEPLAY', 'COMPANION-PARTY-COMPOSITION') }
+    if ($Id -eq 517) { return @('STORY', 'ADVENTURER-POWER-GROWTH') }
+    if ($Id -eq 518) { return @('STORY', 'ADVENTURER-IDEA-SIGHT') }
+    if ($Id -eq 519) { return @('STORY', 'ADVENTURER-IDEA-SIGHT') }
+    if ($Id -eq 520) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 521) { return @('STORY', 'ADVENTURER-IDEA-SIGHT') }
+    if ($Id -eq 522) { return @('PLANNING', 'PROJECT-IDENTITY') }
+    if ($Id -eq 523) { return @('GAMEPLAY', 'COMPANION-PARTY-COMPOSITION') }
+    if ($Id -eq 524) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 525) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 526) { return @('INTERACTION', 'NPC-FIELD-AUTONOMY') }
+    if ($Id -eq 527) { return @('INTERACTION', 'EMBODIED-STORY-CHOICE') }
+    if ($Id -eq 528) { return @('STORY', 'ADVENTURER-IDEA-SIGHT') }
+    if ($Id -eq 529) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 530) { return @('INTERACTION', 'EMBODIED-STORY-CHOICE') }
+    if ($Id -eq 531) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 532) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 533) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 534) { return @('INTERACTION', 'EMBODIED-STORY-CHOICE') }
+    if ($Id -eq 535) { return @('PRESENTATION', 'FARM-HANS-HOUSE') }
+    if ($Id -eq 536) { return @('PRESENTATION', 'FARM-HANS-HOUSE') }
+    if ($Id -eq 537) { return @('STORY', 'ADVENTURER-FIRST-MISSION') }
+    if ($Id -eq 538) { return @('STORY', 'HANS-HIDDEN-MASTER') }
+    if ($Id -eq 539) { return @('STORY', 'HANS-HIDDEN-MASTER') }
+    if ($Id -eq 540) { return @('STORY', 'HANS-HIDDEN-MASTER') }
+    if ($Id -eq 541) { return @('STORY', 'HANS-HIDDEN-MASTER') }
+    if ($Id -eq 542) { return @('PRESENTATION', 'HANS-WEAPON') }
+    if ($Id -eq 543) { return @('STORY', 'FARM-BOUNDARY-THREAT') }
+    if ($Id -eq 544) { return @('PRESENTATION', 'HANS-WEAPON') }
+    if ($Id -eq 545) { return @('STORY', 'FARM-BOUNDARY-THREAT') }
+    if ($Id -eq 546) { return @('STORY', 'ADVENTURER-IDEA-SIGHT') }
+    if ($Id -eq 547) { return @('GAMEPLAY', 'HUB-INFERENCE-QUEST') }
+    if ($Id -eq 548) { return @('GAMEPLAY', 'HUB-RECOVERY-MEDITATION') }
+    if ($Id -eq 549) { return @('GAMEPLAY', 'MEDITATION-INSPIRATION') }
+    if ($Id -eq 550) { return @('GAMEPLAY', 'MEDITATION-RECOVERY-LOOP') }
+    if ($Id -eq 551) { return @('GAMEPLAY', 'COMBAT-MIND-FOCUS') }
+    if ($Id -eq 552) { return @('INTERACTION', 'COMBAT-FOCUS-TRIGGER') }
+    if ($Id -eq 553) { return @('GAMEPLAY', 'COMBAT-DIVIDE-CONQUER') }
+    if ($Id -eq 554) { return @('PRESENTATION', 'SYNTY-SURVEY-HANDOFF') }
+    if ($Id -eq 555) { return @('PRESENTATION', 'FARM-BOUNDARY-BEAST') }
 
     throw "분류되지 않은 결정: D-$('{0:D3}' -f $Id) $Title"
 }

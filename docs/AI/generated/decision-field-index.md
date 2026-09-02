@@ -11,11 +11,11 @@
 
 ## 전수성 점검
 
-- 결정 제목: **486개**
-- 고유 전역 번호: **485개** / 최댓값 `D-489`
+- 결정 제목: **552개**
+- 고유 전역 번호: **551개** / 최댓값 `D-555`
 - 비어 있는 전역 번호: `D-422, D-423, D-424, D-425`
 - 중복 전역 번호: `D-096`
-- 주분야: **11개**, 세부주제: **63개**
+- 주분야: **11개**, 세부주제: **91개**
 
 ## 주분야 요약
 
@@ -24,13 +24,13 @@
 | 아키텍처 (`ARCHITECTURE`) | 4 | 46 | 0 | 46 |
 | 데이터·공공자료 (`DATA`) | 4 | 36 | 0 | 36 |
 | 증거·성숙도 (`EVIDENCE`) | 5 | 51 | 0 | 51 |
-| 게임플레이 (`GAMEPLAY`) | 19 | 159 | 5 | 154 |
-| 상호작용·UI (`INTERACTION`) | 2 | 12 | 2 | 10 |
+| 게임플레이 (`GAMEPLAY`) | 30 | 177 | 23 | 154 |
+| 상호작용·UI (`INTERACTION`) | 5 | 23 | 13 | 10 |
 | 운영·개발 운영 (`OPERATIONS`) | 2 | 10 | 0 | 10 |
-| 기획·업무 방법 (`PLANNING`) | 11 | 39 | 4 | 35 |
-| 표현·시각 (`PRESENTATION`) | 5 | 24 | 3 | 21 |
+| 기획·업무 방법 (`PLANNING`) | 12 | 41 | 6 | 35 |
+| 표현·시각 (`PRESENTATION`) | 9 | 30 | 9 | 21 |
 | Simulation 규칙·권위 (`SIMULATION`) | 3 | 48 | 0 | 48 |
-| 스토리 (`STORY`) | 3 | 12 | 2 | 10 |
+| 스토리 (`STORY`) | 12 | 41 | 31 | 10 |
 | 월드·공간 (`WORLD`) | 5 | 49 | 0 | 49 |
 
 ## 세부주제 요약
@@ -38,67 +38,95 @@
 | 주분야 | 세부주제 | 결정 수 | 본문 재검토 | 전역 범위 |
 | --- | --- | ---: | ---: | --- |
 | 아키텍처 | `OPERATIONS-SIMULATION` | 6 | 0 | `D-027` ~ `D-032` |
-| 상호작용·UI | `QUEST` | 10 | 0 | `D-455` ~ `D-464` |
-| 운영·개발 운영 | `GIT-COMMIT` | 1 | 0 | `D-448` ~ `D-448` |
-| 운영·개발 운영 | `OVERNIGHT-VISUAL-DEV` | 9 | 0 | `D-375` ~ `D-383` |
-| 기획·업무 방법 | `CODE-NAMING` | 1 | 0 | `D-051` ~ `D-051` |
-| 기획·업무 방법 | `DECISION-NAMING` | 1 | 1 | `D-486` ~ `D-486` |
-| 기획·업무 방법 | `DECISION-WI-RELATION` | 1 | 1 | `D-487` ~ `D-487` |
-| 기획·업무 방법 | `DISCOVERY-PLAN` | 4 | 0 | `D-465` ~ `D-468` |
-| 기획·업무 방법 | `EVIDENCE-GOVERNANCE` | 2 | 0 | `D-472` ~ `D-473` |
-| 기획·업무 방법 | `GOAL-INQUIRY-HANDOFF` | 18 | 0 | `D-269` ~ `D-286` |
-| 기획·업무 방법 | `GRAPH-MAP-DEVELOPMENT-HANDOFF` | 1 | 1 | `D-489` ~ `D-489` |
-| 기획·업무 방법 | `GRAPH-MAP-HANDOFF` | 1 | 1 | `D-488` ~ `D-488` |
-| 기획·업무 방법 | `INQUIRY-SEARCH` | 1 | 0 | `D-325` ~ `D-325` |
-| 기획·업무 방법 | `PLAYER-CENTERED-INQUIRY` | 8 | 0 | `D-391` ~ `D-398` |
-| 상호작용·UI | `COMBAT-COMMAND` | 2 | 2 | `D-483` ~ `D-484` |
-| 기획·업무 방법 | `PROJECT-IDENTITY` | 1 | 0 | `D-384` ~ `D-384` |
+| 표현·시각 | `FARM-HANS-HOUSE` | 2 | 2 | `D-535` ~ `D-536` |
+| 표현·시각 | `FARM-BOUNDARY-BEAST` | 1 | 1 | `D-555` ~ `D-555` |
 | 표현·시각 | `COMBAT-RISK` | 3 | 3 | `D-480` ~ `D-482` |
+| 표현·시각 | `ANIMATION-WORKFLOW` | 4 | 0 | `D-358` ~ `D-361` |
+| 기획·업무 방법 | `PROJECT-IDENTITY` | 2 | 1 | `D-384` ~ `D-522` |
+| 기획·업무 방법 | `PLAYER-CENTERED-INQUIRY` | 8 | 0 | `D-391` ~ `D-398` |
+| 기획·업무 방법 | `INQUIRY-SEARCH` | 1 | 0 | `D-325` ~ `D-325` |
+| 기획·업무 방법 | `GRAPH-MAP-HANDOFF` | 1 | 1 | `D-488` ~ `D-488` |
+| 기획·업무 방법 | `GRAPH-MAP-DEVELOPMENT-HANDOFF` | 1 | 1 | `D-489` ~ `D-489` |
+| 기획·업무 방법 | `GOAL-INQUIRY-HANDOFF` | 18 | 0 | `D-269` ~ `D-286` |
+| 기획·업무 방법 | `EVIDENCE-GOVERNANCE` | 2 | 0 | `D-472` ~ `D-473` |
+| 기획·업무 방법 | `DISCOVERY-PLAN` | 4 | 0 | `D-465` ~ `D-468` |
+| 기획·업무 방법 | `DECISION-WI-RELATION` | 1 | 1 | `D-487` ~ `D-487` |
+| 기획·업무 방법 | `DECISION-NAMING` | 1 | 1 | `D-486` ~ `D-486` |
+| 기획·업무 방법 | `CODE-NAMING` | 1 | 0 | `D-051` ~ `D-051` |
+| 기획·업무 방법 | `AUDIO-REQUIREMENT` | 1 | 1 | `D-505` ~ `D-505` |
+| 운영·개발 운영 | `OVERNIGHT-VISUAL-DEV` | 9 | 0 | `D-375` ~ `D-383` |
+| 운영·개발 운영 | `GIT-COMMIT` | 1 | 0 | `D-448` ~ `D-448` |
+| 상호작용·UI | `QUEST` | 10 | 0 | `D-455` ~ `D-464` |
+| 표현·시각 | `HANS-WEAPON` | 2 | 2 | `D-542` ~ `D-544` |
+| 상호작용·UI | `NPC-FIELD-AUTONOMY` | 3 | 3 | `D-511` ~ `D-526` |
 | 표현·시각 | `HERBAL-PROP` | 1 | 0 | `D-385` ~ `D-385` |
 | 표현·시각 | `WORLD-CAMERA-STREAMING` | 13 | 0 | `D-096` ~ `D-125` |
-| 표현·시각 | `WORLD-REGION-ASSET` | 3 | 0 | `D-033` ~ `D-035` |
-| Simulation 규칙·권위 | `LOGISTICS-TRADE` | 20 | 0 | `D-052` ~ `D-071` |
-| Simulation 규칙·권위 | `SETTLEMENT-ECONOMY` | 13 | 0 | `D-038` ~ `D-050` |
-| Simulation 규칙·권위 | `WORLD-OBJECT-RULES` | 15 | 0 | `D-081` ~ `D-095` |
-| 스토리 | `FIRST-DISCOVERY` | 8 | 0 | `D-408` ~ `D-415` |
-| 스토리 | `MAIN-STORY` | 2 | 0 | `D-470` ~ `D-471` |
-| 스토리 | `YODONG` | 2 | 2 | `D-474` ~ `D-475` |
-| 월드·공간 | `GRAPH-MAP-E6` | 6 | 0 | `D-442` ~ `D-447` |
-| 월드·공간 | `H-LH-ASSET-COMPOSITION` | 24 | 0 | `D-177` ~ `D-200` |
 | 월드·공간 | `LANDSCAPE-PLACEMENT-LH` | 3 | 0 | `D-362` ~ `D-364` |
-| 표현·시각 | `ANIMATION-WORKFLOW` | 4 | 0 | `D-358` ~ `D-361` |
+| 월드·공간 | `H-LH-ASSET-COMPOSITION` | 24 | 0 | `D-177` ~ `D-200` |
+| 월드·공간 | `GRAPH-MAP-E6` | 6 | 0 | `D-442` ~ `D-447` |
+| 스토리 | `YODONG-SUCCESSION` | 1 | 1 | `D-492` ~ `D-492` |
+| 스토리 | `YODONG` | 2 | 2 | `D-474` ~ `D-475` |
+| 스토리 | `PROTAGONIST` | 1 | 1 | `D-490` ~ `D-490` |
+| 스토리 | `MAIN-STORY` | 2 | 0 | `D-470` ~ `D-471` |
+| 스토리 | `HANS-HIDDEN-MASTER` | 4 | 4 | `D-538` ~ `D-541` |
+| 스토리 | `FIRST-DISCOVERY` | 8 | 0 | `D-408` ~ `D-415` |
+| 스토리 | `FARM-BOUNDARY-THREAT` | 2 | 2 | `D-543` ~ `D-545` |
+| 스토리 | `DUAL-PROTAGONIST` | 2 | 2 | `D-495` ~ `D-496` |
+| 스토리 | `ADVENTURER-POWER-GROWTH` | 3 | 3 | `D-507` ~ `D-517` |
+| 스토리 | `ADVENTURER-IDEA-SIGHT` | 6 | 6 | `D-513` ~ `D-546` |
+| 스토리 | `ADVENTURER-FIRST-MISSION` | 9 | 9 | `D-514` ~ `D-537` |
+| 스토리 | `ADVENTURER-FIRST-MEETING` | 1 | 1 | `D-509` ~ `D-509` |
+| Simulation 규칙·권위 | `WORLD-OBJECT-RULES` | 15 | 0 | `D-081` ~ `D-095` |
+| Simulation 규칙·권위 | `SETTLEMENT-ECONOMY` | 13 | 0 | `D-038` ~ `D-050` |
+| Simulation 규칙·권위 | `LOGISTICS-TRADE` | 20 | 0 | `D-052` ~ `D-071` |
+| 표현·시각 | `WORLD-REGION-ASSET` | 3 | 0 | `D-033` ~ `D-035` |
+| 표현·시각 | `SYNTY-SURVEY-HANDOFF` | 1 | 1 | `D-554` ~ `D-554` |
 | 월드·공간 | `SPATIAL-DATA-PRESENTATION` | 14 | 0 | `D-100` ~ `D-113` |
-| 게임플레이 | `YODONG` | 4 | 4 | `D-476` ~ `D-479` |
-| 게임플레이 | `TRADE-REALITY` | 8 | 0 | `D-367` ~ `D-374` |
-| 아키텍처 | `PLAYABLE-DEVELOPMENT` | 17 | 0 | `D-214` ~ `D-230` |
-| 아키텍처 | `REFACTOR-DATA-ASSET` | 6 | 0 | `D-139` ~ `D-144` |
-| 아키텍처 | `UNITY-WORLD-FOUNDATION` | 17 | 0 | `D-001` ~ `D-017` |
-| 데이터·공공자료 | `GAME-OBJECT-ASSET-DB` | 16 | 0 | `D-426` ~ `D-441` |
-| 데이터·공공자료 | `MARKET-SUPPLY` | 9 | 0 | `D-018` ~ `D-026` |
-| 데이터·공공자료 | `PRODUCT-ASSET-IDENTITY` | 2 | 0 | `D-036` ~ `D-037` |
-| 데이터·공공자료 | `TIME-PUBLIC-DATA` | 9 | 0 | `D-072` ~ `D-080` |
-| 증거·성숙도 | `E5-CONTEXT` | 1 | 0 | `D-469` ~ `D-469` |
-| 증거·성숙도 | `PRESENTATION-E4-E5` | 5 | 0 | `D-386` ~ `D-390` |
-| 증거·성숙도 | `PRESENTATION-INTEGRATION` | 19 | 0 | `D-250` ~ `D-268` |
-| 증거·성숙도 | `SPATIAL-MATURITY` | 16 | 0 | `D-145` ~ `D-160` |
-| 증거·성숙도 | `WORLD-PLAY-LOOPS` | 10 | 0 | `D-201` ~ `D-210` |
-| 게임플레이 | `BATTLE-PREPARATION` | 1 | 1 | `D-485` ~ `D-485` |
-| 게임플레이 | `WI-LOOP-PROGRESSION` | 19 | 0 | `D-231` ~ `D-249` |
-| 게임플레이 | `CONSTRUCTION-CANCEL` | 5 | 0 | `D-320` ~ `D-324` |
-| 게임플레이 | `FARM-DELEGATION` | 1 | 0 | `D-357` ~ `D-357` |
-| 게임플레이 | `FOCUS-RESEARCH` | 2 | 0 | `D-365` ~ `D-366` |
-| 게임플레이 | `HERBAL-CONTENT` | 11 | 0 | `D-346` ~ `D-356` |
-| 게임플레이 | `HERBAL-TEA` | 8 | 0 | `D-326` ~ `D-333` |
-| 게임플레이 | `HUB-REALITY-LOGISTICS` | 6 | 0 | `D-449` ~ `D-454` |
-| 게임플레이 | `IDEA-NPC-INQUIRY` | 6 | 0 | `D-334` ~ `D-339` |
-| 게임플레이 | `NATURE-THREAT-RECOVERY` | 16 | 0 | `D-161` ~ `D-176` |
-| 게임플레이 | `PERSPECTIVE-FOCUS` | 6 | 0 | `D-416` ~ `D-421` |
-| 게임플레이 | `PLAYER-RECOVERY-RESOURCES` | 33 | 0 | `D-287` ~ `D-319` |
-| 게임플레이 | `SEASON-TECH-TREE` | 7 | 0 | `D-399` ~ `D-405` |
-| 게임플레이 | `TAROT` | 4 | 0 | `D-096` ~ `D-099` |
-| 게임플레이 | `TAROT-REALITY-SPATIAL` | 3 | 0 | `D-211` ~ `D-213` |
-| 게임플레이 | `TEAM-COMBAT` | 13 | 0 | `D-126` ~ `D-138` |
+| 상호작용·UI | `EMBODIED-STORY-CHOICE` | 7 | 7 | `D-503` ~ `D-534` |
+| 상호작용·UI | `COMBAT-COMMAND` | 2 | 2 | `D-483` ~ `D-484` |
 | 게임플레이 | `CREDIT-MULTIPLAYER` | 6 | 0 | `D-340` ~ `D-345` |
+| 게임플레이 | `CONSTRUCTION-CANCEL` | 5 | 0 | `D-320` ~ `D-324` |
+| 게임플레이 | `COMPANION-PARTY-COMPOSITION` | 3 | 3 | `D-512` ~ `D-523` |
+| 게임플레이 | `COMBAT-MIND-FOCUS` | 1 | 1 | `D-551` ~ `D-551` |
+| 게임플레이 | `COMBAT-DIVIDE-CONQUER` | 1 | 1 | `D-553` ~ `D-553` |
+| 게임플레이 | `BATTLE-PREPARATION` | 1 | 1 | `D-485` ~ `D-485` |
+| 게임플레이 | `ALCHEMY-ECONOMY` | 1 | 1 | `D-491` ~ `D-491` |
+| 증거·성숙도 | `WORLD-PLAY-LOOPS` | 10 | 0 | `D-201` ~ `D-210` |
+| 증거·성숙도 | `SPATIAL-MATURITY` | 16 | 0 | `D-145` ~ `D-160` |
+| 증거·성숙도 | `PRESENTATION-INTEGRATION` | 19 | 0 | `D-250` ~ `D-268` |
+| 증거·성숙도 | `PRESENTATION-E4-E5` | 5 | 0 | `D-386` ~ `D-390` |
+| 증거·성숙도 | `E5-CONTEXT` | 1 | 0 | `D-469` ~ `D-469` |
+| 데이터·공공자료 | `TIME-PUBLIC-DATA` | 9 | 0 | `D-072` ~ `D-080` |
+| 데이터·공공자료 | `PRODUCT-ASSET-IDENTITY` | 2 | 0 | `D-036` ~ `D-037` |
+| 데이터·공공자료 | `MARKET-SUPPLY` | 9 | 0 | `D-018` ~ `D-026` |
+| 데이터·공공자료 | `GAME-OBJECT-ASSET-DB` | 16 | 0 | `D-426` ~ `D-441` |
+| 아키텍처 | `UNITY-WORLD-FOUNDATION` | 17 | 0 | `D-001` ~ `D-017` |
+| 아키텍처 | `REFACTOR-DATA-ASSET` | 6 | 0 | `D-139` ~ `D-144` |
+| 아키텍처 | `PLAYABLE-DEVELOPMENT` | 17 | 0 | `D-214` ~ `D-230` |
+| 게임플레이 | `FARM-DELEGATION` | 1 | 0 | `D-357` ~ `D-357` |
+| 상호작용·UI | `COMBAT-FOCUS-TRIGGER` | 1 | 1 | `D-552` ~ `D-552` |
+| 게임플레이 | `FOCUS-RESEARCH` | 2 | 0 | `D-365` ~ `D-366` |
+| 게임플레이 | `HERBAL-TEA` | 8 | 0 | `D-326` ~ `D-333` |
+| 게임플레이 | `YODONG-CRISIS` | 1 | 1 | `D-493` ~ `D-493` |
+| 게임플레이 | `YODONG` | 4 | 4 | `D-476` ~ `D-479` |
+| 게임플레이 | `WINTER-LOGISTICS` | 1 | 1 | `D-494` ~ `D-494` |
+| 게임플레이 | `WI-LOOP-PROGRESSION` | 19 | 0 | `D-231` ~ `D-249` |
+| 게임플레이 | `TRADE-REALITY` | 8 | 0 | `D-367` ~ `D-374` |
+| 게임플레이 | `TEAM-COMBAT` | 13 | 0 | `D-126` ~ `D-138` |
+| 게임플레이 | `TAROT-REALITY-SPATIAL` | 3 | 0 | `D-211` ~ `D-213` |
+| 게임플레이 | `TAROT` | 4 | 0 | `D-096` ~ `D-099` |
+| 게임플레이 | `SETTLEMENT-SUPPLY` | 6 | 6 | `D-497` ~ `D-502` |
+| 게임플레이 | `SEASON-TECH-TREE` | 7 | 0 | `D-399` ~ `D-405` |
+| 게임플레이 | `PLAYER-RECOVERY-RESOURCES` | 33 | 0 | `D-287` ~ `D-319` |
+| 게임플레이 | `PERSPECTIVE-FOCUS` | 6 | 0 | `D-416` ~ `D-421` |
+| 게임플레이 | `NATURE-THREAT-RECOVERY` | 16 | 0 | `D-161` ~ `D-176` |
+| 게임플레이 | `MEDITATION-RECOVERY-LOOP` | 1 | 1 | `D-550` ~ `D-550` |
+| 게임플레이 | `MEDITATION-INSPIRATION` | 1 | 1 | `D-549` ~ `D-549` |
+| 게임플레이 | `IDEA-NPC-INQUIRY` | 6 | 0 | `D-334` ~ `D-339` |
+| 게임플레이 | `HUB-RECOVERY-MEDITATION` | 1 | 1 | `D-548` ~ `D-548` |
+| 게임플레이 | `HUB-REALITY-LOGISTICS` | 6 | 0 | `D-449` ~ `D-454` |
+| 게임플레이 | `HUB-INFERENCE-QUEST` | 1 | 1 | `D-547` ~ `D-547` |
+| 게임플레이 | `HERBAL-CONTENT` | 11 | 0 | `D-346` ~ `D-356` |
 | 월드·공간 | `WORLDMAP-PROPOSAL` | 2 | 0 | `D-406` ~ `D-407` |
 
 ## 전체 결정 대응표
@@ -591,3 +619,69 @@
 | [D-487](../DECISIONS.md#d-487-결정-분야-분류와-공식-wi-대장을-양방향-관계-색인으로-연결한다) | `D-PLANNING-DECISION-WI-RELATION-001` | 결정 분야 분류와 공식 WI 대장을 양방향 관계 색인으로 연결한다 | `BodyReviewed` |
 | [D-488](../DECISIONS.md#d-488-승인-기획을-graph-map-작업에-판본-인계하고-최종-결과만-기획에-반환한다) | `D-PLANNING-GRAPH-MAP-HANDOFF-001` | 승인 기획을 Graph Map 작업에 판본 인계하고 최종 결과만 기획에 반환한다 | `BodyReviewed` |
 | [D-489](../DECISIONS.md#d-489-graph-map의-작은-구현-후보를-기존-goalwi작업-명세에-결속해-개발로-인계한다) | `D-PLANNING-GRAPH-MAP-DEVELOPMENT-HANDOFF-001` | Graph Map의 작은 구현 후보를 기존 Goal·WI·작업 명세에 결속해 개발로 인계한다 | `BodyReviewed` |
+| [D-490](../DECISIONS.md#d-490-플레이어는-병약한-소가주의-몸에-빙의한-sss급-연금술사다) | `D-STORY-PROTAGONIST-001` | 플레이어는 병약한 소가주의 몸에 빙의한 SSS급 연금술사다 | `BodyReviewed` |
+| [D-491](../DECISIONS.md#d-491-플레이어는-핵심-연금술을-직접-하고-일상-운영은-npc에게-위임한다) | `D-GAMEPLAY-ALCHEMY-ECONOMY-001` | 플레이어는 핵심 연금술을 직접 하고 일상 운영은 NPC에게 위임한다 | `BodyReviewed` |
+| [D-492](../DECISIONS.md#d-492-현-가주의-전사는-원래-역사지만-플레이어의-축적-준비로-바꿀-수-있다) | `D-STORY-YODONG-SUCCESSION-001` | 현 가주의 전사는 원래 역사지만 플레이어의 축적 준비로 바꿀 수 있다 | `BodyReviewed` |
+| [D-493](../DECISIONS.md#d-493-요동성은-정확한-countdown-대신-징후와-주기적-위기로-최전방의-긴장을-만든다) | `D-GAMEPLAY-YODONG-CRISIS-001` | 요동성은 정확한 countdown 대신 징후와 주기적 위기로 최전방의 긴장을 만든다 | `BodyReviewed` |
+| [D-494](../DECISIONS.md#d-494-겨울-전쟁의-난방방한의료보급-준비가-전투-인력을-보호한다) | `D-GAMEPLAY-WINTER-LOGISTICS-001` | 겨울 전쟁의 난방·방한·의료·보급 준비가 전투 인력을 보호한다 | `BodyReviewed` |
+| [D-495](../DECISIONS.md#d-495-새-게임에서-모험가와-소가주-중-빙의-대상을-고르고-다른-인물은-주요-npc로-남긴다) | `D-STORY-DUAL-PROTAGONIST-001` | 새 게임에서 모험가와 소가주 중 빙의 대상을 고르고 다른 인물은 주요 NPC로 남긴다 | `BodyReviewed` |
+| [D-496](../DECISIONS.md#d-496-모험가와-소가주는-불신-속-제한-협력으로-시작하고-실제-기록에-따라-관계가-달라진다) | `D-STORY-DUAL-PROTAGONIST-002` | 모험가와 소가주는 불신 속 제한 협력으로 시작하고 실제 기록에 따라 관계가 달라진다 | `BodyReviewed` |
+| [D-497](../DECISIONS.md#d-497-영지-인구에서-자원-수요를-파생하고-부족분은-생산교역hub-조달로-충족한다) | `D-GAMEPLAY-SETTLEMENT-SUPPLY-001` | 영지 인구에서 자원 수요를 파생하고 부족분은 생산·교역·Hub 조달로 충족한다 | `BodyReviewed` |
+| [D-498](../DECISIONS.md#d-498-자원별-평시-비축일수에-계절위기-보정치를-적용한다) | `D-GAMEPLAY-SETTLEMENT-SUPPLY-002` | 자원별 평시 비축일수에 계절·위기 보정치를 적용한다 | `BodyReviewed` |
+| [D-499](../DECISIONS.md#d-499-부족-물자는-모든-집단의-최소-생존선을-보호한-뒤-긴급도에-따라-배분한다) | `D-GAMEPLAY-SETTLEMENT-SUPPLY-003` | 부족 물자는 모든 집단의 최소 생존선을 보호한 뒤 긴급도에 따라 배분한다 | `BodyReviewed` |
+| [D-500](../DECISIONS.md#d-500-모든-최소-생존선을-지킬-수-없으면-보호-우선순위와-예상-손실을-공개해-예외-배분한다) | `D-GAMEPLAY-SETTLEMENT-SUPPLY-004` | 모든 최소 생존선을 지킬 수 없으면 보호 우선순위와 예상 손실을 공개해 예외 배분한다 | `BodyReviewed` |
+| [D-501](../DECISIONS.md#d-501-전원-보호를-우선하고-불가능할-때-생명-수-최대화-뒤-필수-기능을-보존한다) | `D-GAMEPLAY-SETTLEMENT-SUPPLY-005` | 전원 보호를 우선하고 불가능할 때 생명 수 최대화 뒤 필수 기능을 보존한다 | `BodyReviewed` |
+| [D-502](../DECISIONS.md#d-502-새-배분-규칙은-기존-정책과-결과를-비교하고-시험한-뒤-채택하거나-폐기한다) | `D-GAMEPLAY-SETTLEMENT-SUPPLY-006` | 새 배분 규칙은 기존 정책과 결과를 비교하고 시험한 뒤 채택하거나 폐기한다 | `BodyReviewed` |
+| [D-503](../DECISIONS.md#d-503-스토리-선택은-카드가-아니라-3인칭-현장-행동과-순서로-기록한다) | `D-INTERACTION-EMBODIED-STORY-CHOICE-001` | 스토리 선택은 카드가 아니라 3인칭 현장 행동과 순서로 기록한다 | `BodyReviewed` |
+| [D-504](../DECISIONS.md#d-504-행동형-스토리-선택에는-countdown-대신-현장-징후의-부드러운-시간-압박을-사용한다) | `D-INTERACTION-EMBODIED-STORY-CHOICE-002` | 행동형 스토리 선택에는 countdown 대신 현장 징후의 부드러운 시간 압박을 사용한다 | `BodyReviewed` |
+| [D-505](../DECISIONS.md#d-505-기획-중-발견한-소리는-중앙-오디오-요구사항-대장에-별도-상태로-기록한다) | `D-PLANNING-AUDIO-REQUIREMENT-001` | 기획 중 발견한 소리는 중앙 오디오 요구사항 대장에 별도 상태로 기록한다 | `BodyReviewed` |
+| [D-506](../DECISIONS.md#d-506-시간-기반-압박은-신속한-대응으로-현장-목표를-모두-해결할-수-있게-설계한다) | `D-INTERACTION-EMBODIED-STORY-CHOICE-003` | 시간 기반 압박은 신속한 대응으로 현장 목표를 모두 해결할 수 있게 설계한다 | `BodyReviewed` |
+| [D-507](../DECISIONS.md#d-507-모험가-시작은-개인의-신뢰에서-동료거점연결망으로-세력이-점진적으로-확장된다) | `D-STORY-ADVENTURER-POWER-GROWTH-001` | 모험가 시작은 개인의 신뢰에서 동료·거점·연결망으로 세력이 점진적으로 확장된다 | `BodyReviewed` |
+| [D-508](../DECISIONS.md#d-508-현장-npc에게-생존자-응급처치와-마차화물-보호를-맡길-수-있다) | `D-INTERACTION-EMBODIED-STORY-CHOICE-004` | 현장 NPC에게 생존자 응급처치와 마차·화물 보호를 맡길 수 있다 | `BodyReviewed` |
+| [D-509](../DECISIONS.md#d-509-모험가는-nature와-town을-오가다-경비대장에게-발탁되어-병영학교에서-소가주를-만난다) | `D-STORY-ADVENTURER-FIRST-MEETING-001` | 모험가는 Nature와 Town을 오가다 경비대장에게 발탁되어 병영학교에서 소가주를 만난다 | `BodyReviewed` |
+| [D-510](../DECISIONS.md#d-510-모험가의-첫-세력은-관계를-유지하며-함께-이동하는-소규모-npc-동행대다) | `D-STORY-ADVENTURER-POWER-GROWTH-002` | 모험가의 첫 세력은 관계를 유지하며 함께 이동하는 소규모 NPC 동행대다 | `BodyReviewed` |
+| [D-511](../DECISIONS.md#d-511-현장-npc는-별도-지시가-없어도-안전한-범위의-기본-응급처치를-수행한다) | `D-INTERACTION-NPC-FIELD-AUTONOMY-001` | 현장 NPC는 별도 지시가 없어도 안전한 범위의 기본 응급처치를 수행한다 | `BodyReviewed` |
+| [D-512](../DECISIONS.md#d-512-npc별-적성과-역할-조합에-따라-소규모-동행대의-장점과-공백이-달라진다) | `D-GAMEPLAY-COMPANION-PARTY-COMPOSITION-001` | NPC별 적성과 역할 조합에 따라 소규모 동행대의 장점과 공백이 달라진다 | `BodyReviewed` |
+| [D-513](../DECISIONS.md#d-513-모험가는-이데아의-편린을-통해-검술의-본질을-꿰뚫어보는-시각을-가진다) | `D-STORY-ADVENTURER-IDEA-SIGHT-001` | 모험가는 이데아의 편린을 통해 검술의 본질을 꿰뚫어보는 시각을 가진다 | `BodyReviewed` |
+| [D-514](../DECISIONS.md#d-514-경비대장은-모험가에게-병영학교-입교-대신-첫-호송대-호위-임무를-부탁한다) | `D-STORY-ADVENTURER-FIRST-MISSION-001` | 경비대장은 모험가에게 병영학교 입교 대신 첫 호송대 호위 임무를 부탁한다 | `BodyReviewed` |
+| [D-515](../DECISIONS.md#d-515-희귀-약품은-기본-승인제로-두되-현장을-떠나기-전에-npc-자율-사용-정책을-설정한다) | `D-INTERACTION-NPC-FIELD-AUTONOMY-002` | 희귀 약품은 기본 승인제로 두되 현장을 떠나기 전에 NPC 자율 사용 정책을 설정한다 | `BodyReviewed` |
+| [D-516](../DECISIONS.md#d-516-모험가-동행대의-기본-전투-조합은-플레이어를-포함한-근거리-1명과-원거리-1명이다) | `D-GAMEPLAY-COMPANION-PARTY-COMPOSITION-002` | 모험가 동행대의 기본 전투 조합은 플레이어를 포함한 근거리 1명과 원거리 1명이다 | `BodyReviewed` |
+| [D-517](../DECISIONS.md#d-517-npc-관계의-중심은-선물과-대화가-아니라-실제-공동-행동과-약속-이행-기록이다) | `D-STORY-ADVENTURER-POWER-GROWTH-003` | NPC 관계의 중심은 선물과 대화가 아니라 실제 공동 행동과 약속 이행 기록이다 | `BodyReviewed` |
+| [D-518](../DECISIONS.md#d-518-병영마법학교마탑-교육의-공통-목표는-이데아를-직관해-현실에-드러내는-것이다) | `D-STORY-ADVENTURER-IDEA-SIGHT-002` | 병영·마법학교·마탑 교육의 공통 목표는 이데아를 직관해 현실에 드러내는 것이다 | `BodyReviewed` |
+| [D-519](../DECISIONS.md#d-519-경비대장의-소개로-만난-훈련-교관의-시범-동작에서-첫-검술-이데아-후보를-직관한다) | `D-STORY-ADVENTURER-IDEA-SIGHT-003` | 경비대장의 소개로 만난 훈련 교관의 시범 동작에서 첫 검술 이데아 후보를 직관한다 | `BodyReviewed` |
+| [D-520](../DECISIONS.md#d-520-첫-호송-화물은-국방-경비-거점으로-보내는-의약품과-보존식량이다) | `D-STORY-ADVENTURER-FIRST-MISSION-002` | 첫 호송 화물은 국방 경비 거점으로 보내는 의약품과 보존식량이다 | `BodyReviewed` |
+| [D-521](../DECISIONS.md#d-521-모험가의-핵심-재능은-이데아를-직관하고-원리를-자기-방식으로-흡수재구성하는-능력이다) | `D-STORY-ADVENTURER-IDEA-SIGHT-004` | 모험가의 핵심 재능은 이데아를 직관하고 원리를 자기 방식으로 흡수·재구성하는 능력이다 | `BodyReviewed` |
+| [D-522](../DECISIONS.md#d-522-메인-스토리-기획서의-표시-이름은-mirror로-한다) | `D-PLANNING-PROJECT-IDENTITY-002` | 메인 스토리 기획서의 표시 이름은 Mirror로 한다 | `BodyReviewed` |
+| [D-523](../DECISIONS.md#d-523-자주-쓰는-동행대-구성을-프리셋으로-저장하고-출발-전에-현재-조건을-다시-확인한다) | `D-GAMEPLAY-COMPANION-PARTY-COMPOSITION-003` | 자주 쓰는 동행대 구성을 프리셋으로 저장하고 출발 전에 현재 조건을 다시 확인한다 | `BodyReviewed` |
+| [D-524](../DECISIONS.md#d-524-경비대-호송-의뢰-전에-한스-농장에서-공동-행동으로-친분을-쌓는다) | `D-STORY-ADVENTURER-FIRST-MISSION-003` | 경비대 호송 의뢰 전에 한스 농장에서 공동 행동으로 친분을 쌓는다 | `BodyReviewed` |
+| [D-525](../DECISIONS.md#d-525-한스와의-첫-공동-행동은-농장-침입-흔적-조사와-무너진-울타리-임시-보수다) | `D-STORY-ADVENTURER-FIRST-MISSION-004` | 한스와의 첫 공동 행동은 농장 침입 흔적 조사와 무너진 울타리 임시 보수다 | `BodyReviewed` |
+| [D-526](../DECISIONS.md#d-526-호송대-중상자는-현장-책임자의-기록-아래-사전-허용된-의약품을-긴급-사용한다) | `D-INTERACTION-NPC-FIELD-AUTONOMY-003` | 호송대 중상자는 현장 책임자의 기록 아래 사전 허용된 의약품을 긴급 사용한다 | `BodyReviewed` |
+| [D-527](../DECISIONS.md#d-527-중요한-현장-결정은-실행-가능한-선택-카드로-안내하고-실제-행동으로-성립시킨다) | `D-INTERACTION-EMBODIED-STORY-CHOICE-005` | 중요한 현장 결정은 실행 가능한 선택 카드로 안내하고 실제 행동으로 성립시킨다 | `BodyReviewed` |
+| [D-528](../DECISIONS.md#d-528-교관의-기본기-시범을-직관하면-미숙련-스킬이-상태창에-조용히-등록된다) | `D-STORY-ADVENTURER-IDEA-SIGHT-005` | 교관의 기본기 시범을 직관하면 미숙련 스킬이 상태창에 조용히 등록된다 | `BodyReviewed` |
+| [D-529](../DECISIONS.md#d-529-한스와의-첫-신뢰는-플레이어의-자발적인-벌목과-무보수-울타리-수리에서-시작한다) | `D-STORY-ADVENTURER-FIRST-MISSION-005` | 한스와의 첫 신뢰는 플레이어의 자발적인 벌목과 무보수 울타리 수리에서 시작한다 | `BodyReviewed` |
+| [D-530](../DECISIONS.md#d-530-선택-카드-열람은-안전한-상황에서-정지하고-시간-민감-사건에서는-감속한다) | `D-INTERACTION-EMBODIED-STORY-CHOICE-006` | 선택 카드 열람은 안전한 상황에서 정지하고 시간 민감 사건에서는 감속한다 | `BodyReviewed` |
+| [D-531](../DECISIONS.md#d-531-첫-울타리-수리는-현장-손도끼-발견과-선택-카드-뒤-직접-행동으로-완결한다) | `D-STORY-ADVENTURER-FIRST-MISSION-006` | 첫 울타리 수리는 현장 손도끼 발견과 선택 카드 뒤 직접 행동으로 완결한다 | `BodyReviewed` |
+| [D-532](../DECISIONS.md#d-532-현장-손도끼-사용과-한스-집-옆-추가-목재-적재는-선택-카드로-분리한다) | `D-STORY-ADVENTURER-FIRST-MISSION-007` | 현장 손도끼 사용과 한스 집 옆 추가 목재 적재는 선택 카드로 분리한다 | `BodyReviewed` |
+| [D-533](../DECISIONS.md#d-533-한스는-플레이어가-떠난-뒤-집-옆의-추가-목재를-발견한다) | `D-STORY-ADVENTURER-FIRST-MISSION-008` | 한스는 플레이어가 떠난 뒤 집 옆의 추가 목재를 발견한다 | `BodyReviewed` |
+| [D-534](../DECISIONS.md#d-534-플레이어는-이동-중-변화된-농장을-먼저-보고-한스의-후속-표식을-선택한다) | `D-INTERACTION-EMBODIED-STORY-CHOICE-007` | 플레이어는 이동 중 변화된 농장을 먼저 보고 한스의 후속 표식을 선택한다 | `BodyReviewed` |
+| [D-535](../DECISIONS.md#d-535-여분-목재로-수리되는-첫-농장-변화는-한스의-집이다) | `D-PRESENTATION-FARM-HANS-HOUSE-001` | 여분 목재로 수리되는 첫 농장 변화는 한스의 집이다 | `BodyReviewed` |
+| [D-536](../DECISIONS.md#d-536-한스의-손상된-집은-원본을-보존한-blender-전용-복사본-후보로-만든다) | `D-PRESENTATION-FARM-HANS-HOUSE-002` | 한스의 손상된 집은 원본을 보존한 Blender 전용 복사본 후보로 만든다 | `BodyReviewed` |
+| [D-537](../DECISIONS.md#d-537-수리된-한스의-집은-경비대-임무를-지원하는-첫-생활-거점이-된다) | `D-STORY-ADVENTURER-FIRST-MISSION-009` | 수리된 한스의 집은 경비대 임무를 지원하는 첫 생활 거점이 된다 | `BodyReviewed` |
+| [D-538](../DECISIONS.md#d-538-한스는-첫-경계-순찰에서-정체를-숨긴-은둔고수의-면모를-드러낸다) | `D-STORY-HANS-HIDDEN-MASTER-001` | 한스는 첫 경계 순찰에서 정체를 숨긴 은둔고수의 면모를 드러낸다 | `BodyReviewed` |
+| [D-539](../DECISIONS.md#d-539-한스가-집-수리를-미룬-이유는-무능이나-체력-부족이-아니라-능글맞은-무심함이다) | `D-STORY-HANS-HIDDEN-MASTER-002` | 한스가 집 수리를 미룬 이유는 무능이나 체력 부족이 아니라 능글맞은 무심함이다 | `BodyReviewed` |
+| [D-540](../DECISIONS.md#d-540-한스는-감사를-능글맞게-돌려-말하고-식사잠자리로-답한다) | `D-STORY-HANS-HIDDEN-MASTER-003` | 한스는 감사를 능글맞게 돌려 말하고 식사·잠자리로 답한다 | `BodyReviewed` |
+| [D-541](../DECISIONS.md#d-541-한스-집에는-오래됐지만-잘-관리된-무기-하나가-선택형-정체-단서로-남는다) | `D-STORY-HANS-HIDDEN-MASTER-004` | 한스 집에는 오래됐지만 잘 관리된 무기 하나가 선택형 정체 단서로 남는다 | `BodyReviewed` |
+| [D-542](../DECISIONS.md#d-542-한스의-관리된-무기는-검으로-정하고-synty-prefab-후보를-e4에서-조사한다) | `D-PRESENTATION-HANS-WEAPON-001` | 한스의 관리된 무기는 검으로 정하고 Synty Prefab 후보를 E4에서 조사한다 | `BodyReviewed` |
+| [D-543](../DECISIONS.md#d-543-첫-경계-순찰의-마수-무리는-깊은-숲의-더-큰-위협에-밀려-내려왔다) | `D-STORY-FARM-BOUNDARY-THREAT-001` | 첫 경계 순찰의 마수 무리는 깊은 숲의 더 큰 위협에 밀려 내려왔다 | `BodyReviewed` |
+| [D-544](../DECISIONS.md#d-544-한스의-검은-첫-순찰에서-사용하지-않고-이후의-진짜-위기에-남겨-둔다) | `D-PRESENTATION-HANS-WEAPON-002` | 한스의 검은 첫 순찰에서 사용하지 않고 이후의 진짜 위기에 남겨 둔다 | `BodyReviewed` |
+| [D-545](../DECISIONS.md#d-545-영역을-넓히는-거대-마수는-요동성-적대-조직이-이용하는-전위-위협이다) | `D-STORY-FARM-BOUNDARY-THREAT-002` | 영역을 넓히는 거대 마수는 요동성 적대 조직이 이용하는 전위 위협이다 | `BodyReviewed` |
+| [D-546](../DECISIONS.md#d-546-첫-town-공방-경험은-견습의-생산-실패-원인을-직관해-복구를-돕는다) | `D-STORY-ADVENTURER-IDEA-SIGHT-006` | 첫 Town 공방 경험은 견습의 생산 실패 원인을 직관해 복구를 돕는다 | `BodyReviewed` |
+| [D-547](../DECISIONS.md#d-547-허브의-미도착-화물은-플레이-중-모은-단서를-직접-추론해-해결한다) | `D-GAMEPLAY-HUB-INFERENCE-QUEST-001` | 허브의 미도착 화물은 플레이 중 모은 단서를 직접 추론해 해결한다 | `BodyReviewed` |
+| [D-548](../DECISIONS.md#d-548-미도착-화물-문제-예방은-플레이어와-npc의-회복을-높이고-플레이어의-명상-준비에-가중한다) | `D-GAMEPLAY-HUB-RECOVERY-MEDITATION-001` | 미도착 화물 문제 예방은 플레이어와 NPC의 회복을 높이고 플레이어의 명상 준비에 가중한다 | `BodyReviewed` |
+| [D-549](../DECISIONS.md#d-549-회복이-높은-때의-명상은-실제-획득한-영감과-이데아의-편린-산출량을-증폭한다) | `D-GAMEPLAY-MEDITATION-INSPIRATION-001` | 회복이 높은 때의 명상은 실제 획득한 영감과 이데아의 편린 산출량을 증폭한다 | `BodyReviewed` |
+| [D-550](../DECISIONS.md#d-550-증폭-명상은-회복을-소모하지-않고-적절한-완료-뒤-회복을-더-높인다) | `D-GAMEPLAY-MEDITATION-RECOVERY-LOOP-001` | 증폭 명상은 회복을 소모하지 않고 적절한 완료 뒤 회복을 더 높인다 | `BodyReviewed` |
+| [D-551](../DECISIONS.md#d-551-강적-조우의-정신적-위협에는-전투-중-집중-타이밍으로-회복을-지키고-되올릴-수-있다) | `D-GAMEPLAY-COMBAT-MIND-FOCUS-001` | 강적 조우의 정신적 위협에는 전투 중 집중 타이밍으로 회복을 지키고 되올릴 수 있다 | `BodyReviewed` |
+| [D-552](../DECISIONS.md#d-552-전투-집중-기회는-위협이-크게-변하는-핵심-순간에만-짧게-연다) | `D-INTERACTION-COMBAT-FOCUS-TRIGGER-001` | 전투 집중 기회는 위협이 크게 변하는 핵심 순간에만 짧게 연다 | `BodyReviewed` |
+| [D-553](../DECISIONS.md#d-553-강대한-적의-종합-역량은-구성-노드와-지원-연결을-실제로-분리해-낮출-수-있다) | `D-GAMEPLAY-COMBAT-DIVIDE-CONQUER-001` | 강대한 적의 종합 역량은 구성 노드와 지원 연결을 실제로 분리해 낮출 수 있다 | `BodyReviewed` |
+| [D-554](../DECISIONS.md#d-554-최근-확정-기획의-synty-표현-요구를-선별해-개발전문-조사로-인계한다) | `D-PRESENTATION-SYNTY-SURVEY-HANDOFF-001` | 최근 확정 기획의 Synty 표현 요구를 선별해 개발·전문 조사로 인계한다 | `BodyReviewed` |
+| [D-555](../DECISIONS.md#d-555-첫-경계-마수는-동물형야수형-의미를-유지하고-현재-사람형-후보는-미확보-보류한다) | `D-PRESENTATION-FARM-BOUNDARY-BEAST-001` | 첫 경계 마수는 동물형·야수형 의미를 유지하고 현재 사람형 후보는 미확보 보류한다 | `BodyReviewed` |

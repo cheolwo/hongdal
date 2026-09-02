@@ -7,15 +7,18 @@
 GPT Chat과 Codex는 대화 기록이 아니라 저장소 문서를 공용 기억으로 사용한다. 작업을 시작할 때 다음 순서로 현재 상태를 확인한다.
 
 1. [공용 프로젝트 컨텍스트](docs/ProjectOverview/GptProjectContext.md)
-2. [확정 결정](docs/AI/DECISIONS.md)
-3. [현재 작업](docs/AI/CURRENT_WORK.md)
-4. 게임 구현이면 [Codex PlayableLoop Goal 상태](docs/AI/generated/codex-playable-loop-goals.md)에서 활성 Goal·WI·기획서·작업 명세를 확인
-5. 활성 PlayableLoop의 `planningGate.designDocumentRef` 기획서, 그 기획서가 `Required`로 연결한 `Accepted` 전문 심화 연구, E7 작업 명세
-6. 작업 경로에 가까운 `AGENTS.md`와 관련 Architecture 문서
+2. 게임 기획이면 [기획 목차](docs/AI/PLANNING.md)에서 현재 기획 ID·판본·상태·상하위 관계를 확인
+3. [확정 결정](docs/AI/DECISIONS.md)
+4. [현재 작업](docs/AI/CURRENT_WORK.md)
+5. 게임 구현이면 [Codex PlayableLoop Goal 상태](docs/AI/generated/codex-playable-loop-goals.md)에서 활성 Goal·WI·기획서·작업 명세를 확인
+6. 활성 PlayableLoop의 `planningGate.designDocumentRef` 기획서, 그 기획서가 `Required`로 연결한 `Accepted` 전문 심화 연구, E7 작업 명세
+7. 작업 경로에 가까운 `AGENTS.md`와 관련 Architecture 문서
 
 Unity 개발 순서는 제품 릴리스 버전 순서와 별개다. Unity는 전체 Ssalddel 도메인을 `World`, `Data`, `Object`, `Interaction`, `Simulation` 관점에서 다루되, 실제 구현은 검증 가능한 좁은 vertical slice로 진행한다. 영역 개발에서는 Farm·Hub·City 각각의 독립 완결 slice를 먼저 만들고, 영역 간 운송 경로를 기본 slice로 삼지 않는다. 서버는 운영 상태의 최종 권위이며 Unity의 simulation과 operational data를 명확히 구분한다.
 
 의미 있는 구현이나 설계 작업을 마치면 `docs/AI/CURRENT_WORK.md`를 누적 일지가 아닌 최신 snapshot으로 갱신한다. 변경 파일, 검증한 범위, runtime 검증 여부와 남은 문제를 사실대로 기록한다. 장기간 유지할 결정이 바뀌면 `docs/AI/DECISIONS.md`에 새 결정이나 대체 관계를 기록하고 과거 결정을 조용히 덮어쓰지 않는다.
+
+게임 기획의 본문·질문·분기·미정·판본은 [기획 문서 독립 관리 체계](docs/Architecture/기획문서독립관리체계.md)에 따라 개별 기획 문서와 `docs/AI/PLANNING.md`가 소유한다. 기획 답변 하나마다 새 D를 만들지 않으며, 여러 기획이 공통으로 따라야 하는 장기 원칙·권위·안전·호환 경계만 `DECISIONS.md`에 남긴다. 기존 D 항목은 링크 호환과 이력 보존을 위해 삭제하거나 재번호화하지 않는다.
 
 ## 우선순위와 적용 범위
 
