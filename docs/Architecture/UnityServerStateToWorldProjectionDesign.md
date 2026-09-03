@@ -12,6 +12,8 @@ Web route는 Unity navigation과 panel handoff를 찾는 보조 자료다. World
 
 ## 2. 조사 범위와 확인 결과
 
+> 아래 수동 표와 10장의 개체 목록은 2026-08-08 조사 이력이다. 현행 전수 모수와 Unity 선별 이관 판정은 [운영 서버에서 Mirror Unity로의 선별 이관 대장](../AI/generated/operational-unity-transfer-catalog.md)을 사용한다. 이 대장은 실제 페이지 기능 규칙, EF Core `DbSet`, MongoDB `GetCollection` 사용 지점, H 안정 ID와 Unity 대표 경로를 다시 읽으며 수동 요약과의 차이를 진단한다.
+
 2026-08-08 현재 체크아웃의 직접 선언을 기준으로 조사했다. migration snapshot과 `bin`, `obj`는 제외했다.
 
 | 저장 경계 | 명시적 객체 수 | 위치 | 비고 |
