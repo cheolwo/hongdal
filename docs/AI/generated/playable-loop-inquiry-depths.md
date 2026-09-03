@@ -1,8 +1,19 @@
 # PlayableLoop Inquiry Depth and Evidence Readiness
 
-- Catalog revision: `playable-loop-inquiry-depth-catalog.r1`
+- Catalog revision: `playable-loop-inquiry-depth-catalog.r2`
 - Evidence model: `horizontal-dual-cycle-evidence.r3`
 - Inquiry depth forecasts implementation readiness and never promotes actual Evidence.
+
+## Question branch revision
+
+- Schema: `playable-loop-question-branch.v1`
+- Revision format: `{questionStableId}.r{positiveInteger}`
+- One branch revision contains one core question. An answer or a meaningful context/depth change creates a new revision instead of overwriting the previous one.
+- A deeper question references its parent revision. Same-depth refinement may also create a child revision. Question revision never promotes Evidence automatically.
+- Decision statuses: `Asked / ConfirmedDirection / Confirmed / Deferred / Superseded`
+- Graph impact: assess the direct ring, explicit one-hop neighbors, and causally justified two-hop propagation. Effects beyond two hops become a follow-up question revision.
+- Higher H changes are derived from child H and edge changes; unknown graph effects remain unknown and never become confirmed automatically.
+- Placement Map impact: Graph Map keeps gameplay meaning; a separate versioned Placement Map keeps repeated H instances, relative arrangement, and placement constraints. Relative plans never prove Unity World placement.
 
 | Depth | Question scope | Logic readiness | Presentation readiness | Horizontal campaign readiness | Evidence still required |
 | --- | --- | --- | --- | --- | --- |

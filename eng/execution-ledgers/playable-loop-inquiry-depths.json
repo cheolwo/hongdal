@@ -1,6 +1,6 @@
 {
   "schemaVersion": "playable-loop-inquiry-depth-catalog.v1",
-  "revision": "playable-loop-inquiry-depth-catalog.r1",
+  "revision": "playable-loop-inquiry-depth-catalog.r2",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "principles": {
     "depthForecastsEvidenceReadiness": true,
@@ -8,7 +8,99 @@
     "logicAndPresentationForecastsRemainDistinct": true,
     "actualEvidenceComesFromLedgersAndEvidencePackages": true,
     "globalQuestionNumberRemainsImmutable": true,
-    "depthCanReopenEarlierQuestions": true
+    "depthCanReopenEarlierQuestions": true,
+    "questionIdentityRemainsStableAcrossRevisions": true,
+    "questionBranchesPreserveParentAndSupersededLineage": true
+  },
+  "questionVersioning": {
+    "schemaVersion": "playable-loop-question-branch.v1",
+    "branchRevisionFormat": "{questionStableId}.r{positiveInteger}",
+    "requiredFields": [
+      "questionStableId",
+      "displayQuestionId",
+      "branchRevision",
+      "depthCode",
+      "parentRevisionRef",
+      "decisionStatusCode",
+      "contextDeltaKo",
+      "confirmedAnswerKo",
+      "openQuestionKo",
+      "graphImpactAssessment",
+      "placementMapImpactAssessment",
+      "supersedesRevisionRefs"
+    ],
+    "allowedDecisionStatusCodes": [
+      "Asked",
+      "ConfirmedDirection",
+      "Confirmed",
+      "Deferred",
+      "Superseded"
+    ],
+    "rules": {
+      "oneBranchRevisionContainsOneCoreQuestion": true,
+      "answerCreatesNewRevisionInsteadOfOverwriting": true,
+      "deeperQuestionReferencesParentRevision": true,
+      "depthChangeRequiresNewRevision": true,
+      "sameDepthRefinementMayCreateNewRevision": true,
+      "revisionNeverPromotesEvidenceAutomatically": true
+    },
+    "graphImpactAssessment": {
+      "schemaVersion": "question-graph-impact-assessment.v1",
+      "allowedImpactCodes": [
+        "NoImpact",
+        "UpdateExisting",
+        "CreateSubgraph",
+        "CreateGraphMap",
+        "Blocked"
+      ],
+      "requiredFields": [
+        "impactCode",
+        "primaryNodeRefs",
+        "primaryEdgeRefs",
+        "adjacentNodeRefs",
+        "propagationEdgeRefs",
+        "derivedHigherHRefs",
+        "stoppingBoundaryRefs",
+        "unknownImpactRefs",
+        "noImpactReasonKo"
+      ],
+      "defaultTraversalHopLimit": 2,
+      "rules": {
+        "directRingAlwaysAssessed": true,
+        "adjacentRingUsesExplicitEdgesOnly": true,
+        "propagationRingRequiresCausalJustification": true,
+        "higherHChangesAreDerivedFromChildren": true,
+        "unknownImpactNeverBecomesConfirmed": true,
+        "beyondHopLimitCreatesFollowupRevision": true
+      }
+    },
+    "placementMapImpactAssessment": {
+      "schemaVersion": "question-placement-map-impact-assessment.v1",
+      "allowedImpactCodes": [
+        "NoImpact",
+        "UpdateExisting",
+        "CreatePlacementMap",
+        "Blocked"
+      ],
+      "requiredFields": [
+        "impactCode",
+        "targetGraphElementRefs",
+        "hDefinitionRefs",
+        "multiplicityIntentKo",
+        "instanceRoleIntentKo",
+        "placementConstraintRefs",
+        "unknownImpactRefs",
+        "noImpactReasonKo"
+      ],
+      "rules": {
+        "graphMeaningRemainsInGraphMap": true,
+        "placementInstancesRemainInPlacementMap": true,
+        "sameHDefinitionMayHaveMultipleInstances": true,
+        "placementEdgesReferenceGraphEdges": true,
+        "relativePlanDoesNotProveWorldPlacement": true,
+        "unityEvidenceRemainsSeparate": true
+      }
+    }
   },
   "allowedDepthStatusCodes": ["Waiting", "InProgress", "Confirmed", "ReopenRequired", "NotApplicable"],
   "items": [

@@ -1,13 +1,14 @@
 {
   "schemaVersion": "mirror-world-interaction-gwae-classifications.v1",
-  "revision": "mirror-world-interaction-gwae-classifications.r2",
+  "revision": "mirror-world-interaction-gwae-classifications.r7",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "policyDocumentPath": "docs/Architecture/WI괘성분류체계.md",
   "classificationMeaning": "기획 탐색·비교·그래프 표시용 괘성 메타데이터이며 WI 권위, 구현 승인, E/G/H 성숙도, 실행 규칙과 순서를 변경하지 않는다.",
-  "displayFormat": "{name}({symbol})",
+  "displayFormat": "{element}({name})",
   "gwaeDefinitions": [
     {
       "code": "JIN",
+      "element": "목",
       "name": "진괘",
       "symbol": "☳",
       "playerMeaning": "행동·농사·채집·벌목·사냥·개척",
@@ -15,6 +16,7 @@
     },
     {
       "code": "TAE",
+      "element": "금",
       "name": "태괘",
       "symbol": "☱",
       "playerMeaning": "배치·건축·시설 이용·공간 정비",
@@ -22,6 +24,7 @@
     },
     {
       "code": "RI",
+      "element": "화",
       "name": "리괘",
       "symbol": "☲",
       "playerMeaning": "질서·지휘·역할 분담·동행대 편성·약속 이행",
@@ -29,6 +32,7 @@
     },
     {
       "code": "GAM",
+      "element": "수",
       "name": "감괘",
       "symbol": "☵",
       "playerMeaning": "학습·조사·추론·계획·물류 판단",
@@ -36,10 +40,25 @@
     },
     {
       "code": "GAN",
+      "element": "토",
       "name": "간괘",
       "symbol": "☶",
       "playerMeaning": "대화·공감·집중·명상·직관·위협 극복·정신 회복",
       "targetMeaning": "NPC·동행자·주민·조직·공포·불안·정신적 압박"
+    }
+  ],
+  "elementRelationDefinitions": [
+    {
+      "code": "SHENG",
+      "name": "상생",
+      "sequence": ["GAM>JIN", "JIN>RI", "RI>GAN", "GAN>TAE", "TAE>GAM"],
+      "meaning": "한 작용이 다른 작용의 발생·성장·전환 조건을 돕는다."
+    },
+    {
+      "code": "KE",
+      "name": "상극",
+      "sequence": ["TAE>JIN", "JIN>GAN", "GAN>GAM", "GAM>RI", "RI>TAE"],
+      "meaning": "한 작용이 다른 작용을 제한·절단·분리·조절한다."
     }
   ],
   "groupDefaults": {
@@ -93,6 +112,9 @@
     { "wiId": "WI-FARM-DEFENSE-RETURN", "actionGwae": "RI", "targetGwae": "GAN", "supportGwae": "GAN", "reason": "방위 분대 귀환 질서를 확정하고 부상자 회복을 인계한다." },
     { "wiId": "WI-FARM-DEFENSE-RESOLVE", "actionGwae": "RI", "operationGwae": "GAM", "targetGwae": "GAN", "reason": "전투 권위가 확정한 결과를 질서 있게 한 번 발현하고 위협·회복 정보를 적용한다." },
     { "wiId": "WI-FARM-01", "actionGwae": "JIN", "operationGwae": "TAE", "targetGwae": "JIN", "reason": "밭갈이는 농업 직접 행동이며 도구와 작업 공간의 태괘 작용을 사용한다." },
+    { "wiId": "WI-FARM-02", "actionGwae": "JIN", "operationGwae": "TAE", "targetGwae": "JIN", "supportGwae": "GAM", "reason": "파종은 씨앗을 밭의 위치와 간격에 직접 배치하며 절기·품종·파종 조건 정보가 보조한다." },
+    { "wiId": "WI-FARM-03", "actionGwae": "GAN", "operationGwae": "GAM", "targetGwae": "JIN", "elementRelations": [{ "relationCode": "SHENG", "sourceGwae": "GAM", "targetGwae": "JIN", "displayName": "수생목", "applicationMode": "RequiredInput", "functionalMeaning": "적정 수분 공급이 작물 생장을 돕는다." }, { "relationCode": "KE", "sourceGwae": "GAN", "targetGwae": "GAM", "displayName": "토극수", "applicationMode": "RequiredConstraint", "functionalMeaning": "토양 수용력과 현재 수분 상태가 물 공급량을 제한한다." }, { "relationCode": "KE", "sourceGwae": "TAE", "targetGwae": "JIN", "displayName": "금극목", "applicationMode": "ConditionalCare", "functionalMeaning": "가지치기가 필요한 품종과 생육 단계에서 과잉 가지를 분리해 성장 방향을 조절한다." }, { "relationCode": "SHENG", "sourceGwae": "JIN", "targetGwae": "RI", "displayName": "목생화", "applicationMode": "Outcome", "functionalMeaning": "씨앗·토양·수분과 필요한 관리 조건이 충족되면 온전한 생육과 성숙 전환이 발동한다." }], "reason": "생육 운영은 토(간괘)를 중심으로 씨앗·토양 적합성, 수생목, 토극수와 조건부 금극목을 검사하고 충족 결과를 목생화로 표현한다." },
+    { "wiId": "WI-FARM-04", "actionGwae": "TAE", "operationGwae": "TAE", "targetGwae": "JIN", "supportGwae": "GAM", "elementRelations": [{ "relationCode": "KE", "sourceGwae": "TAE", "targetGwae": "JIN", "displayName": "금극목", "applicationMode": "Outcome", "functionalMeaning": "성장이 끝난 작물을 절단·분리해 수확물로 완결한다." }], "reason": "열매 따기·베기·수확의 주 행위는 금(태괘), 성장한 작물 대상은 목(진괘)이며 금극목의 분리·완결 작용으로 읽는다." },
     { "wiId": "WI-FARM-05", "actionGwae": "JIN", "operationGwae": "GAM", "targetGwae": "GAM", "reason": "수확 Lot을 집하 위치로 직접 옮겨 재고 흐름에 넣는다." },
     { "wiId": "WI-FARM-06", "actionGwae": "JIN", "operationGwae": "GAM", "targetGwae": "GAM", "reason": "수확 Lot을 직접 포장해 화물 정보로 전환한다." },
     { "wiId": "WI-001", "actionGwae": "GAM", "targetGwae": "GAM", "reason": "도착 화물의 수량·품질 정보를 검수한다." },

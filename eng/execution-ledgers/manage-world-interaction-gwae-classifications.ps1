@@ -70,9 +70,20 @@ foreach ($definition in @($source.gwaeDefinitions)) {
     Require (-not [string]::IsNullOrWhiteSpace($code)) 'GwaeCodeMissing'
     Require (-not $definitionByCode.ContainsKey($code)) "DuplicateGwaeCode:$code"
     Require ([string] $definition.symbol -in @('☳', '☱', '☲', '☵', '☶')) "GwaeSymbolInvalid:$code"
+    Require ([string] $definition.element -in @('금', '목', '수', '화', '토')) "GwaeElementInvalid:$code"
     $definitionByCode[$code] = $definition
 }
 Require ($definitionByCode.Count -eq 5) 'GwaeDefinitionCountInvalid'
+
+$relationByCode = @{}
+foreach ($relation in @($source.elementRelationDefinitions)) {
+    $relationCode = [string] $relation.code
+    Require ($relationCode -in @('SHENG', 'KE')) "ElementRelationCodeInvalid:$relationCode"
+    Require (-not $relationByCode.ContainsKey($relationCode)) "DuplicateElementRelationCode:$relationCode"
+    Require (@($relation.sequence).Count -eq 5) "ElementRelationSequenceInvalid:$relationCode"
+    $relationByCode[$relationCode] = $relation
+}
+Require ($relationByCode.Count -eq 2) 'ElementRelationDefinitionCountInvalid'
 
 $overrideByWiId = @{}
 foreach ($override in @($source.overrides)) {
@@ -111,6 +122,7 @@ foreach ($wi in @($wiCatalog.items)) {
     }
     $additionalTargetGwae = Get-OptionalArray $override $groupDefault 'additionalTargetGwae'
     $operationGwaeByActionCode = if ($null -ne $override -and (Has-Property $override 'operationGwaeByActionCode')) { $override.operationGwaeByActionCode } else { $null }
+    $elementRelations = if ($null -ne $override -and (Has-Property $override 'elementRelations')) { @($override.elementRelations) } else { @() }
 
     Require ($definitionByCode.ContainsKey($actionGwae)) "ActionGwaeInvalid:$($wi.id):$actionGwae"
     Require ($targetMode -in @('Fixed', 'InheritFromTargetObject', 'InheritFromActiveInteraction')) "TargetModeInvalid:$($wi.id):$targetMode"
@@ -135,6 +147,16 @@ foreach ($wi in @($wiCatalog.items)) {
     }
     foreach ($additionalCode in $additionalTargetGwae) {
         Require ($definitionByCode.ContainsKey($additionalCode)) "AdditionalTargetGwaeInvalid:$($wi.id):$additionalCode"
+    }
+    foreach ($elementRelation in $elementRelations) {
+        Require ($relationByCode.ContainsKey([string] $elementRelation.relationCode)) "ElementRelationTypeInvalid:$($wi.id)"
+        Require ($definitionByCode.ContainsKey([string] $elementRelation.sourceGwae)) "ElementRelationSourceInvalid:$($wi.id)"
+        Require ($definitionByCode.ContainsKey([string] $elementRelation.targetGwae)) "ElementRelationTargetInvalid:$($wi.id)"
+        $expectedPair = "{0}>{1}" -f [string] $elementRelation.sourceGwae, [string] $elementRelation.targetGwae
+        Require (@($relationByCode[[string] $elementRelation.relationCode].sequence) -contains $expectedPair) "ElementRelationPairInvalid:$($wi.id):$expectedPair"
+        Require (-not [string]::IsNullOrWhiteSpace([string] $elementRelation.displayName)) "ElementRelationDisplayNameMissing:$($wi.id)"
+        Require ([string] $elementRelation.applicationMode -in @('RequiredInput', 'RequiredConstraint', 'ConditionalCare', 'Outcome')) "ElementRelationApplicationModeInvalid:$($wi.id)"
+        Require (-not [string]::IsNullOrWhiteSpace([string] $elementRelation.functionalMeaning)) "ElementRelationMeaningMissing:$($wi.id)"
     }
 
     if ($operationMode -ne 'Fixed') { $operationGwae = $null }
@@ -161,6 +183,7 @@ foreach ($wi in @($wiCatalog.items)) {
         additionalTargetGwae = $additionalTargetGwae
         supportMode = $supportMode
         supportGwae = $supportGwae
+        elementRelations = @($elementRelations)
         classificationStatus = if ($null -ne $override) { 'ReviewedExplicit' } else { 'ReviewedByMeaningRule' }
         reviewRule = Get-OptionalValue $override $groupDefault 'reviewRule'
         reason = if ($null -ne $override) { [string] $override.reason } else { "검토된 영역 의미 규칙 '$([string] $groupDefault.reviewRule)'을 적용했다." }
@@ -175,6 +198,9 @@ $output = [ordered]@{
     sourceRevision = [string] $source.revision
     worldInteractionCatalogRevision = [string] $wiCatalog.revision
     classificationMeaning = [string] $source.classificationMeaning
+    displayFormat = [string] $source.displayFormat
+    gwaeDefinitions = @($source.gwaeDefinitions)
+    elementRelationDefinitions = @($source.elementRelationDefinitions)
     counts = [ordered]@{
         total = $resolvedItems.Count
         reviewedExplicit = @($resolvedItems | Where-Object classificationStatus -eq 'ReviewedExplicit').Count
@@ -192,13 +218,13 @@ $lines.Add("- WI 대장 판본: ``$($wiCatalog.revision)``")
 $lines.Add("- 전체: $($resolvedItems.Count), 개별 의미 명시 검토: $($output.counts.reviewedExplicit), 검토된 영역 의미 규칙 적용: $($output.counts.reviewedByMeaningRule)")
 $lines.Add('- 이 목록은 기획 탐색용이며 WI 권위·구현 승인·E/G/H 성숙도와 실행 순서를 변경하지 않는다.')
 $lines.Add('')
-$lines.Add('| WI | 제목 | 행위괘 | 작용괘 | 대상괘 | 보조괘 | 상태 |')
-$lines.Add('| --- | --- | --- | --- | --- | --- | --- |')
+$lines.Add('| WI | 제목 | 행위괘 | 작용괘 | 대상괘 | 보조괘 | 오행 관계 | 상태 |')
+$lines.Add('| --- | --- | --- | --- | --- | --- | --- | --- |')
 foreach ($item in $resolvedItems) {
     function Format-Gwae([string] $Code) {
         if ([string]::IsNullOrWhiteSpace($Code)) { return '-' }
         $definition = $definitionByCode[$Code]
-        return "$($definition.name)($($definition.symbol))"
+        return "$($definition.element)($($definition.name))"
     }
     $operationDisplay = switch ($item.operationMode) {
         'ByActionCode' { '작업 코드별' }
@@ -211,7 +237,8 @@ foreach ($item in $resolvedItems) {
         default { Format-Gwae $item.targetGwae }
     }
     $supportDisplay = if ($item.supportMode -eq 'Contextual') { "상황별 $(Format-Gwae $item.supportGwae)" } else { Format-Gwae $item.supportGwae }
-    $lines.Add("| ``$($item.wiId)`` | $($item.title) | $(Format-Gwae $item.actionGwae) | $operationDisplay | $targetDisplay | $supportDisplay | ``$($item.classificationStatus)`` |")
+    $relationDisplay = if (@($item.elementRelations).Count -eq 0) { '-' } else { @($item.elementRelations | ForEach-Object { "$($_.displayName)[$($_.applicationMode)]: $($_.functionalMeaning)" }) -join '<br>' }
+    $lines.Add("| ``$($item.wiId)`` | $($item.title) | $(Format-Gwae $item.actionGwae) | $operationDisplay | $targetDisplay | $supportDisplay | $relationDisplay | ``$($item.classificationStatus)`` |")
 }
 $markdown = ($lines -join "`n") + "`n"
 
