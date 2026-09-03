@@ -3,9 +3,9 @@
   "authority": "DerivedPlanningLookupOnly",
   "decisionSource": {
     "path": "docs/AI/DECISIONS.md",
-    "sha256": "B226600FB00E7545D726333A54E8A99ADB9A3457149594824DAB6A01C3716FE2",
+    "sha256": "2DDB3E2A023422FEEEDDF73016B694F53E659E30C55C2F22DF13431890E7B2CD",
     "fieldIndexPath": "docs/AI/generated/decision-field-index.json",
-    "fieldIndexSha256": "20618FA6DEF4F2043BF9D23ED265FBB23D08C0F3CC17720291E9009BAB63E4A2"
+    "fieldIndexSha256": "8F48FA8711EFEA2347577F013471CDB04EA897E7C34B70B7089BBF82C7D5C594"
   },
   "wiSource": {
     "path": "eng/execution-ledgers/world-interactions.json",

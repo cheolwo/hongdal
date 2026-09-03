@@ -1,7 +1,7 @@
 {
   "schemaVersion": "decision-field-index.v1",
   "sourceRef": "docs/AI/DECISIONS.md",
-  "sourceSha256": "B226600FB00E7545D726333A54E8A99ADB9A3457149594824DAB6A01C3716FE2",
+  "sourceSha256": "2DDB3E2A023422FEEEDDF73016B694F53E659E30C55C2F22DF13431890E7B2CD",
   "classificationMethod": "ExhaustiveHeadingInventoryWithManualFieldRanges",
   "reviewDepthMeaning": {
     "TitleReviewed": "결정 제목과 주변 결정군을 전수 대조한 1차 분야 분류",
