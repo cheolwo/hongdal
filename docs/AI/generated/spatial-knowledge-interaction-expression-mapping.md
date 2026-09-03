@@ -10,6 +10,7 @@
 | `h1-stock:farm-loss-recovery` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-maintenance-yard` | h1-expression:farm:시설하우스-단동, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-production` | h1-expression:farm:감자밭-두렁, h1-expression:farm:혼합-작물밭 |
+| `h1-stock:farm-residential-home` | h1-expression:farm:헛간-작업마당, h1-expression:town:저층-주택-블록 |
 | `h1-stock:farm-restoration-supply` | h1-expression:farm:농산물-집하-직판장, h1-expression:nature:숲-가장자리 |
 | `h1-stock:farm-seed-preparation` | h1-expression:farm:시설하우스-단동, h1-expression:farm:헛간-작업마당 |
 | `h1-stock:farm-sorting` | h1-expression:farm:농산물-집하-직판장, h1-expression:farm:헛간-작업마당 |

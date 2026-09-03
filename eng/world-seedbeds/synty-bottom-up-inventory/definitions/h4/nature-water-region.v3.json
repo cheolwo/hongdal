@@ -27,6 +27,7 @@
   ],
   "sourceGrammarRefs": [
     "farm:감자밭 두렁",
+    "farm:헛간 작업마당",
     "farm:혼합 작물밭",
     "nature:고지대 노출지",
     "nature:산 능선",
@@ -34,11 +35,12 @@
     "nature:숲 가장자리",
     "nature:숲 빈터·고사목",
     "network:농촌도로 곡선",
+    "town:저층 주택 블록",
     "transition:Nature–Farm 전환",
     "transition:Water–Land 전환"
   ],
   "derivationRecipeCode": "h4.nature-water-region.r1",
-  "derivationInputHashSha256": "155e6f8d27b0bc4ccc05ce184d08821de0a7eef20e3f067bb8c316c9d6453dce",
+  "derivationInputHashSha256": "5dace3ad51b1e9a012dd76a4a9fbf4704b3989481f3a8e2584b66d772a0c986d",
   "authoredDocument": "authored/h4/nature-water-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

@@ -27,15 +27,15 @@
 | 21 | `H1` | `h1-expression:farm:혼합-작물밭` | 행동 H1과 능력·용량·연결구 검토 |
 | 22 | `H1` | `h1-expression:nature:초지-야생화` | 행동 H1과 능력·용량·연결구 검토 |
 | 23 | `H1` | `h1-expression:town:근린-놀이터` | 행동 H1과 능력·용량·연결구 검토 |
-| 24 | `H1` | `h1-expression:farm:과수원-블록` | 행동 공간 H1 연결 |
-| 25 | `H1` | `h1-expression:farm:논-필지-농수로-표현` | 행동 공간 H1 연결 |
-| 26 | `H1` | `h1-expression:farm:시설하우스-병렬단지` | 행동 공간 H1 연결 |
-| 27 | `H1` | `h1-expression:nature:개울-회랑` | 행동 공간 H1 연결 |
-| 28 | `H1` | `h1-expression:nature:바위-절개지` | 행동 공간 H1 연결 |
-| 29 | `H1` | `h1-expression:nature:침엽수림-군집` | 행동 공간 H1 연결 |
-| 30 | `H1` | `h1-expression:nature:혼효림-군집` | 행동 공간 H1 연결 |
-| 31 | `H1` | `h1-expression:nature:활엽수림-군집` | 행동 공간 H1 연결 |
-| 32 | `H1` | `h1-expression:town:저층-주택-블록` | 행동 공간 H1 연결 |
+| 24 | `H1` | `h1-expression:town:저층-주택-블록` | 행동 H1과 능력·용량·연결구 검토 |
+| 25 | `H1` | `h1-expression:farm:과수원-블록` | 행동 공간 H1 연결 |
+| 26 | `H1` | `h1-expression:farm:논-필지-농수로-표현` | 행동 공간 H1 연결 |
+| 27 | `H1` | `h1-expression:farm:시설하우스-병렬단지` | 행동 공간 H1 연결 |
+| 28 | `H1` | `h1-expression:nature:개울-회랑` | 행동 공간 H1 연결 |
+| 29 | `H1` | `h1-expression:nature:바위-절개지` | 행동 공간 H1 연결 |
+| 30 | `H1` | `h1-expression:nature:침엽수림-군집` | 행동 공간 H1 연결 |
+| 31 | `H1` | `h1-expression:nature:혼효림-군집` | 행동 공간 H1 연결 |
+| 32 | `H1` | `h1-expression:nature:활엽수림-군집` | 행동 공간 H1 연결 |
 | 33 | `H4` | `h4-blueprint:farm-hub-town-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |
 | 34 | `H4` | `h4-blueprint:farm-production-processing-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |
 | 35 | `H4` | `h4-blueprint:logistics-hub-region` | 세계 의도·하위 H3·관계·외부 연결구 설계 검토 |

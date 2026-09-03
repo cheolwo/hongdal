@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "simulation-world-spatial-design-knowledge-h1.v2",
+  "stableId": "h1-stock:farm-residential-home",
+  "revision": 1,
+  "hierarchyLevelCode": "H1",
+  "title": "농장 생활 주택",
+  "summary": "농장 안에서 영속적인 생활 주택의 건물 정체성, footprint, 출입구, 내외부 경계, 관찰 시야와 소유·이용 허락 경계를 제공하는 공간이다.",
+  "knowledgeStateCode": "ExploratoryInventory",
+  "originModeCode": "WorldIntent",
+  "approvedDefinitionStableId": null,
+  "wiIds": [],
+  "anticipatedGameplayCodes": [
+    "ResidentialBuildingIdentity",
+    "ResidenceAccessBoundary",
+    "ResidentialObservationSightline"
+  ],
+  "spatialRoleCodes": [
+    "FarmResidentialHome"
+  ],
+  "capabilityCodes": [
+    "Spatial.ResidentialBuildingIdentity",
+    "Spatial.ResidentialFootprint",
+    "Spatial.ResidentialEntrance",
+    "Spatial.ResidentialInteriorBoundary",
+    "Spatial.ResidentialObservationSightline",
+    "Spatial.ResidentialUsePermissionBoundary"
+  ],
+  "capacityConceptCodes": [
+    "BuildingFootprint",
+    "ResidenceOccupancy"
+  ],
+  "predecessorH1Refs": [],
+  "successorH1Refs": [],
+  "connectorRoleCodes": [
+    "FarmHomeIngress",
+    "FarmHomeObservation",
+    "ResidentPermissionBoundary"
+  ],
+  "sourcePackCodes": [
+    "Farm",
+    "Town"
+  ],
+  "grammarSetRefs": [
+    "farm:헛간 작업마당",
+    "town:저층 주택 블록"
+  ],
+  "qualificationSignals": {
+    "requiredByExistingWi": false,
+    "likelyFutureGameplay": true,
+    "reusableAcrossWorlds": true,
+    "representableByOwnedSynty": false
+  },
+  "authoredDocument": "authored/h1/farm-residential-home.v2.md",
+  "sourceReferences": [
+    "eng/world-seedbeds/synty-bottom-up-inventory/expansion.v2.json#h1-stock:farm-residential-home",
+    "docs/AI/숲경계농장-H1-H2-배치맵-기획-2026-09-02.md#기존-h1-재사용-조사-반환"
+  ],
+  "unresolvedItems": [
+    "정확 주택 Prefab, footprint 크기, 출입구 방향과 관찰 시야 수치는 개별 배치 맵과 Presentation E4에서 동결한다.",
+    "귀환·휴식·작업자 대기, 농기구 보관, 생산, 수확·집하 WI는 각각 기존 H1이 계속 소유한다."
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

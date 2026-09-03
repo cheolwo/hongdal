@@ -13,7 +13,7 @@
 | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | `Cluster` | h1-stock:farm-tool-storage, h1-stock:farm-seed-preparation | h1-stock:farm-worker-waiting |
 | `h2-candidate:farm-wash-sort-pack` 세척·선별·포장 블록 | `Linear` | h1-stock:farm-harvest-staging, h1-stock:farm-washing, h1-stock:farm-sorting, h1-stock:farm-work-yard |  |
 | `h2-candidate:farm-worker-support` 농가·작업지원 생활 블록 | `Cluster` | h1-stock:farm-worker-waiting, h1-stock:farm-tool-storage, h1-stock:farm-maintenance-yard |  |
-| `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | `ContourAdaptive` | h1-stock:nature-farm-edge, h1-stock:nature-exploration-buffer, h1-stock:farm-production |  |
+| `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | `ContourAdaptive` | h1-stock:nature-farm-edge, h1-stock:nature-exploration-buffer, h1-stock:farm-production | h1-stock:farm-residential-home |
 | `h2-candidate:highland-production` 고지대 생산 블록 | `ModifiedGrid` | h1-stock:farm-production, h1-stock:nature-farm-edge |  |
 | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | `Cluster` | h1-stock:hub-cold-storage, h1-stock:hub-long-term-storage, h1-stock:hub-service-maintenance | h1-stock:hub-temporary-staging |
 | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | `Linear` | h1-stock:hub-outbound-staging, h1-stock:hub-temporary-staging | h1-stock:hub-long-term-storage, h1-stock:hub-vehicle-yard |

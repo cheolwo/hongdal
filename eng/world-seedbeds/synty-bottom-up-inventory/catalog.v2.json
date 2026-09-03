@@ -71,6 +71,14 @@
       "documentSha256": "9091acdffbf875cca841a5c557f1351d726a738e46ea31aa4705ca634ff9ef8a"
     },
     {
+      "stableId": "h1-stock:farm-residential-home",
+      "revision": 1,
+      "definitionPath": "definitions/h1/farm-residential-home.v2.json",
+      "definitionSha256": "63d4a8395d2516d38547646542c14f8c1a955b13fa2d4b4abfebd4567645d15d",
+      "documentPath": "authored/h1/farm-residential-home.v2.md",
+      "documentSha256": "f7086e3d890b5383f84131654e118900d254d686fc158de601c2101547679bf6"
+    },
+    {
       "stableId": "h1-stock:farm-restoration-supply",
       "revision": 1,
       "definitionPath": "definitions/h1/farm-restoration-supply.v2.json",
@@ -130,9 +138,9 @@
       "stableId": "h1-stock:farm-worker-waiting",
       "revision": 3,
       "definitionPath": "definitions/h1/farm-worker-waiting.v2.json",
-      "definitionSha256": "ca5db034477d95a328ef4080b41cdc476b54f995d4c1b7c20bb45460151e9563",
+      "definitionSha256": "97ed1e1ad7ff65a16a5bc4e8f92fca781da3f97e0d64ed81e40d46a1edd06419",
       "documentPath": "authored/h1/farm-worker-waiting.v2.md",
-      "documentSha256": "ed519b5e3f0d91cf7abcc2c7e2dad5b67a3535101dec50d78bd90e2c83e19c18"
+      "documentSha256": "f6fb00338406e5a55d8b5e107ffc764325bdf72274035c4bc9e05ed386300dfc"
     },
     {
       "stableId": "h1-stock:hub-cold-storage",
@@ -498,11 +506,11 @@
     },
     {
       "stableId": "h2-candidate:forest-edge-farm",
-      "revision": 2,
+      "revision": 3,
       "definitionPath": "definitions/h2/forest-edge-farm.v2.json",
-      "definitionSha256": "f164c5096fa8a33fe4c951c3914681ba27704006a48e19511dfbb14afc3923e4",
+      "definitionSha256": "44ed5494dceb09230756a6a3efd3fc4ac5207e859232c403bc391bd1796255cb",
       "documentPath": "authored/h2/forest-edge-farm.v2.md",
-      "documentSha256": "7877dfe92bf005da4f83e5ad21b980674dc769fea062de699845617638ac0015"
+      "documentSha256": "4a021dcc1df68ff64babee49055aff5c8d758f9bc7b3144eb13e2a376bd6acbf"
     },
     {
       "stableId": "h2-candidate:highland-production",

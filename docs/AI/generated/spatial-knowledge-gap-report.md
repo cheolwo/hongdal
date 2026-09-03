@@ -3,7 +3,7 @@
 | 계층 | 지식 | 현재 상태 | 다음 보완 |
 | --- | --- | --- | --- |
 | `H1` | `h1-stock:farm-tool-storage` 농기구 보관 공간 | `CandidateForReview` | 도구별 재고 원장은 후속 Simulation 계약이며 현재는 공간 수용 능력만 승인한다. |
-| `H1` | `h1-stock:farm-worker-waiting` 농가 귀환·작업자 대기 공간 | `CandidateForReview` | 휴식은 표현·다음 작업 선택 기능이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다. |
+| `H1` | `h1-stock:farm-worker-waiting` 농가 귀환·작업자 대기 공간 | `CandidateForReview` | 휴식과 방위 집결은 표현·다음 작업 선택 후보이며 소속 PlayableUnit E7, E8 반복 안정성이나 E9 NPC 생활 조화를 자동으로 만들지 않는다.; 실제 외곽 초소 좌표·분대 Actor·출동 경로는 Farm 방위 E5 승인 뒤 검증한다. |
 | `H1` | `h1-stock:nature-emergency-retreat` 자연권 긴급 후퇴 길목 | `CandidateForReview` | E2에서 파티 단위 경로 예약과 후퇴 중단 규칙을 확정한다. |
 | `H1` | `h1-stock:nature-incident-trace` 자연권 사건 흔적 조사 구역 | `CandidateForReview` | E2에서 관찰 WI 안의 조사 단계와 원인 계보 판정 단위를 확정한다. |
 | `H1` | `h1-stock:nature-restoration-site` 자연권 정화·복구 작업 공간 | `CandidateForReview` | E2에서 해결된 원인 계보와 복원 자재 예약 단위를 확정한다. |
@@ -12,6 +12,7 @@
 | `H1` | `h1-stock:farm-exposure-inspection` 농장 수확물 노출 점검 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-harvest-staging` 수확물 임시 적치 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-maintenance-yard` 농장 시설 정비 공간 | `ExploratoryInventory` | 공간 능력·용량·연결구를 검토한 뒤 CandidateForReview로 승격한다. |
+| `H1` | `h1-stock:farm-residential-home` 농장 생활 주택 | `ExploratoryInventory` | 정확 주택 Prefab, footprint 크기, 출입구 방향과 관찰 시야 수치는 개별 배치 맵과 Presentation E4에서 동결한다.; 귀환·휴식·작업자 대기, 농기구 보관, 생산, 수확·집하 WI는 각각 기존 H1이 계속 소유한다. |
 | `H1` | `h1-stock:farm-restoration-supply` 농장 자연권 복구 자재 인계 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-seed-preparation` 종자 준비 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
 | `H1` | `h1-stock:farm-weather-protection` 농장 기상 보호 적치 공간 | `ExploratoryInventory` | 실제 업무 용량과 연결구 방향은 공식 H1 승격 전에 검토한다. |
@@ -57,7 +58,7 @@
 | `H2` | `h2-candidate:farm-loss-restoration-handoff` 농장 손실 회복·복원 인계 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
 | `H2` | `h2-candidate:farm-processing-shipping` 농장 작업·출하 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:farm-seed-and-tools` 종자·농기구 준비 블록 | `ExploratoryInventory` | 실제 Block 경계와 배치 방향은 현실 근거 적용 단계에서 결정한다. |
-| `H2` | `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
+| `H2` | `h2-candidate:forest-edge-farm` 숲 경계 농장 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다.; 농장 생활 주택은 일반 H2에서 선택 관계이며, 한스 생활 농장처럼 이를 필수로 하는 개별 배치 프로필은 별도 배치 맵에서 판정한다. |
 | `H2` | `h2-candidate:highland-production` 고지대 생산 블록 | `ExploratoryInventory` | 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다. |
 | `H2` | `h2-candidate:hub-emergency-power` Hub 비상 전력·보관 유지 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |
 | `H2` | `h2-candidate:hub-fulfillment` Hub 피킹·출고준비 작업 블록 | `ExploratoryInventory` | 기준 크기·배치 방향과 연결구 조합은 설계 검토에서 확정한다. |

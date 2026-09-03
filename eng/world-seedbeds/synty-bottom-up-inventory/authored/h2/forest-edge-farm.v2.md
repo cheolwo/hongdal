@@ -6,6 +6,7 @@
 @required-h1 h1-stock:nature-farm-edge
 @required-h1 h1-stock:nature-exploration-buffer
 @required-h1 h1-stock:farm-production
+@optional-h1 h1-stock:farm-residential-home
 
 ## 존재 이유
 
@@ -20,5 +21,6 @@
 ## 미해결
 
 - 필수 H1 사이 연결구와 내부 도달 가능성을 검토한다.
+- 농장 생활 주택은 일반 H2에서 선택 관계이며, 한스 생활 농장처럼 이를 필수로 하는 개별 배치 프로필은 별도 배치 맵에서 판정한다.
 
 이 문서는 상향식 공간 설계 지식이며 실제 좌표·AreaSet·LandscapeGraph·Unity 자산 권위를 만들지 않는다.

@@ -197,6 +197,8 @@ Presentation E4 준비 기록에는 최소한 다음을 남긴다.
 - Collider·Bounds·통로·접촉 Window·중단·귀환 의도
 - `Ready / Conditional / Blocked`와 열린 결함
 
+공간 배치가 필요한 경우 이 기록은 [Graph Map 기획 인계 순환 체계의 배치 맵 Synty 표현 조사 태그](GraphMap기획인계순환체계.md#배치-맵의-synty-표현-조사-태그)와 같은 후보를 참조한다. Synty 대장의 기능 분류를 배치 맵에 복제하지 않고 안정 코드·자산 계열·Prefab GUID·fingerprint만 연결한다. Graph Map은 필요한 시각 역할을, 배치 맵은 후보와 상대 배치 적합성을, Presentation E4 대장은 WI 판독 순간과 후보 동결을 각각 소유한다.
+
 애니메이션이 필요 없는 정적 WI에 억지로 AnimationRole을 만들지 않는다. 반대로 이동·전투·
 도구 접촉·수면 기상처럼 동작이 플레이 결과의 판독과 입력 복귀에 영향을 주면 단순
 `Actor Prefab 준비됨`으로 대체하지 않는다.

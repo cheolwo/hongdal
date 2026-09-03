@@ -1,0 +1,214 @@
+{
+  "schemaVersion": "simulation-world-placement-map-preparation-profile.v1",
+  "profileStableId": "placement-map-profile:forest-edge-farm:hans-living-farm",
+  "revision": 3,
+  "title": "숲 경계 한스 생활 농장 배치 준비 프로필",
+  "artifactGwaeCode": "TAE",
+  "relationGwaeCode": null,
+  "dataSourceKindCode": "ManualPlanning",
+  "stateCode": "ExactConstraintPending",
+  "traceabilityStateCode": "BalancedDraft",
+  "planningRef": "docs/AI/숲경계농장-H1-H2-배치맵-기획-2026-09-02.md",
+  "planningRevision": "forest-edge-farm-placement-map-planning.r24",
+  "planningSha256": "71DC5B47F34F23E5FC5119650C18EA8C699D92729EBF61569F13C18A89C27113",
+  "graphMapRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
+  "placementMapRef": null,
+  "h2DefinitionRef": "h2-candidate:forest-edge-farm",
+  "primarySyntyPackCode": "Farm",
+  "firstImpressionCode": "AgedButOperatingLivingFarm",
+  "supportPackPolicies": [
+    {
+      "packCode": "Construction",
+      "supportRoleCode": "DamageRepairRecoveryState",
+      "reason": "Farm 구조물의 손상·수리 중·복구 완료 차이를 보조하며 Farm 건물 문법을 대체하지 않는다."
+    },
+    {
+      "packCode": "Nature",
+      "supportRoleCode": "ForestBoundaryBuffer",
+      "reason": "농장 밖 숲 경계·완충 식생·바위 배경만 보조한다."
+    },
+    {
+      "packCode": "AlpineMountain",
+      "supportRoleCode": "OptionalNorthernDistantTerrain",
+      "reason": "Farm·Nature 후보만으로 북부 원경·경사·암반 표현이 부족할 때만 검토한다."
+    }
+  ],
+  "assetSurveyCatalogRefs": [
+    "eng/execution-ledgers/synty-asset-functional-modules.json",
+    "eng/execution-ledgers/playable-loop-synty-expression-modules.json",
+    "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json"
+  ],
+  "requiredPlacementInstances": [
+    {
+      "placementInstanceId": "placement-instance:forest-edge-farm:hans-residential-home",
+      "hDefinitionRef": "h1-stock:farm-residential-home",
+      "graphNodeRef": null,
+      "intendedGraphNodeRef": "gm-node:hans-house",
+      "graphBindingStateCode": "PendingStableNode",
+      "requirementCode": "RequiredForThisProfile",
+      "relativePlacementIntent": [
+        "InsideDamagedFenceBoundary",
+        "SlightlyElevatedObservationReference",
+        "PartialRoofVisibleFromForestTrail",
+        "FarmEntranceAndPartialFieldObservable",
+        "WorkYardAtSideOrRear",
+        "HarvestRouteBypassesInterior"
+      ],
+      "assetSurvey": {
+        "visualRequirementTags": ["생활 주택", "낡음", "운영 중", "작은 지붕 구멍 하나", "수리 상태 변형", "휴식 기준점"],
+        "sourcePreferenceCodes": ["SyntyOwnedFirst"],
+        "syntyPackCodes": ["Farm", "Construction"],
+        "functionalModuleCodes": ["exterior-structure", "construction-state"],
+        "assetFamilyIds": [
+          "synty-family:farm:buildings:shelter",
+          "synty-family:construction:props:wood-frame",
+          "synty-family:construction:props:plywood-stack"
+        ],
+        "candidateRefs": [],
+        "surveyStateCode": "InventoryMatched",
+        "modificationNeedCode": "BlenderPlanRequiredCandidate",
+        "inventoryEvidenceRefs": ["h1-stock:farm-residential-home", "synty-loop:nature-shelter-foundation.v1"],
+        "openGapCodes": [
+          "DedicatedHansHouseGraphNodePending",
+          "ExactPrefabGuidFingerprintPending",
+          "VisualReviewPending",
+          "BoundsPivotEntrancePending",
+          "ExistingPrefabVersusCompositionPending",
+          "RoofMeshStructurePending"
+        ],
+        "blenderGapSurvey": {
+          "stateCode": "PlanningOnly",
+          "evaluationOrderCodes": ["ExistingPrefab", "CompositionOnly", "ProjectOwnedVariant", "BlenderPlanRequired", "BlenderValidatedCopy"],
+          "singleDamageCueCode": "SmallRoofHoleVisibleFromForestTrail",
+          "compositionCandidates": ["판재", "비계", "사다리", "천", "목재", "생활 소품"],
+          "meshChangeCandidateCodes": ["RoofHole", "BrokenEdge", "ExposedCrossSection"],
+          "requiredInputEvidenceCodes": ["ExactSourceFbx", "SourcePrefabGuidFingerprint", "RoofMeshTopology", "MaterialSlots"],
+          "requiredOutputPlanCodes": ["ProjectOwnedPath", "DistinctStableId", "SourceLineage", "OutputFingerprint"],
+          "requiredValidationCodes": ["Axis", "Unit", "Pivot", "MaterialSlots", "Normals", "UV", "Collider", "Bounds", "SameCameraDistanceBeforeAfter"],
+          "executionApproved": false
+        }
+      }
+    },
+    {
+      "placementInstanceId": "placement-instance:forest-edge-farm:mixed-crop-field",
+      "hDefinitionRef": "h1-expression:farm:혼합-작물밭",
+      "graphNodeRef": "gm-node:farm-production",
+      "intendedGraphNodeRef": "gm-node:farm-production",
+      "graphBindingStateCode": "ExistingNode",
+      "requirementCode": "RequiredForThisProfile",
+      "relativePlacementIntent": ["VisibleAfterBoundaryEntry", "SecondaryOpenRoute", "ProductionAreaReadable"],
+      "assetSurvey": {
+        "visualRequirementTags": ["경작", "춘분", "혼합 작물", "최근 작업 흔적", "생산 판독"],
+        "sourcePreferenceCodes": ["SyntyOwnedFirst"],
+        "syntyPackCodes": ["Farm"],
+        "functionalModuleCodes": ["world-surface", "nature-vegetation", "exterior-functional-prop"],
+        "assetFamilyIds": [],
+        "candidateRefs": [],
+        "surveyStateCode": "InventoryMatched",
+        "modificationNeedCode": "Unknown",
+        "inventoryEvidenceRefs": ["h1-expression:farm:혼합-작물밭"],
+        "openGapCodes": ["VisualCombinationPending", "ExactPrefabGuidFingerprintPending", "BoundsPivotPending", "TraversalPending"]
+      }
+    },
+    {
+      "placementInstanceId": "placement-instance:forest-edge-farm:damaged-fence-entry",
+      "hDefinitionRef": "h1-stock:nature-farm-edge",
+      "graphNodeRef": "gm-node:hans-broken-fence",
+      "intendedGraphNodeRef": "gm-node:hans-broken-fence",
+      "graphBindingStateCode": "ExistingNode",
+      "requirementCode": "RequiredForThisProfile",
+      "relativePlacementIntent": ["NatureFarmBoundary", "PrimaryEntryReadable", "RepairBeforeAfterComparable"],
+      "assetSurvey": {
+        "visualRequirementTags": ["경계", "부분 손상", "운영 통행", "수리 전후", "출입구"],
+        "sourcePreferenceCodes": ["SyntyOwnedFirst"],
+        "syntyPackCodes": ["Farm", "Construction"],
+        "functionalModuleCodes": ["exterior-structure", "exterior-functional-prop", "construction-state"],
+        "assetFamilyIds": ["synty-family:farm:props:fence-wood", "synty-family:construction:props:barrier"],
+        "candidateRefs": [],
+        "surveyStateCode": "InventoryMatched",
+        "modificationNeedCode": "Unknown",
+        "inventoryEvidenceRefs": ["synty-loop:nature-night-day2.v1"],
+        "openGapCodes": ["StateVariantPending", "ExactPrefabGuidFingerprintPending", "EntryGapBoundsPending", "TraversalPending"]
+      }
+    },
+    {
+      "placementInstanceId": "placement-instance:forest-edge-farm:barn-work-yard",
+      "hDefinitionRef": "h1-expression:farm:헛간-작업마당",
+      "graphNodeRef": "gm-node:farm-work-yard",
+      "intendedGraphNodeRef": "gm-node:farm-work-yard",
+      "graphBindingStateCode": "ExistingNode",
+      "requirementCode": "RequiredForThisProfile",
+      "relativePlacementIntent": ["SideOrRearOfHome", "HomeEntranceSightlineClear", "HarvestRouteBypassesInterior"],
+      "assetSurvey": {
+        "visualRequirementTags": ["보관", "작업", "최근 사용 도구", "목재 적치", "수확 바구니", "측후면"],
+        "sourcePreferenceCodes": ["SyntyOwnedFirst"],
+        "syntyPackCodes": ["Farm", "Construction"],
+        "functionalModuleCodes": ["exterior-structure", "exterior-functional-prop", "construction-state"],
+        "assetFamilyIds": [
+          "synty-family:farm:props:table",
+          "synty-family:farm:props:rack",
+          "synty-family:farm:props:crate",
+          "synty-family:construction:props:crate",
+          "synty-family:construction:props:plywood-stack"
+        ],
+        "candidateRefs": [],
+        "surveyStateCode": "InventoryMatched",
+        "modificationNeedCode": "Unknown",
+        "inventoryEvidenceRefs": ["h1-expression:farm:헛간-작업마당", "synty-loop:nature-night-day2.v1"],
+        "openGapCodes": ["CompositionPending", "ExactPrefabGuidFingerprintPending", "BoundsPivotPending", "WorkRoutePending"]
+      }
+    },
+    {
+      "placementInstanceId": "placement-instance:forest-edge-farm:forest-buffer",
+      "hDefinitionRef": "h1-expression:nature:숲-가장자리",
+      "graphNodeRef": "gm-node:nature-farm-edge",
+      "intendedGraphNodeRef": "gm-node:nature-farm-edge",
+      "graphBindingStateCode": "ExistingNode",
+      "requirementCode": "RequiredForThisProfile",
+      "relativePlacementIntent": ["OutsideFarmBoundary", "PartialOcclusionWithoutTraversalBlock", "RoofAndFenceCluesRemainReadable"],
+      "assetSurvey": {
+        "visualRequirementTags": ["숲 가장자리", "침엽수 후보", "부분 차폐", "눌린 접근 동선", "춘분 색감"],
+        "sourcePreferenceCodes": ["SyntyOwnedFirst"],
+        "syntyPackCodes": ["Nature", "AlpineMountain"],
+        "functionalModuleCodes": ["world-surface", "nature-vegetation"],
+        "assetFamilyIds": [
+          "synty-family:nature:trees:birch",
+          "synty-family:nature:trees:pine",
+          "synty-family:nature:trees:large",
+          "synty-family:nature:plants:grass",
+          "synty-family:nature:plants:undergrowth",
+          "synty-family:nature:rocks:small"
+        ],
+        "candidateRefs": [],
+        "surveyStateCode": "InventoryMatched",
+        "modificationNeedCode": "Unknown",
+        "inventoryEvidenceRefs": ["h1-expression:nature:숲-가장자리", "h1-expression:nature:숲-빈터-고사목", "synty-loop:nature-shelter-foundation.v1"],
+        "openGapCodes": ["DensityAndPalettePending", "ExactPrefabGuidFingerprintPending", "VisualReviewPending", "TraversalOcclusionPending"]
+      }
+    }
+  ],
+  "globalH2Requirement": false,
+  "frozenPlacementMapRef": null,
+  "validationResultCode": "Blocked",
+  "blockingReasons": [
+    "CurrentGraphMapRevisionHasUnintegratedFederationReferences",
+    "DedicatedHansHouseGraphNodePending",
+    "GraphVisualRequirementTagsPending",
+    "ExactInstanceCountPending",
+    "ExactConstraintValuesPending",
+    "AssetCandidateFingerprintPending",
+    "FrozenPlacementMapNotCreated"
+  ],
+  "assetSurveyBoundary": {
+    "inventoryMatchIsAssignment": false,
+    "visualReviewCompleted": false,
+    "staticCompatibilityVerified": false,
+    "unityVerified": false,
+    "automaticPrefabAssignment": false,
+    "syntySourceModificationAllowed": false,
+    "blenderExecutionApproved": false
+  },
+  "authorityBoundary": "이 프로필은 한스 생활 농장의 다섯 표현 역할과 보유 재고 조사 상태만 준비한다. InventoryMatched는 정확 Prefab 선택·배치·통행·Unity 검증·일반 H2·WI·Simulation 상태·E5를 승인하지 않는다.",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

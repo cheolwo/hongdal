@@ -74,6 +74,7 @@
     "town:버스 정류장·보행 쉼터",
     "town:생활 공공광장",
     "town:읍내 상점 전면",
+    "town:저층 주택 블록",
     "town:정원·담장 경계",
     "transition:Farm–Hub 전환",
     "transition:Farm–Town 전환",
@@ -84,7 +85,7 @@
     "transition:Town–Hub 전환"
   ],
   "derivationRecipeCode": "h4.farm-hub-town-region.r1",
-  "derivationInputHashSha256": "449acbd0f752dcc48143db611adc6c106d9fe87904b6635db9c922e579c5a91d",
+  "derivationInputHashSha256": "0cec255b04484c1338509c729d01b0dad22f3abc955ea0083d3099575b0a2b93",
   "authoredDocument": "authored/h4/farm-hub-town-region.v3.md",
   "unresolvedItems": [
     "하위 H3 구성·관계와 외부 연결구에 대한 사람의 설계 검토가 필요하다."

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-world-spatial-design-knowledge-expansion.v2",
-  "revision": "simulation-world-spatial-design-knowledge-expansion.r13",
+  "revision": "simulation-world-spatial-design-knowledge-expansion.r14",
   "summary": "기존 v1 재고에 추가할 예상 게임 플레이와 Nature 위협·회복, Farm·Town 사건 대응 기반 H1·H2·H3 상향식 설계 지식이다. H 정의는 위치 독립 설계만 담고 실제 배치는 E5, 공공데이터 계보는 E6에서 별도로 연결한다.",
   "h1Additions": [
     {
@@ -53,6 +53,24 @@
       "connectorRoleCodes": ["WorkerAccess"],
       "grammarSetRefs": ["farm:헛간 작업마당", "town:버스 정류장·보행 쉼터"],
       "qualificationSignals": { "requiredByExistingWi": true, "likelyFutureGameplay": true, "reusableAcrossWorlds": true, "representableByOwnedSynty": true }
+    },
+    {
+      "inventoryId": "h1-stock:farm-residential-home",
+      "title": "농장 생활 주택",
+      "summary": "농장 안에서 영속적인 생활 주택의 건물 정체성, footprint, 출입구, 내외부 경계, 관찰 시야와 소유·이용 허락 경계를 제공하는 공간이다.",
+      "groupCode": "FarmProductionSupport",
+      "stateCode": "ExploratoryInventory",
+      "originModeCode": "WorldIntent",
+      "wiIds": [],
+      "anticipatedGameplayCodes": ["ResidentialBuildingIdentity", "ResidenceAccessBoundary", "ResidentialObservationSightline"],
+      "spatialRoleCodes": ["FarmResidentialHome"],
+      "capabilityCodes": ["Spatial.ResidentialBuildingIdentity", "Spatial.ResidentialFootprint", "Spatial.ResidentialEntrance", "Spatial.ResidentialInteriorBoundary", "Spatial.ResidentialObservationSightline", "Spatial.ResidentialUsePermissionBoundary"],
+      "capacityConceptCodes": ["BuildingFootprint", "ResidenceOccupancy"],
+      "predecessorH1Refs": [],
+      "successorH1Refs": [],
+      "connectorRoleCodes": ["FarmHomeIngress", "FarmHomeObservation", "ResidentPermissionBoundary"],
+      "grammarSetRefs": ["farm:헛간 작업마당", "town:저층 주택 블록"],
+      "qualificationSignals": { "requiredByExistingWi": false, "likelyFutureGameplay": true, "reusableAcrossWorlds": true, "representableByOwnedSynty": false }
     },
     {
       "inventoryId": "h1-stock:farm-harvest-staging",

@@ -10,7 +10,6 @@
 | `H1` | `h1-expression:nature:침엽수림-군집` 침엽수림 군집 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H1` | `h1-expression:nature:혼효림-군집` 혼효림 군집 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H1` | `h1-expression:nature:활엽수림-군집` 활엽수림 군집 — Nature 단독 표현 | 연결된 행동 공간 H1이 없다. |
-| `H1` | `h1-expression:town:저층-주택-블록` 저층 주택 블록 — Town 단독 표현 | 연결된 행동 공간 H1이 없다. |
 | `H4` | `h4-blueprint:farm-hub-town-region` Farm–Hub–Town 연결권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |
 | `H4` | `h4-blueprint:farm-production-processing-region` 농업 생산·후처리권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |
 | `H4` | `h4-blueprint:logistics-hub-region` 물류 Hub권 | 실제 AreaSet 세계 의도와 지역 근거가 없다. |

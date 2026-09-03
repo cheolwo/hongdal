@@ -6,7 +6,7 @@
   "cardKindCode": "PackExpression",
   "title": "저층 주택 블록 — Town 단독 표현",
   "summary": "저층 주택 블록 의미군의 A/B/C 표현 변형을 한 장으로 묶은 위치 독립 팩 단독 탐색 카드다.",
-  "knowledgeStateCode": "IdeaInventory",
+  "knowledgeStateCode": "ExploratoryInventory",
   "originModeCode": "ExpressionExploration",
   "sourcePackCode": "Town",
   "sourceGrammarSetRef": "town:저층 주택 블록",
@@ -52,11 +52,13 @@
     "maximumRendererCount": 3,
     "maximumColliderCount": 3
   },
-  "supportsInteractionH1Refs": [],
+  "supportsInteractionH1Refs": [
+    "h1-stock:farm-residential-home"
+  ],
   "derivationRecipeCode": "h1.pack-expression.town.r1",
   "derivationInputHashSha256": "580603c2a7633c2b96a7280045c5b8f0bc7bb5f157699bc5ed752749571a834c",
   "authoredDocument": "authored/h1-expression/town/저층-주택-블록.v3.md",
-  "unresolvedItems": "연결된 행동 공간 H1과 게임 기획 묶음이 없어 IdeaInventory로 격리한다.",
+  "unresolvedItems": "행동 공간 H1과 결합해도 WI·능력·용량은 별도 검토한다.",
   "presentationOnly": true,
   "isOperationalState": false
 }
