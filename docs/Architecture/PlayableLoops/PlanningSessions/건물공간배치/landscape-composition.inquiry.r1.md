@@ -1,5 +1,7 @@
 # LS-01 강변 Farm 경관 구성 검토
 
+- 현행 기획 계보: `PLAN-PLACEMENT-CROSS-AREA-BUILDING-001`, `PLAN-PLACEMENT-FOREST-EDGE-FARM-001`
+- 현행화 판정: `ReusedAsIs / SupportingInquiry`; 강변 Farm 경관의 승인 구성은 보존하되 이 문서만으로 새 기획 ID·실제 배치·E5를 만들지 않음
 - 판본: `landscape-composition.inquiry.r2`, `LS-01/r2`, 2026-08-30.
 - 상태: `Confirmed` (D-362). 사용자가 Q387~396 전체 추천안을 채택했다. 구체 자산/후보의 실제 검증과 실행 명세 결속은 별도다.
 - 목적: 이미 정한 강변 Farm 첫 H2를 보기 좋고 플레이하기 쉬운 경관으로 구체화한다. 모든 Farm/Town/City의 형태를 하나로 고정하지 않는다.

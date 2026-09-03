@@ -1,5 +1,16 @@
 # Solo 업무 위임·예외 처리 문답
 
+- 기획 ID: `PLAN-GAMEPLAY-DELEGATION-001`
+- 기획 분야: `게임플레이 / 업무 위임`
+- 기획 판본: `solo-work-delegation.inquiry.r3`
+- 상태: `Synthesizing`
+- 상위 기획: `PLAN-GAMEPLAY-MULTI-AREA-CHOICE-001`, `PLAN-STORY-DUAL-PROTAGONIST-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-267~Q-268과 기존 Q-129·Q-152·Q-154는 역사 계보, 현행 기준은 이 문서
+- 관련 WI·PlayableLoop: 대표 업무 선택 전이며 NPC 역량·권한·도구·시설·예외 반환 계약을 재사용
+- Graph Map 영향: 위임된 Actor·업무 노드·경로·실패 반환 관계를 레벨 1 후보로 제공
+- 다음 질문 또는 인계 상태: 대표 업무 하나를 고르기 전까지 공통 위임 약속만 유지하고 모든 업무 자동화를 주장하지 않음
+
 ## 식별과 현재 위치
 
 - 문답 고유 식별자: `inquiry:solo-work-delegation.r1`

@@ -1,5 +1,16 @@
 # Hub 수요·분배·출고 준비 문답 정밀화 기록
 
+- 기획 ID: `PLAN-GAMEPLAY-HUB-DEMAND-001`
+- 기획 분야: `게임플레이 / Hub 수요·분배`
+- 기획 판본: `hub-demand-allocation.inquiry.r1`
+- 상태: `Synthesizing`
+- 상위 기획: `PLAN-STORY-HUB-DISCOVERY-001`, `PLAN-GRAPH-HUB-LOGISTICS-CIRCULATION-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-240~Q-250은 역사 계보, 현행 기준은 이 문서와 허브 물류 순환 기획
+- 관련 WI·PlayableLoop: `playable-loop:hub-outbound-ready-return.v1`, 선행 `playable-loop:hub-inbound-putaway.v1`
+- Graph Map 영향: 수요·할당·부족·조달·출고 준비와 허브 내부 H1 순환 관계를 제공
+- 다음 질문 또는 인계 상태: `Q-250` 미완료 대응은 Deferred이며 첫 독립 Hub 결과와 H 결속이 남아 있음
+
 ## 식별과 현재 위치
 
 - 문답 고유 식별자: `inquiry:hub-demand-allocation.r1`

@@ -1,5 +1,15 @@
 # 농장생활 — 수확 가능 직후의 여유
 
+- 기획 ID: `PLAN-GAMEPLAY-FARM-CROP-LIFE-001`
+- 기획 분야: `게임플레이 / Farm 재배·수확`
+- 기획 판본: `harvest-ready-grace-window.inquiry.r1`
+- 상태: `Asked`
+- 상위 기획: `PLAN-GAMEPLAY-MULTI-AREA-CHOICE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: [영역별 건물·공간·배치 문답](building-spatial-placement.inquiry.r1.md), [Farm 생활·위임 보완](../../Farm생활위임-FB01개발승인보완.md)
+- 관련 WI·PlayableLoop: `farm-crop-cycle`, `WI-FARM-04`; 지연 정책 질문이며 새 WI가 아님
+- Graph Map 영향: Farm 작물 상태와 수확 선택의 시간 레이어 후보이며 공간 배치를 직접 바꾸지 않음
+- 다음 질문 또는 인계 상태: 수확 가능 직후 손실 전 여유를 둘지 `Asked`로 유지
 - 판본: `harvest-ready-grace-window.inquiry.r1` (2026-08-31)
 - 상태: `Asked`; 추천안은 미승인.
 - 질문 식별: `harvest-ready-grace-window` — 기존 `Q-농장생활-D3-01 · Q378`의 시간 조건 후속. 새 전체 Q 번호를 임의 배정하지 않는다.

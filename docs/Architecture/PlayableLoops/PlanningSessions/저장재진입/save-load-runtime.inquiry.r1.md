@@ -1,5 +1,16 @@
 # 저장·Load·재진입 문답
 
+- 기획 ID: `PLAN-SYSTEM-SAVE-REENTRY-001`
+- 기획 분야: `시스템 / 저장·재진입`
+- 기획 판본: `save-load-runtime.inquiry.r1`
+- 상태: `Refining`
+- 상위 기획: `PLAN-GAME-COMMON-PURPOSE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-072~Q-076·Q-139~Q-140은 역사 계보, 현행 기준은 이 문서와 PlayableLoop별 Save/Replay 기준
+- 관련 WI·PlayableLoop: 모든 PlayableLoop의 저장·Load·중단·재진입을 지원하되 각 판본의 실제 저장 증거가 필요
+- Graph Map 영향: `NoDirectTopologyChange`; 저장된 노드·엣지 상태의 revision 계보만 참조
+- 다음 질문 또는 인계 상태: 대표 PlayableLoop마다 실제 종료·Load·재진입 증거를 별도로 결속
+
 ## 식별과 현재 위치
 
 - 문답 고유 식별자: `inquiry:save-load-runtime.r1`

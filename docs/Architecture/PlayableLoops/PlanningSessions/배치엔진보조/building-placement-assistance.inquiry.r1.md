@@ -1,5 +1,8 @@
 # 시스템 보조 건물 배치 문답
 
+- 현행 기획 계보: `PLAN-PLACEMENT-CROSS-AREA-BUILDING-001`, `PLAN-PLACEMENT-FOREST-EDGE-FARM-001`
+- 현행화 판정: `ReusedAsIs / SupportingInquiry`; 시스템 보조 배치 선택은 현행 배치 기획의 근거이며 별도 자동 배치 승인이나 새 기획 ID가 아님
+
 ## 식별과 현재 위치
 
 - 문답 고유 식별자: `inquiry:building-placement-assistance.r1`

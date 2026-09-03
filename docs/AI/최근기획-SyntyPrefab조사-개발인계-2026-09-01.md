@@ -1,8 +1,16 @@
 # 최근 기획 Synty Prefab 조사 — 개발 인계
 
+- 기획 ID: `PLAN-PRESENTATION-SYNTY-SURVEY-001`
+- 기획 분야: `표현 / Synty 자산 조사`
 - 기획 판본: `recent-planning-synty-survey-handoff.r2`, 2026-09-01
 - 결정: D-554~D-555
 - 상태: `ApprovedResearchHandoff / PresentationE4Only`
+- 상위 기획: `PLAN-GAMEPLAY-MULTI-AREA-CHOICE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: D-554~D-555는 과거 이력, 현행 기준은 이 문서와 [Synty 표현 모듈 체계](../Architecture/플레이폐루프Synty표현모듈체계.md)
+- 관련 WI·PlayableLoop: 각 기획의 Presentation E4 후보 조사이며 실제 WI 결속·Rig·입력·Scene·E5는 별도
+- Graph Map 영향: 승인된 역할 후보의 `VisualKey`·자산 fingerprint만 개별 노드 표현 후보로 반환
+- 다음 질문 또는 인계 상태: P0~P2 후보를 현행 기획 ID와 재결속하고 미확보 역할은 구매·가공 승인 없이 공백으로 유지
 - 기준: [Presentation 단계별 Synty 자산 조사](Presentation단계별Synty자산조사-2026-08-31.md), [Synty 표현 모듈 체계](../Architecture/플레이폐루프Synty표현모듈체계.md)
 - 상위 이야기: [Mirror r73](메인스토리-거울의흐름-기획-2026-09-01.md)
 

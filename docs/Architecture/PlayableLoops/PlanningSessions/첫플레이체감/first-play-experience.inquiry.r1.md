@@ -1,5 +1,15 @@
 # 첫 플레이 체감과 반복 문답
 
+- 기획 ID: `PLAN-GAMEPLAY-FIRST-EXPERIENCE-001`
+- 기획 분야: `게임플레이 / 첫 플레이·발견`
+- 기획 판본: `first-play-experience.inquiry.r10`
+- 상태: `ConfirmedDirection / RuntimeEvidenceSeparate`
+- 상위 기획: `PLAN-STORY-MIRROR-MAIN-001`
+- 관련 하위 기획: `PLAN-STORY-FIRST-FARM-DISCOVERY-001`, `PLAN-GAMEPLAY-NATURE-SHELTER-001`
+- 관련 결정·기준: 과거 D-409·D-411~D-415는 역사 계보, 현행 기준은 이 문서와 한스 농장 현행 기획
+- 관련 WI·PlayableLoop: 첫 이동·발견·도움 필요 판독·선택·귀환 후보이며 강제 시작 경로는 아님
+- Graph Map 영향: Nature 경계에서 선택 가능한 첫 발견 노드·날씨 단서·Farm 접근 관계를 제공
+- 다음 질문 또는 인계 상태: 한스 농장 현행 기획이 정확 첫 행동을 소유하며 나머지 첫 체감 후보는 별도 선택으로 유지
 - 내용 판본: `first-play-experience.inquiry.r10`, 2026-08-31, D415. 대표 장면은 눈 없는 춘분의 봄으로 전환하고 역할 분담·작은 식사·압박 완화·가방 필요의 후속 답변을 기존 보완본 r3에 연결한다. D411 구간·D412 춘분·D413 자료와 D409 날씨별 발견/전투 후속 구분은 보존한다.
 - 이전 r9 SHA256: `F6EBC5EC0ABA7FA43E14B3286FABE7C388520B401776A9AF23959AA2D94298E9`.
 - 이전 r8 SHA256: `4AF026C29628BAFEB1A4084E074533C7206368799AF26F41644BC64654B9751F`.

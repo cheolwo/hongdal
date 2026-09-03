@@ -1,5 +1,8 @@
 # Nature Night Day2 통합 문답 아카이브
 
+- 현행 기획 계보: `PLAN-GAMEPLAY-NATURE-SHELTER-001`, `PLAN-GAMEPLAY-NATURE-RESOURCE-CONSTRUCTION-001`, `PLAN-GAMEPLAY-HERBAL-CRAFTING-001`, `PLAN-SYSTEM-SAVE-REENTRY-001`
+- 현행화 판정: `ReferenceOnly / FrozenCompatibilityArchive`; 현행 답변을 이 파일에 추가하지 않으며 분리된 주제 기획이 현재 내용을 소유
+
 > 이 문서는 Q-001~Q-075의 상세 조사·답변 당시 상태를 보존하는 동결 호환 아카이브다.
 > 현재 routing과 이후 문답 위치는 [PlanningSessions 문답 기록 경로](README.md)를 따른다. 새 질문과 답변은 이 파일에 추가하지 않는다.
 

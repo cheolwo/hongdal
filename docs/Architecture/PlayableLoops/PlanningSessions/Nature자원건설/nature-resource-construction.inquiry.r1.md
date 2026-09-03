@@ -1,9 +1,20 @@
 # Nature 자원·LandUse·건설 문답
 
+- 기획 ID: `PLAN-GAMEPLAY-NATURE-RESOURCE-CONSTRUCTION-001`
+- 기획 분야: `게임플레이 / Nature 자원·건설`
+- 기획 판본: `nature-resource-construction.inquiry.r6`
+- 상태: `Refining`
+- 상위 기획: `PLAN-GAMEPLAY-FIRST-EXPERIENCE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-036~Q-134 일부와 동결 통합 아카이브는 역사 계보, 현행 기준은 이 문서
+- 관련 WI·PlayableLoop: 자원 재생·LandUse 제외·청사진·재료 투입·단계 건설 후보
+- Graph Map 영향: 자원 원천·건설 후보지·LandUse·접근·재생 관계와 배치 제약 후보를 제공
+- 다음 질문 또는 인계 상태: 자연 복원·안전 회복 H2에서 재탐색을 여는 최소 복원선 문답 중
+
 ## 식별
 
 - 문답 고유 식별자: `inquiry:nature-resource-construction.r1`
-- 내용 개정: `nature-resource-construction.inquiry.r5` (2026-08-30, 기존 파일명·고유 식별자는 참조 호환 유지)
+- 내용 개정: `nature-resource-construction.inquiry.r6` (2026-09-03, 기존 파일명·고유 식별자는 참조 호환 유지)
 - 이관 질문: `Q-036~Q-039`, `Q-051~Q-060`, `Q-134`
 - 상세 원문·조사 계보: [동결 통합 아카이브](../nature-night-day2.inquiry.r1.md)
 - 상태: `Refining`
@@ -92,6 +103,20 @@
 - 회수 위치와 위 후속 문답의 미정 계산 경계
 - 손상·수리·완성 건물 해체의 자원 반환 규칙
 - 건설 단계별 실제 Animation과 Audio Profile
+
+## 자연 복원·안전 회복 H2 — 현재 질문
+
+- 질문 ID: `Q-NATURE-H2-RESTORATION-REOPEN-01.r1`
+- 상태: `Asked / 현재 우선`
+- 지금: 위협·사고·악천후로 파티가 후퇴한 뒤 복원 작업을 시작하는 시점
+- 여기: `h1-stock:nature-restoration-site`와 `h1-stock:nature-safe-recovery-camp`가 연결되는 자연 복원·안전 회복 H2
+- 나: 위험 원인을 확인하고 직접 복원하거나 NPC에게 역할을 나누는 플레이어
+- 너: 손상된 자연 지점·막힌 경로·회복이 필요한 동행대와 안전 거점
+- 이렇게: 위험 원인을 제거하고 최소 생태 기반을 회복한 뒤 안전 거점과 통행을 다시 연결한다.
+- 질문: 재탐색은 길만 다시 통과 가능해지면 열까, 아니면 **위험 원인 제거 + 최소 생태 기반 회복 + 안전 거점 연결**이 모두 확인된 뒤 열까?
+- 추천: 세 조건을 모두 요구하되 완전한 원상복구까지 기다리지는 않는다. 그래야 통행 가능만으로 훼손을 방치하지 않으면서도 복원 H2 하나에 영구 생태 완성을 요구하지 않는다.
+- 대가: 최소 생태 기반과 안전 거점 연결을 판독하는 상태·표현 기준이 필요하며, 복원 완료와 파티 회복 완료를 같은 상태로 뭉개지 않아야 한다.
+- 경계: 이 질문은 H2 완료 조건의 기획 초안이다. 새 WI·Graph Map·배치 맵·Unity·Evidence를 자동 생성하거나 승격하지 않는다.
 
 ## 취소 확정 전 재료 안내 — 후속 문답
 

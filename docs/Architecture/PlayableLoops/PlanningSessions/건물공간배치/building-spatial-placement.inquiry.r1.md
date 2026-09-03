@@ -1,5 +1,16 @@
 # 영역별 건물·공간·배치 문답 정밀화 기록
 
+- 기획 ID: `PLAN-PLACEMENT-CROSS-AREA-BUILDING-001`
+- 기획 분야: `배치 맵 / 영역별 건물·공간`
+- 기획 판본: `cross-area-building-spatial-placement.inquiry.r3`
+- 상태: `Open`
+- 상위 기획: `PLAN-WORLD-FOUR-AREAS-001`
+- 관련 하위 기획: `PLAN-PLACEMENT-FOREST-EDGE-FARM-001`, `PLAN-GAMEPLAY-FARM-CROP-LIFE-001`
+- 관련 결정·기준: 과거 Q-077~Q-339과 D-357은 역사 계보, 현행 기준은 이 문서와 [기획 문서 독립 관리 체계](../../../기획문서독립관리체계.md)
+- 관련 WI·PlayableLoop: 대표 영역 폐루프 선택 전이며 기존 배치·Farm WI 관계만 보존
+- Graph Map 영향: 영역별 H·진입·통행·시설 관계와 배치 제약 후보를 제공하되 실제 노드·제약은 승인 판본으로 별도 인계
+- 다음 질문 또는 인계 상태: 미정 배치 의미를 기존 확정과 구분해 한 질문씩 정밀화하고 현행 숲 경계 농장 기획과 중복하지 않음
+
 ## 식별과 현재 위치
 
 - 문답 고유 식별자: `inquiry:cross-area-building-spatial-placement.r1`

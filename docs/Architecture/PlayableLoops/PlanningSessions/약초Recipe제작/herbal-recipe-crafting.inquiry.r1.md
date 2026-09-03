@@ -1,5 +1,16 @@
 # 약초·Recipe·조합 제작 문답
 
+- 기획 ID: `PLAN-GAMEPLAY-HERBAL-CRAFTING-001`
+- 기획 분야: `게임플레이 / 약초·Recipe 제작`
+- 기획 판본: `herbal-recipe-crafting.inquiry.r30`
+- 상태: `Refining / SourceRecoveryGapQ272To274`
+- 상위 기획: `PLAN-GAMEPLAY-MULTI-AREA-CHOICE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-045~Q-377과 HB-01 계보, 현행 기준은 이 문서와 [Nature 기초 약초 회복](../../Nature기초약초회복.md)
+- 관련 WI·PlayableLoop: `playable-loop:nature-basic-herbal-recovery.v1`과 약초 식별·채집·Recipe·달이기·음용 후보
+- Graph Map 영향: 약초 자원·야영지·물·열원·용기·귀환 관계를 레벨 1 후보로 제공하며 자산 배치를 자동 확정하지 않음
+- 다음 질문 또는 인계 상태: `Q-272~Q-274` 원문 소실은 복구 전까지 `EvidenceMissing`; 다음 미정 묶음은 별도 질문으로 정밀화
+
 ## 식별
 
 - 문답 고유 식별자: `inquiry:herbal-recipe-crafting.r1`

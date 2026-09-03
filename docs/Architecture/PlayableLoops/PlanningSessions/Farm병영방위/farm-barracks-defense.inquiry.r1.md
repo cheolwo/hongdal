@@ -1,5 +1,16 @@
 # Farm 병영·방위 문답 정밀화 기록
 
+- 기획 ID: `PLAN-GAMEPLAY-FARM-DEFENSE-001`
+- 기획 분야: `게임플레이 / Farm 병영·방위`
+- 기획 판본: `farm-barracks-defense.inquiry.r1`
+- 상태: `ReadyForSynthesis`
+- 상위 기획: `PLAN-STORY-YODONG-DEFENSE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 병영 D1~D5 문답은 역사 계보, 현행 기준은 이 문서와 요동성 방어 기획
+- 관련 WI·PlayableLoop: `playable-loop:farm-barracks-defense.v1` 후보, 농민 소집·전문병 성장·분대·초소·귀환·치료
+- Graph Map 영향: 병영·초소·순찰·방어 구역·귀환·치료 노드와 지휘·위협 레이어 관계를 제공
+- 다음 질문 또는 인계 상태: D1~D5 합성 뒤 대표 WI 분해와 Formation·Animation 연구가 필요
+
 ## 식별과 현재 위치
 
 - 문답 고유 식별자: `inquiry:farm-barracks-defense.r1`

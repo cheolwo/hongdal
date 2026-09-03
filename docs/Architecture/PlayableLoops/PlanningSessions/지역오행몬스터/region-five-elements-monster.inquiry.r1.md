@@ -1,5 +1,16 @@
 # 지역 오행 몬스터·개척 준비 문답
 
+- 기획 ID: `PLAN-GAMEPLAY-REGIONAL-MONSTER-001`
+- 기획 분야: `게임플레이 / 지역 몬스터·개척`
+- 기획 판본: `region-five-elements-monster.inquiry.r5`
+- 상태: `Refining / SuitableCreatureAssetPending`
+- 상위 기획: `PLAN-STORY-YODONG-DEFENSE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-161~Q-194와 D-555는 역사 계보, 현행 기준은 이 문서
+- 관련 WI·PlayableLoop: Nature 탐사·흔적 조사·위협 대응·개척 준비 후보이며 대표 전투/귀환 폐루프는 미선정
+- Graph Map 영향: 서식지·흔적·위협 원천·경비·회랑·퇴로 관계를 위협 레이어 후보로 제공
+- 다음 질문 또는 인계 상태: 동물형·야수형 첫 경계 마수 의미는 유지하고 적합 Synty 자산 미확보를 보류
+
 ## 식별
 
 - 문답 고유 식별자: `inquiry:region-five-elements-monster.r1`

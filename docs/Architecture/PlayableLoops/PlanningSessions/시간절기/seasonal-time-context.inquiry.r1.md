@@ -1,5 +1,7 @@
 # 시간성 — 절기를 바탕으로 상황과 선택을 읽는다
 
+- 현행 기획 계보: `PLAN-TIME-SEASONAL-001`, `PLAN-TIME-SOLAR-TERM-TAROT-TURN-001`
+- 현행화 판정: `ReusedAsIs / AuthoritativeInquirySource`; 절기 문답 원문을 보존하고 조사 자료·전략 턴 기획이 필요한 범위만 참조
 - 파일 식별: `seasonal-time-context.inquiry.r1` (기존 경로 보존)
 - 내용 판본: `seasonal-time-context.inquiry.r5` (2026-08-31, D405)
 - 이전 r4 SHA256: `5C49D0C86A8028760D3720534562153AAB8B12A773EE136AB23E6C42C4628EFA` (D403 인계 이력)

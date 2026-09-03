@@ -1,5 +1,16 @@
 # Town 주문 수령·소비·귀환 문답
 
+- 기획 ID: `PLAN-GAMEPLAY-TOWN-ORDER-001`
+- 기획 분야: `게임플레이 / Town 주문·수령`
+- 기획 판본: `town-order-pickup.inquiry.r1`
+- 상태: `Refining`
+- 상위 기획: `PLAN-GAMEPLAY-MULTI-AREA-CHOICE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-135~Q-160 일부는 역사 계보, 현행 기준은 이 문서
+- 관련 WI·PlayableLoop: `playable-loop:town-order-consume-return.v1`과 주문 확인·수령·소비·귀환
+- Graph Map 영향: Town 수령 장소·선반·입고·귀환 경로와 상태 표시 관계를 제공
+- 다음 질문 또는 인계 상태: Town 독립 시작 상태와 대표 주문·소비 결과를 동결하기 전까지 실제 폐루프는 미완료
+
 ## 식별
 
 - 문답 고유 식별자: `inquiry:town-order-pickup.r1`

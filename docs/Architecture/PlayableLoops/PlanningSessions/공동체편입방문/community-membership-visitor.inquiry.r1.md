@@ -1,5 +1,16 @@
 # 공동체 편입·손님·원격 응대 문답
 
+- 기획 ID: `PLAN-GAMEPLAY-COMMUNITY-VISITOR-001`
+- 기획 분야: `게임플레이 / 공동체·방문`
+- 기획 판본: `community-membership-visitor.inquiry.r10`
+- 상태: `Synthesizing`
+- 상위 기획: `PLAN-GAMEPLAY-MULTI-AREA-CHOICE-001`
+- 관련 하위 기획: 없음
+- 관련 결정·기준: 과거 Q-199~Q-219·Q-359은 역사 계보, 현행 기준은 이 문서
+- 관련 WI·PlayableLoop: 공동체 편입·손님 체류·원격 응대 후보이며 대표 PlayableLoop는 미선택
+- Graph Map 영향: 방문자 후보·도착·체류·귀환과 공간 접근 관계를 레벨 1 후보로 제공
+- 다음 질문 또는 인계 상태: 후반 거래 확장과 약초 제작 문답을 분리하고 첫 적용 Area·대표 WI를 미선정으로 유지
+
 ## 식별과 현재 위치
 
 - 문답 고유 식별자: `inquiry:community-membership-visitor.r1`
