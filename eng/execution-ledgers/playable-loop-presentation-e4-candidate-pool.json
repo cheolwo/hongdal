@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "playable-loop-presentation-e4-candidate-pool.v1",
+  "revision": "playable-loop-presentation-e4-candidate-pool.r1",
+  "planningBaseline": {
+    "planId": "PLAN-PRESENTATION-E4-POOL-001",
+    "path": "docs/AI/Planning/표현/PLAN-PRESENTATION-E4-POOL-001/README.md",
+    "sha256": "82D796C6AB4F49E4821C6B99C28E076DEA3F4CECF9518D804BD90A6BE2315A56"
+  },
+  "planningIndex": {
+    "path": "docs/AI/PLANNING.md",
+    "sha256": "69F0A4D18028239C1780F6975FD5D7A8F40268276A8AFC856EE4BDF5E9DDB6CC",
+    "expectedPlanCount": 47
+  },
+  "sourceCatalogs": {
+    "playableLoops": "eng/execution-ledgers/playable-loops.json",
+    "worldInteractions": "eng/execution-ledgers/world-interactions.json",
+    "presentationModules": "eng/execution-ledgers/playable-loop-presentation-validation-modules.json",
+    "syntyExpressionModules": "eng/execution-ledgers/playable-loop-synty-expression-modules.json",
+    "hCatalog": "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json"
+  },
+  "classificationPolicy": {
+    "frozenPrimaryStatusPrefixes": ["Approved", "Confirmed"],
+    "notApplicablePlanIds": [
+      "PLAN-GAME-COMMON-PURPOSE-001",
+      "PLAN-PLANNING-PLAYER-CONTEXT-001",
+      "PLAN-PLANNING-WI-GWAE-001",
+      "PLAN-PLANNING-MIGRATION-001",
+      "PLAN-PLANNING-DECISION-READING-001",
+      "PLAN-GAMEPLAY-PROGRESSION-CLUSTERS-001",
+      "PLAN-SYSTEM-SAVE-REENTRY-001",
+      "PLAN-GRAPH-PLANNING-INTEGRATION-001",
+      "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001",
+      "PLAN-DATA-GAMEOBJECT-ASSET-001",
+      "PLAN-DATA-REALITY-MYSQL-001",
+      "PLAN-PRESENTATION-SYNTY-SURVEY-001",
+      "PLAN-PRESENTATION-E4-POOL-001"
+    ],
+    "notApplicableReason": "플레이 판독 대상 자체가 아니라 공통 목적·관리·검색·자료·검증 절차이므로 독립 E4 후보를 만들지 않는다. 소비 기획의 근거로만 재사용한다."
+  },
+  "normalization": {
+    "workOrderDirectory": "eng/execution-ledgers/work-orders",
+    "expectedExistingPresentationE4PreparationCount": 12,
+    "expectedExistingSyntyLoopModuleCount": 4,
+    "requiredPreparationIdentity": "workOrderRef+playableLoop+worldInteraction+visualKey",
+    "notApplicableIdentity": "workOrderRef+scopeReason",
+    "doesNotPromoteEvidence": true
+  },
+  "graphMapRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
+  "areaPreparations": [
+    {
+      "areaCode": "Nature",
+      "planId": "PLAN-GAMEPLAY-REGIONAL-MONSTER-001",
+      "loopStableId": "playable-loop:nature-regional-threat-recovery.v1",
+      "workOrderRef": null,
+      "readinessCode": "Blocked",
+      "earliestReopenStage": "E1",
+      "placementMapRef": null,
+      "hDefinitionRefs": [
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/nature-threat-watch.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/nature-emergency-retreat.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/nature-restoration-site.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/nature-safe-recovery-camp.v2.json"
+      ],
+      "constraintCodes": [],
+      "missing": ["ApprovedPlanningGate", "E7V2WorkOrder", "FrozenVisualKeys", "FrozenAssetFingerprints", "PlacementMapConstraints"],
+      "nextOwner": "기획: regional threat 승인 판본 결속; 개발: 승인 뒤 E7 v2 준비 명세; 공간: H·배치·통행 조사",
+      "worldInteractions": [
+        {"id":"WI-NATURE-01","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-NATURE-02","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-NATURE-03","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-NATURE-04","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]}
+      ],
+      "assetCandidates": []
+    },
+    {
+      "areaCode": "Farm",
+      "planId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "loopStableId": "playable-loop:farm-crop-cycle.v1",
+      "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json",
+      "readinessCode": "Blocked",
+      "earliestReopenStage": "E4",
+      "placementMapRef": "eng/world-seedbeds/placement-map-profiles/forest-edge-farm-hans-living-farm.v1.json",
+      "hDefinitionRefs": [
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/farm-production.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/farm-seed-preparation.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/farm-harvest-staging.v2.json"
+      ],
+      "constraintCodes": ["CultivationSupportPending", "PlayerTraversalPending", "CameraVisibilityPending"],
+      "missing": ["GraphMapRevisionStale", "PlacementMapBlocked", "ProductConsumerBinding", "ExactInteractionAnchors", "CurrentUnityBoundsAndTraversalEvidence"],
+      "nextOwner": "개발: 기존 preparation 소비 경로; 공간: 지지·통행·가시성 격리 검증",
+      "worldInteractions": [
+        {"id":"WI-FARM-01","visualKeys":["farm.crop.prepare"],"interactionAnchor":"TillingWorkArea","assetCandidateIds":["farm-dirt-rows-01"]},
+        {"id":"WI-FARM-02","visualKeys":["farm.crop.plant"],"interactionAnchor":"CropProduction","assetCandidateIds":["farm-potato-01-s"]},
+        {"id":"WI-FARM-03","visualKeys":["farm.crop.grow"],"interactionAnchor":"WaterAccessible","assetCandidateIds":["farm-potato-01-s","farm-potato-01-l"]},
+        {"id":"WI-FARM-04","visualKeys":["farm.crop.harvest"],"interactionAnchor":"HarvestWorkArea","assetCandidateIds":["farm-potato-box-01"]}
+      ],
+      "assetCandidates": [
+        {"id":"farm-dirt-rows-01","roleCode":"Primary","reuseDecision":"ConfigurationRequired","assetPath":"Assets/Synty/PolygonFarm/Prefabs/Environments/SM_Env_Dirt_Rows_01.prefab","guid":"c738b62174ab09f4eb2d7b486398a6ed","fileSha256":"1C9876DE7FE7B6F3800617ECB0B23C2206152D4AF1B7C6065193E7774356E15A","metaSha256":"8A15007ED17215972969BB5160F8BF65ED27F8E6CE3EB035DE011040E57D7F30","fingerprintKind":"SourceFileAndMetaSha256"},
+        {"id":"farm-potato-01-s","roleCode":"Primary","reuseDecision":"ConfigurationRequired","assetPath":"Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_S.prefab","guid":"53e5ab917382c9749a58810d6e170537","fileSha256":"2D5093E764F6F66C08EC2C862ECDF250745B66694CE5278622083E3C9FD12912","metaSha256":"EE7CDCB2404C218F97697C60B6E1299A307DDE102B9F52C1E54C1EBFE917BD70","fingerprintKind":"SourceFileAndMetaSha256"},
+        {"id":"farm-potato-01-l","roleCode":"Alternative","reuseDecision":"ConfigurationRequired","assetPath":"Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Plant_Potato_01_L.prefab","guid":"e48b8d820d122d64484926ce5e8f6e8c","fileSha256":"FC01F89A96545D8FBA023FCAE7BE54F4EAE5330306A46519D52D6F3C945FF627","metaSha256":"D960A73F1FB4EB2A5A55A3F8045C65B7FF0A889771AABECA8CA1085CDBB98703","fingerprintKind":"SourceFileAndMetaSha256"},
+        {"id":"farm-potato-box-01","roleCode":"Primary","reuseDecision":"ConfigurationRequired","assetPath":"Assets/Synty/PolygonFarm/Prefabs/Plants/SM_Prop_Box_Potato_01.prefab","guid":"2131bc3845099584ebe0cb30614e96f4","fileSha256":"A128993CF0644A5988A537A0196DC69DCD36619538FC499E01ED7F5A3377C583","metaSha256":"374ED7092770D129BFC362BAA94068F24CE76EADC5EE3B6AEE29A0498306011B","fingerprintKind":"SourceFileAndMetaSha256"}
+      ]
+    },
+    {
+      "areaCode": "Town",
+      "planId": "PLAN-GAMEPLAY-TOWN-ORDER-001",
+      "loopStableId": "playable-loop:town-order-consume-return.v1",
+      "workOrderRef": null,
+      "readinessCode": "Blocked",
+      "earliestReopenStage": "E1",
+      "placementMapRef": null,
+      "hDefinitionRefs": [
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/town-market-display.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/town-order-packing.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/town-resident-pickup.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/town-living-square.v2.json"
+      ],
+      "constraintCodes": [],
+      "missing": ["ApprovedPlanningGate", "OrderAndReservationSpatialDecision", "E7V2WorkOrder", "FrozenVisualKeys", "FrozenAssetFingerprints", "PlacementMapConstraints"],
+      "nextOwner": "기획: Town 주문 r1 확정; 개발: 승인 뒤 준비 명세; 공간·자산: 피킹·포장·수령·소비 후보 조사",
+      "worldInteractions": [
+        {"id":"WI-ORDER-01","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-ORDER-02","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-ORDER-03","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-ORDER-04","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-ORDER-05","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-ORDER-06","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-ORDER-07","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]}
+      ],
+      "assetCandidates": []
+    },
+    {
+      "areaCode": "Hub",
+      "planId": "PLAN-GAMEPLAY-HUB-DEMAND-001",
+      "loopStableId": "playable-loop:hub-outbound-ready-return.v1",
+      "workOrderRef": null,
+      "readinessCode": "Blocked",
+      "earliestReopenStage": "E1",
+      "placementMapRef": null,
+      "hDefinitionRefs": [
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/hub-outbound-staging.v2.json",
+        "eng/world-seedbeds/synty-bottom-up-inventory/definitions/h1/hub-temporary-staging.v2.json"
+      ],
+      "constraintCodes": [],
+      "missing": ["ApprovedPlanningGate", "E7V2WorkOrder", "FrozenVisualKeys", "FrozenAssetFingerprints", "PlacementMapConstraints"],
+      "nextOwner": "기획: Hub 수요·분배 r1 확정; 개발: 승인 뒤 준비 명세; 공간·자산: 창고·피킹·포장 후보 조사",
+      "worldInteractions": [
+        {"id":"WI-HUB-03","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-HUB-04","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-HUB-05","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]}
+      ],
+      "assetCandidates": []
+    },
+    {
+      "areaCode": "City",
+      "planId": "PLAN-STORY-CITY-DISCOVERY-001",
+      "loopStableId": "playable-loop:city-demand-service-return.v1",
+      "workOrderRef": null,
+      "readinessCode": "Blocked",
+      "earliestReopenStage": "E1",
+      "placementMapRef": null,
+      "hDefinitionRefs": [],
+      "constraintCodes": [],
+      "missing": ["ApprovedPlanningGate", "CityHDefinitions", "E7V2WorkOrder", "FrozenVisualKeys", "FrozenAssetFingerprints", "PlacementMapConstraints"],
+      "nextOwner": "기획: City 수요·서비스 승인 기획; 개발: 권위 Core와 준비 명세; 공간·자산: H·서비스 후보 조사",
+      "worldInteractions": [
+        {"id":"WI-CITY-01","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-CITY-02","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-CITY-03","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]},
+        {"id":"WI-CITY-04","visualKeys":[],"interactionAnchor":"","assetCandidateIds":[]}
+      ],
+      "assetCandidates": []
+    }
+  ]
+}
