@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "ssalddel-playable-loop-planning-e1-policy.v1",
+  "revision": "ssalddel-playable-loop-planning-e1-policy.r1",
+  "expectedPlanCount": 47,
+  "planningIndexRef": "docs/AI/PLANNING.md",
+  "playableLoopCatalogRef": "eng/execution-ledgers/playable-loops.json",
+  "atomicModuleLedgerRef": "eng/execution-ledgers/playable-loop-planning-atomic-e1-modules.json",
+  "atomicOutlineLedgerRef": "eng/execution-ledgers/playable-loop-planning-atomic-e1-outlines.json",
+  "crossCuttingPlanIds": [
+    "PLAN-GAME-COMMON-PURPOSE-001",
+    "PLAN-PLANNING-PLAYER-CONTEXT-001",
+    "PLAN-PLANNING-WI-GWAE-001"
+  ],
+  "noDirectE1ImpactPlanIds": [
+    "PLAN-PLANNING-MIGRATION-001",
+    "PLAN-PLANNING-DECISION-READING-001",
+    "PLAN-GRAPH-PLANNING-INTEGRATION-001",
+    "PLAN-GRAPH-LAYER-FIRST-WORKFLOW-001",
+    "PLAN-DATA-GAMEOBJECT-ASSET-001",
+    "PLAN-DATA-REALITY-MYSQL-001",
+    "PLAN-PRESENTATION-SYNTY-SURVEY-001",
+    "PLAN-PRESENTATION-E4-POOL-001"
+  ],
+  "classificationMeaning": {
+    "ContractOwner": "기획 문서가 한 PlayableUnit의 planningGate.designDocumentRef와 정확히 일치해 E1 계약을 직접 소유한다.",
+    "SupportingContext": "기획 문서가 PlayableUnit의 sourcePlanningDocumentRefs에 명시되어 E1 계약의 근거로 소비된다.",
+    "CrossCuttingContext": "여러 PlayableUnit이 공통으로 참고하는 목적·문답·탐색 메타데이터이며 단독 E1은 아니다.",
+    "NoDirectE1Impact": "관리·생성·Graph Map·자료·표현 조사 문서로서 단독 E1을 만들지 않는다.",
+    "E1CandidateNeeded": "현행 기획 목차에는 있으나 어떤 PlayableUnit의 E1 계약 또는 명시 근거에도 아직 결속되지 않았다."
+  },
+  "doesNotCreateGameplayMeaning": true,
+  "doesNotPromoteEvidence": true
+}

@@ -1,0 +1,393 @@
+{
+  "schemaVersion": "ssalddel-playable-loop-planning-atomic-e1-outlines.v1",
+  "revision": "ssalddel-playable-loop-planning-atomic-e1-outlines.r3",
+  "meaning": "기획 본문에서 플레이 결과 경계로 나눈 1차 후보이다. WI·권위·실패·귀환 계약을 검토한 원자 모듈이나 E1 증거가 아니다.",
+  "outlines": [
+    {
+      "sourcePlanId": "PLAN-ARCH-OPERATIONS-UNITY-TRANSFER-001",
+      "outlineKindCode": "OperationalProjectionComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:operations-unity-transfer.read-authorized-snapshot", "title": "권한 있는 Hub 입고 상태 사본 조회" },
+        { "candidateId": "atomic-outline:operations-unity-transfer.inspect-inbound-cargo", "title": "입고 화물 검수 선택과 결과 확인" },
+        { "candidateId": "atomic-outline:operations-unity-transfer.choose-putaway", "title": "보관 위치 선택과 적치 처리" },
+        { "candidateId": "atomic-outline:operations-unity-transfer.requery-and-return", "title": "권위 상태 재조회와 다음 Hub 작업 복귀" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-STORY-MIRROR-MAIN-001",
+      "outlineKindCode": "CrossLoopComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:mirror-main.nature-first-night", "title": "Nature 첫날 생존과 첫 밤 귀환" },
+        { "candidateId": "atomic-outline:mirror-main.hub-flow-discovery", "title": "Hub 물류 흐름 발견과 문제 확인" },
+        { "candidateId": "atomic-outline:mirror-main.town-workshop-contact", "title": "Town 공방 접촉과 첫 제작 경험" },
+        { "candidateId": "atomic-outline:mirror-main.yodong-defense-contribution", "title": "요동성 위협 인지와 방어 기여" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-STORY-DUAL-PROTAGONIST-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:dual-protagonist.choose-incarnation", "title": "모험가 또는 소가주 빙의 대상 선택" },
+        { "candidateId": "atomic-outline:dual-protagonist.form-first-party", "title": "첫 소규모 동행대 구성" },
+        { "candidateId": "atomic-outline:dual-protagonist.alchemy-prototype", "title": "고급 물약 원형 연구·제조" },
+        { "candidateId": "atomic-outline:dual-protagonist.delegate-production", "title": "채집·재배·양산 업무 위임" },
+        { "candidateId": "atomic-outline:dual-protagonist.sell-potion", "title": "상단에 물약 판매와 자금 확보" },
+        { "candidateId": "atomic-outline:dual-protagonist.respond-house-crisis", "title": "가주 위기 징후 확인과 대응" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-STORY-YODONG-DEFENSE-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:yodong-defense.observe-fragment", "title": "방어 위기 편린 관찰" },
+        { "candidateId": "atomic-outline:yodong-defense.inspect-readiness", "title": "병력·보급·퇴로 준비 상태 확인" },
+        { "candidateId": "atomic-outline:yodong-defense.choose-role", "title": "평소 역량에 맞는 군내 역할 선택" },
+        { "candidateId": "atomic-outline:yodong-defense.delegate-field-work", "title": "응급처치·화물 보호 현장 위임" },
+        { "candidateId": "atomic-outline:yodong-defense.resolve-engagement", "title": "전투·내정 혼합 방어 결과 확정" },
+        { "candidateId": "atomic-outline:yodong-defense.recover-and-return", "title": "손실·회복 확인과 다음 방비 선택" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-STORY-HUB-DISCOVERY-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:hub-discovery.enter-for-own-need", "title": "자기 필요를 가지고 Hub 방문" },
+        { "candidateId": "atomic-outline:hub-discovery.inspect-node", "title": "입구·접점·출구와 창고 상태 조회" },
+        { "candidateId": "atomic-outline:hub-discovery.detect-missing-cargo", "title": "미도착 화물 불일치 발견" },
+        { "candidateId": "atomic-outline:hub-discovery.infer-and-confirm", "title": "단서 추론과 현장 확인" },
+        { "candidateId": "atomic-outline:hub-discovery.resolve-cargo", "title": "화물 문제 해결과 안도 확인" },
+        { "candidateId": "atomic-outline:hub-discovery.view-reality-report", "title": "선택형 현실 자료 대응 보고 열람" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-STORY-TOWN-DISCOVERY-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:town-discovery.enter-living-district", "title": "생활권 진입과 작업 풍경 관찰" },
+        { "candidateId": "atomic-outline:town-discovery.contact-workshop", "title": "지역 공방 선택과 NPC 접촉" },
+        { "candidateId": "atomic-outline:town-discovery.try-craft", "title": "소량 제작·수리 작업 체험" },
+        { "candidateId": "atomic-outline:town-discovery.inspect-seasonal-market", "title": "절기 진열·가격·사유 조회" },
+        { "candidateId": "atomic-outline:town-discovery.ask-resident", "title": "일반 주민의 선택형 설명 듣기" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-STORY-CITY-DISCOVERY-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:city-discovery.enter-district", "title": "City 생활·업무 구역 진입" },
+        { "candidateId": "atomic-outline:city-discovery.request-known-route", "title": "알려진 길 범위의 상세 경로 요청" },
+        { "candidateId": "atomic-outline:city-discovery.select-public-task", "title": "공공 문제 또는 생활 업무 선택" },
+        { "candidateId": "atomic-outline:city-discovery.complete-public-task", "title": "현장 업무 결과 확인" },
+        { "candidateId": "atomic-outline:city-discovery.inspect-data-context", "title": "선택형 현실 자료와 차이 확인" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-FIRST-PERSON-FOCUS-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:first-person-focus.opt-in", "title": "현재 작업의 집중 수행 선택" },
+        { "candidateId": "atomic-outline:first-person-focus.timed-input", "title": "타이밍 입력 한 차례 판정" },
+        { "candidateId": "atomic-outline:first-person-focus.apply-effect", "title": "성공·실패에 따른 작업 효과 반영" },
+        { "candidateId": "atomic-outline:first-person-focus.retry-or-exit", "title": "재시도 또는 일반 작업으로 복귀" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-MULTI-AREA-CHOICE-001",
+      "outlineKindCode": "CrossLoopComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:multi-area.discover-area", "title": "새 Area 단서 발견" },
+        { "candidateId": "atomic-outline:multi-area.choose-destination", "title": "열린 Area 이동 선택" },
+        { "candidateId": "atomic-outline:multi-area.enter-independent-loop", "title": "선택 Area의 독립 폐루프 진입" },
+        { "candidateId": "atomic-outline:multi-area.return-or-switch", "title": "귀환 또는 다른 Area로 전환" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-PERSPECTIVE-ROLES-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:perspective.switch-view", "title": "1인칭·3인칭·광역 시점 전환" },
+        { "candidateId": "atomic-outline:perspective.select-target", "title": "현재 시점에서 대상 선택" },
+        { "candidateId": "atomic-outline:perspective.inspect-node", "title": "광역 노드 또는 현장 객체 상세 조회" },
+        { "candidateId": "atomic-outline:perspective.return-control", "title": "이전 조작 시점으로 복귀" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-PROGRESSION-CLUSTERS-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:progression.observe-action-pattern", "title": "반복 행동과 결과 패턴 관찰" },
+        { "candidateId": "atomic-outline:progression.register-cluster-candidate", "title": "발전 군집 후보 등록" },
+        { "candidateId": "atomic-outline:progression.choose-priority", "title": "현재 성장 우선순위 선택" },
+        { "candidateId": "atomic-outline:progression.apply-unlock", "title": "조건 충족 발전·진화 반영" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-MEDITATION-ACTION-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:meditation.begin", "title": "안전한 문맥에서 명상 시작" },
+        { "candidateId": "atomic-outline:meditation.surface-action-memory", "title": "최근 행동 기억과 핵심 관계 떠올림" },
+        { "candidateId": "atomic-outline:meditation.organize-thought", "title": "생각 정리 미니게임 수행" },
+        { "candidateId": "atomic-outline:meditation.gain-fragment", "title": "영감·이데아 편린 후보 획득" },
+        { "candidateId": "atomic-outline:meditation.rename-known-idea", "title": "인식 심화에 따른 명칭 변경과 역사 기록" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-TIME-SEASONAL-001",
+      "outlineKindCode": "CrossLoopComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:seasonal.close-current-term", "title": "현재 절기 활동 마감" },
+        { "candidateId": "atomic-outline:seasonal.advance-term", "title": "다음 24절기 상태로 전환" },
+        { "candidateId": "atomic-outline:seasonal.apply-world-variants", "title": "식생·복장·작업·경관 후보 갱신" },
+        { "candidateId": "atomic-outline:seasonal.apply-market-context", "title": "제철·재고·수요 가격 문맥 갱신" },
+        { "candidateId": "atomic-outline:seasonal.inspect-change", "title": "변화 대상의 선택형 설명 조회" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-TIME-SOLAR-TERM-TAROT-TURN-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:solar-term-turn.close", "title": "절기 턴 마감과 결과 집계" },
+        { "candidateId": "atomic-outline:solar-term-turn.draw-three", "title": "타로 카드 세 장 제안" },
+        { "candidateId": "atomic-outline:solar-term-turn.choose-one", "title": "운용할 카드 한 장 선택" },
+        { "candidateId": "atomic-outline:solar-term-turn.resolve-orientation", "title": "회복 기준에 따른 정·역방향 판정" },
+        { "candidateId": "atomic-outline:solar-term-turn.apply-card", "title": "카드 효과 적용과 버림 더미 이동" },
+        { "candidateId": "atomic-outline:solar-term-turn.begin-next", "title": "다음 절기 턴 시작" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-FARM-CROP-LIFE-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:farm-crop-life.reach-harvest-ready", "title": "작물 수확 가능 상태 도달" },
+        { "candidateId": "atomic-outline:farm-crop-life.defer-harvest", "title": "여유 시간 안의 수확 연기" },
+        { "candidateId": "atomic-outline:farm-crop-life.apply-grace-time", "title": "절기·날씨·작물별 여유 시간 경과" },
+        { "candidateId": "atomic-outline:farm-crop-life.begin-loss", "title": "여유 종료 뒤 품질·수량 손실 시작" },
+        { "candidateId": "atomic-outline:farm-crop-life.harvest", "title": "현재 상태의 작물 수확" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-COMMUNITY-VISITOR-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:community-visitor.detect-arrival", "title": "방문자 도착과 의도 후보 관찰" },
+        { "candidateId": "atomic-outline:community-visitor.inspect-request", "title": "방문 목적·체류 조건·공개 범위 확인" },
+        { "candidateId": "atomic-outline:community-visitor.accept-or-decline", "title": "방문·체류 수락 또는 거절" },
+        { "candidateId": "atomic-outline:community-visitor.greet", "title": "실제 접촉과 인사 결과 확인" },
+        { "candidateId": "atomic-outline:community-visitor.assign-stay", "title": "허용된 체류 공간과 역할 안내" },
+        { "candidateId": "atomic-outline:community-visitor.end-or-continue", "title": "체류 종료·연장·다음 관계 선택" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-SURVIVAL-ECONOMY-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:survival-economy.inspect-needs", "title": "인구·재고·생존 가능 일수 조회" },
+        { "candidateId": "atomic-outline:survival-economy.allocate-stock", "title": "긴급도와 최소 생존선에 따른 재고 배분" },
+        { "candidateId": "atomic-outline:survival-economy.procure-shortage", "title": "부족 물자 조달 경로 선택" },
+        { "candidateId": "atomic-outline:survival-economy.consume-cycle", "title": "생활 소비와 부족 결과 반영" },
+        { "candidateId": "atomic-outline:survival-economy.review-impact", "title": "개인·집단·공동체 회복 변화 확인" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-DELEGATION-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:delegation.inspect-task", "title": "위임 가능한 업무와 위험 조회" },
+        { "candidateId": "atomic-outline:delegation.select-npc", "title": "역량·관계·상태에 따른 NPC 선택" },
+        { "candidateId": "atomic-outline:delegation.grant-authority", "title": "범위·도구·자원·예외 권한 위임" },
+        { "candidateId": "atomic-outline:delegation.resolve-work", "title": "NPC 업무 수행 결과 확정" },
+        { "candidateId": "atomic-outline:delegation.handle-exception", "title": "실패·중단·추가 승인 예외 처리" },
+        { "candidateId": "atomic-outline:delegation.review-and-disposition", "title": "결과·성장·성향 단서 확인과 후속 처분" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-HERBAL-CRAFTING-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:herbal-crafting.identify-herb", "title": "약초 외형·지식·위험 식별" },
+        { "candidateId": "atomic-outline:herbal-crafting.collect-herb", "title": "허용된 약초 채집과 소지" },
+        { "candidateId": "atomic-outline:herbal-crafting.choose-recipe", "title": "알고 있는 Recipe와 재료 선택" },
+        { "candidateId": "atomic-outline:herbal-crafting.prepare-materials", "title": "세척·손질·건조 등 전처리" },
+        { "candidateId": "atomic-outline:herbal-crafting.decoct", "title": "용기·열원·시간을 사용한 달이기" },
+        { "candidateId": "atomic-outline:herbal-crafting.consume", "title": "완성 약제 음용과 효과 판정" },
+        { "candidateId": "atomic-outline:herbal-crafting.review-and-return", "title": "효과·부작용 확인과 다음 제작 선택" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-SYSTEM-SAVE-REENTRY-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:save-reentry.request-save", "title": "저장 가능한 경계에서 저장 요청" },
+        { "candidateId": "atomic-outline:save-reentry.capture-snapshot", "title": "상태·판본·진행 원인 사본 확정" },
+        { "candidateId": "atomic-outline:save-reentry.leave-session", "title": "세션 중단·종료" },
+        { "candidateId": "atomic-outline:save-reentry.load-snapshot", "title": "저장 사본 선택과 재진입" },
+        { "candidateId": "atomic-outline:save-reentry.verify-return", "title": "같은 결과·점유·다음 선택 복원 확인" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-REGIONAL-MONSTER-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:regional-monster.observe-traces", "title": "지역 경계의 비정상 흔적 관찰" },
+        { "candidateId": "atomic-outline:regional-monster.infer-threat", "title": "계절·지형·상처에서 위협 후보 추론" },
+        { "candidateId": "atomic-outline:regional-monster.prepare-response", "title": "장비·동행대·퇴로 준비" },
+        { "candidateId": "atomic-outline:regional-monster.encounter", "title": "동물형·야수형 첫 마수 조우" },
+        { "candidateId": "atomic-outline:regional-monster.resolve-or-retreat", "title": "격퇴·분할 대응 또는 후퇴 결과 확정" },
+        { "candidateId": "atomic-outline:regional-monster.recover-and-report", "title": "회복·흔적 보고와 다음 추적 선택" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-FIRST-EXPERIENCE-001",
+      "outlineKindCode": "CrossLoopComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:first-experience.enter-nature", "title": "Nature 첫 진입과 자유 시야 확보" },
+        { "candidateId": "atomic-outline:first-experience.observe-opportunity", "title": "가까운 도구·자원·경로 관찰" },
+        { "candidateId": "atomic-outline:first-experience.choose-first-action", "title": "첫 행동 후보 선택" },
+        { "candidateId": "atomic-outline:first-experience.complete-action", "title": "실제 입력으로 첫 결과 만들기" },
+        { "candidateId": "atomic-outline:first-experience.return-choice", "title": "결과 확인 뒤 자유 선택으로 복귀" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-NATURE-SHELTER-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:nature-shelter.discover", "title": "자연 쉼터 발견과 안전 후보 확인" },
+        { "candidateId": "atomic-outline:nature-shelter.enter", "title": "오두막 출입과 휴식 위치 선택" },
+        { "candidateId": "atomic-outline:nature-shelter.sleep", "title": "조건부 안전 수면 시작·완료" },
+        { "candidateId": "atomic-outline:nature-shelter.wake", "title": "시간 경과·상태 변화와 기상" },
+        { "candidateId": "atomic-outline:nature-shelter.store-small-items", "title": "제한 보관함에 물자 넣기·꺼내기" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-NATURE-RESOURCE-CONSTRUCTION-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:nature-construction.choose-blueprint", "title": "학습된 청사진 선택" },
+        { "candidateId": "atomic-outline:nature-construction.preview-site", "title": "부지·재료·배치 제약 미리보기" },
+        { "candidateId": "atomic-outline:nature-construction.commit-materials", "title": "재료 예약·투입과 건설 시작" },
+        { "candidateId": "atomic-outline:nature-construction.progress", "title": "작업 교대별 건설 진행" },
+        { "candidateId": "atomic-outline:nature-construction.cancel", "title": "취소와 사용·미사용 재료 반환" },
+        { "candidateId": "atomic-outline:nature-construction.complete", "title": "시설 완성과 다음 사용 선택" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-TOWN-ORDER-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:town-order.observe-demand", "title": "주민 생활 욕구와 상품 부족 관찰" },
+        { "candidateId": "atomic-outline:town-order.prepare-replenishment", "title": "독립 공급 Fixture로 보충 수량 준비" },
+        { "candidateId": "atomic-outline:town-order.receive-shipment", "title": "차량 도착·하차·검수" },
+        { "candidateId": "atomic-outline:town-order.stock-shelf", "title": "후방 적재와 진열 보충" },
+        { "candidateId": "atomic-outline:town-order.pickup-and-consume", "title": "주민 수령·소비 결과 반영" },
+        { "candidateId": "atomic-outline:town-order.return-operation", "title": "예약 해제와 다음 주문 선택 복귀" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-HUB-DEMAND-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:hub-demand.inspect-cards", "title": "영역별 수요 카드와 근거 조회" },
+        { "candidateId": "atomic-outline:hub-demand.compare-urgency", "title": "긴급도·희소성·기한 비교" },
+        { "candidateId": "atomic-outline:hub-demand.allocate-inventory", "title": "제한 재고 배분" },
+        { "candidateId": "atomic-outline:hub-demand.prepare-outbound", "title": "출고 묶음과 대체·부분 납품 준비" },
+        { "candidateId": "atomic-outline:hub-demand.confirm-outbound", "title": "명시적 출고 확정" },
+        { "candidateId": "atomic-outline:hub-demand.review-shortage", "title": "남은 부족과 다음 조달 선택 확인" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-FARM-DEFENSE-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:farm-defense.detect-threat", "title": "Farm 위협과 방위 필요 관찰" },
+        { "candidateId": "atomic-outline:farm-defense.mobilize", "title": "농민·전문병·분대 소집" },
+        { "candidateId": "atomic-outline:farm-defense.assign-roles", "title": "초소·전투·후퇴·치료 역할 배정" },
+        { "candidateId": "atomic-outline:farm-defense.allocate-supplies", "title": "장비·의약품·식량 보급" },
+        { "candidateId": "atomic-outline:farm-defense.resolve", "title": "방위 교전과 피해 결과 확정" },
+        { "candidateId": "atomic-outline:farm-defense.treat-and-return", "title": "치료·해산·생산 복귀와 다음 선택" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GAMEPLAY-PLAYER-STAMINA-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:player-stamina.consume", "title": "노동·질주·전투 행동 체력 소비" },
+        { "candidateId": "atomic-outline:player-stamina.begin-rest", "title": "제자리 또는 안전 거점 휴식 시작" },
+        { "candidateId": "atomic-outline:player-stamina.resolve-heat", "title": "유효 열원 하나와 벽 차단 판정" },
+        { "candidateId": "atomic-outline:player-stamina.recover-tick", "title": "걷기·대기·휴식 중 회복 적용" },
+        { "candidateId": "atomic-outline:player-stamina.interrupt", "title": "이동·작업·피격으로 휴식 중단" },
+        { "candidateId": "atomic-outline:player-stamina.complete", "title": "최대치 도달과 다음 행동 복귀" },
+        { "candidateId": "atomic-outline:player-stamina.increase-cap", "title": "성장 조건 충족과 최대 행동 체력 증가" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-WORLD-FOUR-AREAS-001",
+      "outlineKindCode": "CrossLoopComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:four-areas.observe-boundary", "title": "자연 지형으로 Area 경계 판독" },
+        { "candidateId": "atomic-outline:four-areas.choose-crossing", "title": "Farm·Town·Hub·City 진입 경로 선택" },
+        { "candidateId": "atomic-outline:four-areas.enter-area", "title": "선택 Area 진입과 역할 확인" },
+        { "candidateId": "atomic-outline:four-areas.return-or-continue", "title": "이전 Area 귀환 또는 다음 공간 진행" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GRAPH-NORTHERN-LIFE-001",
+      "outlineKindCode": "GraphConstraintComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:northern-graph.select-node", "title": "현재 노드와 가능한 출구 조회" },
+        { "candidateId": "atomic-outline:northern-graph.validate-edge", "title": "통행·비용·위험 엣지 조건 확인" },
+        { "candidateId": "atomic-outline:northern-graph.traverse", "title": "선택 엣지 이동" },
+        { "candidateId": "atomic-outline:northern-graph.arrive-node", "title": "도착 노드 진입과 다음 선택 갱신" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GRAPH-NORTHERN-LIFE-REVIEW-001",
+      "outlineKindCode": "CrossLoopComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:northern-review.prepare-patrol", "title": "Farm 경계 순찰 준비" },
+        { "candidateId": "atomic-outline:northern-review.encounter-beasts", "title": "밀려 내려온 마수 무리 조우" },
+        { "candidateId": "atomic-outline:northern-review.inspect-traces", "title": "이동·상처·영역 흔적 조사" },
+        { "candidateId": "atomic-outline:northern-review.return-base", "title": "생활 거점 귀환과 다음 보고 선택" },
+        { "candidateId": "atomic-outline:northern-review.resolve-hub-cargo", "title": "Hub 미도착 화물 조사·확인·회복" },
+        { "candidateId": "atomic-outline:northern-review.try-town-batch", "title": "Town 견습 공방 소량 시험" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GRAPH-LONG-ROUTE-ENCOUNTER-001",
+      "outlineKindCode": "AtomicCandidates",
+      "candidates": [
+        { "candidateId": "atomic-outline:long-route.inspect-options", "title": "병렬 경로의 비용·시간·위험 조회" },
+        { "candidateId": "atomic-outline:long-route.choose-route", "title": "운송 경로와 이동 수단 선택" },
+        { "candidateId": "atomic-outline:long-route.begin-transport", "title": "화물·운송대 예약과 출발" },
+        { "candidateId": "atomic-outline:long-route.resolve-encounter", "title": "조우·악천후·차단 결과 처리" },
+        { "candidateId": "atomic-outline:long-route.reroute-or-risk", "title": "우회·강행·귀환 선택" },
+        { "candidateId": "atomic-outline:long-route.arrive", "title": "목적지 인수와 경로 결과 기록" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-GRAPH-HUB-LOGISTICS-CIRCULATION-001",
+      "outlineKindCode": "CrossLoopComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:hub-circulation.receive", "title": "입차·하차·검수·입고" },
+        { "candidateId": "atomic-outline:hub-circulation.putaway", "title": "접점에서 창고 위치로 적재" },
+        { "candidateId": "atomic-outline:hub-circulation.prepare-outbound", "title": "출고 지시·피킹·적재 준비" },
+        { "candidateId": "atomic-outline:hub-circulation.depart", "title": "출차 확인과 운송 시작" },
+        { "candidateId": "atomic-outline:hub-circulation.upgrade-road", "title": "도로 승격 공사 시작·진행·완료" },
+        { "candidateId": "atomic-outline:hub-circulation.emergency-repair", "title": "파손 도로 긴급 보수와 유효 하중 관리" },
+        { "candidateId": "atomic-outline:hub-circulation.delegate", "title": "운송·보수 업무 권한 위임과 결과 검토" }
+      ]
+    },
+    {
+      "sourcePlanId": "PLAN-PLACEMENT-FOREST-EDGE-FARM-001",
+      "outlineKindCode": "PlacementContextComposition",
+      "candidates": [
+        { "candidateId": "atomic-outline:forest-edge-farm.enter-trailhead", "title": "숲길에서 생활 농장 경계 진입" },
+        { "candidateId": "atomic-outline:forest-edge-farm.observe-operation", "title": "경작 밭·최근 사용 농기구·생활 흔적 관찰" },
+        { "candidateId": "atomic-outline:forest-edge-farm.choose-y-path", "title": "Y자 길에서 집 또는 밭·작업마당 선택" },
+        { "candidateId": "atomic-outline:forest-edge-farm.approach-house", "title": "한스 생활 주택 접근" },
+        { "candidateId": "atomic-outline:forest-edge-farm.use-permitted-tool", "title": "관찰·허락 뒤 농기구 사용" },
+        { "candidateId": "atomic-outline:forest-edge-farm.leave-and-return", "title": "농장 이탈·재진입과 변화 판독" }
+      ]
+    }
+  ]
+}

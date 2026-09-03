@@ -1,0 +1,382 @@
+{
+  "schemaVersion": "ssalddel-playable-loop-planning-atomic-e1-modules.v1",
+  "revision": "ssalddel-playable-loop-planning-atomic-e1-modules.r13",
+  "sourcePlanningIndexRef": "docs/AI/PLANNING.md",
+  "worldInteractionCatalogRef": "eng/execution-ledgers/world-interactions.json",
+  "atomicityPolicy": {
+    "onePlayerIntent": true,
+    "onePrimaryAuthorityTransitionChain": true,
+    "oneCausalRevisionLineage": true,
+    "oneResultReadback": true,
+    "oneRecoveryBoundary": true,
+    "splitOnNewPlayerChoice": true,
+    "asynchronousTaskAllowedWhenSameCorrelationAndNoNewChoice": true,
+    "planningModuleAloneIsNotE1": true,
+    "planningModuleAloneDoesNotCreateWorldInteraction": true,
+    "planningModuleAloneDoesNotPromoteEvidence": true
+  },
+  "atomicClosurePolicy": {
+    "defaultModeCode": "OnePrimaryAtomicClosureTarget",
+    "moduleDoesNotAutomaticallyCreatePlayableUnit": true,
+    "parallelIndependentWorkAllowed": true,
+    "selectionPriorityCodes": [
+      "ApprovedPlanningGate",
+      "ExactWorldInteractionReuse",
+      "FewestOpenContractGaps",
+      "ClosedFailureRecoveryAndReturn"
+    ],
+    "requiredBeforeE1Codes": [
+      "ApprovedDetailedPlanning",
+      "FrozenDesignRevisionAndHash",
+      "ExactlyOnePlayableUnit",
+      "BoundWorldInteractions",
+      "LogicE1Contract",
+      "PresentationE1Contract"
+    ],
+    "closureOrderCodes": ["E1", "E2", "E3", "E4", "E5", "E6", "E7"],
+    "advanceRule": "현재 원자 폐쇄 대상이 E7에서 닫히거나 명시적으로 차단된 뒤 다음 우선 대상의 E1을 연다.",
+    "doesNotImposeGlobalWorkInProgressLimit": true
+  },
+  "activePrimaryClosureTarget": {
+    "moduleId": "play-transaction:hans-farm.till-one-plot.v1",
+    "parentCohortId": "atomic-closure-cohort:farm-life-five-elements.v1",
+    "targetPlayableLoopStableId": "playable-loop:farm-crop-cycle.v1",
+    "stateCode": "PlanningE4Preparation",
+    "planningThreadBoundaryCode": "E1AndPresentationE4Preparation",
+    "developmentHandoffStageCode": "E5",
+    "doesNotPromoteEvidence": true
+  },
+  "atomicClosureCohorts": [
+    {
+      "cohortId": "atomic-closure-cohort:farm-life-five-elements.v1",
+      "title": "Farm 생활·생산 오행 공동 준비 묶음",
+      "sourcePlanIds": ["PLAN-STORY-FIRST-FARM-DISCOVERY-001", "PLAN-GAMEPLAY-FARM-CROP-LIFE-001"],
+      "targetPlayableLoopStableIds": ["playable-loop:farm-crop-cycle.v1", "playable-loop:farm-pack-store-return.v1"],
+      "memberWorldInteractionIds": ["WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04", "WI-FARM-05", "WI-FARM-06"],
+      "sharedPreparationThroughStageCode": "E4",
+      "e5EntryRequirementCodes": ["FrozenApplicableFiveElementClassifications", "FrozenApplicableShengKeRelations", "BoundWorldInteractionRevision", "BoundPresentationCandidateRevision"],
+      "completeGrowthActivationContract": {
+        "worldInteractionId": "WI-FARM-03",
+        "requiredConditionCodes": ["SeedSoilCompatibility", "WaterWithinSoilCapacity", "RequiredCropCareCompleted"],
+        "requiredRelationDisplayNames": ["수생목", "토극수"],
+        "conditionalRelationDisplayNames": ["금극목"],
+        "outcomeRelationDisplayName": "목생화",
+        "allRequiredConditionsMustPass": true,
+        "doesNotPromoteEvidence": true
+      },
+      "farmFieldManagementH2Contract": {
+        "h2StableIdRef": "h2-candidate:farm-irrigation-service",
+        "planningRoleTitle": "논밭 오행 관리 H2",
+        "refactorStateCode": "PlanningConfirmedSpatialRebindPending",
+        "requiredH1Refs": ["h1-stock:farm-production", "h1-stock:farm-maintenance-yard", "h1-stock:farm-weather-protection"],
+        "optionalH1Refs": ["h1-stock:farm-tool-storage"],
+        "managedWorldInteractionIds": ["WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04"],
+        "fiveElementRoleBindings": [
+          { "elementCode": "EARTH", "gwaeCode": "GAN", "roleCode": "SoilFoundationAndManagementCapacity" },
+          { "elementCode": "WOOD", "gwaeCode": "JIN", "roleCode": "SeedCropAndGrowthState" },
+          { "elementCode": "WATER", "gwaeCode": "GAM", "roleCode": "IrrigationAndMoistureFlow" },
+          { "elementCode": "METAL", "gwaeCode": "TAE", "roleCode": "ConditionalPruningAndHarvestSeparation" },
+          { "elementCode": "FIRE", "gwaeCode": "RI", "roleCode": "CompleteGrowthAndMaturationOutcome" }
+        ],
+        "relationDisplayNames": ["수생목", "토극수", "금극목", "목생화"],
+        "waterSourceBoundary": {
+          "allowedLocationCodes": ["InternalH1", "ExternalConnectedSource"],
+          "requiredConnectorRoleCode": "WaterServiceRoute",
+          "currentRevisionAvailabilityRequired": true,
+          "missingConnectionEffectCode": "CultivationCycleBlocked",
+          "missingConnectionDoesNotDeleteH2": true
+        },
+        "formationRuleCode": "RequiredH1CompositionAndRelationsMustBeFrozen",
+        "higherHierarchyRuleCode": "MultipleFieldManagementH2MayComposeFarmH3",
+        "doesNotRenameSpatialDefinitionByPlanningAlone": true,
+        "doesNotEstablishWorldPlacement": true,
+        "doesNotPromoteEvidence": true
+      },
+      "farmHarvestLogisticsContinuityContract": {
+        "sourceH2StableIdRef": "h2-candidate:farm-harvest-throughput",
+        "downstreamH2StableIdRefs": ["h2-candidate:farm-processing-shipping", "h2-candidate:farm-hub-corridor"],
+        "singleAuthorityHandoffEventRequired": true,
+        "handoffStateCode": "FieldEdgeHarvestLotCreated",
+        "dualContextRoles": [
+          { "contextCode": "CropCycle", "roleCode": "HarvestCompletion", "elementCode": "METAL", "gwaeCode": "TAE" },
+          { "contextCode": "LogisticsCycle", "roleCode": "LogisticsIngress", "elementCode": "WOOD", "gwaeCode": "JIN" }
+        ],
+        "logisticsStageBindings": [
+          { "stageCode": "ReceivingWorkIngress", "elementCode": "WOOD", "gwaeCode": "JIN" },
+          { "stageCode": "InboundInspectionAndOrdering", "elementCode": "FIRE", "gwaeCode": "RI" },
+          { "stageCode": "StowageCompletion", "elementCode": "EARTH", "gwaeCode": "GAN" },
+          { "stageCode": "OrderInventoryAllocation", "elementCode": "METAL", "gwaeCode": "TAE" },
+          { "stageCode": "PackingDispatchAndTransport", "elementCode": "WATER", "gwaeCode": "GAM" }
+        ],
+        "confirmedShengRelations": [
+          { "displayName": "목생화", "meaningCode": "ReceivingWorkBecomesInspectedAndOrdered" },
+          { "displayName": "화생토", "meaningCode": "InspectedCargoBecomesStowedInventory" },
+          { "displayName": "토생금", "meaningCode": "StowedInventoryBecomesOrderAllocatedOutboundCargo" },
+          { "displayName": "금생수", "meaningCode": "PackedReleasedCargoBecomesTransportFlow" }
+        ],
+        "arrivalReceivingGate": {
+          "reviewStateCode": "Confirmed",
+          "displayName": "수생목",
+          "meaningCode": "AcceptedArrivalOpensNextReceivingWork",
+          "arrivalDoesNotOpenReceivingWork": true,
+          "requiredCheckCodes": ["DestinationMatch", "OrderMatch", "QuantityMatch", "SealOrDamageStateAccepted"],
+          "acceptedArrivalOpensReceivingWork": true,
+          "rejectedOrUnresolvedArrivalDoesNotOpenReceivingWork": true,
+          "productSpecificCriteriaProfileStateCode": "Deferred"
+        },
+        "placementTermMeaningCode": "OrderInventoryAllocationNotSpatialPlacement",
+        "stowageCompletionDoesNotCompleteWholeLogistics": true,
+        "operationalSequenceIsNotAutomaticallyShengSequence": true,
+        "doesNotDuplicateLotOrAuthorityEvent": true,
+        "doesNotPromoteEvidence": true
+      },
+      "coordinatedPromotionStageCodes": ["E5", "E6", "E7"],
+      "memberEvidenceRuleCode": "IndependentPerWorldInteraction",
+      "cohortEvidenceStageRuleCode": "MinimumOfMembers",
+      "gwaeClassificationLedgerRef": "eng/execution-ledgers/world-interaction-gwae-classifications.json",
+      "gwaeCoverage": [
+        { "gwaeCode": "JIN", "roleCode": "DirectFarmActionsAndLivingTargets", "stateCode": "Covered" },
+        { "gwaeCode": "TAE", "roleCode": "ToolsPlotsAnchorsAccessAndSpatialConstraints", "stateCode": "Covered" },
+        { "gwaeCode": "GAM", "roleCode": "SeasonGrowthWaterLotInventoryAndLogisticsContext", "stateCode": "Covered" },
+        { "gwaeCode": "RI", "roleCode": "WorkOrderRoleReservationAndPromiseContext", "stateCode": "SupportingGap" },
+        { "gwaeCode": "GAN", "roleCode": "FocusRestRecoveryAndHansRelationshipContext", "stateCode": "SupportingGap" }
+      ],
+      "firstDevelopmentWaveWorldInteractionIds": ["WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04"],
+      "secondDevelopmentWaveWorldInteractionIds": ["WI-FARM-05", "WI-FARM-06"],
+      "openGaps": ["FarmWorkOrderAndRoleBoundary", "FarmFocusRestRecoveryBoundary", "SeedSoilCompatibilityProfile", "WateringAmountAndSoilCapacityProfile", "CropSpecificPruningRequirementProfile", "SharedPresentationE4CandidateRevision", "ActualUnityWorldBindingsPerWorldInteraction"],
+      "doesNotForceAllFiveGwaeIntoEachWorldInteraction": true,
+      "doesNotPromoteEvidence": true
+    }
+  ],
+  "modules": [
+    {
+      "moduleId": "play-transaction:hans-farm.fence-damage-observation.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 10,
+      "title": "손상 울타리와 남은 목재 관찰",
+      "reviewStateCode": "Candidate",
+      "primaryWorldInteractionId": null,
+      "reusedWorldInteractionIds": [],
+      "playerIntent": "벌목 뒤 남은 목재와 가까운 손상 울타리를 살펴본다.",
+      "entryConditions": ["VoluntaryWoodcuttingCompleted", "RemainingTimberObservable", "DamagedFenceObservable"],
+      "authorityTransitionMeaning": "관찰 가능한 두 단서를 같은 원인 문맥으로 인지하되 울타리나 목재 상태는 바꾸지 않는다.",
+      "successConditions": ["FenceRepairChoiceAvailable"],
+      "failureRecovery": "한 단서라도 판독할 수 없으면 수리 선택을 열지 않고 자유 이동으로 돌아간다.",
+      "returnState": "PlayerCanChooseAgain",
+      "openGaps": ["ObservationWorldInteraction", "ExactFenceStableId", "ObservationRangeAndReadability"]
+    },
+    {
+      "moduleId": "play-transaction:hans-farm.voluntary-woodcutting.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 20,
+      "title": "허용 나무 자발적 벌목",
+      "reviewStateCode": "PartiallyReused",
+      "primaryWorldInteractionId": "WI-NATURE-06",
+      "reusedWorldInteractionIds": ["WI-NATURE-06"],
+      "playerIntent": "허용된 가까운 나무를 개인 손도끼로 벤다.",
+      "entryConditions": ["WoodcuttingCapabilityEquipped", "PermittedTreeStanding", "PlayerIdle"],
+      "authorityTransitionMeaning": "같은 작업 상관관계 안에서 벌목을 예약·진행하고 나무를 그루터기로 바꾸며 통나무를 생성한다.",
+      "successConditions": ["TreeFelled", "DroppedTimberAvailable"],
+      "failureRecovery": "완료 전 중단하면 점유와 진행률을 해제하고 나무·인벤토리를 바꾸지 않는다.",
+      "returnState": "TimberCollectionOrOtherChoiceAvailable",
+      "openGaps": ["HansFarmPermittedTreeBinding", "ActualFarmBoundaryPresentation"]
+    },
+    {
+      "moduleId": "play-transaction:hans-farm.timber-collection.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 30,
+      "title": "벌목 통나무 수집",
+      "reviewStateCode": "Reused",
+      "primaryWorldInteractionId": "WI-NATURE-18",
+      "reusedWorldInteractionIds": ["WI-NATURE-18"],
+      "playerIntent": "지면에 생성된 통나무 묶음을 소지한다.",
+      "entryConditions": ["DroppedTimberAvailable", "InventoryCapacityAvailable"],
+      "authorityTransitionMeaning": "통나무 묶음을 한 번 수집 상태로 바꾸고 같은 수량을 인벤토리에 원자적으로 더한다.",
+      "successConditions": ["DroppedTimberCollected", "TimberCarried"],
+      "failureRecovery": "용량이나 판본 검사가 실패하면 지면 통나무와 인벤토리를 모두 유지한다.",
+      "returnState": "FenceRepairOrOtherChoiceAvailable",
+      "openGaps": []
+    },
+    {
+      "moduleId": "play-transaction:hans-farm.fence-complete-repair.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 40,
+      "title": "첫 장면 손상 울타리 전체 수리",
+      "reviewStateCode": "Candidate",
+      "primaryWorldInteractionId": null,
+      "reusedWorldInteractionIds": [],
+      "playerIntent": "현재 장면에서 접근 가능한 손상 울타리 전체를 남은 목재로 한 번에 수리한다.",
+      "entryConditions": ["FenceRepairChoiceSelected", "RequiredTimberCarried", "RepairableFenceReachable"],
+      "authorityTransitionMeaning": "정확한 첫 사건 울타리 집합과 필요한 목재를 같은 확정에서 소비하고 전체를 수리 상태로 바꾼다.",
+      "successConditions": ["FirstIncidentFenceFullyRepaired", "RepairActionRecorded"],
+      "failureRecovery": "재료·권한·접근·판본 중 하나라도 실패하면 울타리와 목재를 모두 유지한다.",
+      "returnState": "LeaveFarmOrContinueLifeChoiceAvailable",
+      "openGaps": ["FenceRepairWorldInteraction", "FenceAggregateStableIds", "TimberCostAndAuthority"]
+    },
+    {
+      "moduleId": "play-transaction:hans-farm.post-repair-departure.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 50,
+      "title": "수리 뒤 농장 경계 이탈",
+      "reviewStateCode": "Candidate",
+      "primaryWorldInteractionId": null,
+      "reusedWorldInteractionIds": [],
+      "playerIntent": "수리 결과를 남기고 다른 활동을 위해 농장 경계를 벗어난다.",
+      "entryConditions": ["FirstIncidentFenceFullyRepaired"],
+      "authorityTransitionMeaning": "수리 결과를 보존한 채 실제 경계 이탈을 기록해 한스의 사후 발견 가능 조건을 연다.",
+      "successConditions": ["HansPostDiscoveryEligible"],
+      "failureRecovery": "경계를 벗어나지 않으면 사후 발견을 확정하지 않고 농장 내 선택을 유지한다.",
+      "returnState": "WorldExplorationAvailable",
+      "openGaps": ["FarmBoundaryStableId", "DepartureObservationContract"]
+    },
+    {
+      "moduleId": "play-transaction:hans-farm.reentry-change-observation.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 60,
+      "title": "재진입과 변화 관찰",
+      "reviewStateCode": "Candidate",
+      "primaryWorldInteractionId": null,
+      "reusedWorldInteractionIds": [],
+      "playerIntent": "농장에 돌아와 달라진 울타리와 한스의 새 표식을 관찰한다.",
+      "entryConditions": ["HansPostDiscoveryCompleted", "PlayerReenteredFarmBoundary"],
+      "authorityTransitionMeaning": "실제 사후 발견 결과가 있을 때만 재진입 관찰과 확인 대화 가능 상태를 연다.",
+      "successConditions": ["HansAcknowledgementAvailable"],
+      "failureRecovery": "사후 발견이 없으면 기존 농장 표현과 자유 이동을 유지한다.",
+      "returnState": "HansDialogueOrOtherChoiceAvailable",
+      "openGaps": ["HansPostDiscoveryWorldInteraction", "ReentryPresentationContract"]
+    },
+    {
+      "moduleId": "play-transaction:hans-farm.first-trust-confirmation.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 70,
+      "title": "한스 확인 대화와 첫 신뢰",
+      "reviewStateCode": "Candidate",
+      "primaryWorldInteractionId": null,
+      "reusedWorldInteractionIds": [],
+      "playerIntent": "한스의 확인 표식을 선택해 수리 결과에 대한 대화를 나눈다.",
+      "entryConditions": ["HansAcknowledgementAvailable", "RepairCauseLineageVerified"],
+      "authorityTransitionMeaning": "같은 벌목·목재·수리 원인 계보를 확인하고 첫 신뢰 관계를 한 번 연다.",
+      "successConditions": ["HansFirstTrustEstablished", "FarmLifeFollowupsAvailable"],
+      "failureRecovery": "원인 계보가 없거나 대화를 취소하면 관계 보상을 만들지 않고 다시 선택 가능 상태로 돌아간다.",
+      "returnState": "FarmStayOrMainTravelChoiceAvailable",
+      "openGaps": ["HansRelationshipWorldInteraction", "DialogueAndMarkerPresentationContract"]
+    },
+    {
+      "moduleId": "play-transaction:hans-farm.till-one-plot.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "sequence": 80,
+      "title": "한스 농장 한 구획 밭갈기",
+      "reviewStateCode": "PartiallyReused",
+      "primaryWorldInteractionId": "WI-FARM-01",
+      "reusedWorldInteractionIds": ["WI-FARM-01"],
+      "playerIntent": "메인 퀘스트를 진행하지 않고 한스 농장을 생활 거점으로 삼아 선택한 한 구획을 경작 가능한 밭으로 만든다.",
+      "entryConditions": ["HansFarmResidenceAvailable", "FarmProductionReady", "UntilledPlotAvailable", "TillingCapabilityAvailable"],
+      "authorityTransitionMeaning": "기존 WI-FARM-01을 재사용해 선택한 한 Farm 구획만 Untilled에서 Tilled로 바꾸고 같은 원인 계보의 밭갈기 행위 기록을 남긴다.",
+      "successConditions": ["SelectedPlotTilled", "TillingActionRecorded", "FarmLifeCanContinueWithoutMainQuest"],
+      "failureRecovery": "도구·체력·권한·접근·판본 검사가 실패하거나 작업을 중단하면 마지막 확정 구획만 보존하고 메인 퀘스트를 강제하지 않은 채 농장 생활 선택으로 돌아간다.",
+      "returnState": "HansFarmLifeChoiceAvailable",
+      "openGaps": ["FirstTillingPlotStableId", "HansFarmResidencePermissionBoundary", "TillingToolTimeAndStaminaProfile", "PresentationE4GraphPlacementAssetBundle"]
+    },
+    {
+      "moduleId": "play-transaction:farm-building.inspect-blueprint-placement.v1",
+      "sourcePlanId": "PLAN-PLACEMENT-CROSS-AREA-BUILDING-001",
+      "sequence": 10,
+      "title": "Farm 청사진 선택과 배치 미리보기",
+      "reviewStateCode": "PartiallyReused",
+      "primaryWorldInteractionId": "WI-CON-01",
+      "reusedWorldInteractionIds": ["WI-CON-01"],
+      "playerIntent": "현재 Farm에 허용된 청사진 하나를 골라 부지·통행·지지·간섭·비용을 상태 변경 없이 확인한다.",
+      "entryConditions": ["FarmPlacementChoiceAvailable", "FarmBlueprintCandidateAvailable", "CurrentWorldRevisionKnown"],
+      "authorityTransitionMeaning": "WI-CON-01의 미리보기 규칙으로 청사진 판본과 배치 후보를 검사하되 재료·발자국·건물 상태는 바꾸지 않는다.",
+      "successConditions": ["FarmPlacementPreviewAvailable", "ConfirmOrAlternativeChoiceAvailable"],
+      "failureRecovery": "청사진·지형·통행·지지·간섭·판본 검사가 실패하면 아무것도 예약하지 않고 차단 이유와 대안 후보 선택으로 돌아간다.",
+      "returnState": "FarmPlacementConfirmOrRetryChoiceAvailable",
+      "openGaps": ["FarmBlueprintCatalogBinding", "FarmSpecificPlacementRuleProfile", "FrozenPreviewRevisionAndHash", "PresentationE4ReadabilityContract"]
+    },
+    {
+      "moduleId": "play-transaction:farm-building.confirm-and-complete.v1",
+      "sourcePlanId": "PLAN-PLACEMENT-CROSS-AREA-BUILDING-001",
+      "sequence": 20,
+      "title": "Farm 배치 확정과 건설 완료",
+      "reviewStateCode": "PartiallyReused",
+      "primaryWorldInteractionId": "WI-CON-01",
+      "reusedWorldInteractionIds": ["WI-CON-01"],
+      "playerIntent": "검토한 Farm 배치 후보의 위치·방향·자원 사용을 확정하고 같은 작업 계보의 완성 결과를 확인한다.",
+      "entryConditions": ["FarmPlacementPreviewSelected", "PreviewRevisionStillCurrent", "ConstructionResourcesAvailable", "FarmFootprintReservable"],
+      "authorityTransitionMeaning": "WI-CON-01의 같은 CommandId·ExpectedRevision 계보로 재료와 발자국을 예약하고 Building을 만든 뒤, 새 플레이어 선택이 없는 같은 작업 상관관계 안에서 Operational과 결과 조회까지 진행한다.",
+      "successConditions": ["FarmPlacementConfirmed", "FarmBuildingOperational", "ConstructionActionRecorded"],
+      "failureRecovery": "확정 전 검사가 실패하면 예약하지 않고 미리보기 선택으로 돌아가며, 확정 뒤 작업이 중단되면 완료 구간과 예약 상태를 같은 작업 계보로 보존해 취소 또는 재개를 선택하게 한다.",
+      "returnState": "FarmPlacementChoiceAvailable",
+      "openGaps": ["WI-CON-01FarmApplicabilityContract", "FarmConstructionTaskAndSaveLineage", "FarmOperationalReadbackContract", "ActualFarmPlacementEvidence"]
+    },
+    {
+      "moduleId": "play-transaction:farm-building.cancel-active-construction.v1",
+      "sourcePlanId": "PLAN-PLACEMENT-CROSS-AREA-BUILDING-001",
+      "sequence": 30,
+      "title": "진행 중 Farm 건설 취소",
+      "reviewStateCode": "PartiallyReused",
+      "primaryWorldInteractionId": "WI-WORLD-03",
+      "reusedWorldInteractionIds": ["WI-WORLD-03"],
+      "playerIntent": "아직 완료되지 않은 Farm 건설을 취소하고 이 작업이 소유한 예약만 반환한다.",
+      "entryConditions": ["FarmConstructionTaskActive", "ConstructionCancellationAllowed", "ConstructionLineageKnown"],
+      "authorityTransitionMeaning": "WI-WORLD-03으로 대상 작업의 계보 소유 재료·발자국·Actor 예약만 멱등 취소하고 다른 건설이나 세계 상태는 바꾸지 않는다.",
+      "successConditions": ["FarmConstructionCancelled", "OwnedReservationsReleased", "CancellationActionRecorded"],
+      "failureRecovery": "완료됨·취소 불가·판본 불일치이면 기존 작업과 예약을 유지하고 현재 차단 이유를 보여 준다.",
+      "returnState": "FarmPlacementChoiceAvailable",
+      "openGaps": ["WI-WORLD-03FarmConstructionApplicability", "PartialProgressPreservationPolicy", "CancellationReadbackContract"]
+    }
+  ],
+  "e1Assemblies": [
+    {
+      "assemblyId": "e1-assembly:hans-farm-first-repair.v1",
+      "sourcePlanId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+      "title": "한스 농장 첫 벌목·울타리 수리·첫 신뢰",
+      "stateCode": "Blocked",
+      "targetPlayableLoopStableId": null,
+      "requiredModuleIds": [
+        "play-transaction:hans-farm.fence-damage-observation.v1",
+        "play-transaction:hans-farm.voluntary-woodcutting.v1",
+        "play-transaction:hans-farm.timber-collection.v1",
+        "play-transaction:hans-farm.fence-complete-repair.v1",
+        "play-transaction:hans-farm.post-repair-departure.v1",
+        "play-transaction:hans-farm.reentry-change-observation.v1",
+        "play-transaction:hans-farm.first-trust-confirmation.v1"
+      ],
+      "optionalModuleIds": [
+        "play-transaction:hans-farm.till-one-plot.v1"
+      ],
+      "successMeaning": "자발적 벌목 결과로 첫 사건 울타리를 완전히 수리하고, 실제 이탈·사후 발견·재진입·확인 대화를 거쳐 첫 신뢰와 다음 선택으로 돌아온다.",
+      "openGaps": [
+        "ApprovedPlayableUnit",
+        "FiveCandidateWorldInteractions",
+        "LogicE1AuthorityContract",
+        "PresentationE1ReadabilityContract",
+        "FailureRecoveryAndSaveReplayBoundary"
+      ],
+      "doesNotEstablishE1": true
+    },
+    {
+      "assemblyId": "e1-assembly:farm-building-placement.v1",
+      "sourcePlanId": "PLAN-PLACEMENT-CROSS-AREA-BUILDING-001",
+      "title": "Farm 청사진 미리보기·배치 확정·건설 귀환",
+      "stateCode": "Blocked",
+      "targetPlayableLoopStableId": "playable-loop:farm-player-placement.v1",
+      "requiredModuleIds": [
+        "play-transaction:farm-building.inspect-blueprint-placement.v1",
+        "play-transaction:farm-building.confirm-and-complete.v1"
+      ],
+      "optionalModuleIds": [
+        "play-transaction:farm-building.cancel-active-construction.v1"
+      ],
+      "successMeaning": "플레이어가 Farm에 맞는 청사진과 위치를 미리 확인하고 명시적으로 확정해 같은 계보의 건물을 운영 상태로 만든 뒤, 다음 배치 또는 다른 활동을 선택할 수 있다.",
+      "openGaps": [
+        "ApprovedFarmPlayerPlacementDesignDocument",
+        "FrozenDesignRevisionAndHash",
+        "WI-CON-01FarmAuthorityBoundary",
+        "FarmPlacementAndConstructionSaveReplay",
+        "PresentationE1ReadabilityContract"
+      ],
+      "doesNotEstablishE1": true
+    }
+  ]
+}
