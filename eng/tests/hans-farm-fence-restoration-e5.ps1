@@ -15,6 +15,13 @@ function Read-Json([string] $path) {
         ConvertFrom-Json
 }
 
+function Get-CanonicalLfSha256([string] $path) {
+    $text = [IO.File]::ReadAllText($path, [Text.Encoding]::UTF8)
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        $text.Replace("`r`n", "`n"))
+    [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+}
+
 $graph = Read-Json 'eng/world-seedbeds/graph-maps/hans-farm-fence-restoration.v1.json'
 $placement = Read-Json 'eng/world-seedbeds/placement-map-profiles/hans-farm-first-fence-restoration-e5.v1.json'
 $stages = Read-Json 'eng/execution-ledgers/evidence-stages.json'
@@ -27,7 +34,7 @@ $delivery = Read-Json 'eng/execution-ledgers/world-interaction-delivery-prioriti
 $goals = Read-Json 'eng/execution-ledgers/codex-playable-loop-goals.json'
 
 $planningPath = Join-Path $root $graph.planningGate.documentRef
-$planningHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $planningPath).Hash
+$planningHash = Get-CanonicalLfSha256 $planningPath
 Assert-FenceE5 ($planningHash -ceq $graph.planningGate.sha256) 'PlanningHash'
 Assert-FenceE5 ($graph.planningGate.revision -ceq 'hans-farm-first-lumber-repair.r27') 'PlanningRevision'
 Assert-FenceE5 ($graph.playableLoopStableId -ceq $placement.playableLoopStableId) 'GraphPlacementLoop'
