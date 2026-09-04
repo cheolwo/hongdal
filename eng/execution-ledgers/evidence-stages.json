@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-evidence-stages.v7",
-  "revision": "simulation-evidence-stages.r13",
+  "revision": "simulation-evidence-stages.r14",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "stages": [
     {
@@ -31,12 +31,12 @@
     {
       "code": "E5",
       "label": "WI 세계 발현",
-      "completionGate": "결정적 Simulation 세계에서 허용 발생원 중 하나가 WI를 만들고 Preview·Confirm 또는 권위 판정, Task·Effect, 결과 상태와 후속·복귀 WI까지 연결되었다. 공간·물체 표현 WI는 E4에서 판본화한 표현 준비 인계의 후보를 실제 Prefab 또는 대체 표현, 배치 객체와 InteractionAnchor에 결속하고 활성 Renderer·Collider·Bounds를 검증한다. 공간 WI는 H·AreaSet·Graph·통행 조립 증거를 추가로 요구하지만 공간 조립이나 자산 조사만으로 E5를 선언하지 않으며, 비공간 WI는 자료·상태·인과 발현으로 검증한다."
+      "completionGate": "결정적 Simulation 세계에서 허용 발생원 중 하나가 WI를 만들고 Preview·Confirm 또는 권위 판정, Task·Effect, 결과 상태와 후속·복귀 WI까지 연결되었다. 공간·물체 표현 WI는 E4에서 판본화한 표현 준비 인계의 후보를 실제 Prefab 또는 대체 표현, 배치 객체와 InteractionAnchor에 결속하고 활성 Renderer·Collider·Bounds를 검증한다. Actor 행위는 이 단계에서 시작·진행·결과를 구별하는 최소 정적 자세·진행 표시·상태 교체 같은 판독 가능한 대체 표현을 허용하며 실제 AnimationClip·Rig/Avatar·IK·root motion·전이 완성은 요구하지 않는다. 공간 WI는 H·AreaSet·Graph·통행 조립 증거를 추가로 요구하지만 공간 조립이나 자산 조사만으로 E5를 선언하지 않으며, 비공간 WI는 자료·상태·인과 발현으로 검증한다."
     },
     {
       "code": "E6",
       "label": "AreaSet 플레이 전 정제·필요 근거 결속",
-      "completionGate": "E5에서 발현한 WI 또는 WI 폐루프를 E7 실제 플레이에 올리기 전에 의미·인과·결과 표현·권위·최신성 결함을 정제한다. 공간 WI는 관련 H·AreaSet·통행을 함께 검토하고 필요한 현실 문맥은 출처·판본·hash·한계와 함께 연결한다. GIS 결속은 독립 선택 축이며 DEM·도로를 공통 필수 자료로 간주하지 않는다."
+      "completionGate": "E5에서 발현한 WI 또는 WI 폐루프를 E7 실제 플레이에 올리기 전에 의미·인과·결과 표현·권위·최신성 결함을 정제한다. Actor 행위가 필요한 WI는 E4에서 동결한 AnimationRole·ActionCue 후보를 실제 AnimationClip·대상 Rig/Avatar·Controller·입력·전이·중단·귀환·root motion 정책과 결속하고 동작 가독성을 검증한다. AnimationRole이 NotApplicable인 즉시 상태 전환은 사유와 결과 판독성을 검증한다. 공간 WI는 관련 H·AreaSet·통행을 함께 검토하고 필요한 현실 문맥은 출처·판본·hash·한계와 함께 연결한다. GIS 결속은 독립 선택 축이며 DEM·도로를 공통 필수 자료로 간주하지 않는다."
     },
     {
       "code": "E7",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "simulation-e7-vertical-implementation-protocol.v2",
-  "revision": "simulation-e7-vertical-implementation-protocol.r5",
+  "revision": "simulation-e7-vertical-implementation-protocol.r6",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderSchemaVersion": "simulation-e7-vertical-work-order.v2",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -20,7 +20,10 @@
     "presentationEvidenceE5RequiresLogicE5": true,
     "presentationE4PreparesApplicableAssetPlacementHandoff": true,
     "assetResearchAloneNeverPromotesE5": true,
-    "nonSpatialOrNonVisualWorkCanDeclareNotApplicable": true
+    "nonSpatialOrNonVisualWorkCanDeclareNotApplicable": true,
+    "animationCandidatesFrozenAtE4": true,
+    "minimalReadableActionCueSatisfiesE5": true,
+    "actualAnimationBindingRequiredAtE6WhenActorAction": true
   },
   "allowedTrackCodes": ["Logic", "Presentation"],
   "allowedCurrentPasses": [
@@ -36,8 +39,8 @@
   "upwardValidationOrder": ["E1", "E2", "E3", "E4", "E5", "E6", "E7"],
   "stagePlans": [
     { "code": "E7", "question": "사람이 실제 입력으로 성공·실패·회복·귀환까지 폐루프를 완주하는가?", "requiredDimensions": ["playerLoop", "authorityModes", "canonicalScene", "runtimeEvidence"] },
-    { "code": "E6", "question": "실제 플레이 전에 의미·인과·배치·통행·표현을 판독할 수 있는가?", "requiredDimensions": ["worldStateExplanation", "presentationReadability", "provenanceLimitations", "causalQuestionMatrix"] },
-    { "code": "E5", "question": "WI가 권위 전이·Task·Effect·결과·후속 선택으로 세계에 발현되는가?", "requiredDimensions": ["triggerOccurrence", "authorityTransition", "taskEffectResult", "successorOrReturnPath"] },
+    { "code": "E6", "question": "실제 플레이 전에 의미·인과·배치·통행·표현과 필요한 Actor 애니메이션 결속을 판독할 수 있는가?", "requiredDimensions": ["worldStateExplanation", "presentationReadability", "actorAnimationBindingWhenApplicable", "provenanceLimitations", "causalQuestionMatrix"] },
+    { "code": "E5", "question": "WI가 권위 전이·Task·Effect·결과·후속 선택과 최소 판독 표현으로 세계에 발현되는가?", "requiredDimensions": ["triggerOccurrence", "authorityTransition", "taskEffectResult", "minimalReadablePresentation", "successorOrReturnPath"] },
     { "code": "E4", "question": "WI 발생원과 주체·대상·자료·자원·시간·선택적 공간 문맥, 적용 가능한 E5 표현 준비 인계가 결속됐는가?", "requiredDimensions": ["allowedTriggerSources", "subjectAndTargetBindings", "dataResourceTimeBindings", "spatialApplicability", "presentationPreparationApplicability"] },
     { "code": "E3", "question": "계약·결정성·저장·재생과 소비자 자동 회귀가 통과하는가?", "requiredDimensions": ["contractTests", "determinism", "saveReplayRegression", "consumerRegression"] },
     { "code": "E2", "question": "공통 Core와 Local·Remote Adapter, Unity 투영 코드가 준비됐는가?", "requiredDimensions": ["contracts", "applicationDomain", "adapters", "unityProjection"] },
@@ -61,6 +64,14 @@
       "openGapRefs"
     ],
     "notApplicableRule": "비공간·비시각 WI는 사유를 기록하고 H·Prefab·배치 후보를 억지로 만들지 않는다.",
-    "promotionBoundary": "후보 조사와 문서 결속은 Presentation E4 준비이며 실제 World 배치·Renderer·Collider·Bounds·WI 발현 증거를 대신하지 않는다."
+    "promotionBoundary": "후보 조사와 문서 결속은 Presentation E4 준비이며 실제 World 배치·Renderer·Collider·Bounds·WI 발현 증거를 대신하지 않는다.",
+    "allowedAnimationReadinessCodes": ["NotApplicable", "DeferredToE6", "ReadyForE6"],
+    "e5ActorFallbackRule": "Actor 행위는 시작·진행·결과를 구별하는 정적 자세·진행 표시·상태 교체 fallback으로 E5 최소 판독 표현을 성립시킬 수 있다. 실제 AnimationClip·Rig/Avatar·IK·root motion·전이는 E6 책임이다."
+  },
+  "presentationE6AnimationGate": {
+    "requiredWhen": "AnimationRole이 NotApplicable이 아닌 Actor 행위 WI",
+    "requiredBindings": ["animationRole", "actionCue", "animationClip", "targetRigOrAvatar", "controllerTransition", "inputBinding", "interruptAndReturn", "rootMotionPolicy"],
+    "notApplicableRule": "즉시 상태 교체로 의도된 WI는 AnimationRole NotApplicable 사유와 결과 판독성을 기록한다.",
+    "promotionBoundary": "E5의 정적 자세·진행 표시·상태 교체 fallback은 E6 애니메이션 결속 증거를 대신하지 않는다."
   }
 }
