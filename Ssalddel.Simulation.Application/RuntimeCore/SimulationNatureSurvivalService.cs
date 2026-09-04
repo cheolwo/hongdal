@@ -90,7 +90,9 @@ namespace Ssalddel.Simulation.Application
                 or SimulationNatureSurvivalCodes.StoreAtCabin
                 or SimulationNatureSurvivalCodes.SleepInCabin
                 or SimulationNatureSurvivalCodes.SelectExpansionPlan
-                or SimulationNatureSurvivalCodes.CollectDroppedTimber;
+                or SimulationNatureSurvivalCodes.CollectDroppedTimber
+                or SimulationNatureSurvivalCodes.AcquireHansBrokenAxe
+                or SimulationNatureSurvivalCodes.RepairHansFarmFence;
             var successor = request.ActionCode switch
             {
                 SimulationNatureSurvivalCodes.AcquireAxe =>
@@ -104,8 +106,19 @@ namespace Ssalddel.Simulation.Application
                     SimulationNatureSurvivalCodes
                         .PlaceCabinBlueprintWorldInteractionId,
                 SimulationNatureSurvivalCodes.CollectDroppedTimber =>
+                    SimulationNatureSurvivalCodes.IsR6(
+                        aggregate.GetNatureSurvivalState().ProfileRevision)
+                        && aggregate.GetNatureSurvivalState()
+                            .HansFarmFenceRestoration != null
+                        ? SimulationNatureSurvivalCodes
+                            .RepairHansFarmFenceWorldInteractionId
+                        : SimulationNatureSurvivalCodes
+                            .PlaceCabinBlueprintWorldInteractionId,
+                SimulationNatureSurvivalCodes.AcquireHansBrokenAxe =>
+                    SimulationNatureSurvivalCodes.BeginHarvestWorldInteractionId,
+                SimulationNatureSurvivalCodes.RepairHansFarmFence =>
                     SimulationNatureSurvivalCodes
-                        .PlaceCabinBlueprintWorldInteractionId,
+                        .HansFarmLifeOrTravelChoiceAvailable,
                 SimulationNatureSurvivalCodes.PlaceCabinBlueprint =>
                     SimulationNatureSurvivalCodes.BeginCabinBuildWorldInteractionId,
                 SimulationNatureSurvivalCodes.BeginCabinBuild =>
@@ -203,6 +216,18 @@ namespace Ssalddel.Simulation.Application
                 {
                     Simulation행위변화의미Codes.Actor상태변경,
                     Simulation행위변화의미Codes.재고변경,
+                },
+                SimulationNatureSurvivalCodes.AcquireHansBrokenAxe => new[]
+                {
+                    Simulation행위변화의미Codes.Actor상태변경,
+                    Simulation행위변화의미Codes.재고변경,
+                    Simulation행위변화의미Codes.실외배치변경,
+                },
+                SimulationNatureSurvivalCodes.RepairHansFarmFence => new[]
+                {
+                    Simulation행위변화의미Codes.재고변경,
+                    Simulation행위변화의미Codes.실외배치변경,
+                    Simulation행위변화의미Codes.통행변경,
                 },
                 SimulationNatureSurvivalCodes.BeginHarvest or
                 SimulationNatureSurvivalCodes.CollectDroppedTimber => new[]

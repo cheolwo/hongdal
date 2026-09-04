@@ -1,6 +1,6 @@
 {
   "schemaVersion": "codex-playable-loop-goals.v4",
-  "revision": "codex-playable-loop-goals.r141",
+  "revision": "codex-playable-loop-goals.r142",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "worldInteractionDeliveryPriorityPath": "eng/execution-ledgers/world-interaction-delivery-priorities.json",
   "evidencePackageCatalogPath": "eng/execution-ledgers/evidence-packages.json",
@@ -81,7 +81,7 @@
     "goalStateCode": "Active",
     "activeMaturityTrackCode": "Logic",
     "activeWorldInteractionId": "WI-WORLD-RESOURCE-REGENERATE",
-    "baselineRevision": "world-interaction-delivery-priorities.r40",
+    "baselineRevision": "world-interaction-delivery-priorities.r41",
     "workOrderRef": "eng/execution-ledgers/work-orders/nature-resource-regeneration.e7-work-order.json",
     "workOrderTargetRevision": "nature-resource-regeneration.design.r1",
     "pipelineValidation": {
@@ -1159,6 +1159,17 @@
     },
     {
       "queueOrder": 20,
+      "loopStableId": "playable-loop:nature-hans-farm-fence-restoration.v1",
+      "areaCode": "Farm",
+      "completionRoleCode": "Extension",
+      "targetEvidenceStage": "E7",
+      "targetClosureStateCode": "PlayClosed",
+      "goalStateCode": "Queued",
+      "activationPrerequisiteLoopStableIds": [],
+      "nextWorldInteractionId": "WI-NATURE-19"
+    },
+    {
+      "queueOrder": 21,
       "loopStableId": "playable-loop:town-arcana-context.v1",
       "areaCode": "Town",
       "completionRoleCode": "Extension",

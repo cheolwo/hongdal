@@ -1,7 +1,7 @@
 {
   "schemaVersion": "world-interaction-delivery-priorities.v1",
-"revision": "world-interaction-delivery-priorities.r40",
-  "lastVerifiedDate": "2026-08-30",
+"revision": "world-interaction-delivery-priorities.r41",
+  "lastVerifiedDate": "2026-09-04",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "wiEhStatusPath": "eng/world-seedbeds/generated/wi-eh-status.v1.json",
@@ -261,6 +261,8 @@
     { "worldInteractionId": "WI-NATURE-16", "deliveryWaveCode": "D1", "orderInWave": 19, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-field-supply-return.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-17", "deliveryWaveCode": "D1", "orderInWave": 20, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-field-supply-return.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-NATURE-18", "deliveryWaveCode": "D1", "orderInWave": 22, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-shelter-foundation.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-19", "deliveryWaveCode": "D1", "orderInWave": 23, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-hans-farm-fence-restoration.v1"], "syntyTrackCode": "Nature" },
+    { "worldInteractionId": "WI-NATURE-20", "deliveryWaveCode": "D1", "orderInWave": 24, "completionRoleCode": "Core", "playableLoopRefs": ["playable-loop:nature-hans-farm-fence-restoration.v1"], "syntyTrackCode": "Construction" },
     { "worldInteractionId": "WI-REFLECT-01", "deliveryWaveCode": "D1", "orderInWave": 21, "completionRoleCode": "Extension", "playableLoopRefs": ["playable-loop:nature-base-reflection.v1"], "syntyTrackCode": "Nature" },
     { "worldInteractionId": "WI-CON-01", "deliveryWaveCode": "D1", "orderInWave": 18, "completionRoleCode": "Shared", "playableLoopRefs": ["playable-loop:nature-workbench-foundation.v1", "playable-loop:nature-building-learning.v1", "playable-loop:farm-player-placement.v1"], "syntyTrackCode": "Construction" },
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-playable-loop-catalog.v6",
-  "revision": "playable-loops.r38",
+  "revision": "playable-loops.r39",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -2378,6 +2378,106 @@
         "계약만 있으며 권위 Core·Save/Replay·Fixture가 없다."
       ],
       "nextAction": "기존 도심마트 파생 엔진을 상태 권위로 오인하지 않고 독립 City 명령 Aggregate부터 만든다."
+    },
+    {
+      "priority": 80,
+      "loopStableId": "playable-loop:nature-hans-farm-fence-restoration.v1",
+      "title": "한스 농장 첫 울타리 수리",
+      "loopKind": "WorldIntegration",
+      "loopLevelCode": "PlayableUnit",
+      "planningGate": {
+        "topicStableId": "topic:hans-farm-first-fence-restoration.v1",
+        "designDocumentRef": "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md",
+        "designRevision": "hans-farm-first-lumber-repair.r27",
+        "designHashSha256": "ADC540046294B02E12FB2D329A8E75E3AD6FF5354DA1DCBD0247AFD47AAF6D2A",
+        "statusCode": "Approved",
+        "approvalEvidenceRef": "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"
+      },
+      "completionTierCode": "Extension",
+      "parentLoopStableId": "",
+      "requiredCoreChildLoopStableIds": [],
+      "optionalExtensionChildLoopStableIds": [],
+      "areaSetStableIds": [
+        "area-set:sim:pyeongchang:nature-home.v1",
+        "area-set:sim:pyeongchang:farm-production.v1"
+      ],
+      "playerPromise": "별도의 부러진 농장 손도끼를 회수하고 개인 손도끼로 허용 나무 한 그루를 베어 목재 2개를 얻은 뒤, 첫 사건 울타리 세 구간을 한 번에 수리하고 다음 선택으로 돌아간다.",
+      "entryStateCodes": [
+        "HansBrokenAxeAvailable",
+        "PersonalWoodcuttingAxeEquipped",
+        "HansFarmFenceDamaged"
+      ],
+      "worldInteractionIds": [
+        "WI-NATURE-19",
+        "WI-NATURE-06",
+        "WI-NATURE-18",
+        "WI-NATURE-20"
+      ],
+      "successStateCodes": [
+        "HansFarmFenceRepaired",
+        "HansFarmLifeOrTravelChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [],
+      "returnStateCodes": [
+        "HansFarmLifeOrTravelChoiceAvailable"
+      ],
+      "requiredHCapabilities": [
+        "h2-candidate:hans-farm:first-restoration",
+        "h1-stock:farm-fence-edge"
+      ],
+      "independentExecutionRequired": true,
+      "saveCheckpointCodes": [
+        "AfterHansBrokenAxePickup",
+        "AfterHansFarmFenceRepair"
+      ],
+      "currentEvidenceStage": "E4",
+      "nextClosureTargetStage": "E5",
+      "finalEvidenceStage": "E7",
+      "closureStateCode": "Open",
+      "statusCode": "InProgress",
+      "maturityTracks": {
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E5",
+          "targetStage": "E7",
+          "statusCode": "Validated",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "E6 결과 설명 정제와 E7 실제 입력은 별도다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E4",
+          "targetStage": "E7",
+          "statusCode": "Blocked",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "학습 중점 서비스의 RuntimeCore 패키지 경로 결손은 해소했지만 Unity 전체 컴파일은 별도 미추적 AreaSet authoring 파일 오류로 중단됐다."
+          ]
+        }
+      },
+      "openFeedbackItems": [
+        {
+          "feedbackId": "FB-HANS-FENCE-PRESENTATION-E5-01",
+          "earliestReopenEvidenceStageCode": "E5",
+          "summary": "별도 컴파일 결손 해소 뒤 최소 World Presenter EditMode 검증을 다시 실행한다."
+        },
+        {
+          "feedbackId": "FB-HANS-FENCE-ANIMATION-E6-01",
+          "earliestReopenEvidenceStageCode": "E6",
+          "summary": "벌목 Actor의 실제 Clip·Rig·입력·전이·중단·귀환과 root motion을 결속한다."
+        }
+      ],
+      "evidencePackageRefs": [],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/hans-farm-fence-restoration.e7-work-order.json"
+      ],
+      "blockers": [
+        "Presentation E5의 최종 Unity EditMode 실행 검증이 외부 컴파일 결손으로 차단됐다.",
+        "Play Mode·Game View E7은 이번 범위가 아니다."
+      ],
+      "nextAction": "별도 AreaSet authoring 파일의 컴파일 오류가 해당 소유 경계에서 해소되면 한스 농장 울타리 Presenter EditMode를 재실행해 Presentation E5만 닫고, 애니메이션은 E6에서 다룬다."
     },
     {
       "priority": 90,

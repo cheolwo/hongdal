@@ -17,6 +17,8 @@ namespace Ssalddel.WorkflowRules
         public const int NightEndsAtSecond = 1_110;
         public const int HarvestWorkSeconds = 4;
         public const int HarvestTimberQuantity = 2;
+        public const int HansFarmFenceRepairTimberCost = 2;
+        public const int HansFarmFenceSegmentCount = 3;
         public const int CabinTimberCost = 6;
         public const int CabinWorkSeconds = 30;
         public const int TreeRegrowthCycleCount = 3;

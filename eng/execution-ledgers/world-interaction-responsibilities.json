@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-responsibilities.v1",
-  "revision": "simulation-world-interaction-responsibilities.r13",
-  "lastVerifiedDate": "2026-08-27",
+  "revision": "simulation-world-interaction-responsibilities.r14",
+  "lastVerifiedDate": "2026-09-04",
   "principles": {
     "oneIntentPerWorldInteraction": true,
     "onePrimaryAuthorityOutcomePerWorldInteraction": true,
@@ -117,6 +117,8 @@
     "WI-NATURE-16": "NatureFieldSupplyPackAdded",
     "WI-NATURE-17": "NpcFieldSupplyPolicySelected",
     "WI-NATURE-18": "TimberCollected",
+    "WI-NATURE-19": "HansBrokenAxeCarried",
+    "WI-NATURE-20": "HansFarmFenceRepaired",
     "WI-REFLECT-01": "InnerLearningPending",
     "WI-CARD-01": "MajorArcanaActivated",
     "WI-CON-01": "AreaBuildingOperational",
@@ -186,6 +188,10 @@
     {
       "worldInteractionId": "WI-NATURE-18",
       "reason": "지면 통나무의 수집 완료와 같은 수량의 소지 인벤토리 증가는 하나의 자원 이동으로 함께 성공하거나 함께 실패해야 한다."
+    },
+    {
+      "worldInteractionId": "WI-NATURE-20",
+      "reason": "통나무 2개 소비, 울타리 세 구간 수리와 생활 또는 이동 선택 개방은 한 수리 확정에서 함께 성립해야 한다."
     },
     {
       "worldInteractionId": "WI-CARD-01",

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r6",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-HANS-FARM-FENCE-RESTORATION",
+  "title": "한스 농장 첫 울타리 수리 E5",
+  "playableUnitStableId": "playable-loop:nature-hans-farm-fence-restoration.v1",
+  "activeWorldInteractionId": "WI-NATURE-20",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E4",
+  "promotionEligible": false,
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md",
+    "designRevision": "hans-farm-first-lumber-repair.r27",
+    "designHashSha256": "ADC540046294B02E12FB2D329A8E75E3AD6FF5354DA1DCBD0247AFD47AAF6D2A",
+    "approvalEvidenceRef": "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"
+  },
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E5",
+    "promotionBeyondStageAllowed": false,
+    "reason": "이번 범위는 최소 World 표현 E5까지이며 실제 AnimationClip 결속은 E6, 실제 입력·Play Mode·Game View는 E7에서 별도 수행한다."
+  },
+  "iterationState": {
+    "currentPass": "StableOrExplicitlyBlocked",
+    "nextReopenCondition": "다른 작업 소유의 미추적 AreaSet배치AuthoringPipeline.cs가 Unity 전체 컴파일을 통과하면 동일 Presenter EditMode 검증부터 재개한다."
+  },
+  "presentationE4Preparation": {
+    "applicabilityCode": "Required",
+    "notApplicableReason": "",
+    "playerReadableMoment": "줍기 전 부러진 도끼와 손상 울타리 세 구간, 줍기 후 도끼 제거, 수리 후 세 구간 정렬을 읽는다.",
+    "requiredHCapabilities": [
+      "h2-candidate:hans-farm:first-restoration",
+      "h1-stock:farm-fence-edge"
+    ],
+    "visualKeys": [
+      "visual:nature:hans-broken-axe:e5-fallback",
+      "visual:nature:hans-fence:damaged:e5-fallback",
+      "visual:nature:hans-fence:repaired:e5-fallback"
+    ],
+    "primaryAssetCandidateRefs": [
+      "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Tool_Axe_01.prefab",
+      "Assets/Synty/PolygonFarm/Prefabs/Props/SM_Prop_Fence_Wood_01.prefab"
+    ],
+    "alternativeAssetCandidateRefs": [],
+    "fallbackPresentationRefs": [
+      "Assets/Ssalddel/Presentation/World/Hans농장울타리E5Presenter.cs"
+    ],
+    "placementIntent": "placement-map:hans-farm:first-fence-restoration-e5.v1의 PlacementRoot 로컬 좌표에 부러진 도끼 하나와 울타리 세 구간을 배치하고 권위 상태 사본에 따라 Available/Carried 및 Damaged/Repaired 표현만 교체한다.",
+    "interactionAnchorIntent": "부러진 도끼 줍기와 울타리 수리의 안정 식별자를 표현 객체에 유지하되 Presenter는 Simulation 상태를 변경하지 않는다.",
+    "candidateRevisionOrFingerprint": "hans-farm-fence-restoration.presentation-e5.r1",
+    "e5ReadinessCode": "Blocked",
+    "openGapRefs": [
+      "SimulationPlayerLearningFocusService를 RuntimeCore 패키지 경로로 옮겨 기존 결손은 해소했으나 Unity 프로젝트 컴파일은 다른 작업 소유의 미추적 AreaSet배치AuthoringPipeline.cs:473 Application.dataPath 이름 충돌로 차단됨",
+      "실제 Prefab 결속과 canonical SimulationWorldShell 배치는 컴파일 복구 후 검증 필요",
+      "Play Mode·Game View·실제 입력 재생은 E7 범위이며 이번 작업에서 수행하지 않음"
+    ],
+    "animationReadinessCode": "DeferredToE6",
+    "animationBoundary": "E5는 정적 자세·진행 표식·상태 교체를 허용하고 실제 Actor 애니메이션은 E6에서 검증한다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E5",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 플레이어 입력과 Game View는 이번 범위 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "결과 설명과 장기 후속 인과 정제는 별도다." },
+        { "code": "E5", "disposition": "Affected", "summary": "권위 상태 사본, 같은 revision 행위 기록, 목재 소비와 울타리 전체 수리를 결속한다." },
+        { "code": "E4", "disposition": "Affected", "summary": "첫 사건 H1·H2·울타리 aggregate와 Graph Map·배치 맵을 동결한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "멱등·원자 수리·Save/Replay와 실패 조건을 자동시험한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "기존 Nature 서비스와 Session aggregate에 두 WI를 연결한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "부러진 도끼와 개인 손도끼를 분리하고 한 나무·목재 2개·울타리 3구간 순서를 고정한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs", "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationHansFarmFenceRestoration.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationHansFarmFenceRestorationTests.cs", "test:SimulationHansFarmFenceRestorationTests:2/2"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["eng/world-seedbeds/graph-maps/hans-farm-fence-restoration.v1.json", "eng/world-seedbeds/placement-map-profiles/hans-farm-first-fence-restoration-e5.v1.json"] },
+        { "code": "E5", "status": "Passed", "evidenceRefs": ["test:SimulationNatureSurvivalTests+SimulationHansFarmFenceRestorationTests:52/52"] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E4",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력·Play Mode·Game View는 이번 범위 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "실제 벌목 AnimationClip·Rig·입력·전이·중단·귀환·root motion을 검증한다." },
+        { "code": "E5", "disposition": "Affected", "summary": "실제 또는 fallback GameObject, 배치 기준점, Renderer·Collider·Bounds, 손상/수리 VisualKey 상태 교체를 검증한다." },
+        { "code": "E4", "disposition": "Affected", "summary": "동결한 visual key·fallback·배치 의도를 presentationE4Preparation에 기록한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "권위 상태를 읽기만 하는 Presenter EditMode 회귀를 준비한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "Simulation 상태 사본에서 Unity 표현으로 가는 읽기 전용 투영을 구현한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "부러진 도끼의 존재 변화와 울타리 손상/수리 차이를 플레이어가 읽어야 한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["unity:Assets/Ssalddel/Presentation/World/Hans농장울타리E5Presenter.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["eng/tests/hans-farm-fence-restoration-e5.ps1"] },
+        { "code": "E4", "status": "Passed", "evidenceRefs": ["eng/world-seedbeds/placement-map-profiles/hans-farm-first-fence-restoration-e5.v1.json"] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E4",
+    "status": "Blocked",
+    "candidateRevision": "hans-farm-fence-restoration.e5.r1",
+    "evidenceRefs": [
+      "test:SimulationNatureSurvivalTests+SimulationHansFarmFenceRestorationTests:52/52",
+      "eng/world-seedbeds/graph-maps/hans-farm-fence-restoration.v1.json",
+      "eng/world-seedbeds/placement-map-profiles/hans-farm-first-fence-restoration-e5.v1.json"
+    ],
+    "openFeedbackRefs": [
+      "학습 중점 서비스 경로 결손은 해소했지만 별도 AreaSet authoring 파일의 컴파일 오류를 해당 소유자가 정리한 뒤 Presenter EditMode를 재실행해야 Presentation·통합 E5가 닫힌다.",
+      "애니메이션은 E6, 실제 입력·Play Mode·Game View는 E7에서 별도 검증한다."
+    ]
+  }
+}

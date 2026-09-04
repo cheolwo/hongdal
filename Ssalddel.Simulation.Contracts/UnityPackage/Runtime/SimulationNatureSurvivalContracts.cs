@@ -609,6 +609,7 @@ namespace Ssalddel.Simulation.Contracts
         public const string ProfileRevisionR3 = "nature-survival.realtime.r3";
         public const string ProfileRevisionR4 = "nature-survival.realtime.r4";
         public const string ProfileRevisionR5 = "nature-survival.realtime.r5";
+        public const string ProfileRevisionR6 = "nature-survival.realtime.r6";
         public const string ProfileRevision = ProfileRevisionR1;
         public const string AreaSetStableId = "area-set:sim:pyeongchang:nature-home.v1";
         public const string HomeH3StableId = "h3-candidate:nature-home-encounter-defense";
@@ -619,6 +620,15 @@ namespace Ssalddel.Simulation.Contracts
         public const string AxeItemCode = "tool:axe.basic";
         public const string AxePickupStableId = "pickup:nature-safe-clearing:basic-axe";
         public const string TimberItemCode = "material:timber-log";
+        public const string HansBrokenAxeItemCode = "tool:axe.hans-broken.r1";
+        public const string HansBrokenAxePickupStableId =
+            "pickup:hans-farm:broken-axe:first-incident";
+        public const string HansFarmFenceAggregateStableId =
+            "fence-aggregate:hans-farm:first-incident";
+        public const string HansFarmFenceH2StableId =
+            "h2-candidate:hans-farm:first-restoration";
+        public const string HansFarmFenceH1StableId =
+            "h1-stock:farm-fence-edge";
         public const string RebuildPartItemCode = "material:rebuild-part";
         public const string NatureFieldSupplyPackItemCode =
             "supply:nature-field-pack";
@@ -645,6 +655,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string PrepareFieldSupplyDelegated =
             "PrepareFieldSupplyDelegated";
         public const string CollectDroppedTimber = "CollectDroppedTimber";
+        public const string AcquireHansBrokenAxe = "AcquireHansBrokenAxe";
+        public const string RepairHansFarmFence = "RepairHansFarmFence";
 
         public const string AcquireAxeWorldInteractionId = "WI-NATURE-05";
         public const string BeginHarvestWorldInteractionId = "WI-NATURE-06";
@@ -662,6 +674,10 @@ namespace Ssalddel.Simulation.Contracts
             "WI-NATURE-17";
         public const string CollectDroppedTimberWorldInteractionId =
             "WI-NATURE-18";
+        public const string AcquireHansBrokenAxeWorldInteractionId =
+            "WI-NATURE-19";
+        public const string RepairHansFarmFenceWorldInteractionId =
+            "WI-NATURE-20";
         public const string TacticalSelfNavigationPlayableLoopStableId =
             "playable-loop:nature-tactical-self-navigation.v1";
         public const string ShelterFoundationPlayableLoopStableId =
@@ -674,6 +690,8 @@ namespace Ssalddel.Simulation.Contracts
             "playable-loop:nature-building-learning.v1";
         public const string FieldSupplyReturnPlayableLoopStableId =
             "playable-loop:nature-field-supply-return.v1";
+        public const string HansFarmFenceRestorationPlayableLoopStableId =
+            "playable-loop:nature-hans-farm-fence-restoration.v1";
         public const string Fight = "Fight";
         public const string Retreat = "Retreat";
         public const string Victory = "Victory";
@@ -703,6 +721,12 @@ namespace Ssalddel.Simulation.Contracts
         public const string ApplicationInactive = "ApplicationInactive";
         public const string DroppedTimberAvailable = "Available";
         public const string DroppedTimberCollected = "Collected";
+        public const string Available = "Available";
+        public const string Carried = "Carried";
+        public const string Damaged = "Damaged";
+        public const string Repaired = "Repaired";
+        public const string HansFarmLifeOrTravelChoiceAvailable =
+            "HansFarmLifeOrTravelChoiceAvailable";
 
         public const string Disabled = "SimulationNatureSurvivalDisabled";
         public const string ExpectedRevisionMismatch = "SimulationExpectedRevisionMismatch";
@@ -748,6 +772,12 @@ namespace Ssalddel.Simulation.Contracts
             "SimulationNatureDroppedTimberNotFound";
         public const string DroppedTimberUnavailable =
             "SimulationNatureDroppedTimberUnavailable";
+        public const string HansBrokenAxeUnavailable =
+            "SimulationNatureHansBrokenAxeUnavailable";
+        public const string HansFarmFenceTargetInvalid =
+            "SimulationNatureHansFarmFenceTargetInvalid";
+        public const string HansFarmFenceAlreadyRepaired =
+            "SimulationNatureHansFarmFenceAlreadyRepaired";
 
         /// <summary>
         /// 플레이어가 명시적으로 선택하고 권위 상태를 바꾸는 Nature 생존 행동을
@@ -773,6 +803,8 @@ namespace Ssalddel.Simulation.Contracts
                 PrepareFieldSupplyDelegated =>
                     PrepareFieldSupplyDelegatedWorldInteractionId,
                 CollectDroppedTimber => CollectDroppedTimberWorldInteractionId,
+                AcquireHansBrokenAxe => AcquireHansBrokenAxeWorldInteractionId,
+                RepairHansFarmFence => RepairHansFarmFenceWorldInteractionId,
                 _ => string.Empty,
             };
 
@@ -793,6 +825,8 @@ namespace Ssalddel.Simulation.Contracts
                 BeginBuildingConstruction => BuildingLearningPlayableLoopStableId,
                 PrepareFieldSupply or PrepareFieldSupplyDelegated =>
                     FieldSupplyReturnPlayableLoopStableId,
+                AcquireHansBrokenAxe or RepairHansFarmFence =>
+                    HansFarmFenceRestorationPlayableLoopStableId,
                 _ => string.Empty,
             };
 
@@ -800,8 +834,10 @@ namespace Ssalddel.Simulation.Contracts
             => actionCode switch
             {
                 AcquireAxe or BeginHarvest or ResolveEncounter or
-                    CollectDroppedTimber =>
+                    CollectDroppedTimber or AcquireHansBrokenAxe =>
                     Simulation플레이어활동경로Codes.FieldExpedition,
+                RepairHansFarmFence =>
+                    Simulation플레이어활동경로Codes.AreaManufacturing,
                 StoreAtCabin or SleepInCabin or SelectExpansionPlan =>
                     Simulation플레이어활동경로Codes.AreaOperation,
                 PlaceCabinBlueprint or BeginCabinBuild or
@@ -818,7 +854,8 @@ namespace Ssalddel.Simulation.Contracts
                 BeginHarvest or ResolveEncounter =>
                     Simulation플레이흐름Codes.발산,
                 PlaceCabinBlueprint or BeginCabinBuild or
-                    BeginBuildingConstruction or PrepareFieldSupply =>
+                    BeginBuildingConstruction or PrepareFieldSupply or
+                    RepairHansFarmFence =>
                     Simulation플레이흐름Codes.순환연결부,
                 _ => Simulation플레이흐름Codes.수렴,
             };
@@ -843,6 +880,8 @@ namespace Ssalddel.Simulation.Contracts
                || string.Equals(profileRevision?.Trim(), ProfileRevisionR4,
                     StringComparison.Ordinal)
                || string.Equals(profileRevision?.Trim(), ProfileRevisionR5,
+                    StringComparison.Ordinal)
+               || string.Equals(profileRevision?.Trim(), ProfileRevisionR6,
                     StringComparison.Ordinal);
 
         public static bool IsR3(string profileRevision)
@@ -851,16 +890,26 @@ namespace Ssalddel.Simulation.Contracts
                || string.Equals(profileRevision?.Trim(), ProfileRevisionR4,
                    StringComparison.Ordinal)
                || string.Equals(profileRevision?.Trim(), ProfileRevisionR5,
+                   StringComparison.Ordinal)
+               || string.Equals(profileRevision?.Trim(), ProfileRevisionR6,
                    StringComparison.Ordinal);
 
         public static bool IsR4(string profileRevision)
             => string.Equals(profileRevision?.Trim(), ProfileRevisionR4,
                    StringComparison.Ordinal)
                || string.Equals(profileRevision?.Trim(), ProfileRevisionR5,
+                   StringComparison.Ordinal)
+               || string.Equals(profileRevision?.Trim(), ProfileRevisionR6,
                    StringComparison.Ordinal);
 
         public static bool IsR5(string profileRevision)
             => string.Equals(profileRevision?.Trim(), ProfileRevisionR5,
+                   StringComparison.Ordinal)
+               || string.Equals(profileRevision?.Trim(), ProfileRevisionR6,
+                   StringComparison.Ordinal);
+
+        public static bool IsR6(string profileRevision)
+            => string.Equals(profileRevision?.Trim(), ProfileRevisionR6,
                 StringComparison.Ordinal);
 
         public static string ActualE5SpatialStableId(string worldInteractionId)
@@ -898,6 +947,7 @@ namespace Ssalddel.Simulation.Contracts
         public string SpawnH1StableId { get; set; } = SimulationNatureSurvivalCodes.SafeClearingH1StableId;
         public decimal InventoryCapacityUnits { get; set; } = 24m;
         public bool StartsWithAxe { get; set; } = true;
+        public bool HansFarmFenceRestorationEnabled { get; set; }
         public string FocusAccessibilityModeCode { get; set; }
             = Simulation집중판정Codes.Standard;
         public SimulationNatureResourceNodeInitialStateRequest[] ResourceNodes { get; set; }
@@ -1049,6 +1099,8 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationNatureCabinSnapshot Cabin { get; set; }
             = new SimulationNatureCabinSnapshot();
         public SimulationNatureEncounterSnapshot? Encounter { get; set; }
+        public SimulationHansFarmFenceRestorationSnapshot?
+            HansFarmFenceRestoration { get; set; }
         public bool SimulationOnly { get; set; } = true;
         public bool IsOperationalState { get; set; }
     }
@@ -1062,6 +1114,37 @@ namespace Ssalddel.Simulation.Contracts
         public double LocalZ { get; set; }
         public string StateCode { get; set; } = SimulationNatureSurvivalCodes.Standing;
         public int RegrowsAtCycleIndex { get; set; } = -1;
+    }
+
+    public sealed class SimulationHansFarmFenceRestorationSnapshot
+    {
+        public string FenceAggregateStableId { get; set; } =
+            SimulationNatureSurvivalCodes.HansFarmFenceAggregateStableId;
+        public string H2StableId { get; set; } =
+            SimulationNatureSurvivalCodes.HansFarmFenceH2StableId;
+        public string H1StableId { get; set; } =
+            SimulationNatureSurvivalCodes.HansFarmFenceH1StableId;
+        public string FenceStateCode { get; set; } =
+            SimulationNatureSurvivalCodes.Damaged;
+        public string BrokenAxePickupStableId { get; set; } =
+            SimulationNatureSurvivalCodes.HansBrokenAxePickupStableId;
+        public string BrokenAxeStateCode { get; set; } =
+            SimulationNatureSurvivalCodes.Available;
+        public bool PlayerCarriesBrokenAxe { get; set; }
+        public int RequiredTimberQuantity { get; set; } = 2;
+        public bool NextChoiceAvailable { get; set; }
+        public SimulationHansFarmFenceSegmentSnapshot[] Segments { get; set; }
+            = Array.Empty<SimulationHansFarmFenceSegmentSnapshot>();
+    }
+
+    public sealed class SimulationHansFarmFenceSegmentSnapshot
+    {
+        public string SegmentStableId { get; set; } = string.Empty;
+        public string StateCode { get; set; } =
+            SimulationNatureSurvivalCodes.Damaged;
+        public double LocalX { get; set; }
+        public double LocalZ { get; set; }
+        public double YawDegrees { get; set; }
     }
 
     /// <summary>

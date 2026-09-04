@@ -1,6 +1,6 @@
 {
   "schemaVersion": "playable-loop-presentation-validation-modules.v2",
-  "revision": "playable-loop-presentation-validation-modules.r12",
+  "revision": "playable-loop-presentation-validation-modules.r13",
   "trackCode": "Presentation",
   "appliesToLoopLevelCodes": [
     "PlayableUnit"
@@ -37,7 +37,10 @@
     "presentationValidationDoesNotMutateSimulationAuthority": true,
     "e4FreezesApplicableAssetPlacementHandoff": true,
     "assetResearchAloneNeverPromotesE5": true,
-    "notApplicableDoesNotForceSpatialAssets": true
+    "notApplicableDoesNotForceSpatialAssets": true,
+    "e5RequiresMinimalReadableWorldManifestationNotFinalAnimation": true,
+    "staticPoseProgressOrStateSwapMaySatisfyE5": true,
+    "actorActionAnimationBindingBelongsToE6": true
   },
   "generatedDocumentText": {
     "titleKo": "PlayableLoop 공통 표현 검증 모듈 상태",
@@ -71,7 +74,8 @@
     "WorkZone",
     "CameraOcclusion",
     "Atmosphere",
-    "DirectionalLighting"
+    "DirectionalLighting",
+    "ActorAction"
   ],
   "modules": [
     {
@@ -578,6 +582,36 @@
       ],
       "implementationRefs": [],
       "testRefs": []
+    },
+    {
+      "moduleCode": "actor-action-animation-readability",
+      "displayNameKo": "Actor 행위 애니메이션 결속·판독 검증",
+      "evidenceStageCode": "E6",
+      "applicabilityCode": "Feature",
+      "requiredFeatureCodes": [
+        "ActorAction"
+      ],
+      "severityCode": "Blocking",
+      "automationLevelCode": "Mixed",
+      "reads": [
+        "E4 AnimationRole·ActionCue 후보",
+        "실제 AnimationClip과 대상 Rig·Avatar",
+        "Controller·입력·전이와 중단·귀환·root motion 정책"
+      ],
+      "failureReasonCodes": [
+        "AnimationRoleBindingMissing",
+        "AnimationClipOrRigMissing",
+        "AnimationTransitionUnreadable",
+        "AnimationInterruptReturnInvalid"
+      ],
+      "outputs": [
+        "Actor 행위의 실제 동작 결속과 판독 검증 결과",
+        "E5에서 허용한 정적 자세·진행 표식·상태 교체 fallback을 실제 동작으로 대체했는지 여부"
+      ],
+      "implementationRefs": [
+        "repo:docs/Architecture/플레이폐루프Synty표현모듈체계.md"
+      ],
+      "testRefs": []
     }
   ],
   "loopProfiles": [
@@ -669,6 +703,18 @@
         }
       ],
       "workOrderRef": "eng/execution-ledgers/work-orders/farm-crop-cycle.e7-work-order.json"
+    },
+    {
+      "loopStableId": "playable-loop:nature-hans-farm-fence-restoration.v1",
+      "featureCodes": [
+        "GroundSurface",
+        "FenceChain",
+        "Actor",
+        "WorkZone",
+        "CameraOcclusion",
+        "ActorAction"
+      ],
+      "workOrderRef": "eng/execution-ledgers/work-orders/hans-farm-fence-restoration.e7-work-order.json"
     }
   ]
 }

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "simulation-world-placement-map-e5-profile.v1",
+  "profileStableId": "placement-map:hans-farm:first-fence-restoration-e5.v1",
+  "revision": "hans-farm-first-fence-restoration-e5.r1",
+  "title": "한스 농장 첫 울타리 수리 최소 World E5",
+  "playableLoopStableId": "playable-loop:nature-hans-farm-fence-restoration.v1",
+  "graphMapRef": "eng/world-seedbeds/graph-maps/hans-farm-fence-restoration.v1.json",
+  "targetH2StableId": "h2-candidate:hans-farm:first-restoration",
+  "targetH1StableId": "h1-stock:farm-fence-edge",
+  "authorityAggregateStableId": "fence-aggregate:hans-farm:first-incident",
+  "placementRootStableId": "placement-root:hans-farm:first-restoration",
+  "coordinateSpaceCode": "PlacementRootLocalMeters",
+  "instances": [
+    {
+      "stableId": "pickup:hans-farm:broken-axe:first-incident",
+      "placementRole": "BrokenAxePickupAnchor",
+      "localPosition": [-3.1, 0.14, 0.9],
+      "localEuler": [8.0, 24.0, 82.0],
+      "stateVisuals": {
+        "Available": "visual:nature:hans-broken-axe:e5-fallback",
+        "Carried": "HiddenAfterAuthorityPickup"
+      },
+      "prefabPolicy": "OwnedSyntyCandidateOrDeterministicPrimitiveFallback",
+      "requiredComponents": ["Renderer", "Collider", "StableIdMarker"]
+    },
+    {
+      "stableId": "fence-segment:hans-farm:first-incident:01",
+      "placementRole": "FenceSegment",
+      "localPosition": [-2.4, 0.65, 2.2],
+      "damagedYawDegrees": 90.0,
+      "repairedYawDegrees": 90.0
+    },
+    {
+      "stableId": "fence-segment:hans-farm:first-incident:02",
+      "placementRole": "FenceSegment",
+      "localPosition": [0.0, 0.65, 2.2],
+      "damagedYawDegrees": 82.0,
+      "repairedYawDegrees": 90.0
+    },
+    {
+      "stableId": "fence-segment:hans-farm:first-incident:03",
+      "placementRole": "FenceSegment",
+      "localPosition": [2.4, 0.65, 2.2],
+      "damagedYawDegrees": 96.0,
+      "repairedYawDegrees": 90.0
+    }
+  ],
+  "fenceStateVisuals": {
+    "Damaged": "visual:nature:hans-fence:damaged:e5-fallback",
+    "Repaired": "visual:nature:hans-fence:repaired:e5-fallback"
+  },
+  "e5Checks": [
+    "ExactlyThreeFenceSegments",
+    "StableIdsMatchAuthoritySnapshot",
+    "BrokenAxeVisibleOnlyWhenAvailable",
+    "DamagedAndRepairedVisualKeysDiffer",
+    "ActiveRenderer",
+    "ColliderPresent",
+    "NonZeroBounds",
+    "PresentationDoesNotMutateSimulation"
+  ],
+  "animationBoundary": {
+    "e5AllowedReadability": ["StaticPose", "ProgressMarker", "StateSwap"],
+    "fenceRepairAnimationRole": "NotApplicable",
+    "woodcuttingActualAnimationStage": "E6",
+    "requiredAtE6": ["AnimationRole", "ActionCue", "AnimationClip", "RigAvatar", "ControllerInputTransition", "InterruptReturn", "RootMotionPolicy"]
+  },
+  "validationStateCode": "ImplementedPendingCanonicalUnityCompile",
+  "blockingReasons": [
+    "The SimulationPlayerLearningFocusService package-path gap is resolved, but Unity compilation is blocked by an unrelated untracked AreaSet authoring source error",
+    "PlayMode and GameView belong to E7 and were not requested"
+  ],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

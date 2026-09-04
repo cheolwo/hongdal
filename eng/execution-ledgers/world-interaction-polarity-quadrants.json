@@ -1,7 +1,7 @@
 {
   "schemaVersion": "world-interaction-polarity-quadrants.v1",
-  "revision": "world-interaction-polarity-quadrants.r12",
-  "lastVerifiedDate": "2026-08-27",
+  "revision": "world-interaction-polarity-quadrants.r13",
+  "lastVerifiedDate": "2026-09-04",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "playableLoopCatalogPath": "eng/execution-ledgers/playable-loops.json",
   "principles": {
@@ -30,14 +30,14 @@
     "WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04", "WI-FARM-05", "WI-FARM-06",
     "WI-002", "WI-HUB-04", "WI-HUB-05", "WI-HUB-06", "WI-LOG-01",
     "WI-MARKET-01", "WI-MARKET-04", "WI-MARKET-05",
-    "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-18",
+    "WI-NATURE-01", "WI-NATURE-02", "WI-NATURE-05", "WI-NATURE-06", "WI-NATURE-09", "WI-NATURE-10", "WI-NATURE-11", "WI-NATURE-18", "WI-NATURE-19",
     "WI-ORDER-03", "WI-ORDER-04", "WI-ORDER-06", "WI-WORLD-05"
   ],
   "fixedYinWorldInteractionIds": [
     "WI-ACTOR-02", "WI-ACTOR-03",
     "WI-CARD-01", "WI-CITY-01", "WI-CITY-03", "WI-CITY-04", "WI-COMMUNITY-VISITOR-STAY",
     "WI-001", "WI-HUB-03", "WI-MARKET-02", "WI-MARKET-03",
-    "WI-NATURE-04", "WI-NATURE-12", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-NATURE-17",
+    "WI-NATURE-04", "WI-NATURE-12", "WI-NATURE-13", "WI-NATURE-14", "WI-NATURE-15", "WI-NATURE-17", "WI-NATURE-20",
     "WI-ORDER-01", "WI-ORDER-07", "WI-REFLECT-01",
     "WI-WORLD-02", "WI-WORLD-03", "WI-WORLD-06", "WI-WORLD-07", "WI-WORLD-08", "WI-REVIEW-01", "WI-SQUAD-ASSIGN", "WI-SQUAD-SUPPLY"
   ],

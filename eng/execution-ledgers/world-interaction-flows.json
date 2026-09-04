@@ -1,7 +1,7 @@
 {
   "schemaVersion": "simulation-world-interaction-flows.v1",
-  "revision": "simulation-world-interaction-flows.r3",
-  "lastVerifiedDate": "2026-08-27",
+  "revision": "simulation-world-interaction-flows.r4",
+  "lastVerifiedDate": "2026-09-04",
   "principles": {
     "flowComposesWorldInteractionsWithoutOwningThem": true,
     "worldInteractionCanParticipateInMultipleFlows": true,
@@ -132,7 +132,9 @@
         { "fromWorldInteractionId": "WI-NATURE-15", "toWorldInteractionId": "WI-CON-01" },
         { "fromWorldInteractionId": "WI-NATURE-17", "toWorldInteractionId": "WI-NATURE-06" },
         { "fromWorldInteractionId": "WI-NATURE-18", "toWorldInteractionId": "WI-NATURE-06" },
-        { "fromWorldInteractionId": "WI-NATURE-18", "toWorldInteractionId": "WI-NATURE-07" }
+        { "fromWorldInteractionId": "WI-NATURE-18", "toWorldInteractionId": "WI-NATURE-07" },
+        { "fromWorldInteractionId": "WI-NATURE-19", "toWorldInteractionId": "WI-NATURE-06" },
+        { "fromWorldInteractionId": "WI-NATURE-18", "toWorldInteractionId": "WI-NATURE-20" }
       ]
     },
     {

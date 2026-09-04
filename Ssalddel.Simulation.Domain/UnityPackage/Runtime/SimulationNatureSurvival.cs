@@ -164,6 +164,14 @@ namespace Ssalddel.Simulation.Domain
                             value.DroppedTimberStableId)))
                     .Concat(new[]
                     {
+                        OpportunityRequest(
+                            SimulationNatureSurvivalCodes.AcquireHansBrokenAxe,
+                            SimulationNatureSurvivalCodes
+                                .HansBrokenAxePickupStableId),
+                        OpportunityRequest(
+                            SimulationNatureSurvivalCodes.RepairHansFarmFence,
+                            SimulationNatureSurvivalCodes
+                                .HansFarmFenceAggregateStableId),
                         OpportunityRequest(SimulationNatureSurvivalCodes.StoreAtCabin,
                             natureCabin.CabinStableId),
                         OpportunityRequest(
@@ -419,6 +427,7 @@ namespace Ssalddel.Simulation.Domain
                     });
             }
             EnsureNaturePlayerInventory(request);
+            InitializeHansFarmFenceRestoration(request);
             foreach (var actor in request.CooperativeActors
                          .OrderBy(value => value.ActorStableId,
                              StringComparer.Ordinal))
@@ -524,6 +533,13 @@ namespace Ssalddel.Simulation.Domain
                     && remainingInventoryCapacity < targetDroppedTimber.Quantity)
                     reasons.Add(SimulationWorldSurvivalInventoryCodes
                         .PlayerCapacityExceeded);
+            }
+            else if (action ==
+                SimulationNatureSurvivalCodes.AcquireHansBrokenAxe
+                || action == SimulationNatureSurvivalCodes.RepairHansFarmFence)
+            {
+                AppendHansFarmFencePreviewReasons(action,
+                    NormalizeOptional(request.TargetStableId), reasons);
             }
             else if (action == SimulationNatureSurvivalCodes.PlaceCabinBlueprint)
             {
@@ -703,10 +719,15 @@ namespace Ssalddel.Simulation.Domain
                             ?.RequiredTimberQuantity ?? 0
                         : action == SimulationNatureSurvivalCodes.PrepareFieldSupply
                             ? SimulationNatureSurvivalCodes.FieldSupplyTimberCost
+                            : action == SimulationNatureSurvivalCodes
+                                .RepairHansFarmFence
+                                ? NatureSurvivalRules
+                                    .HansFarmFenceRepairTimberCost
                             : 0,
                 AvailableTimberQuantity = action ==
                     SimulationNatureSurvivalCodes.BeginBuildingConstruction
                     || action == SimulationNatureSurvivalCodes.PrepareFieldSupply
+                    || action == SimulationNatureSurvivalCodes.RepairHansFarmFence
                     ? NatureAvailableTimberQuantity() : timber,
                 RequiredWorkSeconds = workSeconds,
                 TransferableTimberQuantity = action ==
@@ -780,6 +801,12 @@ namespace Ssalddel.Simulation.Domain
                     new[] { "effect:nature:dropped-timber-collected" },
                     new[] { "TimberCollected", "DroppedTimberRemoved" },
                     Revision + 1L);
+            }
+            else if (action ==
+                SimulationNatureSurvivalCodes.AcquireHansBrokenAxe
+                || action == SimulationNatureSurvivalCodes.RepairHansFarmFence)
+            {
+                ApplyHansFarmFenceAction(action);
             }
             else if (action == SimulationNatureSurvivalCodes.PlaceCabinBlueprint)
             {
@@ -1286,6 +1313,8 @@ namespace Ssalddel.Simulation.Domain
                 LastFocusResult = CloneFocusResult(natureLastFocusResult),
                 Cabin = CloneNatureCabin(natureCabin),
                 Encounter = CloneNatureEncounter(natureEncounter),
+                HansFarmFenceRestoration =
+                    CreateHansFarmFenceRestorationSnapshot(),
                 SimulationOnly = true,
                 IsOperationalState = false,
             };
@@ -1349,6 +1378,10 @@ namespace Ssalddel.Simulation.Domain
 
         private bool IsNatureR5 => natureSurvivalCreationState != null
             && SimulationNatureSurvivalCodes.IsR5(
+                natureSurvivalCreationState.ProfileRevision);
+
+        private bool IsNatureR6 => natureSurvivalCreationState != null
+            && SimulationNatureSurvivalCodes.IsR6(
                 natureSurvivalCreationState.ProfileRevision);
 
         private decimal NatureRemainingInventoryCapacityUnits()
@@ -1643,6 +1676,9 @@ namespace Ssalddel.Simulation.Domain
                     StringComparison.Ordinal)
                 && !string.Equals(request.ProfileRevision,
                     SimulationNatureSurvivalCodes.ProfileRevisionR5,
+                    StringComparison.Ordinal)
+                && !string.Equals(request.ProfileRevision,
+                    SimulationNatureSurvivalCodes.ProfileRevisionR6,
                     StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationNatureSurvivalProfileUnsupported");
             RequireStableId(request.PlayerStableId, "SimulationNaturePlayerStableIdInvalid");
@@ -1721,6 +1757,7 @@ namespace Ssalddel.Simulation.Domain
                 request.SpawnH2StableId.Trim(), request.SpawnH1StableId.Trim(),
                 request.InventoryCapacityUnits.ToString(CultureInfo.InvariantCulture),
                 request.StartsWithAxe.ToString(),
+                request.HansFarmFenceRestorationEnabled.ToString(),
                 request.FocusAccessibilityModeCode,
                 request.BuildingProgressionCatalog?.Revision ?? string.Empty,
                 request.BuildingProgressionCatalog?.HashSha256 ?? string.Empty,
@@ -1785,6 +1822,8 @@ namespace Ssalddel.Simulation.Domain
                 SpawnH1StableId = source.SpawnH1StableId,
                 InventoryCapacityUnits = source.InventoryCapacityUnits,
                 StartsWithAxe = source.StartsWithAxe,
+                HansFarmFenceRestorationEnabled =
+                    source.HansFarmFenceRestorationEnabled,
                 FocusAccessibilityModeCode = source.FocusAccessibilityModeCode,
                 BuildingProgressionCatalog = source.BuildingProgressionCatalog == null
                     ? null : Simulation영역건물발전Catalog.Clone(
@@ -1865,6 +1904,9 @@ namespace Ssalddel.Simulation.Domain
                 LastFocusResult = CloneFocusResult(source.LastFocusResult),
                 Cabin = CloneNatureCabin(source.Cabin),
                 Encounter = CloneNatureEncounter(source.Encounter),
+                HansFarmFenceRestoration =
+                    CloneHansFarmFenceRestoration(
+                        source.HansFarmFenceRestoration),
                 SimulationOnly = source.SimulationOnly,
                 IsOperationalState = source.IsOperationalState,
             };

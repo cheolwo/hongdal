@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "ssalddel-focused-graph-map.v1",
+  "revision": "hans-farm-fence-restoration.graph.r1",
+  "graphMapStableId": "graph-map:hans-farm-fence-restoration.v1",
+  "parentGraphMapRef": "eng/world-seedbeds/graph-maps/northern-life-hub-discovery.v1.json",
+  "planningGate": {
+    "planId": "PLAN-STORY-FIRST-FARM-DISCOVERY-001",
+    "documentRef": "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md",
+    "revision": "hans-farm-first-lumber-repair.r27",
+    "sha256": "ADC540046294B02E12FB2D329A8E75E3AD6FF5354DA1DCBD0247AFD47AAF6D2A"
+  },
+  "playableLoopStableId": "playable-loop:nature-hans-farm-fence-restoration.v1",
+  "level1": {
+    "meaning": "첫 사건의 주체·대상·행위·결과·다음 선택 인과만 관리한다.",
+    "nodes": [
+      {
+        "nodeId": "gm-node:hans-farm-restoration:player",
+        "roleCode": "PlayerSubject",
+        "stableRef": "actor:player",
+        "stateCode": "Ready"
+      },
+      {
+        "nodeId": "gm-node:hans-farm-restoration:broken-axe",
+        "roleCode": "IncidentPickup",
+        "stableRef": "pickup:hans-farm:broken-axe:first-incident",
+        "stateCodes": ["Available", "Carried"],
+        "equipmentAllowed": false
+      },
+      {
+        "nodeId": "gm-node:hans-farm-restoration:personal-axe",
+        "roleCode": "EquippedWoodcuttingTool",
+        "stableRef": "tool:axe.personal.worn.r1",
+        "requiredCapabilityCode": "Woodcutting"
+      },
+      {
+        "nodeId": "gm-node:hans-farm-restoration:permitted-tree",
+        "roleCode": "ConsumableTimberSource",
+        "stableRef": "resource-node:nature:tree:renewable",
+        "requiredCount": 1
+      },
+      {
+        "nodeId": "gm-node:hans-farm-restoration:dropped-timber",
+        "roleCode": "CollectibleResult",
+        "stableRef": "item:timber",
+        "requiredQuantity": 2
+      },
+      {
+        "nodeId": "gm-node:hans-farm-restoration:fence-aggregate",
+        "roleCode": "AtomicRepairTarget",
+        "stableRef": "fence-aggregate:hans-farm:first-incident",
+        "h2Ref": "h2-candidate:hans-farm:first-restoration",
+        "h1Ref": "h1-stock:farm-fence-edge",
+        "stateCodes": ["Damaged", "Repaired"],
+        "requiredSegmentIds": [
+          "fence-segment:hans-farm:first-incident:01",
+          "fence-segment:hans-farm:first-incident:02",
+          "fence-segment:hans-farm:first-incident:03"
+        ]
+      },
+      {
+        "nodeId": "gm-node:hans-farm-restoration:next-choice",
+        "roleCode": "ReturnChoice",
+        "stableRef": "next-choice:hans-farm:first-restoration",
+        "stateCode": "AvailableAfterRepair"
+      }
+    ],
+    "edges": [
+      {
+        "edgeId": "gm-edge:hans-farm-restoration:pickup-broken-axe",
+        "fromNodeId": "gm-node:hans-farm-restoration:player",
+        "toNodeId": "gm-node:hans-farm-restoration:broken-axe",
+        "worldInteractionId": "WI-NATURE-19",
+        "actionCode": "AcquireHansBrokenAxe",
+        "effect": "AvailableToCarried"
+      },
+      {
+        "edgeId": "gm-edge:hans-farm-restoration:cut-tree",
+        "fromNodeId": "gm-node:hans-farm-restoration:personal-axe",
+        "toNodeId": "gm-node:hans-farm-restoration:permitted-tree",
+        "worldInteractionId": "WI-NATURE-06",
+        "actionCode": "StartWoodcutting",
+        "effect": "OneTreeToDroppedTimber"
+      },
+      {
+        "edgeId": "gm-edge:hans-farm-restoration:collect-timber",
+        "fromNodeId": "gm-node:hans-farm-restoration:dropped-timber",
+        "toNodeId": "gm-node:hans-farm-restoration:player",
+        "worldInteractionId": "WI-NATURE-18",
+        "actionCode": "CollectDroppedTimber",
+        "effect": "InventoryTimberPlusTwo"
+      },
+      {
+        "edgeId": "gm-edge:hans-farm-restoration:repair-all-segments",
+        "fromNodeId": "gm-node:hans-farm-restoration:player",
+        "toNodeId": "gm-node:hans-farm-restoration:fence-aggregate",
+        "worldInteractionId": "WI-NATURE-20",
+        "actionCode": "RepairHansFarmFence",
+        "requires": ["HansBrokenAxeCarried", "InventoryTimberAtLeastTwo", "NoActiveWork"],
+        "effect": "ConsumeTwoTimberAndRepairThreeSegmentsAtomically"
+      },
+      {
+        "edgeId": "gm-edge:hans-farm-restoration:return-to-choice",
+        "fromNodeId": "gm-node:hans-farm-restoration:fence-aggregate",
+        "toNodeId": "gm-node:hans-farm-restoration:next-choice",
+        "requires": ["FenceAggregateRepaired"],
+        "effect": "HansFarmLifeOrTravelChoiceAvailable"
+      }
+    ]
+  },
+  "level2": {
+    "meaning": "실제 배치 전에 첫 사건 세 구간과 줍기 기준점의 판독·접근·간섭을 검사한다.",
+    "placementMapRef": "eng/world-seedbeds/placement-map-profiles/hans-farm-first-fence-restoration-e5.v1.json",
+    "constraints": [
+      {
+        "constraintId": "gm-constraint:hans-farm-restoration:incident-axe-separate",
+        "severityCode": "Blocking",
+        "rule": "부러진 농장 손도끼는 개인 손도끼와 서로 다른 안정 ID·상태·표현을 유지하며 장비로 등록하지 않는다.",
+        "requiredAtEvidence": "E2"
+      },
+      {
+        "constraintId": "gm-constraint:hans-farm-restoration:atomic-three-segments",
+        "severityCode": "Blocking",
+        "rule": "첫 수리 확정은 목재 2개 소비와 세 울타리 구간 Repaired 전환을 같은 revision에서 원자적으로 기록한다.",
+        "requiredAtEvidence": "E3"
+      },
+      {
+        "constraintId": "gm-constraint:hans-farm-restoration:minimal-readable-world",
+        "severityCode": "Blocking",
+        "rule": "E5에는 부러진 도끼와 세 울타리 구간의 실제 또는 fallback GameObject, StableId, VisualKey, Renderer, Collider, 유효 Bounds 및 손상/수리 상태 교체가 필요하다.",
+        "requiredAtEvidence": "E5"
+      },
+      {
+        "constraintId": "gm-constraint:hans-farm-restoration:animation-deferred",
+        "severityCode": "Blocking",
+        "rule": "E5는 정적 자세·진행 표식·상태 교체를 허용한다. Actor의 실제 Clip·Rig·입력·전이·중단·귀환·root motion은 E6에서 검증한다.",
+        "requiredAtEvidence": "E6"
+      }
+    ]
+  },
+  "level3": {
+    "meaning": "권위 상태와 Unity 읽기 전용 표현을 같은 안정 ID로 결속한다.",
+    "bindings": [
+      {
+        "bindingId": "gm-code:hans-farm-restoration:contracts",
+        "refs": [
+          "Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationNatureSurvivalContracts.cs",
+          "Ssalddel.WorkflowRules/UnityPackage/Runtime/NatureSurvivalRules.cs"
+        ]
+      },
+      {
+        "bindingId": "gm-code:hans-farm-restoration:authority",
+        "refs": [
+          "Ssalddel.Simulation.Domain/UnityPackage/Runtime/SimulationHansFarmFenceRestoration.cs",
+          "Ssalddel.Simulation.Application/RuntimeCore/SimulationNatureSurvivalService.cs"
+        ]
+      },
+      {
+        "bindingId": "gm-code:hans-farm-restoration:presentation-e5",
+        "refs": [
+          "unity:Assets/Ssalddel/Presentation/World/Hans농장울타리E5Presenter.cs",
+          "unity:Assets/Ssalddel/Tests/EditMode/Hans농장울타리E5PresenterTests.cs"
+        ],
+        "authorityMutationAllowed": false,
+        "animationRole": "NotApplicable"
+      }
+    ]
+  },
+  "evidenceBoundary": {
+    "logicCurrentStage": "E5",
+    "presentationTargetStage": "E5",
+    "animationTargetStage": "E6",
+    "actualInputGameViewTargetStage": "E7",
+    "operationalStateChanged": false
+  }
+}

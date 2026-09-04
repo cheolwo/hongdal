@@ -18,6 +18,8 @@ namespace Ssalddel.Simulation.Domain
             Add(canonical, source.SpawnH1StableId);
             Add(canonical, source.InventoryCapacityUnits);
             Add(canonical, source.StartsWithAxe);
+            if (SimulationNatureSurvivalCodes.IsR6(source.ProfileRevision))
+                Add(canonical, source.HansFarmFenceRestorationEnabled);
             Add(canonical, source.ResourceNodes.Length);
             foreach (var node in source.ResourceNodes.OrderBy(value =>
                          value.ResourceNodeStableId, StringComparer.Ordinal))
@@ -190,6 +192,30 @@ namespace Ssalddel.Simulation.Domain
                 Add(canonical, dropped.StateCode);
                 Add(canonical, dropped.CreatedWorldRevision);
                 Add(canonical, dropped.CollectedWorldRevision);
+            }
+            if (!SimulationNatureSurvivalCodes.IsR6(source.ProfileRevision))
+                return;
+            Add(canonical, source.HansFarmFenceRestoration == null);
+            if (source.HansFarmFenceRestoration == null) return;
+            var hans = source.HansFarmFenceRestoration;
+            Add(canonical, hans.FenceAggregateStableId);
+            Add(canonical, hans.H2StableId);
+            Add(canonical, hans.H1StableId);
+            Add(canonical, hans.FenceStateCode);
+            Add(canonical, hans.BrokenAxePickupStableId);
+            Add(canonical, hans.BrokenAxeStateCode);
+            Add(canonical, hans.PlayerCarriesBrokenAxe);
+            Add(canonical, hans.RequiredTimberQuantity);
+            Add(canonical, hans.NextChoiceAvailable);
+            Add(canonical, hans.Segments.Length);
+            foreach (var segment in hans.Segments.OrderBy(value =>
+                         value.SegmentStableId, StringComparer.Ordinal))
+            {
+                Add(canonical, segment.SegmentStableId);
+                Add(canonical, segment.StateCode);
+                Add(canonical, segment.LocalX);
+                Add(canonical, segment.LocalZ);
+                Add(canonical, segment.YawDegrees);
             }
         }
     }
