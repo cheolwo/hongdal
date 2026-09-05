@@ -3,7 +3,7 @@
   "protocolRevision": "simulation-e7-vertical-implementation-protocol.r7",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "workOrderId": "E7-WO-HEXAGRAM-CAMPAIGN-RETRY",
-  "title": "괘 캠페인 실패·초효 복귀 Logic E3",
+  "title": "영감 기반 이야기 캠페인 단계·진입 복원 Logic E3",
   "playableUnitStableId": "playable-loop:hexagram-campaign-retry.v1",
   "activeWorldInteractionId": "WI-STORY-HEXAGRAM-CAMPAIGN-RETRY",
   "targetEvidenceStage": "E7",
@@ -12,8 +12,8 @@
   "planningGate": {
     "statusCode": "Approved",
     "designDocumentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md",
-    "designRevision": "hexagram-campaign-reset.r1",
-    "designHashSha256": "3D22D758F736537CA1EE87DCBE1EE4F6D95E78D1A358BD0D8A3CFBFB2AEE15E3",
+    "designRevision": "hexagram-campaign-reset.r2",
+    "designHashSha256": "03C2284C7C76EE41B89059ECE2BDAB0BBE2853437608E6ED342ADFE5FEB28C2E",
     "approvalEvidenceRef": "docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md#승인-근거"
   },
   "deliveryCap": {
@@ -23,7 +23,7 @@
   },
   "iterationState": {
     "currentPass": "StableOrExplicitlyBlocked",
-    "nextReopenCondition": "괘 실패·복귀의 Unity 표현 기획이 승인되면 Presentation E4부터 다시 연다."
+    "nextReopenCondition": "story-inspiration.r1 사용자 요청으로 Logic E1~E3를 재검토한다. StoryStageCount와 기존 6단계 저장 호환을 검증하며 Presentation은 기존 차단을 유지한다."
   },
   "trackPlans": {
     "logic": {
@@ -34,14 +34,14 @@
         { "code": "E6", "disposition": "Blocked", "summary": "실제 표현과 애니메이션은 범위 밖이다." },
         { "code": "E5", "disposition": "Blocked", "summary": "Unity World 배치는 수행하지 않는다." },
         { "code": "E4", "disposition": "Defined", "summary": "이번 WI는 공간 후보를 새로 만들지 않는 비공간 규칙이다." },
-        { "code": "E3", "disposition": "Affected", "summary": "실패 복원·재도전 seed·저장 우회 차단·육효 완료를 자동시험한다." },
+        { "code": "E3", "disposition": "Affected", "summary": "1·3·6·8단계, WI 개수 독립, 기존 저장·해시 호환, 변조 거부와 재시도 복원을 자동시험한다." },
         { "code": "E2", "disposition": "Affected", "summary": "Simulation Core와 LocalProcess·RemoteHost API를 연결한다." },
-        { "code": "E1", "disposition": "Defined", "summary": "한 괘 육효 순서와 회복 가능·불가능 실패 경계를 정의한다." }
+        { "code": "E1", "disposition": "Defined", "summary": "원전 효 수와 독립적인 이야기 단계 수를 사용하고 기존 실패 경계를 유지한다." }
       ],
       "upwardValidation": [
         { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md"] },
         { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationHexagramCampaignContracts.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationHexagramCampaignService.cs"] },
-        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationHexagramCampaignTests.cs", "test:SimulationHexagramCampaignTests:8/8"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationHexagramCampaignTests.cs", "test:SimulationHexagramCampaignTests:15/15", "artifacts/local/story-inspiration-tests.log"] },
         { "code": "E4", "status": "NotStarted", "evidenceRefs": [] },
         { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
         { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
@@ -74,8 +74,8 @@
   "integratedGate": {
     "currentEvidenceStage": "E1",
     "status": "Blocked",
-    "candidateRevision": "hexagram-campaign-reset.logic-e3.r1",
-    "evidenceRefs": ["test:SimulationHexagramCampaignTests:8/8"],
+    "candidateRevision": "hexagram-campaign-reset.logic-e3.r2",
+    "evidenceRefs": ["test:SimulationHexagramCampaignTests:15/15"],
     "openFeedbackRefs": ["Presentation E4 이상과 실제 Unity 입력·Game View가 아직 없다."]
   }
 }

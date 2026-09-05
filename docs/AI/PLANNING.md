@@ -1,5 +1,7 @@
 # Mirror 기획 목차
 
+> 현행 스토리 기준 `story-inspiration.r1` (2026-09-05): [스토리 영감과 플레이 진행 분리](../Architecture/스토리영감과플레이진행분리.md). 인물·사건·선택을 중심으로 기획하고 괘·효는 영감과 참조 이력으로 사용한다. 아래 이전 판본의 64캠페인·육효 순서·제작 커서는 새 기획 관문이 아니다. 캠페인 복원 기획은 `hexagram-campaign-reset.r2`를 따른다.
+
 > 게임 기획의 현재 판본과 상·하위 관계를 찾는 시작점이다. 세부 본문은 각 기획 문서가 소유하며 이 목차는 내용을 복제하지 않는다. 운영 기준은 [기획 문서 독립 관리 체계](../Architecture/기획문서독립관리체계.md), 단계적 경로 통합은 [현행 기획 정본 경로](Planning/README.md)를 따른다.
 
 ## 읽는 순서
@@ -12,7 +14,7 @@
 
 ## 현재 문답 우선순위
 
-- 메인 스토리 제작은 [역경 64괘 기반 게임 스토리 기획·제작 체계 r13](Planning/스토리/PLAN-STORY-HEXAGRAM-SEQUENCE-001/README.md)에 따라 진행한다. [64괘·384효 전체 기획 트리](generated/hexagram-story-tree.md)는 모든 효의 안정 링크와 열린 효사 문서, 주체·WI·H 요구사항을 연결한다. 한 괘 안에서는 육효를 순서대로 진행하고, 괘 사이 자유 생활에서 플레이어가 다음 괘 시작을 선택한다. 핵심 목적을 회복 불가능하게 잃으면 [괘 캠페인 실패·초효 복귀 r1](Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md)에 따라 진입 상태를 복원한다.
+- 메인 스토리 문답은 [영감 중심 기획 r16](Planning/스토리/PLAN-STORY-HEXAGRAM-SEQUENCE-001/README.md)에 따라 인물의 목적·갈등·선택·대가와 사건 인과부터 구성한다. 괘·효는 선택적 참고 자료이며 기존 이야기·효사 배정과 큰 줄기 제안은 참고 이력으로 보존한다. 다음 사건은 효 번호가 아니라 현재 이야기의 미정과 플레이 필요로 선택한다.
 - 한스 농장의 첫 밭갈기 표본은 한스 집에서 보이는 가장 가까운 비통행 허용 구획으로 확정했다. 첫 NPC 학습 중점은 비울 수 있는 주 슬롯 한 칸, 초·중·후반 세 구간, 다음 구간 적용, 결속된 플레이어 행위의 이해도 `+1`만 E3로 동결했다. 관계 기반 취득·플레이어 멘토 공유·실제 카드 UI는 후속 범위다.
 - Farm 수확 Lot은 물류 입구 목으로 이어지고, 입고·정돈 화→적재 완료 토→주문 배치·재고 할당 금(`토생금`)→포장·출고 인계·운송 수(`금생수`)로 순환한다. 도착 화물은 목적지·주문·수량·봉인/파손 상태의 인수 관문을 통과한 뒤에만 `수생목`으로 새 입고 작업을 연다. 상품별 인수 기준은 후속 Profile로 미뤘다.
 - H2 오행 순환의 다음 질문은 Nature `자연 복원·안전 회복 블록`에서 재탐색을 열 수 있는 최소 복원선을 정하는 것이다.
@@ -38,8 +40,8 @@
 | 기획 ID | 현재 문서·판본 | 상태 | 상위·하위 관계 |
 | --- | --- | --- | --- |
 | `PLAN-STORY-MIRROR-MAIN-001` | [Mirror 메인 스토리 r83](메인스토리-거울의흐름-기획-2026-09-01.md) | `SourcePending / ReadyForReview / HexagramProductionHierarchyBound / RuntimePlayOrderDeferred` | 최상위 이야기. 64괘→육효 이야기를 제작 주계층으로 사용하고 기존 Act·Chapter는 호환 묶음으로 보존한다. 실제 플레이 순서와 흑막상인 원작 정사는 별도 승인 전 미확정 |
-| `PLAN-STORY-HEXAGRAM-SEQUENCE-001` | [역경 64괘 기반 게임 스토리 기획·제작 r13](Planning/스토리/PLAN-STORY-HEXAGRAM-SEQUENCE-001/README.md) | `ApprovedPlanningBaseline / Full384LineTreeAvailable / ExistingPlayerPlanningCandidatesClassified / RuntimeCampaignOrderApproved` | [전체 트리](generated/hexagram-story-tree.md)에서 64괘·384효와 열린 효사 문서, 주체·WI·H 요구사항을 탐색한다. 한 괘의 육효는 순서대로 진행하고 괘 사이는 자유 생활로 연결한다. |
-| `PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001` | [괘 캠페인 실패·초효 복귀 r1](Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md) | `ApprovedForHandoff / LogicE3Requested / PresentationDeferred` | 핵심 목적의 회복 불가능 상실만 전체 실패로 판정하고 이전 괘 성과를 보존한 진입 상태로 복원한다. 대표 WI 후보는 `WI-STORY-HEXAGRAM-CAMPAIGN-RETRY`다. |
+| `PLAN-STORY-HEXAGRAM-SEQUENCE-001` | [역경에서 영감을 얻는 스토리 기획 r16](Planning/스토리/PLAN-STORY-HEXAGRAM-SEQUENCE-001/README.md) | `ApprovedPlanningBaseline / InspirationReferenceOnly` | 이야기·사건이 주 탐색이며 괘·효는 선택적 영감·원문 대조 이력이다. 고정 캠페인 수·육효 진행·순차 제작 관문을 대체한다. |
+| `PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001` | [캠페인 실패·진입 복귀 r2](Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md) | `ApprovedForHandoff / LogicE3Validation / PresentationDeferred` | 이야기 단계 수를 명시하고 기존 6단계 저장과 진입 복원·재시도·성과 보존을 호환한다. |
 | `PLAN-STORY-IDEA-MAP-LEARNING-001` | [수뢰둔→산수몽 이데아 맵 학습 r2](Planning/스토리/PLAN-STORY-IDEA-MAP-LEARNING-001/README.md) | `ApprovedPlanningBaseline / MengContextLogicE3Implemented / PresentationDeferred` | 산수몽을 독립 괘상 맥락 카드로 제안·수락·보류·해제하고 실제 행위에만 NPC 학습과 별도 가산 보정을 적용한다. 지리는 효별 강제 순서가 아닌 횡단 학습 배경이다. |
 | `PLAN-STORY-HEX03-LINE-001` | [수뢰둔 초구 효사 기획 r3](Planning/스토리/PLAN-STORY-HEX03-LINE-001/README.md) | `PrototypeReference / StoryApproved / RequirementsUnresolved / NotReadyForDevelopment` | 손님 체류 선택과 더불어 첫 유효 플레이어 행위가 장소와 무관하게 기초 이데아 맵을 연다. |
 | `PLAN-STORY-HEX03-LINE-002` | [수뢰둔 육이 효사 기획 r2](Planning/스토리/PLAN-STORY-HEX03-LINE-002/README.md) | `PrototypeReference / StoryApproved / RequirementsUnresolved / NotReadyForDevelopment` | 한스와 농장 경계를 공동 순찰해 피해를 줄이고 행동→결과→관계의 첫 계보를 읽는다. |
