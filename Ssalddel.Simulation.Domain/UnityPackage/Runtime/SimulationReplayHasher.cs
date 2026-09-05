@@ -53,6 +53,10 @@ namespace Ssalddel.Simulation.Domain
                             value.LineOrdinal, value.WorldTick,
                             value.WorldRevision))),
                 });
+                // 기존 6단계 저장의 해시는 유지하고 새 단계 수는 무결성에 포함한다.
+                if (state != null && state.StoryStageCount != 6)
+                    campaignCanonical += "|StoryStageCount="
+                        + state.StoryStageCount.ToString(CultureInfo.InvariantCulture);
                 using var sha = SHA256.Create();
                 return BitConverter.ToString(sha.ComputeHash(
                         Encoding.UTF8.GetBytes(campaignCanonical)))
@@ -520,6 +524,11 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, state.CampaignStateCode);
                     Add(canonical, state.HexagramStableId);
                     Add(canonical, state.CurrentLineOrdinal);
+                    if (state.StoryStageCount != 6)
+                    {
+                        Add(canonical, "StoryStageCount");
+                        Add(canonical, state.StoryStageCount);
+                    }
                     Add(canonical, state.AttemptOrdinal);
                     Add(canonical, state.AttemptVariationSeed);
                     Add(canonical, state.EntrySaveStableId);

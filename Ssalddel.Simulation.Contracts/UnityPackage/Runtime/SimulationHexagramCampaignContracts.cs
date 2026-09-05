@@ -27,6 +27,8 @@ namespace Ssalddel.Simulation.Contracts
         public string CommandId { get; set; } = string.Empty;
         public long ExpectedRevision { get; set; }
         public string HexagramStableId { get; set; } = string.Empty;
+        // 이야기에서 정한 단계 수. 누락된 기존 요청은 종전 6단계를 유지한다.
+        public int StoryStageCount { get; set; } = 6;
         public string[] LineWorldInteractionIds { get; set; } =
             Array.Empty<string>();
     }
@@ -77,6 +79,8 @@ namespace Ssalddel.Simulation.Contracts
         public string CampaignStateCode { get; set; } = string.Empty;
         public string HexagramStableId { get; set; } = string.Empty;
         public int CurrentLineOrdinal { get; set; }
+        // CurrentLineOrdinal은 호환 이름이며 효가 아닌 이야기 단계로 해석한다.
+        public int StoryStageCount { get; set; } = 6;
         public int AttemptOrdinal { get; set; }
         public int AttemptVariationSeed { get; set; }
         public string EntrySaveStableId { get; set; } = string.Empty;

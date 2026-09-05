@@ -31,9 +31,9 @@ namespace Ssalddel.Simulation.Domain
                     "HexagramCampaignEntrySaveStableIdInvalid");
             var wiIds = NormalizeWorldInteractionIds(
                 request.LineWorldInteractionIds);
-            if (wiIds.Length != 6)
+            if (request.StoryStageCount < 1)
                 throw new SimulationContractException(
-                    "HexagramCampaignLineWorldInteractionCountInvalid");
+                    "HexagramCampaignStoryStageCountInvalid");
 
             lock (gate)
             {
@@ -56,6 +56,7 @@ namespace Ssalddel.Simulation.Domain
                     CampaignStateCode = SimulationHexagramCampaignCodes.Active,
                     HexagramStableId = request.HexagramStableId.Trim(),
                     CurrentLineOrdinal = 1,
+                    StoryStageCount = request.StoryStageCount,
                     AttemptOrdinal = 1,
                     AttemptVariationSeed = CalculateAttemptVariationSeed(
                         ScenarioSeed, request.HexagramStableId.Trim(), 1),
@@ -84,7 +85,7 @@ namespace Ssalddel.Simulation.Domain
                 if (request.ExpectedLineOrdinal != state.CurrentLineOrdinal)
                     throw new SimulationConflictException(
                         "HexagramCampaignLineOrdinalMismatch");
-                if (state.CurrentLineOrdinal >= 6)
+                if (state.CurrentLineOrdinal >= state.StoryStageCount)
                     throw new SimulationConflictException(
                         "HexagramCampaignUpperLineRequiresCompletion");
                 state.Events = AppendEvent(state.Events,
@@ -171,7 +172,7 @@ namespace Ssalddel.Simulation.Domain
             lock (gate)
             {
                 var state = RequireActiveCampaign(request.ExpectedRevision);
-                if (state.CurrentLineOrdinal != 6)
+                if (state.CurrentLineOrdinal != state.StoryStageCount)
                     throw new SimulationConflictException(
                         "HexagramCampaignUpperLineNotReached");
                 state.PermanentlyUnlockedWorldInteractionIds = state
@@ -183,7 +184,7 @@ namespace Ssalddel.Simulation.Domain
                 state.CampaignStateCode = SimulationHexagramCampaignCodes.FreeRoam;
                 state.Events = AppendEvent(state.Events,
                     CampaignEvent("CampaignCompleted", string.Empty,
-                        state.AttemptOrdinal, 6));
+                        state.AttemptOrdinal, state.CurrentLineOrdinal));
                 Revision++;
                 AppendHexagramCampaignTransition();
                 return CloneHexagramCampaignState(state)!;
@@ -233,6 +234,7 @@ namespace Ssalddel.Simulation.Domain
                 CampaignStateCode = source.CampaignStateCode,
                 HexagramStableId = source.HexagramStableId,
                 CurrentLineOrdinal = source.CurrentLineOrdinal,
+                StoryStageCount = source.StoryStageCount,
                 AttemptOrdinal = source.AttemptOrdinal,
                 AttemptVariationSeed = source.AttemptVariationSeed,
                 EntrySaveStableId = source.EntrySaveStableId,

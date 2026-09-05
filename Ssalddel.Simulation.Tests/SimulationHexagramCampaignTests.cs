@@ -11,6 +11,93 @@ namespace Ssalddel.Simulation.Tests;
 
 public sealed class SimulationHexagramCampaignTests
 {
+    [Theory]
+    [InlineData(1)]
+    [InlineData(3)]
+    [InlineData(6)]
+    [InlineData(8)]
+    public void 이야기단계는_효수와WI개수에종속되지않고_저장재생된다(int count)
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        session.BeginHexagramCampaign(new SimulationHexagramCampaignEnterRequest
+        {
+            CommandId = "story:enter",
+            ExpectedRevision = session.Revision,
+            HexagramStableId = "story:hans-learning",
+            StoryStageCount = count,
+            LineWorldInteractionIds = new[] { "WI-FARM-05" },
+        }, "save:story-entry");
+        if (count > 1)
+            Assert.Throws<SimulationConflictException>(() =>
+                session.CompleteHexagramCampaign(new SimulationHexagramCampaignCompleteRequest
+                {
+                    CommandId = "story:too-early",
+                    ExpectedRevision = session.Revision,
+                }));
+        for (var stage = 1; stage < count; stage++)
+            session.CompleteHexagramLine(new SimulationHexagramCampaignLineCompleteRequest
+            {
+                CommandId = "story:stage:" + stage,
+                ExpectedRevision = session.Revision,
+                ExpectedLineOrdinal = stage,
+            });
+        var saved = session.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = "save:story",
+            ExpectedRevision = session.Revision,
+        });
+        var restored = SimulationSessionReplay.Restore(saved);
+        if (count == 6)
+        {
+            var legacyJson = System.Text.Json.JsonSerializer.Serialize(saved)
+                .Replace("\"StoryStageCount\":6,", string.Empty);
+            var legacy = System.Text.Json.JsonSerializer.Deserialize<SimulationSessionSavePackage>(legacyJson)!;
+            Assert.Equal(6, legacy.HexagramCampaign!.StoryStageCount);
+            Assert.Equal(saved.ReplayHash, SimulationSessionReplay.Restore(legacy)
+                .CreateSavePackage(new SimulationSessionSaveRequest
+                {
+                    SaveStableId = saved.SaveStableId,
+                    ExpectedRevision = restored.Revision,
+                }).ReplayHash);
+        }
+        Assert.Equal(count, restored.GetHexagramCampaignState().StoryStageCount);
+        Assert.Equal(saved.ReplayHash, restored.CreateSavePackage(new SimulationSessionSaveRequest
+        {
+            SaveStableId = saved.SaveStableId,
+            ExpectedRevision = restored.Revision,
+        }).ReplayHash);
+        var completed = restored.CompleteHexagramCampaign(new SimulationHexagramCampaignCompleteRequest
+        {
+            CommandId = "story:complete",
+            ExpectedRevision = restored.Revision,
+        });
+        Assert.Equal(SimulationHexagramCampaignCodes.FreeRoam, completed.CampaignStateCode);
+        Assert.Equal(count, completed.Events.Last().LineOrdinal);
+        Assert.Single(completed.PermanentlyUnlockedWorldInteractionIds);
+        saved.HexagramCampaign!.StoryStageCount = count + 1;
+        var mismatch = Assert.Throws<SimulationConflictException>(() => SimulationSessionReplay.Restore(saved));
+        Assert.Equal("SimulationReplayHashMismatch", mismatch.ErrorCode);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void 유효하지않은이야기단계수는_상태변경없이거부한다(int count)
+    {
+        var session = new 경영SimulationSessionAggregate(CreateRequest());
+        var revision = session.Revision;
+        var error = Assert.Throws<SimulationContractException>(() =>
+            session.BeginHexagramCampaign(new SimulationHexagramCampaignEnterRequest
+            {
+                CommandId = "story:invalid",
+                ExpectedRevision = revision,
+                HexagramStableId = "story:hans-learning",
+                StoryStageCount = count,
+            }, "save:invalid"));
+        Assert.Equal("HexagramCampaignStoryStageCountInvalid", error.ErrorCode);
+        Assert.Equal(revision, session.Revision);
+    }
+
     [Fact]
     public async Task 수뢰둔_핵심목적상실은_진입상태와초효로복원한다()
     {
@@ -55,6 +142,31 @@ public sealed class SimulationHexagramCampaignTests
             world.HexagramCampaign!.AttemptOrdinal);
         Assert.Contains(restarted.Events, value =>
             value.EventCode == SimulationHexagramCampaignCodes.CampaignFailure);
+    }
+
+    [Fact]
+    public async Task 세단계이야기의_실패복원은_단계수를보존한다()
+    {
+        using var fixture = new Fixture();
+        var created = await fixture.Runtime.Sessions.CreateAsync(CreateRequest());
+        var entered = await Enter(fixture.Runtime, created, 3);
+        await fixture.Runtime.HexagramCampaigns.CompleteHexagramLineAsync(
+            created.SessionStableId, new SimulationHexagramCampaignLineCompleteRequest
+            {
+                CommandId = "story:advance",
+                ExpectedRevision = entered.EntryWorldRevision,
+                ExpectedLineOrdinal = 1,
+            });
+        var restarted = await fixture.Runtime.HexagramCampaigns.FailHexagramCampaignAsync(
+            created.SessionStableId, new SimulationHexagramCampaignFailureRequest
+            {
+                CommandId = "story:retry",
+                ExpectedRevision = entered.EntryWorldRevision + 1,
+                FailureReasonCode = SimulationHexagramCampaignCodes.HansLost,
+            });
+        Assert.Equal(3, restarted.StoryStageCount);
+        Assert.Equal(1, restarted.CurrentLineOrdinal);
+        Assert.Equal(2, restarted.AttemptOrdinal);
     }
 
     [Theory]
@@ -170,7 +282,8 @@ public sealed class SimulationHexagramCampaignTests
     }
 
     private static async Task<SimulationHexagramCampaignStateSnapshot> Enter(
-        LocalSimulationRuntime runtime, 경영SimulationSessionSnapshot created)
+        LocalSimulationRuntime runtime, 경영SimulationSessionSnapshot created,
+        int storyStageCount = 6)
         => await runtime.HexagramCampaigns.EnterHexagramCampaignAsync(
             created.SessionStableId,
             new SimulationHexagramCampaignEnterRequest
@@ -178,6 +291,7 @@ public sealed class SimulationHexagramCampaignTests
                 CommandId = "campaign:enter",
                 ExpectedRevision = created.Revision,
                 HexagramStableId = SimulationHexagramCampaignCodes.ZhunStableId,
+                StoryStageCount = storyStageCount,
                 LineWorldInteractionIds = Enumerable.Range(1, 6)
                     .Select(value => "WI-STORY-ZHUN-L" + value).ToArray(),
             });
