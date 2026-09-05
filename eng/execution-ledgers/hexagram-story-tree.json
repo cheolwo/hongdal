@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "mirror-hexagram-story-tree.v1",
+  "revision": "hexagram-story-tree.r2",
+  "productionLedgerPath": "eng/execution-ledgers/hexagram-story-production.json",
+  "campaignIdentityLedgerPath": "eng/execution-ledgers/hexagram-campaign-identities.json",
+  "storySeedLedgerPath": "eng/execution-ledgers/hexagram-story-seeds.json",
+  "existingPlanningClassificationPath": "eng/execution-ledgers/hexagram-existing-planning-classifications.json",
+  "lineRequirementLedgerPath": "eng/execution-ledgers/hexagram-line-planning-requirements.json",
+  "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
+  "lineDocumentRootPath": "docs/AI/Planning/스토리",
+  "outputJsonPath": "docs/AI/generated/hexagram-story-tree.json",
+  "outputMarkdownPath": "docs/AI/generated/hexagram-story-tree.md",
+  "hReferenceJsonPath": "docs/AI/generated/hexagram-h-reference-index.json",
+  "hReferenceMarkdownPath": "docs/AI/generated/hexagram-h-reference-index.md",
+  "policy": {
+    "hexagramCount": 64,
+    "lineCountPerHexagram": 6,
+    "physicalDocumentPolicyCode": "OpenedLinesOnly",
+    "unopenedLinePolicyCode": "GeneratedStableAnchor",
+    "formalStudyOrderCode": "StrictKingWen01To64",
+    "existingPlanningScopeCode": "PlayerExperienceOnly",
+    "storyAuthorityCode": "ApprovedLineStoryDocumentsOnly",
+    "existingPlanningReferenceCode": "TechnicalAppendixOnly",
+    "storyAndTechnicalStatusAreSeparate": true,
+    "doesNotCreateLineDocuments": true,
+    "doesNotCreateWorldInteractionsOrH": true,
+    "doesNotActivateDevelopment": true,
+    "doesNotPromoteEvidence": true
+  }
+}

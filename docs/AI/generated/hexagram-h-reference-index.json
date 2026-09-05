@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "mirror-hexagram-h-reference-index.v1",
+  "revision": "hexagram-story-tree.r2",
+  "sourceLineRequirementRevision": "hexagram-line-planning-requirements.r6",
+  "items": [
+    {
+      "anchor": "ref-h-h1-h1-stock-farm-fence-edge",
+      "levelCode": "H1",
+      "targetRef": "h1-stock:farm-fence-edge",
+      "roles": [
+        "FarmFenceDefenseChokepoint"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": []
+    },
+    {
+      "anchor": "ref-h-h1-h1-stock-farm-production",
+      "levelCode": "H1",
+      "targetRef": "h1-stock:farm-production",
+      "roles": [
+        "FarmProductionObjective",
+        "FarmProductionPlotContext",
+        "ManagedPotatoCultivationPlot",
+        "PotatoCultivationPlotAuthorityBoundary"
+      ],
+      "resolutionCodes": [
+        "CandidateNeedsReview",
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": []
+    },
+    {
+      "anchor": "ref-h-h1-h1-stock-farm-residential-home",
+      "levelCode": "H1",
+      "targetRef": "h1-stock:farm-residential-home",
+      "roles": [
+        "FarmhouseDefenseObjective",
+        "FarmLivingHomeAuthorityBoundary",
+        "FarmLivingHomeWithGuestAnchors",
+        "FullyRepairedFarmLivingHome"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": []
+    },
+    {
+      "anchor": "ref-h-h1-h1-stock-farm-tool-storage",
+      "levelCode": "H1",
+      "targetRef": "h1-stock:farm-tool-storage",
+      "roles": [
+        "FarmToolStorage"
+      ],
+      "resolutionCodes": [
+        "CandidateNeedsReview"
+      ],
+      "compositionEvidenceRefs": []
+    },
+    {
+      "anchor": "ref-h-h1-h1-stock-nature-emergency-retreat",
+      "levelCode": "H1",
+      "targetRef": "h1-stock:nature-emergency-retreat",
+      "roles": [
+        "EmergencyRetreat"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": []
+    },
+    {
+      "anchor": "ref-h-h1-h1-stock-nature-incident-trace",
+      "levelCode": "H1",
+      "targetRef": "h1-stock:nature-incident-trace",
+      "roles": [
+        "IncidentTrace"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": []
+    },
+    {
+      "anchor": "ref-h-h2-h2-candidate-farm-boundary-defense-recovery",
+      "levelCode": "H2",
+      "targetRef": "h2-candidate:farm-boundary-defense-recovery",
+      "roles": [
+        "FarmBoundaryDefenseRecovery"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": [
+        "h1-stock:farm-fence-edge",
+        "h1-stock:farm-residential-home",
+        "h1-stock:nature-emergency-retreat",
+        "h1-stock:nature-incident-trace"
+      ]
+    },
+    {
+      "anchor": "ref-h-h2-h2-candidate-forest-edge-living-farm",
+      "levelCode": "H2",
+      "targetRef": "h2-candidate:forest-edge-living-farm",
+      "roles": [
+        "ForestEdgeFarm"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": [
+        "h1-stock:farm-fence-edge",
+        "h1-stock:farm-production",
+        "h1-stock:farm-residential-home"
+      ]
+    },
+    {
+      "anchor": "ref-h-h2-h2-candidate-nature-threat-response",
+      "levelCode": "H2",
+      "targetRef": "h2-candidate:nature-threat-response",
+      "roles": [
+        "ThreatResponse"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": [
+        "h1-stock:nature-emergency-retreat",
+        "h1-stock:nature-incident-trace"
+      ]
+    },
+    {
+      "anchor": "ref-h-h3-h3-candidate-forest-edge-living-farm-campaign",
+      "levelCode": "H3",
+      "targetRef": "h3-candidate:forest-edge-living-farm-campaign",
+      "roles": [
+        "ForestEdgeLivingFarmCampaign"
+      ],
+      "resolutionCodes": [
+        "ExistingReused"
+      ],
+      "compositionEvidenceRefs": [
+        "h2-candidate:farm-boundary-defense-recovery",
+        "h2-candidate:forest-edge-living-farm"
+      ]
+    }
+  ]
+}

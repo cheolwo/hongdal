@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "mirror-hexagram-story-seeds.v1",
+  "revision": "hexagram-story-seeds.r1",
+  "parentProductionLedgerPath": "eng/execution-ledgers/hexagram-story-production.json",
+  "outputJsonPath": "docs/AI/generated/hexagram-story-seeds.json",
+  "outputMarkdownPath": "docs/AI/generated/hexagram-story-seeds.md",
+  "policy": {
+    "intakeCode": "FreePlanningBeforeHexagramAndLineClassification",
+    "assignmentCode": "OnePrimaryWithRankedSecondaryCandidates",
+    "classificationAuthorityCode": "CodexSuggestsUserConfirms",
+    "lineGateCode": "SubjectSituationTransformationResultKnown",
+    "preserveReclassificationHistory": true,
+    "doesNotChangeActiveProductionHexagram": true,
+    "doesNotCreateLinePlanDocument": true,
+    "doesNotCreateWorldInteraction": true,
+    "doesNotPromoteEvidence": true
+  },
+  "allowedCodes": {
+    "classificationStateCodes": ["StorySeed", "HexagramCandidate", "HexagramConfirmed", "LineCandidate", "LineConfirmed"],
+    "lineClassificationStateCodes": ["NotStarted", "Deferred", "Candidate", "Confirmed"],
+    "developmentHandoffStateCodes": ["NotEligible", "RequirementsPending", "ReadyForRequirementReview"]
+  },
+  "seeds": [
+    {
+      "storySeedStableId": "STORY-SEED-HANS-FARM-FOOTHOLD-001",
+      "title": "낯선 세계에서 한스 농장을 첫 생활 거점으로 일구기",
+      "synopsis": "플레이어가 한스 농장에 머물며 자발적인 노동과 방어, 관계와 작은 질서를 통해 세계에 처음 뿌리를 내린다.",
+      "sourcePlanningRefs": ["PLAN-STORY-HANS-FARM-001", "PLAN-STORY-HEX03-LINE-001", "PLAN-STORY-HEX03-LINE-006"],
+      "subjectSummary": "낯선 세계에 들어온 모험가와 농장주 한스",
+      "situationSummary": "생활 기반과 신뢰가 아직 없는 변경 농장",
+      "transformationSummary": "손님이 자발적으로 일하고 책임지는 생활 구성원으로 변한다.",
+      "resultOrNextStateSummary": "작은 거점의 질서가 생기고 다음 학습 필요가 열린다.",
+      "classificationStateCode": "HexagramConfirmed",
+      "primaryHexagramStableId": "HEX-03-ZHUN",
+      "primaryReason": "처음 싹트는 생활 기반이 아직 어수선한 조건 속에서 관계와 질서로 자라나는 흐름이 중심이다.",
+      "secondaryCandidates": [
+        {
+          "rank": 1,
+          "hexagramStableId": "HEX-04-MENG",
+          "reason": "한스에게 배우고 자신의 한계를 깨닫는 후속 흐름과 맞지만 첫 정착 자체보다 한 단계 뒤의 의미다."
+        }
+      ],
+      "lineClassificationStateCode": "Deferred",
+      "lineCandidates": [],
+      "confirmedLineStableId": "",
+      "lineDeferralReason": "이 씨앗은 수뢰둔 전체를 감싸는 이야기 묶음이며 개별 효 이야기는 기존 하위 기획이 소유한다.",
+      "userConfirmationRef": "planning-conversation:2026-09-05:hans-farm-zhun-prototype",
+      "developmentHandoffStateCode": "NotEligible",
+      "classificationHistory": [
+        {
+          "revision": 1,
+          "stateCode": "HexagramConfirmed",
+          "primaryHexagramStableId": "HEX-03-ZHUN",
+          "reason": "기존 한스 농장 수뢰둔 표본을 자유 기획 유입 체계의 첫 이관 사례로 보존한다."
+        }
+      ]
+    },
+    {
+      "storySeedStableId": "STORY-SEED-MENG-LEARNING-CONTEXT-001",
+      "title": "자유 행동 속에서 멘토의 가르침을 받아 세계의 관계를 읽기",
+      "synopsis": "플레이어가 자유롭게 생활하면서 필요할 때 산수몽 학습 맥락을 받아들이고 실제 행동으로 이해를 검증한다.",
+      "sourcePlanningRefs": ["PLAN-STORY-IDEA-MAP-LEARNING-001", "PLAN-STORY-HEXAGRAM-SEQUENCE-001"],
+      "subjectSummary": "기초 이데아 맵을 얻었지만 세계의 구조를 충분히 알지 못하는 플레이어",
+      "situationSummary": "자유 행동은 가능하지만 혼자 해석한 관계에 교정과 배움이 필요한 시기",
+      "transformationSummary": "멘토의 설명과 실제 행동을 통해 흐릿한 관계가 검증된 이해로 바뀐다.",
+      "resultOrNextStateSummary": "학습 필요 하나가 해소되고 더 넓은 지리와 사회 구조를 읽을 준비가 된다.",
+      "classificationStateCode": "HexagramConfirmed",
+      "primaryHexagramStableId": "HEX-04-MENG",
+      "primaryReason": "미숙함을 인정하고 묻고 배우며 실제 행동으로 이해를 바로잡는 변화가 중심이다.",
+      "secondaryCandidates": [
+        {
+          "rank": 1,
+          "hexagramStableId": "HEX-03-ZHUN",
+          "reason": "수뢰둔의 첫 정착에서 발생한 학습 필요가 발단이지만 이야기의 중심은 정착보다 배움과 교정이다."
+        }
+      ],
+      "lineClassificationStateCode": "Deferred",
+      "lineCandidates": [],
+      "confirmedLineStableId": "",
+      "lineDeferralReason": "산수몽 육효를 순차 퀘스트로 고정하지 않고 독립 공명 원형으로 유지한다.",
+      "userConfirmationRef": "planning-conversation:2026-09-05:meng-independent-learning-context",
+      "developmentHandoffStateCode": "NotEligible",
+      "classificationHistory": [
+        {
+          "revision": 1,
+          "stateCode": "HexagramConfirmed",
+          "primaryHexagramStableId": "HEX-04-MENG",
+          "reason": "산수몽을 자유 플레이를 막지 않는 독립 학습 맥락으로 확정한 기획을 이관한다."
+        }
+      ]
+    }
+  ]
+}

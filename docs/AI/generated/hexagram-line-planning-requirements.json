@@ -1,0 +1,752 @@
+{
+  "schemaVersion": "mirror-hexagram-line-planning-requirements-index.v1",
+  "revision": "hexagram-line-planning-requirements.r6",
+  "sourceSnapshots": [
+    {
+      "path": "eng/execution-ledgers/hexagram-line-planning-requirements.json",
+      "sha256": "8493B28970A3350BF9D21847227968834324732B4F35A22C8716B517EA580968"
+    },
+    {
+      "path": "eng/execution-ledgers/hexagram-story-production.json",
+      "sha256": "27D35262016DBD873245460A792C469243FCE876C2B1D93F9D0D36B33A5F8D88"
+    },
+    {
+      "path": "eng/execution-ledgers/gameplay-subjects.json",
+      "sha256": "34767D82080E1058640C863704A9E561126CDE5C0632BE10EABBC6298849E9DB"
+    },
+    {
+      "path": "eng/execution-ledgers/world-interactions.json",
+      "sha256": "AF745AA42BF837ED9277E0435503D4123F65ECA93FD122F967CB448D517E8E2A"
+    },
+    {
+      "path": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-001/README.md",
+      "sha256": "0C0BAE19FD020E4549D282D2E9E32DA742EDA7C74920C515D114FCBB000C1844"
+    },
+    {
+      "path": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-002/README.md",
+      "sha256": "66F24DE834610A6413B1494ED19F709E435937B8604A13F652DD5452FDB6A2F1"
+    },
+    {
+      "path": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-003/README.md",
+      "sha256": "EFC260B2B4CD06FD9F9D3997683798B7709F5615874869E217603BCEE7540C83"
+    },
+    {
+      "path": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-004/README.md",
+      "sha256": "F6D417CB18B4AF10C4C02716CD595F8D6DBB7E69A45A2AA5E855BBE13FD804F9"
+    },
+    {
+      "path": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-005/README.md",
+      "sha256": "D7310F04D88EF8E7378983E8C0D60C823094A05A1D7C568B0B505B003E4DE21F"
+    },
+    {
+      "path": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-006/README.md",
+      "sha256": "700A451AF693B2AA68329E515F12367340B6D1F491A45EAF3B708CBEC6183973"
+    }
+  ],
+  "counts": {
+    "registeredLinePlanIds": 384,
+    "openedRequirementPlans": 6,
+    "activeStudy": 0,
+    "seeded": 0,
+    "readyForDevelopment": 6
+  },
+  "principles": {
+    "allLinesHaveStablePlanIds": true,
+    "onlyStudiedLinesRequireDocuments": true,
+    "atMostOneActiveStudy": true,
+    "storyApprovalAndDevelopmentReadinessAreSeparate": true,
+    "linePlanDeclaresButDoesNotCreateWorldInteractionsOrH": true,
+    "developmentGoalOwnsExactlyOneWorldInteraction": true,
+    "higherHRequiresCompositionEvidence": true,
+    "automaticGraphMapUnityOrEvidencePromotion": false
+  },
+  "items": [
+    {
+      "linePlanId": "PLAN-STORY-HEX03-LINE-001",
+      "hexagramLineStableId": "HEX-03-ZHUN-L1",
+      "planningStatusCode": "StoryApproved",
+      "requirementStateCode": "Resolved",
+      "handoffStateCode": "ReadyForDevelopment",
+      "documentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-001/README.md",
+      "documentRevisionCode": "hex03-line001.r6",
+      "documentExpectedSha256": "0C0BAE19FD020E4549D282D2E9E32DA742EDA7C74920C515D114FCBB000C1844",
+      "originalText": "初九：磐桓，利居貞，利建侯。",
+      "originalSourceId": "wikisource-zhouyi-traditional",
+      "originalSourceLocator": "周易/屯#初九",
+      "originalFitCode": "Aligned",
+      "primaryStoryBeatStableId": "story-beat:hex03-line001:establish-guest-place-through-fence-repair",
+      "subjectRequirements": [
+        {
+          "roleCode": "PlayerActor",
+          "targetRef": "subject:player-controlled-actor.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "HansNpc",
+          "targetRef": "subject:hans-farm-owner-npc.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "HansGuestRightsGrant",
+          "targetRef": "subject:hans-farm-owner-npc.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "FarmhouseGuestSpace",
+          "targetRef": "subject:hans-farm-residential-home.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "worldInteractionRequirements": [
+        {
+          "roleCode": "ConfirmFenceRepairAttributionAndGrantGuestRights",
+          "targetRef": "WI-GUEST-PERMISSION-SET",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "RecoverBrokenFarmAxePrerequisite",
+          "targetRef": "WI-NATURE-19",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "FirstWoodcuttingPrerequisite",
+          "targetRef": "WI-NATURE-06",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "CollectRepairTimberPrerequisite",
+          "targetRef": "WI-NATURE-18",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "RepairFarmFencePrerequisite",
+          "targetRef": "WI-NATURE-20",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "StorePersonalResourcesFollowUp",
+          "targetRef": "WI-NATURE-13",
+          "necessityCode": "Optional",
+          "resolutionCode": "CandidateNeedsReview"
+        }
+      ],
+      "hRequirements": [
+        {
+          "levelCode": "H1",
+          "roleCode": "FarmLivingHomeWithGuestAnchors",
+          "targetRef": "h1-stock:farm-residential-home",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H1",
+          "roleCode": "FarmProductionPlotContext",
+          "targetRef": "h1-stock:farm-production",
+          "necessityCode": "Optional",
+          "resolutionCode": "CandidateNeedsReview",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H2",
+          "roleCode": "ForestEdgeFarm",
+          "targetRef": "h2-candidate:forest-edge-living-farm",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": [
+            "h1-stock:farm-residential-home",
+            "h1-stock:farm-production",
+            "h1-stock:farm-fence-edge"
+          ]
+        },
+        {
+          "levelCode": "H3",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H4",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        }
+      ],
+      "graphMapImpactCode": "UpdateExisting",
+      "placementMapRequirementCode": "Required",
+      "optionalPlayableLoopCode": "NotRequiredUnlessMultipleWorldInteractionsNeedJointClosure",
+      "openGaps": []
+    },
+    {
+      "linePlanId": "PLAN-STORY-HEX03-LINE-002",
+      "hexagramLineStableId": "HEX-03-ZHUN-L2",
+      "planningStatusCode": "StoryApproved",
+      "requirementStateCode": "Resolved",
+      "handoffStateCode": "ReadyForDevelopment",
+      "documentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-002/README.md",
+      "documentRevisionCode": "hex03-line002.r5",
+      "documentExpectedSha256": "66F24DE834610A6413B1494ED19F709E435937B8604A13F652DD5452FDB6A2F1",
+      "originalText": "六二：屯如邅如，乘馬班如，匪寇婚媾，女子貞不字，十年乃字。",
+      "originalSourceId": "wikisource-zhouyi-traditional",
+      "originalSourceLocator": "周易/屯#六二",
+      "originalFitCode": "Partial",
+      "primaryStoryBeatStableId": "story-beat:hex03-line002:return-together-after-boundary-patrol",
+      "subjectRequirements": [
+        {
+          "roleCode": "PlayerActor",
+          "targetRef": "subject:player-controlled-actor.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "HansNpc",
+          "targetRef": "subject:hans-farm-owner-npc.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "FarmBoundaryPatrolRoute",
+          "targetRef": "subject:authoritative-interaction-target.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "worldInteractionRequirements": [
+        {
+          "roleCode": "PatrolFarmBoundaryLoopWithHans",
+          "targetRef": "WI-NATURE-HANS-BOUNDARY-PATROL",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "RecordReturnTogetherBeforeDusk",
+          "targetRef": "WI-NATURE-HANS-BOUNDARY-PATROL",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "hRequirements": [
+        {
+          "levelCode": "H1",
+          "roleCode": "FarmToolStorage",
+          "targetRef": "h1-stock:farm-tool-storage",
+          "necessityCode": "Optional",
+          "resolutionCode": "CandidateNeedsReview",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H2",
+          "roleCode": "ForestEdgeFarm",
+          "targetRef": "h2-candidate:forest-edge-living-farm",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": [
+            "h1-stock:farm-residential-home",
+            "h1-stock:farm-production",
+            "h1-stock:farm-fence-edge"
+          ]
+        },
+        {
+          "levelCode": "H3",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H4",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        }
+      ],
+      "graphMapImpactCode": "UpdateExisting",
+      "placementMapRequirementCode": "Required",
+      "optionalPlayableLoopCode": "NotRequiredUnlessMultipleWorldInteractionsNeedJointClosure",
+      "openGaps": []
+    },
+    {
+      "linePlanId": "PLAN-STORY-HEX03-LINE-003",
+      "hexagramLineStableId": "HEX-03-ZHUN-L3",
+      "planningStatusCode": "StoryApproved",
+      "requirementStateCode": "Resolved",
+      "handoffStateCode": "ReadyForDevelopment",
+      "documentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-003/README.md",
+      "documentRevisionCode": "hex03-line003.r4",
+      "documentExpectedSha256": "EFC260B2B4CD06FD9F9D3997683798B7709F5615874869E217603BCEE7540C83",
+      "originalText": "六三：即鹿无虞，惟入于林中，君子幾不如舍，往吝。",
+      "originalSourceId": "wikisource-zhouyi-traditional",
+      "originalSourceLocator": "周易/屯#六三",
+      "originalFitCode": "Aligned",
+      "primaryStoryBeatStableId": "story-beat:hex03-line003:refuse-unguided-pursuit",
+      "subjectRequirements": [
+        {
+          "roleCode": "PlayerActor",
+          "targetRef": "subject:player-controlled-actor.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "ThreatTraceTarget",
+          "targetRef": "subject:authoritative-interaction-target.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "worldInteractionRequirements": [
+        {
+          "roleCode": "InvestigateTrace",
+          "targetRef": "WI-NATURE-TRACE-INVESTIGATE",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "ChooseThreatResponse",
+          "targetRef": "WI-NATURE-11",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "hRequirements": [
+        {
+          "levelCode": "H1",
+          "roleCode": "IncidentTrace",
+          "targetRef": "h1-stock:nature-incident-trace",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H1",
+          "roleCode": "EmergencyRetreat",
+          "targetRef": "h1-stock:nature-emergency-retreat",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H2",
+          "roleCode": "ThreatResponse",
+          "targetRef": "h2-candidate:nature-threat-response",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": [
+            "h1-stock:nature-incident-trace",
+            "h1-stock:nature-emergency-retreat"
+          ]
+        },
+        {
+          "levelCode": "H3",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H4",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        }
+      ],
+      "graphMapImpactCode": "UpdateExisting",
+      "placementMapRequirementCode": "Required",
+      "optionalPlayableLoopCode": "CandidateNeedsReviewForInvestigationAndReturn",
+      "openGaps": []
+    },
+    {
+      "linePlanId": "PLAN-STORY-HEX03-LINE-004",
+      "hexagramLineStableId": "HEX-03-ZHUN-L4",
+      "planningStatusCode": "StoryApproved",
+      "requirementStateCode": "Resolved",
+      "handoffStateCode": "ReadyForDevelopment",
+      "documentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-004/README.md",
+      "documentRevisionCode": "hex03-line004.r5",
+      "documentExpectedSha256": "F6D417CB18B4AF10C4C02716CD595F8D6DBB7E69A45A2AA5E855BBE13FD804F9",
+      "originalText": "六四：乘馬班如，求婚媾，往，吉无不利。",
+      "originalSourceId": "wikisource-zhouyi-traditional",
+      "originalSourceLocator": "周易/屯#六四",
+      "originalFitCode": "Partial",
+      "primaryStoryBeatStableId": "story-beat:hex03-line004:receive-bounded-house-and-plot-authority",
+      "subjectRequirements": [
+        {
+          "roleCode": "PlayerActor",
+          "targetRef": "subject:player-controlled-actor.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "HansNpcAuthorityGrantor",
+          "targetRef": "subject:hans-farm-owner-npc.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "FarmhouseManagementAuthorityTarget",
+          "targetRef": "subject:hans-farm-residential-home.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "PotatoPlotManagementAuthorityTarget",
+          "targetRef": "subject:hans-farm-potato-plot.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "worldInteractionRequirements": [
+        {
+          "roleCode": "GrantBoundedFarmhouseAndPlotManagementAuthority",
+          "targetRef": "WI-WORLD-BOUNDED-MANAGEMENT-GRANT",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "InvestigateThreatTraceAndReturnPrerequisite",
+          "targetRef": "WI-NATURE-TRACE-INVESTIGATE",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "hRequirements": [
+        {
+          "levelCode": "H1",
+          "roleCode": "FarmLivingHomeAuthorityBoundary",
+          "targetRef": "h1-stock:farm-residential-home",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H1",
+          "roleCode": "PotatoCultivationPlotAuthorityBoundary",
+          "targetRef": "h1-stock:farm-production",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H2",
+          "roleCode": "ForestEdgeFarm",
+          "targetRef": "h2-candidate:forest-edge-living-farm",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": [
+            "h1-stock:farm-residential-home",
+            "h1-stock:farm-production",
+            "h1-stock:farm-fence-edge"
+          ]
+        },
+        {
+          "levelCode": "H3",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H4",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        }
+      ],
+      "graphMapImpactCode": "UpdateExisting",
+      "placementMapRequirementCode": "Required",
+      "optionalPlayableLoopCode": "NotRequiredForDialogueAuthorityGrant",
+      "openGaps": []
+    },
+    {
+      "linePlanId": "PLAN-STORY-HEX03-LINE-005",
+      "hexagramLineStableId": "HEX-03-ZHUN-L5",
+      "planningStatusCode": "StoryApproved",
+      "requirementStateCode": "Resolved",
+      "handoffStateCode": "ReadyForDevelopment",
+      "documentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-005/README.md",
+      "documentRevisionCode": "hex03-line005.r5",
+      "documentExpectedSha256": "D7310F04D88EF8E7378983E8C0D60C823094A05A1D7C568B0B505B003E4DE21F",
+      "originalText": "九五：屯其膏；小貞吉，大貞凶。",
+      "originalSourceId": "wikisource-zhouyi-traditional",
+      "originalSourceLocator": "周易/屯#九五",
+      "originalFitCode": "Aligned",
+      "primaryStoryBeatStableId": "story-beat:hex03-line005:restore-one-plot-and-farmhouse",
+      "subjectRequirements": [
+        {
+          "roleCode": "PlayerWorkActor",
+          "targetRef": "subject:player-controlled-actor.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "HansFarmhouseRepairPartner",
+          "targetRef": "subject:hans-farm-owner-npc.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "NeglectedPotatoPlotTarget",
+          "targetRef": "subject:hans-farm-potato-plot.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "DamagedFarmhouseTarget",
+          "targetRef": "subject:hans-farm-residential-home.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "worldInteractionRequirements": [
+        {
+          "roleCode": "RestoreNeglectedPotatoPlot",
+          "targetRef": "WI-FARM-01",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "RepairFarmhouseTogether",
+          "targetRef": "WI-WORLD-04",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "CompleteSmallFarmOrder",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable"
+        },
+        {
+          "roleCode": "OptionalForestFowlDomestication",
+          "targetRef": "",
+          "necessityCode": "Optional",
+          "resolutionCode": "NewDefinitionRequired"
+        }
+      ],
+      "hRequirements": [
+        {
+          "levelCode": "H1",
+          "roleCode": "ManagedPotatoCultivationPlot",
+          "targetRef": "h1-stock:farm-production",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H1",
+          "roleCode": "FullyRepairedFarmLivingHome",
+          "targetRef": "h1-stock:farm-residential-home",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H2",
+          "roleCode": "ForestEdgeFarm",
+          "targetRef": "h2-candidate:forest-edge-living-farm",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": [
+            "h1-stock:farm-residential-home",
+            "h1-stock:farm-production",
+            "h1-stock:farm-fence-edge"
+          ]
+        },
+        {
+          "levelCode": "H3",
+          "roleCode": "NoHigherAreaRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H4",
+          "roleCode": "NoRegionalAggregateRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        }
+      ],
+      "graphMapImpactCode": "UpdateExisting",
+      "placementMapRequirementCode": "Required",
+      "optionalPlayableLoopCode": "CandidateOnlyIfPlotAndFarmhouseMustCloseInOneCampaignRevision",
+      "openGaps": []
+    },
+    {
+      "linePlanId": "PLAN-STORY-HEX03-LINE-006",
+      "hexagramLineStableId": "HEX-03-ZHUN-L6",
+      "planningStatusCode": "StoryApproved",
+      "requirementStateCode": "Resolved",
+      "handoffStateCode": "ReadyForDevelopment",
+      "documentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEX03-LINE-006/README.md",
+      "documentRevisionCode": "hex03-line006.r5",
+      "documentExpectedSha256": "700A451AF693B2AA68329E515F12367340B6D1F491A45EAF3B708CBEC6183973",
+      "originalText": "上六：乘馬班如，泣血漣如。",
+      "originalSourceId": "wikisource-zhouyi-traditional",
+      "originalSourceLocator": "周易/屯#上六",
+      "originalFitCode": "Aligned",
+      "primaryStoryBeatStableId": "story-beat:hex03-line006:recognize-limit-after-partial-farm-loss",
+      "subjectRequirements": [
+        {
+          "roleCode": "PlayerActor",
+          "targetRef": "subject:player-controlled-actor.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "HansDefenseAndDebriefNpc",
+          "targetRef": "subject:hans-farm-owner-npc.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "DisplacedBeastGroup",
+          "targetRef": "subject:hans-farm-displaced-beast-group.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "FarmhouseDefenseObjectiveTarget",
+          "targetRef": "subject:hans-farm-residential-home.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "FarmProductionObjectiveTarget",
+          "targetRef": "subject:hans-farm-potato-plot.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "FenceDefenseObjectiveTarget",
+          "targetRef": "subject:hans-farm-fence-defense-objective.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "WorldThreatRule",
+          "targetRef": "subject:world-automatic-rule.v1",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "worldInteractionRequirements": [
+        {
+          "roleCode": "ChooseThreatResponse",
+          "targetRef": "WI-NATURE-11",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "PrepareOneTickFarmMultiObjectiveDefense",
+          "targetRef": "WI-FARM-DEFENSE-MOBILIZE",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "ResolvePartialFarmDefenseLoss",
+          "targetRef": "WI-FARM-DEFENSE-RESOLVE",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "RecoverAndReturnAfterPartialDefense",
+          "targetRef": "WI-FARM-DEFENSE-RETURN",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        },
+        {
+          "roleCode": "DebriefFarmCrisisLearningNeeds",
+          "targetRef": "WI-REFLECT-HANS-FARM-CRISIS-DEBRIEF",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused"
+        }
+      ],
+      "hRequirements": [
+        {
+          "levelCode": "H1",
+          "roleCode": "FarmhouseDefenseObjective",
+          "targetRef": "h1-stock:farm-residential-home",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H1",
+          "roleCode": "FarmProductionObjective",
+          "targetRef": "h1-stock:farm-production",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H1",
+          "roleCode": "FarmFenceDefenseChokepoint",
+          "targetRef": "h1-stock:farm-fence-edge",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": []
+        },
+        {
+          "levelCode": "H2",
+          "roleCode": "FarmBoundaryDefenseRecovery",
+          "targetRef": "h2-candidate:farm-boundary-defense-recovery",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": [
+            "h1-stock:farm-fence-edge",
+            "h1-stock:nature-incident-trace",
+            "h1-stock:nature-emergency-retreat",
+            "h1-stock:farm-residential-home"
+          ]
+        },
+        {
+          "levelCode": "H3",
+          "roleCode": "ForestEdgeLivingFarmCampaign",
+          "targetRef": "h3-candidate:forest-edge-living-farm-campaign",
+          "necessityCode": "Required",
+          "resolutionCode": "ExistingReused",
+          "compositionEvidenceRefs": [
+            "h2-candidate:forest-edge-living-farm",
+            "h2-candidate:farm-boundary-defense-recovery"
+          ]
+        },
+        {
+          "levelCode": "H4",
+          "roleCode": "NoRegionalAggregateRequired",
+          "targetRef": "",
+          "necessityCode": "NotApplicable",
+          "resolutionCode": "NotApplicable",
+          "compositionEvidenceRefs": []
+        }
+      ],
+      "graphMapImpactCode": "CreateSubgraph",
+      "placementMapRequirementCode": "Required",
+      "optionalPlayableLoopCode": "RequiredForPreparationPartialLossRecoveryAndDebriefClosure",
+      "openGaps": []
+    }
+  ]
+}

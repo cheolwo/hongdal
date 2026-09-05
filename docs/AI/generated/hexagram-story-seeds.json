@@ -1,0 +1,615 @@
+{
+  "schemaVersion": "mirror-hexagram-story-seeds-index.v1",
+  "revision": "hexagram-story-seeds.r1",
+  "parentProductionRevision": "hexagram-story-production.r14",
+  "formalAuthoringHexagramStableId": "HEX-01-QIAN",
+  "prototypeDialogueLineStableId": "HEX-04-MENG-L3",
+  "policy": {
+    "intakeCode": "FreePlanningBeforeHexagramAndLineClassification",
+    "assignmentCode": "OnePrimaryWithRankedSecondaryCandidates",
+    "classificationAuthorityCode": "CodexSuggestsUserConfirms",
+    "lineGateCode": "SubjectSituationTransformationResultKnown",
+    "preserveReclassificationHistory": true,
+    "doesNotChangeActiveProductionHexagram": true,
+    "doesNotCreateLinePlanDocument": true,
+    "doesNotCreateWorldInteraction": true,
+    "doesNotPromoteEvidence": true
+  },
+  "counts": {
+    "seeds": 2,
+    "confirmedHexagrams": 2,
+    "lineCandidates": 0,
+    "lineConfirmed": 0
+  },
+  "hexagramSummary": [
+    {
+      "ordinal": 1,
+      "hexagramStableId": "HEX-01-QIAN",
+      "symbol": "䷀",
+      "nameKorean": "중천건",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 2,
+      "hexagramStableId": "HEX-02-KUN",
+      "symbol": "䷁",
+      "nameKorean": "중지곤",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 3,
+      "hexagramStableId": "HEX-03-ZHUN",
+      "symbol": "䷂",
+      "nameKorean": "수뢰둔",
+      "primarySeedCount": 1,
+      "secondaryCandidateCount": 1
+    },
+    {
+      "ordinal": 4,
+      "hexagramStableId": "HEX-04-MENG",
+      "symbol": "䷃",
+      "nameKorean": "산수몽",
+      "primarySeedCount": 1,
+      "secondaryCandidateCount": 1
+    },
+    {
+      "ordinal": 5,
+      "hexagramStableId": "HEX-05-XU",
+      "symbol": "䷄",
+      "nameKorean": "수천수",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 6,
+      "hexagramStableId": "HEX-06-SONG",
+      "symbol": "䷅",
+      "nameKorean": "천수송",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 7,
+      "hexagramStableId": "HEX-07-SHI",
+      "symbol": "䷆",
+      "nameKorean": "지수사",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 8,
+      "hexagramStableId": "HEX-08-BI",
+      "symbol": "䷇",
+      "nameKorean": "수지비",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 9,
+      "hexagramStableId": "HEX-09-XIAO-CHU",
+      "symbol": "䷈",
+      "nameKorean": "풍천소축",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 10,
+      "hexagramStableId": "HEX-10-LU",
+      "symbol": "䷉",
+      "nameKorean": "천택리",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 11,
+      "hexagramStableId": "HEX-11-TAI",
+      "symbol": "䷊",
+      "nameKorean": "지천태",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 12,
+      "hexagramStableId": "HEX-12-PI",
+      "symbol": "䷋",
+      "nameKorean": "천지비",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 13,
+      "hexagramStableId": "HEX-13-TONG-REN",
+      "symbol": "䷌",
+      "nameKorean": "천화동인",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 14,
+      "hexagramStableId": "HEX-14-DA-YOU",
+      "symbol": "䷍",
+      "nameKorean": "화천대유",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 15,
+      "hexagramStableId": "HEX-15-QIAN-MODESTY",
+      "symbol": "䷎",
+      "nameKorean": "지산겸",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 16,
+      "hexagramStableId": "HEX-16-YU",
+      "symbol": "䷏",
+      "nameKorean": "뇌지예",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 17,
+      "hexagramStableId": "HEX-17-SUI",
+      "symbol": "䷐",
+      "nameKorean": "택뢰수",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 18,
+      "hexagramStableId": "HEX-18-GU",
+      "symbol": "䷑",
+      "nameKorean": "산풍고",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 19,
+      "hexagramStableId": "HEX-19-LIN",
+      "symbol": "䷒",
+      "nameKorean": "지택림",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 20,
+      "hexagramStableId": "HEX-20-GUAN",
+      "symbol": "䷓",
+      "nameKorean": "풍지관",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 21,
+      "hexagramStableId": "HEX-21-SHI-HE",
+      "symbol": "䷔",
+      "nameKorean": "화뢰서합",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 22,
+      "hexagramStableId": "HEX-22-BI-GRACE",
+      "symbol": "䷕",
+      "nameKorean": "산화비",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 23,
+      "hexagramStableId": "HEX-23-BO",
+      "symbol": "䷖",
+      "nameKorean": "산지박",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 24,
+      "hexagramStableId": "HEX-24-FU",
+      "symbol": "䷗",
+      "nameKorean": "지뢰복",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 25,
+      "hexagramStableId": "HEX-25-WU-WANG",
+      "symbol": "䷘",
+      "nameKorean": "천뢰무망",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 26,
+      "hexagramStableId": "HEX-26-DA-CHU",
+      "symbol": "䷙",
+      "nameKorean": "산천대축",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 27,
+      "hexagramStableId": "HEX-27-YI",
+      "symbol": "䷚",
+      "nameKorean": "산뢰이",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 28,
+      "hexagramStableId": "HEX-28-DA-GUO",
+      "symbol": "䷛",
+      "nameKorean": "택풍대과",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 29,
+      "hexagramStableId": "HEX-29-KAN",
+      "symbol": "䷜",
+      "nameKorean": "중수감",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 30,
+      "hexagramStableId": "HEX-30-LI",
+      "symbol": "䷝",
+      "nameKorean": "중화리",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 31,
+      "hexagramStableId": "HEX-31-XIAN",
+      "symbol": "䷞",
+      "nameKorean": "택산함",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 32,
+      "hexagramStableId": "HEX-32-HENG",
+      "symbol": "䷟",
+      "nameKorean": "뇌풍항",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 33,
+      "hexagramStableId": "HEX-33-DUN",
+      "symbol": "䷠",
+      "nameKorean": "천산둔",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 34,
+      "hexagramStableId": "HEX-34-DA-ZHUANG",
+      "symbol": "䷡",
+      "nameKorean": "뇌천대장",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 35,
+      "hexagramStableId": "HEX-35-JIN",
+      "symbol": "䷢",
+      "nameKorean": "화지진",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 36,
+      "hexagramStableId": "HEX-36-MING-YI",
+      "symbol": "䷣",
+      "nameKorean": "지화명이",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 37,
+      "hexagramStableId": "HEX-37-JIA-REN",
+      "symbol": "䷤",
+      "nameKorean": "풍화가인",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 38,
+      "hexagramStableId": "HEX-38-KUI",
+      "symbol": "䷥",
+      "nameKorean": "화택규",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 39,
+      "hexagramStableId": "HEX-39-JIAN",
+      "symbol": "䷦",
+      "nameKorean": "수산건",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 40,
+      "hexagramStableId": "HEX-40-XIE",
+      "symbol": "䷧",
+      "nameKorean": "뇌수해",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 41,
+      "hexagramStableId": "HEX-41-SUN",
+      "symbol": "䷨",
+      "nameKorean": "산택손",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 42,
+      "hexagramStableId": "HEX-42-YI-BENEFIT",
+      "symbol": "䷩",
+      "nameKorean": "풍뢰익",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 43,
+      "hexagramStableId": "HEX-43-GUAI",
+      "symbol": "䷪",
+      "nameKorean": "택천쾌",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 44,
+      "hexagramStableId": "HEX-44-GOU",
+      "symbol": "䷫",
+      "nameKorean": "천풍구",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 45,
+      "hexagramStableId": "HEX-45-CUI",
+      "symbol": "䷬",
+      "nameKorean": "택지췌",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 46,
+      "hexagramStableId": "HEX-46-SHENG",
+      "symbol": "䷭",
+      "nameKorean": "지풍승",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 47,
+      "hexagramStableId": "HEX-47-KUN-DISTRESS",
+      "symbol": "䷮",
+      "nameKorean": "택수곤",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 48,
+      "hexagramStableId": "HEX-48-JING",
+      "symbol": "䷯",
+      "nameKorean": "수풍정",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 49,
+      "hexagramStableId": "HEX-49-GE",
+      "symbol": "䷰",
+      "nameKorean": "택화혁",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 50,
+      "hexagramStableId": "HEX-50-DING",
+      "symbol": "䷱",
+      "nameKorean": "화풍정",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 51,
+      "hexagramStableId": "HEX-51-ZHEN",
+      "symbol": "䷲",
+      "nameKorean": "중뢰진",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 52,
+      "hexagramStableId": "HEX-52-GEN",
+      "symbol": "䷳",
+      "nameKorean": "중산간",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 53,
+      "hexagramStableId": "HEX-53-JIAN-GRADUAL",
+      "symbol": "䷴",
+      "nameKorean": "풍산점",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 54,
+      "hexagramStableId": "HEX-54-GUI-MEI",
+      "symbol": "䷵",
+      "nameKorean": "뇌택귀매",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 55,
+      "hexagramStableId": "HEX-55-FENG",
+      "symbol": "䷶",
+      "nameKorean": "뇌화풍",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 56,
+      "hexagramStableId": "HEX-56-LU-TRAVELER",
+      "symbol": "䷷",
+      "nameKorean": "화산려",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 57,
+      "hexagramStableId": "HEX-57-XUN",
+      "symbol": "䷸",
+      "nameKorean": "중풍손",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 58,
+      "hexagramStableId": "HEX-58-DUI",
+      "symbol": "䷹",
+      "nameKorean": "중택태",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 59,
+      "hexagramStableId": "HEX-59-HUAN",
+      "symbol": "䷺",
+      "nameKorean": "풍수환",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 60,
+      "hexagramStableId": "HEX-60-JIE",
+      "symbol": "䷻",
+      "nameKorean": "수택절",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 61,
+      "hexagramStableId": "HEX-61-ZHONG-FU",
+      "symbol": "䷼",
+      "nameKorean": "풍택중부",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 62,
+      "hexagramStableId": "HEX-62-XIAO-GUO",
+      "symbol": "䷽",
+      "nameKorean": "뇌산소과",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 63,
+      "hexagramStableId": "HEX-63-JI-JI",
+      "symbol": "䷾",
+      "nameKorean": "수화기제",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    },
+    {
+      "ordinal": 64,
+      "hexagramStableId": "HEX-64-WEI-JI",
+      "symbol": "䷿",
+      "nameKorean": "화수미제",
+      "primarySeedCount": 0,
+      "secondaryCandidateCount": 0
+    }
+  ],
+  "seeds": [
+    {
+      "storySeedStableId": "STORY-SEED-HANS-FARM-FOOTHOLD-001",
+      "title": "낯선 세계에서 한스 농장을 첫 생활 거점으로 일구기",
+      "synopsis": "플레이어가 한스 농장에 머물며 자발적인 노동과 방어, 관계와 작은 질서를 통해 세계에 처음 뿌리를 내린다.",
+      "sourcePlanningRefs": [
+        "PLAN-STORY-HANS-FARM-001",
+        "PLAN-STORY-HEX03-LINE-001",
+        "PLAN-STORY-HEX03-LINE-006"
+      ],
+      "subjectSummary": "낯선 세계에 들어온 모험가와 농장주 한스",
+      "situationSummary": "생활 기반과 신뢰가 아직 없는 변경 농장",
+      "transformationSummary": "손님이 자발적으로 일하고 책임지는 생활 구성원으로 변한다.",
+      "resultOrNextStateSummary": "작은 거점의 질서가 생기고 다음 학습 필요가 열린다.",
+      "classificationStateCode": "HexagramConfirmed",
+      "primaryHexagramStableId": "HEX-03-ZHUN",
+      "primaryReason": "처음 싹트는 생활 기반이 아직 어수선한 조건 속에서 관계와 질서로 자라나는 흐름이 중심이다.",
+      "secondaryCandidates": [
+        {
+          "rank": 1,
+          "hexagramStableId": "HEX-04-MENG",
+          "reason": "한스에게 배우고 자신의 한계를 깨닫는 후속 흐름과 맞지만 첫 정착 자체보다 한 단계 뒤의 의미다."
+        }
+      ],
+      "lineClassificationStateCode": "Deferred",
+      "lineCandidates": [],
+      "confirmedLineStableId": "",
+      "lineDeferralReason": "이 씨앗은 수뢰둔 전체를 감싸는 이야기 묶음이며 개별 효 이야기는 기존 하위 기획이 소유한다.",
+      "userConfirmationRef": "planning-conversation:2026-09-05:hans-farm-zhun-prototype",
+      "developmentHandoffStateCode": "NotEligible",
+      "classificationHistory": [
+        {
+          "revision": 1,
+          "stateCode": "HexagramConfirmed",
+          "primaryHexagramStableId": "HEX-03-ZHUN",
+          "reason": "기존 한스 농장 수뢰둔 표본을 자유 기획 유입 체계의 첫 이관 사례로 보존한다."
+        }
+      ]
+    },
+    {
+      "storySeedStableId": "STORY-SEED-MENG-LEARNING-CONTEXT-001",
+      "title": "자유 행동 속에서 멘토의 가르침을 받아 세계의 관계를 읽기",
+      "synopsis": "플레이어가 자유롭게 생활하면서 필요할 때 산수몽 학습 맥락을 받아들이고 실제 행동으로 이해를 검증한다.",
+      "sourcePlanningRefs": [
+        "PLAN-STORY-IDEA-MAP-LEARNING-001",
+        "PLAN-STORY-HEXAGRAM-SEQUENCE-001"
+      ],
+      "subjectSummary": "기초 이데아 맵을 얻었지만 세계의 구조를 충분히 알지 못하는 플레이어",
+      "situationSummary": "자유 행동은 가능하지만 혼자 해석한 관계에 교정과 배움이 필요한 시기",
+      "transformationSummary": "멘토의 설명과 실제 행동을 통해 흐릿한 관계가 검증된 이해로 바뀐다.",
+      "resultOrNextStateSummary": "학습 필요 하나가 해소되고 더 넓은 지리와 사회 구조를 읽을 준비가 된다.",
+      "classificationStateCode": "HexagramConfirmed",
+      "primaryHexagramStableId": "HEX-04-MENG",
+      "primaryReason": "미숙함을 인정하고 묻고 배우며 실제 행동으로 이해를 바로잡는 변화가 중심이다.",
+      "secondaryCandidates": [
+        {
+          "rank": 1,
+          "hexagramStableId": "HEX-03-ZHUN",
+          "reason": "수뢰둔의 첫 정착에서 발생한 학습 필요가 발단이지만 이야기의 중심은 정착보다 배움과 교정이다."
+        }
+      ],
+      "lineClassificationStateCode": "Deferred",
+      "lineCandidates": [],
+      "confirmedLineStableId": "",
+      "lineDeferralReason": "산수몽 육효를 순차 퀘스트로 고정하지 않고 독립 공명 원형으로 유지한다.",
+      "userConfirmationRef": "planning-conversation:2026-09-05:meng-independent-learning-context",
+      "developmentHandoffStateCode": "NotEligible",
+      "classificationHistory": [
+        {
+          "revision": 1,
+          "stateCode": "HexagramConfirmed",
+          "primaryHexagramStableId": "HEX-04-MENG",
+          "reason": "산수몽을 자유 플레이를 막지 않는 독립 학습 맥락으로 확정한 기획을 이관한다."
+        }
+      ]
+    }
+  ]
+}
