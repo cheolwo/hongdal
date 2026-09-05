@@ -1,6 +1,6 @@
 {
   "schemaVersion": "ssalddel-playable-loop-catalog.v6",
-  "revision": "playable-loops.r39",
+  "revision": "playable-loops.r44",
   "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
   "worldInteractionCatalogPath": "eng/execution-ledgers/world-interactions.json",
   "evidenceStageCatalogPath": "eng/execution-ledgers/evidence-stages.json",
@@ -21,7 +21,11 @@
     "playableUnitHorizontalStabilityUsesE8": true,
     "areaAggregateHarmonyStartsAtE9": true,
     "topicDesignPrecedesGoalActivation": true,
-    "topicMapsToExactlyOnePlayableUnit": true
+    "subjectFoundationPrecedesInteractionGoal": true,
+    "interactionGoalMayExistWithoutPlayableLoop": true,
+    "registeredPlayableLoopKeepsDedicatedTopicGate": true,
+    "storyBeatContextDoesNotReplaceTopicPlanning": true,
+    "storyBeatToPlayableUnitUsesExplicitManyToManyBindings": true
   },
   "dualMaturityPolicy": {
     "rolloutCode": "AllPlayableUnits",
@@ -55,8 +59,27 @@
     "statusSnapshotAuthorityPath": "eng/execution-ledgers/playable-loops.json",
     "detailedDesignRoot": "docs/Architecture/PlayableLoops",
     "topicDesignTemplateRef": "docs/ProjectOverview/templates/PlayableLoop주제기획서템플릿.md",
-    "topicPlanningRequiredForPlayableUnits": true,
-    "topicMapsToExactlyOnePlayableUnit": true,
+    "topicPlanningRequiredForRegisteredPlayableUnits": true,
+    "registeredPlayableLoopKeepsDedicatedTopicGate": true,
+    "interactionGoalMayUseIndependentPlanningGate": true,
+    "storyBeatBindingPolicy": {
+      "hexagramStoryProductionLedgerRef": "eng/execution-ledgers/hexagram-story-production.json",
+      "bindingCardinalityCode": "ExplicitManyToMany",
+      "bindingOptionalForIndependentGameplay": true,
+      "acceptedBindingRequiredToClaimStoryDrivenDevelopment": true,
+      "bindingDoesNotReplaceApprovedPlanningGate": true,
+      "graphMapRoutingCode": "RequiredOnlyWhenSpatialImpactElseNoImpact",
+      "allowedRoleCodes": [
+        "PrimaryExperience",
+        "SupportingExperience",
+        "AlternativeExperience"
+      ],
+      "allowedStatusCodes": [
+        "Candidate",
+        "Accepted"
+      ],
+      "acceptedBindingRequiresApprovedLineStory": true
+    },
     "allowedPlanningStatusCodes": [
       "NotStarted",
       "Draft",
@@ -2381,18 +2404,119 @@
     },
     {
       "priority": 80,
+      "loopStableId": "playable-loop:player-npc-learning-focus.v1",
+      "title": "플레이어 NPC 학습 중점 E3",
+      "loopKind": "WorldIntegration",
+      "loopLevelCode": "PlayableUnit",
+      "planningGate": {
+        "topicStableId": "topic:player-npc-learning-focus.v1",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/플레이어NPC학습중점.md",
+        "designRevision": "player-npc-learning-focus.design.r1",
+        "designHashSha256": "B58E884BF20BFDC77D18914702BC6AB5F050C406A6E2701FDDCCBBF737A51EAB",
+        "statusCode": "Approved",
+        "approvalEvidenceRef": "docs/AI/PLANNING.md"
+      },
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/플레이어NPC학습중점.md",
+        "docs/Architecture/PlayableLoops/PlanningSessions/플레이어내면명상/player-mind-meditation.inquiry.r1.md",
+        "docs/AI/절기전략턴-타로카드-기획-2026-09-02.md"
+      ],
+      "completionTierCode": "Extension",
+      "parentLoopStableId": "",
+      "requiredCoreChildLoopStableIds": [],
+      "optionalExtensionChildLoopStableIds": [],
+      "areaSetStableIds": [],
+      "playerPromise": "플레이어는 보유한 NPC 학습 카드 한 장을 현재 또는 다음 절기 구간의 중점으로 정하고, 결속된 실제 행위의 제한된 이해도 기여를 저장·복원 후에도 한 번만 받는다.",
+      "entryStateCodes": [
+        "LearningCadenceScheduleReady",
+        "OwnedNpcLearningCardsReady"
+      ],
+      "worldInteractionIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-NATURE-06",
+        "WI-NATURE-11"
+      ],
+      "successStateCodes": [
+        "LearningFocusActiveOrEmpty",
+        "LearningContributionAppliedOnce",
+        "LearningFocusChoiceAvailable"
+      ],
+      "failureRecoveryWorldInteractionIds": [],
+      "returnStateCodes": [
+        "LearningFocusChoiceAvailable"
+      ],
+      "requiredHCapabilities": [],
+      "independentExecutionRequired": true,
+      "saveCheckpointCodes": [
+        "AfterLearningFocusChange",
+        "AfterLearningContribution"
+      ],
+      "currentEvidenceStage": "E3",
+      "nextClosureTargetStage": "E4",
+      "finalEvidenceStage": "E7",
+      "closureStateCode": "Open",
+      "statusCode": "InProgress",
+      "maturityTracks": {
+        "logic": {
+          "trackCode": "Logic",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "관계 기반 카드 취득·플레이어 멘토 공유·보조 슬롯은 후속 계약이다."
+          ]
+        },
+        "presentation": {
+          "trackCode": "Presentation",
+          "currentStage": "E3",
+          "targetStage": "E7",
+          "statusCode": "InProgress",
+          "evidencePackageRefs": [],
+          "blockers": [
+            "실제 카드 UI·입력·Unity Game View와 접근성 검증은 E4 이상에서 별도 수행한다."
+          ]
+        }
+      },
+      "openFeedbackItems": [
+        {
+          "feedbackId": "FB-PLAYER-LEARNING-FOCUS-E4-01",
+          "earliestReopenEvidenceStageCode": "E4",
+          "summary": "주 슬롯·보유 카드·구간 예고·변경 확인의 실제 판독 순간과 입력 계약을 동결한다."
+        }
+      ],
+      "evidencePackageRefs": [],
+      "legacyWorkOrderRefs": [
+        "eng/execution-ledgers/work-orders/player-npc-learning-focus.e7-work-order.json"
+      ],
+      "blockers": [
+        "E3 이후 UI·Unity·온라인 멘토 공유는 이번 구현 범위 밖이다."
+      ],
+      "nextAction": "E3 기준선을 보존하고 Presentation E4에서 실제 카드 판독·입력·VisualKey를 별도 승인한다."
+    },
+    {
+      "priority": 81,
       "loopStableId": "playable-loop:nature-hans-farm-fence-restoration.v1",
       "title": "한스 농장 첫 울타리 수리",
       "loopKind": "WorldIntegration",
       "loopLevelCode": "PlayableUnit",
       "planningGate": {
-        "topicStableId": "topic:hans-farm-first-fence-restoration.v1",
-        "designDocumentRef": "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md",
-        "designRevision": "hans-farm-first-lumber-repair.r27",
-        "designHashSha256": "ADC540046294B02E12FB2D329A8E75E3AD6FF5354DA1DCBD0247AFD47AAF6D2A",
+        "topicStableId": "topic:nature-hans-farm-fence-restoration.v1",
+        "designDocumentRef": "docs/Architecture/PlayableLoops/Nature한스농장첫울타리수리.md",
+        "designRevision": "nature-hans-farm-fence-restoration.design.r1",
+        "designHashSha256": "62F743887EAA79628507BA5D81C26C62FA80F1F1527CF0DAA925B182B2F57A5E",
         "statusCode": "Approved",
         "approvalEvidenceRef": "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"
       },
+      "sourcePlanningDocumentRefs": [
+        "docs/Architecture/PlayableLoops/Nature한스농장첫울타리수리.md",
+        "docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"
+      ],
       "completionTierCode": "Extension",
       "parentLoopStableId": "",
       "requiredCoreChildLoopStableIds": [],
@@ -2599,6 +2723,51 @@
         "Nature와 Farm 독립 영역 집계가 모두 E7 PlayClosed가 아니다."
       ],
       "nextAction": "두 독립 영역이 E7로 닫힐 때까지 대표 다음 작업으로 선택하지 않는다."
+    },
+    {
+      "priority": 44,
+      "loopStableId": "playable-loop:hexagram-campaign-retry.v1",
+      "title": "괘 캠페인 실패·초효 복귀 검증 단위",
+      "loopKind": "IndependentArea",
+      "loopLevelCode": "PlayableUnit",
+      "planningGate": {
+        "topicStableId": "topic:hexagram-campaign-retry.v1",
+        "designDocumentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md",
+        "designRevision": "hexagram-campaign-reset.r1",
+        "designHashSha256": "3D22D758F736537CA1EE87DCBE1EE4F6D95E78D1A358BD0D8A3CFBFB2AEE15E3",
+        "statusCode": "Approved",
+        "approvalEvidenceRef": "docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md#승인-근거"
+      },
+      "sourcePlanningDocumentRefs": ["docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md"],
+      "completionTierCode": "Core",
+      "parentLoopStableId": "",
+      "requiredCoreChildLoopStableIds": [],
+      "optionalExtensionChildLoopStableIds": [],
+      "areaSetStableIds": [],
+      "playerPromise": "회복 불가능한 실패 때 이전 괘 성과를 보존한 채 현재 괘 진입 상태와 초효로 되돌아간다.",
+      "entryStateCodes": ["HexagramCampaignActive", "IrrecoverableCoreObjectiveLost"],
+      "worldInteractionIds": ["WI-STORY-HEXAGRAM-CAMPAIGN-RETRY"],
+      "successStateCodes": ["HexagramCampaignRetriedAtFirstLine"],
+      "failureRecoveryWorldInteractionIds": [],
+      "returnStateCodes": ["HexagramCampaignActive"],
+      "requiredHCapabilities": [],
+      "independentExecutionRequired": true,
+      "saveCheckpointCodes": ["CampaignEntrySnapshot"],
+      "currentEvidenceStage": "E1",
+      "nextClosureTargetStage": "E4",
+      "finalEvidenceStage": "E7",
+      "closureStateCode": "Open",
+      "statusCode": "InProgress",
+      "maturityTracks": {
+        "logic": { "trackCode": "Logic", "currentStage": "E3", "targetStage": "E7", "statusCode": "Validated", "evidencePackageRefs": [], "blockers": [] },
+        "presentation": { "trackCode": "Presentation", "currentStage": "E1", "targetStage": "E7", "statusCode": "Blocked", "evidencePackageRefs": [], "blockers": ["Presentation E4 이상은 별도 기획 전까지 차단한다."] }
+      },
+      "openFeedbackItems": ["Unity Scene·실제 입력·Game View 미검증"],
+      "evidencePackageRefs": [],
+      "workOrderRefs": ["eng/execution-ledgers/work-orders/hexagram-campaign-retry.e7-work-order.json"],
+      "legacyWorkOrderRefs": [],
+      "blockers": ["Presentation E4 이상 미착수"],
+      "nextAction": "별도 표현 기획 승인 후 Presentation E4를 연다."
     }
   ]
 }
