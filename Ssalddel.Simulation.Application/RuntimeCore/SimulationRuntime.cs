@@ -118,6 +118,68 @@ namespace Ssalddel.Simulation.Application
         ISimulationBattleRuntime Battles { get; }
         ISimulationPlayerKnowledgeRuntime PlayerKnowledge { get; }
         ISimulation방문자체류Runtime CommunityVisitors { get; }
+        ISimulationPlayerLearningFocusRuntime LearningFocus { get; }
+        ISimulationPlayerIdeaMapRuntime IdeaMap { get; }
+        ISimulationHexagramCampaignRuntime HexagramCampaigns { get; }
+    }
+
+    public interface ISimulationHexagramCampaignRuntime
+    {
+        ValueTask<SimulationHexagramCampaignStateSnapshot> GetHexagramCampaignAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationHexagramCampaignStateSnapshot> EnterHexagramCampaignAsync(
+            string sessionStableId,
+            SimulationHexagramCampaignEnterRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationHexagramCampaignStateSnapshot> CompleteHexagramLineAsync(
+            string sessionStableId,
+            SimulationHexagramCampaignLineCompleteRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationHexagramCampaignStateSnapshot> RecordHexagramSetbackAsync(
+            string sessionStableId,
+            SimulationHexagramCampaignSetbackRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationHexagramCampaignStateSnapshot> FailHexagramCampaignAsync(
+            string sessionStableId,
+            SimulationHexagramCampaignFailureRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<SimulationHexagramCampaignStateSnapshot> CompleteHexagramCampaignAsync(
+            string sessionStableId,
+            SimulationHexagramCampaignCompleteRequest request,
+            CancellationToken cancellationToken = default);
+    }
+
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E2,
+        "플레이어 이데아 맵의 LocalProcess 공통 읽기 경계를 제공한다.",
+        Boundary = "파생 조회만 제공하며 별도 권위 상태나 Unity UI를 포함하지 않는다.")]
+    public interface ISimulationPlayerIdeaMapRuntime
+    {
+        ValueTask<Simulation플레이어이데아맵ProjectionSnapshot>
+            GetPlayerIdeaMapAsync(string sessionStableId,
+                string playerStableId,
+                CancellationToken cancellationToken = default);
+    }
+
+    [SsalddelEvidenceResponsibility(
+        SsalddelEvidenceStage.E2,
+        "NPC 학습중점의 LocalProcess 공통 실행 경계를 제공한다.",
+        Boundary = "한 슬롯 상태와 절기 구간 예약만 다루며 Unity UI를 포함하지 않는다.")]
+    public interface ISimulationPlayerLearningFocusRuntime
+    {
+        ValueTask<Simulation학습중점ProjectionSnapshot> GetLearningFocusAsync(
+            string sessionStableId,
+            string playerStableId,
+            CancellationToken cancellationToken = default);
+        ValueTask<Simulation학습중점PreviewSnapshot> PreviewLearningFocusAsync(
+            string sessionStableId,
+            Simulation학습중점ChangeRequest request,
+            CancellationToken cancellationToken = default);
+        ValueTask<Simulation학습중점StateSnapshot> ConfirmLearningFocusAsync(
+            string sessionStableId,
+            Simulation학습중점ChangeRequest request,
+            CancellationToken cancellationToken = default);
     }
 
     [SsalddelEvidenceResponsibility(

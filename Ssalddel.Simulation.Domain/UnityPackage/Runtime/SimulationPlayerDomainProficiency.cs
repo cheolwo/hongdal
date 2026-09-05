@@ -141,6 +141,78 @@ namespace Ssalddel.Simulation.Domain
             }
         }
 
+        public Simulation플레이어분야ProfileSnapshot ApplyNpcLearningFocus(
+            SimulationNpc학습중점기여Request request)
+        {
+            if (request == null) throw new SimulationContractException(
+                "SimulationPlayerDomainNpcLearningRequestRequired");
+            lock (gate)
+            {
+                ValidatePlayer(request.PlayerStableId);
+                var record = ValidateRecord(request.ActionRecord);
+                Require(request.CardStableId,
+                    "SimulationPlayerDomainLearningCardInvalid");
+                Require(request.CardRevision,
+                    "SimulationPlayerDomainLearningCardRevisionInvalid");
+                Require(request.CardDefinitionHashSha256,
+                    "SimulationPlayerDomainLearningCardHashInvalid");
+                Require(request.SourceActorStableId,
+                    "SimulationPlayerDomainLearningSourceActorInvalid");
+                Require(request.EffectReceiptStableId,
+                    "SimulationPlayerDomainLearningReceiptInvalid");
+                var eligibleResult = string.Equals(record.결과분류Code,
+                        Simulation행위결과분류Codes.성공,
+                        StringComparison.Ordinal)
+                    || string.Equals(record.결과분류Code,
+                        Simulation행위결과분류Codes.의미있는실패,
+                        StringComparison.Ordinal)
+                    || string.Equals(record.결과분류Code,
+                        Simulation행위결과분류Codes.후퇴복구,
+                        StringComparison.Ordinal);
+                if (!string.Equals(record.TriggerSourceCode,
+                         SimulationWorldInteractionTriggerSourceCodes.PlayerDriven,
+                         StringComparison.Ordinal)
+                    || !string.Equals(record.ActorStableId,
+                         state.PlayerStableId, StringComparison.Ordinal)
+                    || !eligibleResult)
+                    throw new SimulationContractException(
+                        "SimulationPlayerDomainNpcLearningActionInvalid");
+                var effect = request.EffectLine
+                    ?? throw new SimulationContractException(
+                        "SimulationPlayerDomainLearningEffectRequired");
+                if (effect.이해도증가량 != 1)
+                    throw new SimulationContractException(
+                        "SimulationPlayerDomainLearningAmountInvalid");
+                ValidateDomainSkill(effect.분야StableId,
+                    effect.세부숙련StableId);
+                var id = ContributionId(request.EffectReceiptStableId,
+                    Simulation분야기여SourceCodes.Npc학습중점,
+                    effect.분야StableId, effect.세부숙련StableId);
+                if (HasContribution(id)) return Snapshot();
+                AddContribution(new Simulation분야진척기여Snapshot
+                {
+                    ContributionStableId = id,
+                    PlayerStableId = state.PlayerStableId,
+                    SourceCode = Simulation분야기여SourceCodes.Npc학습중점,
+                    분야StableId = effect.분야StableId,
+                    세부숙련StableId = effect.세부숙련StableId,
+                    PublicationStableId = request.CardStableId,
+                    PublicationRevision = request.CardRevision,
+                    WorldInteractionId = record.WorldInteractionId,
+                    OriginCommandId = record.CommandId,
+                    SourceActionRecordStableId = record.행위기록StableId,
+                    EffectBatchStableId = record.EffectBatchStableId,
+                    EffectReceiptStableId = request.EffectReceiptStableId,
+                    결과Code = record.결과분류Code,
+                    이해도증가량 = effect.이해도증가량,
+                    AppliedWorldRevision = record.AfterWorldRevision,
+                    RuleRevision = effect.RuleRevision,
+                }, Array.Empty<string>());
+                CompleteMutation();
+                return Snapshot();
+            }
+        }
+
         public Simulation플레이어분야ProfileSnapshot ApplyOperation(
             Simulation운영숙련기여Request request)
         {

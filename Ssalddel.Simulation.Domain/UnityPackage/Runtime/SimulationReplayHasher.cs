@@ -13,6 +13,81 @@ namespace Ssalddel.Simulation.Domain
         public static string Calculate(SimulationSessionSavePackage package)
         {
             if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V31,
+                    StringComparison.Ordinal))
+            {
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.HexagramCampaignBaseSchemaVersion;
+                basePackage.HexagramCampaignBaseSchemaVersion = string.Empty;
+                basePackage.HexagramCampaign = null;
+                basePackage.ReplayHash = string.Empty;
+                var baseReplayHash = Calculate(basePackage);
+                var state = package.HexagramCampaign;
+                var campaignCanonical = string.Join("|", new[]
+                {
+                    SimulationSaveSchemaVersions.V31,
+                    package.HexagramCampaignBaseSchemaVersion,
+                    baseReplayHash,
+                    state?.RuleRevision ?? string.Empty,
+                    state?.CampaignStateCode ?? string.Empty,
+                    state?.HexagramStableId ?? string.Empty,
+                    state?.CurrentLineOrdinal.ToString(
+                        CultureInfo.InvariantCulture) ?? string.Empty,
+                    state?.AttemptOrdinal.ToString(
+                        CultureInfo.InvariantCulture) ?? string.Empty,
+                    state?.AttemptVariationSeed.ToString(
+                        CultureInfo.InvariantCulture) ?? string.Empty,
+                    state?.EntrySaveStableId ?? string.Empty,
+                    state?.EntryWorldRevision.ToString(
+                        CultureInfo.InvariantCulture) ?? string.Empty,
+                    string.Join(",", state?.TemporaryWorldInteractionIds
+                        ?? Array.Empty<string>()),
+                    string.Join(",", state?
+                        .PermanentlyUnlockedWorldInteractionIds
+                        ?? Array.Empty<string>()),
+                    string.Join(",", (state?.Events
+                        ?? Array.Empty<SimulationHexagramCampaignEventSnapshot>())
+                        .Select(value => string.Join("~", value.EventCode,
+                            value.ReasonCode, value.AttemptOrdinal,
+                            value.LineOrdinal, value.WorldTick,
+                            value.WorldRevision))),
+                });
+                using var sha = SHA256.Create();
+                return BitConverter.ToString(sha.ComputeHash(
+                        Encoding.UTF8.GetBytes(campaignCanonical)))
+                    .Replace("-", string.Empty).ToLowerInvariant();
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V30,
+                    StringComparison.Ordinal))
+            {
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion = package.LearningFocusBaseSchemaVersion;
+                basePackage.LearningFocusBaseSchemaVersion = string.Empty;
+                basePackage.LearningFocus = null;
+                basePackage.SessionCreateRequest.LearningFocus = null;
+                basePackage.Snapshot.LearningFocus = null;
+                basePackage.ReplayHash = string.Empty;
+                var baseReplayHash = Calculate(basePackage);
+                var v30Canonical = string.Join("|", new[]
+                {
+                    SimulationSaveSchemaVersions.V30,
+                    package.LearningFocusBaseSchemaVersion,
+                    baseReplayHash,
+                    경영SimulationSessionAggregate
+                        .BuildLearningFocusInitialPayloadKey(
+                            package.SessionCreateRequest.LearningFocus),
+                    package.LearningFocus?.StateHashSha256 ?? string.Empty,
+                    package.Snapshot.LearningFocus?.StateHashSha256
+                        ?? string.Empty,
+                });
+                using var v30Sha = SHA256.Create();
+                return BitConverter.ToString(v30Sha.ComputeHash(
+                        Encoding.UTF8.GetBytes(v30Canonical)))
+                    .Replace("-", string.Empty).ToLowerInvariant();
+            }
+            if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V29,
                     StringComparison.Ordinal))
             {
@@ -437,6 +512,26 @@ namespace Ssalddel.Simulation.Domain
                     Add(canonical, request.SlotCode);
                     Add(canonical, request.SwapItemInstanceStableId);
                     Add(canonical, request.SpecializationWorldInteractionId);
+                }
+                if (entry.HexagramCampaignState != null)
+                {
+                    var state = entry.HexagramCampaignState;
+                    Add(canonical, state.RuleRevision);
+                    Add(canonical, state.CampaignStateCode);
+                    Add(canonical, state.HexagramStableId);
+                    Add(canonical, state.CurrentLineOrdinal);
+                    Add(canonical, state.AttemptOrdinal);
+                    Add(canonical, state.AttemptVariationSeed);
+                    Add(canonical, state.EntrySaveStableId);
+                    Add(canonical, state.EntryWorldRevision);
+                    Add(canonical, string.Join(",",
+                        state.TemporaryWorldInteractionIds));
+                    Add(canonical, string.Join(",",
+                        state.PermanentlyUnlockedWorldInteractionIds));
+                    Add(canonical, string.Join(",", state.Events.Select(value =>
+                        string.Join("~", value.EventCode, value.ReasonCode,
+                            value.AttemptOrdinal, value.LineOrdinal,
+                            value.WorldTick, value.WorldRevision))));
                 }
                 if (entry.DecisionConfirmRequest != null)
                 {

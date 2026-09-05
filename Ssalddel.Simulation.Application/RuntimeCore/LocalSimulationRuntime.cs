@@ -21,7 +21,10 @@ namespace Ssalddel.Simulation.Application
         ISimulationSessionRuntime, ISimulationNatureSurvivalRuntime,
         ISimulationSessionGameplayRuntime, ISimulationWorldInteractionRuntime,
         ISimulationBattleRuntime, ISimulationActorEquipmentRuntime,
-        ISimulationPlayerKnowledgeRuntime, ISimulation방문자체류Runtime, IDisposable
+        ISimulationPlayerKnowledgeRuntime, ISimulation방문자체류Runtime,
+        ISimulationPlayerLearningFocusRuntime, ISimulationPlayerIdeaMapRuntime,
+        ISimulationHexagramCampaignRuntime,
+        IDisposable
     {
         private readonly SemaphoreSlim commandGate = new SemaphoreSlim(1, 1);
         private readonly ISimulationSessionSaveStore saveStore;
@@ -35,6 +38,9 @@ namespace Ssalddel.Simulation.Application
         private readonly SimulationBattleInstanceService battles;
         private readonly Simulation플레이어지식Service playerKnowledge;
         private readonly Simulation공동체방문자체류Service communityVisitors;
+        private readonly SimulationPlayerLearningFocusService learningFocus;
+        private readonly SimulationPlayerIdeaMapService ideaMap;
+        private readonly SimulationHexagramCampaignService hexagramCampaigns;
         private readonly ISimulationPlayableLoopEngineTraceSink engineTraceSink;
 
         public LocalSimulationRuntime(
@@ -45,7 +51,8 @@ namespace Ssalddel.Simulation.Application
             SimulationBattleInstanceService? battleService = null,
             ISimulationPlayableLoopEngineTraceSink? playableLoopEngineTraceSink = null,
             Simulation플레이어지식Service? playerKnowledgeService = null,
-            Simulation공동체방문자체류Service? visitorStayService = null)
+            Simulation공동체방문자체류Service? visitorStayService = null,
+            ISimulationHexagramCampaignAttemptStore? campaignAttemptStore = null)
         {
             this.sessionStore = sessionStore
                 ?? throw new ArgumentNullException(nameof(sessionStore));
@@ -65,9 +72,15 @@ namespace Ssalddel.Simulation.Application
             communityVisitors = visitorStayService
                 ?? new Simulation공동체방문자체류Service(
                     new InMemorySimulation공동체방문자체류Store());
+            learningFocus = new SimulationPlayerLearningFocusService(sessionStore);
+            ideaMap = new SimulationPlayerIdeaMapService(sessionStore);
             var sessions = new 경영SimulationSessionAccessor(sessionStore);
+            var attempts = campaignAttemptStore
+                ?? new InMemorySimulationHexagramCampaignAttemptStore();
             lifecycle = new 경영SimulationSession생명주기Service(
-                sessions, saveStore, battleReconciler ?? battles);
+                sessions, saveStore, battleReconciler ?? battles, attempts);
+            hexagramCampaigns = new SimulationHexagramCampaignService(
+                sessions, lifecycle, attempts);
             var worldInteractionPipeline = new 세계상호작용실행Pipeline(
                 engineTraceSink);
             nature = new SimulationNatureSurvivalService(sessionStore,
@@ -103,6 +116,78 @@ namespace Ssalddel.Simulation.Application
         public ISimulationActorEquipmentRuntime ActorEquipment => this;
         public ISimulationPlayerKnowledgeRuntime PlayerKnowledge => this;
         public ISimulation방문자체류Runtime CommunityVisitors => this;
+        public ISimulationPlayerLearningFocusRuntime LearningFocus => this;
+        public ISimulationPlayerIdeaMapRuntime IdeaMap => this;
+        public ISimulationHexagramCampaignRuntime HexagramCampaigns => this;
+
+        public ValueTask<Simulation플레이어이데아맵ProjectionSnapshot>
+            GetPlayerIdeaMapAsync(string sessionStableId,
+                string playerStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => ideaMap.Get(sessionStableId,
+                playerStableId), cancellationToken);
+
+        public ValueTask<SimulationHexagramCampaignStateSnapshot>
+            GetHexagramCampaignAsync(string sessionStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => hexagramCampaigns.Get(sessionStableId),
+                cancellationToken);
+
+        public ValueTask<SimulationHexagramCampaignStateSnapshot>
+            EnterHexagramCampaignAsync(string sessionStableId,
+                SimulationHexagramCampaignEnterRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => hexagramCampaigns.Enter(sessionStableId,
+                request), cancellationToken);
+
+        public ValueTask<SimulationHexagramCampaignStateSnapshot>
+            CompleteHexagramLineAsync(string sessionStableId,
+                SimulationHexagramCampaignLineCompleteRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => hexagramCampaigns.CompleteLine(
+                sessionStableId, request), cancellationToken);
+
+        public ValueTask<SimulationHexagramCampaignStateSnapshot>
+            RecordHexagramSetbackAsync(string sessionStableId,
+                SimulationHexagramCampaignSetbackRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => hexagramCampaigns.RecordSetback(
+                sessionStableId, request), cancellationToken);
+
+        public ValueTask<SimulationHexagramCampaignStateSnapshot>
+            FailHexagramCampaignAsync(string sessionStableId,
+                SimulationHexagramCampaignFailureRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => hexagramCampaigns.Fail(sessionStableId,
+                request), cancellationToken);
+
+        public ValueTask<SimulationHexagramCampaignStateSnapshot>
+            CompleteHexagramCampaignAsync(string sessionStableId,
+                SimulationHexagramCampaignCompleteRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => hexagramCampaigns.Complete(sessionStableId,
+                request), cancellationToken);
+
+        public ValueTask<Simulation학습중점ProjectionSnapshot>
+            GetLearningFocusAsync(string sessionStableId,
+                string playerStableId,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => learningFocus.Get(sessionStableId,
+                playerStableId), cancellationToken);
+
+        public ValueTask<Simulation학습중점PreviewSnapshot>
+            PreviewLearningFocusAsync(string sessionStableId,
+                Simulation학습중점ChangeRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => learningFocus.Preview(sessionStableId,
+                request), cancellationToken);
+
+        public ValueTask<Simulation학습중점StateSnapshot>
+            ConfirmLearningFocusAsync(string sessionStableId,
+                Simulation학습중점ChangeRequest request,
+                CancellationToken cancellationToken = default)
+            => ExecuteAsync(() => learningFocus.Confirm(sessionStableId,
+                request), cancellationToken);
 
         public ValueTask<Simulation공동체방문자체류LedgerSnapshot> GetVisitorsAsync(
             string ledgerStableId, CancellationToken cancellationToken = default)

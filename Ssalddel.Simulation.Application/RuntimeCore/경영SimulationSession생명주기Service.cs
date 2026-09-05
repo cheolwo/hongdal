@@ -38,15 +38,18 @@ namespace Ssalddel.Simulation.Application
         private readonly 경영SimulationSessionAccessor sessions;
         private readonly ISimulationSessionSaveStore saveStore;
         private readonly ISimulationBattleWorldReconciler? battleReconciler;
+        private readonly ISimulationHexagramCampaignAttemptStore? campaignAttempts;
 
         public 경영SimulationSession생명주기Service(
             경영SimulationSessionAccessor sessions,
             ISimulationSessionSaveStore saveStore,
-            ISimulationBattleWorldReconciler? battleReconciler = null)
+            ISimulationBattleWorldReconciler? battleReconciler = null,
+            ISimulationHexagramCampaignAttemptStore? campaignAttempts = null)
         {
             this.sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
             this.saveStore = saveStore ?? throw new ArgumentNullException(nameof(saveStore));
             this.battleReconciler = battleReconciler;
+            this.campaignAttempts = campaignAttempts;
         }
 
         public 경영SimulationSessionSnapshot Create(경영SimulationSession생성Request request,
@@ -78,13 +81,27 @@ namespace Ssalddel.Simulation.Application
                     battleReconciler.Capture(sessionStableId));
             }
 
-            return saveStore.SaveOrGet(package);
+            var saved = saveStore.SaveOrGet(package);
+            campaignAttempts?.RegisterSave(saved.SaveStableId,
+                saved.SessionStableId,
+                saved.HexagramCampaign?.HexagramStableId ?? string.Empty,
+                saved.HexagramCampaign?.AttemptOrdinal ?? 0);
+            return saved;
         }
 
         public SimulationSessionRestoreResult Restore(SimulationSessionRestoreRequest request)
         {
             var (package, restored) = Replay(request);
             sessions.Restore(restored);
+            battleReconciler?.Restore(package.SessionStableId, package.Battles);
+            return Result(package, restored);
+        }
+
+        public SimulationSessionRestoreResult RestoreForCampaignRetry(
+            SimulationSessionRestoreRequest request, long expectedCurrentRevision)
+        {
+            var (package, restored) = Replay(request, bypassAttemptGuard: true);
+            sessions.ReplaceForCampaignRetry(restored, expectedCurrentRevision);
             battleReconciler?.Restore(package.SessionStableId, package.Battles);
             return Result(package, restored);
         }
@@ -98,13 +115,17 @@ namespace Ssalddel.Simulation.Application
 
         private (SimulationSessionSavePackage Package,
             경영SimulationSessionAggregate Restored) Replay(
-            SimulationSessionRestoreRequest request)
+            SimulationSessionRestoreRequest request,
+            bool bypassAttemptGuard = false)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (string.IsNullOrWhiteSpace(request.SaveStableId))
                 throw new SimulationContractException("SimulationSaveStableIdInvalid");
             var package = saveStore.Find(request.SaveStableId.Trim())
                 ?? throw new SimulationNotFoundException("SimulationSaveNotFound");
+            if (!bypassAttemptGuard)
+                campaignAttempts?.EnsureRestoreAllowed(package.SaveStableId,
+                    package.HexagramCampaign);
             return (package, SimulationSessionReplay.Restore(package));
         }
 

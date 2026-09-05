@@ -52,6 +52,7 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationSurvivalTarotInitialStateRequest? SurvivalTarot { get; set; }
         public SimulationFarmSurvivalInitialStateRequest? FarmSurvival { get; set; }
         public SimulationTeamRoleCardInitialState? TeamRoleCards { get; set; }
+        public Simulation학습중점InitialState? LearningFocus { get; set; }
         public SimulationIntegratedWorldInitialStateRequest? IntegratedWorld { get; set; }
         public SimulationNatureMindInitialStateRequest? NatureMind { get; set; }
         public SimulationNatureSurvivalInitialStateRequest? NatureSurvival { get; set; }
@@ -159,6 +160,7 @@ namespace Ssalddel.Simulation.Contracts
         public SimulationSettlementEconomySnapshot? Settlement { get; set; }
         public SimulationFarmSurvivalStateSnapshot? FarmSurvival { get; set; }
         public SimulationTeamRoleCardStateSnapshot? TeamRoleCards { get; set; }
+        public Simulation학습중점StateSnapshot? LearningFocus { get; set; }
         public SimulationWorldExplorationStateSnapshot? Exploration { get; set; }
         public SimulationCollectibleCardRewardStateSnapshot? CollectibleCardRewards { get; set; }
         public SimulationRegionalIncidentSnapshot[] RegionalIncidents { get; set; }
@@ -189,6 +191,8 @@ namespace Ssalddel.Simulation.Contracts
             = new SimulationAtmosphereStateSnapshot();
         public SimulationTownNpcLifeStateSnapshot TownNpcLife { get; set; }
             = new SimulationTownNpcLifeStateSnapshot();
+        public SimulationHexagramCampaignStateSnapshot? HexagramCampaign
+            { get; set; }
     }
 
     public sealed class SimulationWorldContextSnapshot

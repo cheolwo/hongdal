@@ -96,6 +96,7 @@ namespace Ssalddel.Simulation.Domain
             InitializeSurvivalTarot(request.SurvivalTarot);
             InitializeFarmSurvival(request.FarmSurvival);
             InitializeTeamRoleCards(request.TeamRoleCards);
+            InitializeLearningFocus(request.LearningFocus);
             InitializeCollectibleCardRewards();
             InitializeIntegratedWorld(request.IntegratedWorld);
             InitializeNatureMind(request.NatureMind);
@@ -184,6 +185,7 @@ namespace Ssalddel.Simulation.Domain
         {
             var previousTick = CurrentTick;
             CurrentTick += tickCount;
+            AdvanceLearningFocus(previousTick, CurrentTick);
             EvaluateNpcRoutineWork();
             AdvanceNpcWorkforce(CurrentTick);
             AdvanceDecisionWork(CurrentTick);
@@ -262,6 +264,10 @@ namespace Ssalddel.Simulation.Domain
                 || !string.Equals(
                     teamRoleCardInitialPayloadKey,
                     BuildTeamRoleCardPayloadKey(request.TeamRoleCards),
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    learningFocusInitialPayloadKey,
+                    BuildLearningFocusInitialPayloadKey(request.LearningFocus),
                     StringComparison.Ordinal)
                 || !string.Equals(
                     BuildIntegratedWorldInitialFingerprint(integratedWorldCreationState),
@@ -350,6 +356,7 @@ namespace Ssalddel.Simulation.Domain
                 FarmSurvival = farmSurvivalCreationState == null
                     ? null : CreateFarmSurvivalStateSnapshot(),
                 TeamRoleCards = CreateTeamRoleCardStateSnapshotOrNull(),
+                LearningFocus = CreateLearningFocusStateSnapshotOrNull(),
                 Exploration = CreateWorldExplorationStateSnapshotOrNull(),
                 CollectibleCardRewards = CreateCollectibleCardRewardStateSnapshotOrNull(),
                 RegionalIncidents = CreateRegionalIncidentSnapshots(),
@@ -364,6 +371,8 @@ namespace Ssalddel.Simulation.Domain
                 NatureSurvival = CreateNatureSurvivalStateSnapshot(),
                 ActorEquipment = CreateActorEquipmentStateSnapshot(),
                 Atmosphere = CreateWorldAtmosphereStateSnapshot(),
+                HexagramCampaign = CloneHexagramCampaignState(
+                    hexagramCampaignState),
             };
 
         internal static 경영SimulationSessionSnapshot Clone(경영SimulationSessionSnapshot source)
@@ -440,6 +449,7 @@ namespace Ssalddel.Simulation.Domain
                 Settlement = CloneSettlementSnapshot(source.Settlement),
                 FarmSurvival = CloneFarmSurvivalStateOrNull(source.FarmSurvival),
                 TeamRoleCards = CloneTeamRoleCardStateOrNull(source.TeamRoleCards),
+                LearningFocus = CloneLearningFocusStateOrNull(source.LearningFocus),
                 Exploration = CloneWorldExplorationStateOrNull(source.Exploration),
                 CollectibleCardRewards = CloneCollectibleCardRewardStateOrNull(
                     source.CollectibleCardRewards),
@@ -480,6 +490,8 @@ namespace Ssalddel.Simulation.Domain
                     : CloneActorEquipmentState(source.ActorEquipment),
                 Atmosphere = CloneWorldAtmosphereState(source.Atmosphere
                     ?? new SimulationAtmosphereStateSnapshot()),
+                HexagramCampaign = CloneHexagramCampaignState(
+                    source.HexagramCampaign),
             };
 
         internal static void ValidateCreate(경영SimulationSession생성Request request)
@@ -531,6 +543,8 @@ namespace Ssalddel.Simulation.Domain
             ValidateSurvivalTarotInitialState(request.SurvivalTarot);
             ValidateFarmSurvivalInitialState(request.FarmSurvival);
             ValidateTeamRoleCardInitialState(request.TeamRoleCards);
+            if (request.LearningFocus != null)
+                Simulation학습중점State.ValidateInitial(request.LearningFocus);
             ValidateNatureSurvivalInitialState(request.NatureSurvival);
             ValidateWorldAtmosphereInitialState(request.Atmosphere,
                 request.NatureSurvival);

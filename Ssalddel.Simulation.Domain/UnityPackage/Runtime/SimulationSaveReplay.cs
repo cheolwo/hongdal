@@ -140,6 +140,10 @@ namespace Ssalddel.Simulation.Domain
                     PlayerDomainProfiles = playerDomainProfiles.Select(value =>
                         SimulationSaveReplayCloner.ClonePlayerDomainProfile(
                             value)!).ToArray(),
+                    LearningFocus = CloneLearningFocusStateOrNull(
+                        CreateLearningFocusStateSnapshotOrNull()),
+                    HexagramCampaign = CloneHexagramCampaignState(
+                        hexagramCampaignState),
                 };
                 if (worldAssetPlacement != null)
                 {
@@ -172,6 +176,17 @@ namespace Ssalddel.Simulation.Domain
                     package.FocusMeditationBaseSchemaVersion =
                         package.SchemaVersion;
                     package.SchemaVersion = SimulationSaveSchemaVersions.V29;
+                }
+                if (package.LearningFocus != null)
+                {
+                    package.LearningFocusBaseSchemaVersion = package.SchemaVersion;
+                    package.SchemaVersion = SimulationSaveSchemaVersions.V30;
+                }
+                if (package.HexagramCampaign != null)
+                {
+                    package.HexagramCampaignBaseSchemaVersion =
+                        package.SchemaVersion;
+                    package.SchemaVersion = SimulationSaveSchemaVersions.V31;
                 }
                 package.ReplayHash = SimulationReplayHasher.Calculate(package);
                 return SimulationSaveReplayCloner.ClonePackage(package);
@@ -527,6 +542,8 @@ namespace Ssalddel.Simulation.Domain
                 FarmSurvival = CloneFarmSurvivalInitialState(farmSurvivalCreationState),
                 TeamRoleCards = CloneTeamRoleCardInitialStateOrNull(
                     teamRoleCardCreationState),
+                LearningFocus = CloneLearningFocusInitialStateOrNull(
+                    learningFocusCreationState),
                 IntegratedWorld = CloneIntegratedWorldInitialState(
                     integratedWorldCreationState),
                 NatureMind = CloneNatureMindInitialState(natureMindCreationState),

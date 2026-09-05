@@ -200,7 +200,10 @@ public static class SimulationServerServiceCollectionExtensions
         services.AddSingleton<SimulationOnlineCooperativeLoggingService>();
         services.AddSingleton<경영SimulationSessionService>();
         services.AddSingleton<경영SimulationSessionAccessor>();
+        services.AddSingleton<ISimulationHexagramCampaignAttemptStore,
+            InMemorySimulationHexagramCampaignAttemptStore>();
         services.AddSingleton<경영SimulationSession생명주기Service>();
+        services.AddSingleton<SimulationHexagramCampaignService>();
         services.AddSingleton<경영SimulationWorldGameplayService>();
         services.AddSingleton<ISimulationRealityContextClock,
             SystemSimulationRealityContextClock>();
@@ -288,6 +291,8 @@ public static class SimulationServerServiceCollectionExtensions
             provider.GetRequiredService<InMemorySimulationTeamObservationSessionStore>());
         services.AddSingleton<SimulationTeamObservationService>();
         services.AddSingleton<SimulationTeamRoleCardService>();
+        services.AddSingleton<SimulationPlayerLearningFocusService>();
+        services.AddSingleton<SimulationPlayerIdeaMapService>();
         services.AddSingleton<InMemorySimulationBattleInstanceStore>();
         services.AddSingleton<ISimulationBattleInstanceStore>(provider =>
             provider.GetRequiredService<InMemorySimulationBattleInstanceStore>());

@@ -214,6 +214,9 @@ namespace Ssalddel.Simulation.Domain
                     record.AppliedWorldTick);
             }
 
+            if (!reused)
+                ApplyLearningFocusToAction(record, playerStableId, playerDomain);
+
             actionManifestationLedgerState = ledger.Snapshot();
             var updatedProfile = playerDomain.Snapshot();
             playerDomainProfileStates[playerStableId] = updatedProfile;

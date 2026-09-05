@@ -75,6 +75,7 @@ namespace Ssalddel.Simulation.Contracts
     public static class Simulation분야기여SourceCodes
     {
         public const string 승인자료성찰 = "ApprovedMaterialReflection";
+        public const string Npc학습중점 = "NpcLearningFocus";
         public const string 플레이어현장행동 = "PlayerFieldAction";
         public const string 플레이어운영위임 = "PlayerOperationalDelegation";
     }

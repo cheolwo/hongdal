@@ -34,6 +34,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string V27 = "simulation-save.v27";
         public const string V28 = "simulation-save.v28";
         public const string V29 = "simulation-save.v29";
+        public const string V30 = "simulation-save.v30";
+        public const string V31 = "simulation-save.v31";
     }
 
     public static class SimulationReplayHashAlgorithmCodes
@@ -76,6 +78,8 @@ namespace Ssalddel.Simulation.Contracts
         public const string NatureFocusTimingAttempt = "NatureFocusTimingAttempt";
         public const string ActorItemAcquireConfirm = "ActorItemAcquireConfirm";
         public const string ActorEquipmentChangeConfirm = "ActorEquipmentChangeConfirm";
+        public const string HexagramCampaignStateTransition =
+            "HexagramCampaignStateTransition";
     }
 
     [SsalddelCodeMetadata(
@@ -165,6 +169,8 @@ namespace Ssalddel.Simulation.Contracts
             { get; set; }
         public SimulationActorEquipmentChangeConfirmRequest?
             ActorEquipmentChangeConfirmRequest { get; set; }
+        public SimulationHexagramCampaignStateSnapshot? HexagramCampaignState
+            { get; set; }
         public SimulationWorldInteractionInvocationRecord? WorldInteractionInvocation
             { get; set; }
     }
@@ -194,6 +200,10 @@ namespace Ssalddel.Simulation.Contracts
             = string.Empty;
         public string FocusMeditationBaseSchemaVersion { get; set; }
             = string.Empty;
+        public string LearningFocusBaseSchemaVersion { get; set; }
+            = string.Empty;
+        public string HexagramCampaignBaseSchemaVersion { get; set; }
+            = string.Empty;
         public 경영SimulationSession생성Request SessionCreateRequest { get; set; }
             = new 경영SimulationSession생성Request();
         public 경영SimulationSessionSnapshot Snapshot { get; set; }
@@ -221,6 +231,9 @@ namespace Ssalddel.Simulation.Contracts
         public Simulation플레이어분야ProfileSnapshot? PlayerDomainProfile { get; set; }
         public Simulation플레이어분야ProfileSnapshot[] PlayerDomainProfiles
             { get; set; } = Array.Empty<Simulation플레이어분야ProfileSnapshot>();
+        public Simulation학습중점StateSnapshot? LearningFocus { get; set; }
+        public SimulationHexagramCampaignStateSnapshot? HexagramCampaign
+            { get; set; }
     }
 
     public sealed class SimulationSessionRestoreResult

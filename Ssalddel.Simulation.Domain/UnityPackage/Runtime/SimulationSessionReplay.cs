@@ -14,6 +14,39 @@ namespace Ssalddel.Simulation.Domain
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
             if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V31,
+                    StringComparison.Ordinal))
+            {
+                ValidatePackage(package);
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.HexagramCampaignBaseSchemaVersion;
+                basePackage.HexagramCampaignBaseSchemaVersion = string.Empty;
+                basePackage.HexagramCampaign = null;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                var restored = Restore(basePackage);
+                restored.RestoreHexagramCampaignState(package.HexagramCampaign);
+                return restored;
+            }
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V30,
+                    StringComparison.Ordinal))
+            {
+                ValidatePackage(package);
+                var initial = package.SessionCreateRequest.LearningFocus;
+                var learning = package.LearningFocus;
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion = package.LearningFocusBaseSchemaVersion;
+                basePackage.LearningFocusBaseSchemaVersion = string.Empty;
+                basePackage.LearningFocus = null;
+                basePackage.SessionCreateRequest.LearningFocus = null;
+                basePackage.Snapshot.LearningFocus = null;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(basePackage);
+                var restored = Restore(basePackage);
+                restored.RestoreLearningFocusState(initial, learning);
+                return restored;
+            }
+            if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V29,
                     StringComparison.Ordinal))
             {
@@ -125,6 +158,18 @@ namespace Ssalddel.Simulation.Domain
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V24,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V25,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V26,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V27,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V28,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V29,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V30,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V31,
                     StringComparison.Ordinal))
                 aggregate.UseLegacyRegionalCausalityRules();
             if (!string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V14,
@@ -414,6 +459,12 @@ namespace Ssalddel.Simulation.Domain
                             .CloneActorEquipmentChangeConfirmRequest(
                                 entry.ActorEquipmentChangeConfirmRequest!));
                 }
+                else if (entry.CommandTypeCode == SimulationCommandTypeCodes
+                    .HexagramCampaignStateTransition)
+                {
+                    aggregate.ReplayHexagramCampaignTransition(
+                        entry.HexagramCampaignState!);
+                }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
@@ -456,6 +507,19 @@ namespace Ssalddel.Simulation.Domain
                 SaveStableId = package.SaveStableId,
                 ExpectedRevision = aggregate.Revision,
             });
+            if (!string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V31,
+                    StringComparison.Ordinal)
+                && string.Equals(replayed.SchemaVersion,
+                    SimulationSaveSchemaVersions.V31,
+                    StringComparison.Ordinal))
+            {
+                replayed.SchemaVersion =
+                    replayed.HexagramCampaignBaseSchemaVersion;
+                replayed.HexagramCampaignBaseSchemaVersion = string.Empty;
+                replayed.HexagramCampaign = null;
+                replayed.ReplayHash = SimulationReplayHasher.Calculate(replayed);
+            }
             if (!string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V27,
                     StringComparison.Ordinal)
@@ -521,6 +585,41 @@ namespace Ssalddel.Simulation.Domain
         private static void ValidatePackage(SimulationSessionSavePackage package)
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
+            if (string.Equals(package.SchemaVersion,
+                    SimulationSaveSchemaVersions.V30,
+                    StringComparison.Ordinal))
+            {
+                if (string.IsNullOrWhiteSpace(
+                        package.LearningFocusBaseSchemaVersion)
+                    || string.Equals(package.LearningFocusBaseSchemaVersion,
+                        SimulationSaveSchemaVersions.V30,
+                        StringComparison.Ordinal)
+                    || package.SessionCreateRequest.LearningFocus == null
+                    || package.LearningFocus == null
+                    || package.Snapshot.LearningFocus == null
+                    || !string.Equals(package.LearningFocus.StateHashSha256,
+                        package.Snapshot.LearningFocus.StateHashSha256,
+                        StringComparison.Ordinal))
+                    throw new SimulationContractException(
+                        "SimulationLearningFocusSaveStateInvalid");
+                Simulation학습중점State.Restore(package.LearningFocus);
+                if (!string.Equals(package.ReplayHash,
+                        SimulationReplayHasher.Calculate(package),
+                        StringComparison.Ordinal))
+                    throw new SimulationConflictException(
+                        "SimulationReplayHashMismatch");
+                var basePackage = SimulationSaveReplayCloner.ClonePackage(package);
+                basePackage.SchemaVersion =
+                    package.LearningFocusBaseSchemaVersion;
+                basePackage.LearningFocusBaseSchemaVersion = string.Empty;
+                basePackage.LearningFocus = null;
+                basePackage.SessionCreateRequest.LearningFocus = null;
+                basePackage.Snapshot.LearningFocus = null;
+                basePackage.ReplayHash = SimulationReplayHasher.Calculate(
+                    basePackage);
+                ValidatePackage(basePackage);
+                return;
+            }
             if (string.Equals(package.SchemaVersion,
                     SimulationSaveSchemaVersions.V29,
                     StringComparison.Ordinal))
@@ -689,6 +788,18 @@ namespace Ssalddel.Simulation.Domain
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V24,
                     StringComparison.Ordinal)
                 && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V25,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V26,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V27,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V28,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V29,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V30,
+                    StringComparison.Ordinal)
+                && !string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V31,
                     StringComparison.Ordinal))
                 throw new SimulationContractException("SimulationSaveSchemaUnsupported");
             if (string.Equals(package.SchemaVersion, SimulationSaveSchemaVersions.V3,
@@ -1308,6 +1419,13 @@ namespace Ssalddel.Simulation.Domain
                         .ValidateActorEquipmentChangeConfirmRequest(
                             entry.ActorEquipmentChangeConfirmRequest!);
                 }
+                else if (entry.CommandTypeCode == SimulationCommandTypeCodes
+                    .HexagramCampaignStateTransition)
+                {
+                    if (entry.HexagramCampaignState == null)
+                        throw new SimulationConflictException(
+                            "SimulationCommandLogPayloadInvalid");
+                }
                 else if (entry.CommandTypeCode == SimulationCommandTypeCodes.TickAdvance)
                 {
                     if (entry.TickRequest == null || entry.DecisionConfirmRequest != null
@@ -1431,6 +1549,7 @@ namespace Ssalddel.Simulation.Domain
             if (entry.NatureFocusTimingAttemptRequest != null) payloadCount++;
             if (entry.ActorItemAcquireConfirmRequest != null) payloadCount++;
             if (entry.ActorEquipmentChangeConfirmRequest != null) payloadCount++;
+            if (entry.HexagramCampaignState != null) payloadCount++;
             if (payloadCount != 1)
                 throw new SimulationConflictException("SimulationCommandLogPayloadInvalid");
         }

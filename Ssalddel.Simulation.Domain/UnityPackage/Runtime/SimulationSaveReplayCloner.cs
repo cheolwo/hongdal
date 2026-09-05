@@ -30,6 +30,10 @@ namespace Ssalddel.Simulation.Domain
                     source.ActionManifestationBaseSchemaVersion,
                 FocusMeditationBaseSchemaVersion =
                     source.FocusMeditationBaseSchemaVersion,
+                LearningFocusBaseSchemaVersion =
+                    source.LearningFocusBaseSchemaVersion,
+                HexagramCampaignBaseSchemaVersion =
+                    source.HexagramCampaignBaseSchemaVersion,
                 SessionCreateRequest = CloneCreateRequest(source.SessionCreateRequest),
                 Snapshot = 경영SimulationSessionAggregate.Clone(source.Snapshot),
                 WorldInventory = 경영SimulationSessionAggregate.CloneWorldInventory(
@@ -78,6 +82,10 @@ namespace Ssalddel.Simulation.Domain
                     ?? Array.Empty<Simulation플레이어분야ProfileSnapshot>())
                     .Select(value => ClonePlayerDomainProfile(value)!)
                     .ToArray(),
+                LearningFocus = 경영SimulationSessionAggregate
+                    .CloneLearningFocusStateOrNull(source.LearningFocus),
+                HexagramCampaign = 경영SimulationSessionAggregate
+                    .CloneHexagramCampaignState(source.HexagramCampaign),
             };
 
         public static Simulation행위기록LedgerSnapshot?
@@ -181,6 +189,8 @@ namespace Ssalddel.Simulation.Domain
                     source.FarmSurvival),
                 TeamRoleCards = 경영SimulationSessionAggregate
                     .CloneTeamRoleCardInitialStateOrNull(source.TeamRoleCards),
+                LearningFocus = 경영SimulationSessionAggregate
+                    .CloneLearningFocusInitialStateOrNull(source.LearningFocus),
                 IntegratedWorld = 경영SimulationSessionAggregate
                     .CloneIntegratedWorldInitialState(source.IntegratedWorld),
                 NatureMind = 경영SimulationSessionAggregate
@@ -321,6 +331,8 @@ namespace Ssalddel.Simulation.Domain
                     source.ActorEquipmentChangeConfirmRequest == null ? null
                         : CloneActorEquipmentChangeConfirmRequest(
                             source.ActorEquipmentChangeConfirmRequest),
+                HexagramCampaignState = 경영SimulationSessionAggregate
+                    .CloneHexagramCampaignState(source.HexagramCampaignState),
                 WorldInteractionInvocation = source.WorldInteractionInvocation == null
                     ? null
                     : 경영SimulationSessionAggregate.CloneWorldInteractionInvocation(

@@ -52,6 +52,22 @@ namespace Ssalddel.Simulation.Infrastructure
                 throw new SimulationConflictException("SimulationSessionAlreadyActive");
             return session;
         }
+
+        public 경영SimulationSessionAggregate ReplaceForCampaignRetry(
+            경영SimulationSessionAggregate session, long expectedCurrentRevision)
+        {
+            if (session == null) throw new ArgumentNullException(nameof(session));
+            while (true)
+            {
+                if (!sessions.TryGetValue(session.SessionStableId, out var current))
+                    throw new SimulationNotFoundException("SimulationSessionNotFound");
+                if (current.Revision != expectedCurrentRevision)
+                    throw new SimulationConflictException(
+                        "SimulationExpectedRevisionMismatch");
+                if (sessions.TryUpdate(session.SessionStableId, session, current))
+                    return session;
+            }
+        }
     }
 
 

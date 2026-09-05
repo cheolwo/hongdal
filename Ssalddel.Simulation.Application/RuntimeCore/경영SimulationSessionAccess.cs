@@ -22,5 +22,9 @@ namespace Ssalddel.Simulation.Application
 
         public 경영SimulationSessionAggregate Restore(경영SimulationSessionAggregate session)
             => store.Restore(session);
+
+        public 경영SimulationSessionAggregate ReplaceForCampaignRetry(
+            경영SimulationSessionAggregate session, long expectedCurrentRevision)
+            => store.ReplaceForCampaignRetry(session, expectedCurrentRevision);
     }
 }

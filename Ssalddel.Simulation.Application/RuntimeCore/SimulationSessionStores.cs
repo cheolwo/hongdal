@@ -13,6 +13,8 @@ namespace Ssalddel.Simulation.Application
             SimulationRealityContextSnapshot? frozenRealityContext = null);
         경영SimulationSessionAggregate? Find(string sessionStableId);
         경영SimulationSessionAggregate Restore(경영SimulationSessionAggregate session);
+        경영SimulationSessionAggregate ReplaceForCampaignRetry(
+            경영SimulationSessionAggregate session, long expectedCurrentRevision);
     }
 
     [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
