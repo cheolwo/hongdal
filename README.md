@@ -9,7 +9,7 @@
 - [이야기와 플레이 기획](docs/AI/PLANNING.md)
   - [게임의 상위 목적](docs/AI/게임상위목적-오행순환과광복기-기획-2026-09-02.md)
   - [64괘·384효 기획 트리](docs/AI/generated/hexagram-story-tree.md)
-    - [수뢰둔 — 한스 농장](docs/AI/Planning/스토리/PLAN-STORY-HEX03-CAMPAIGN-001/README.md)
+    - [수뢰둔 — 한스 농장](docs/AI/generated/hexagram-story-tree.md#hex-03-zhun)
     - [산수몽 — 이데아 맵과 학습](docs/AI/Planning/스토리/PLAN-STORY-IDEA-MAP-LEARNING-001/README.md)
     - [효사별 기획·WI·H 연결](docs/AI/generated/hexagram-line-planning-requirements.md)
     - [효사 기획의 H 공간 참조](docs/AI/generated/hexagram-h-reference-index.md)
