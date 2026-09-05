@@ -12,6 +12,24 @@ Mirror(거울)는 **정보 공개형 커뮤니티와 실제 업무 도구**, 그
 | Simulation Core | 플레이어·NPC·자원·시설·시간·작업·결과 | Solo의 `LocalProcess`, Hosted의 `RemoteHost`가 같은 규칙 실행 |
 | Unity 게임 | 이동·선택·카메라·공간·건물·애니메이션·UI·Audio | canonical `SimulationWorldShell`이 권위 상태를 입력과 표현으로 연결 |
 
+현행 게임 개발의 중심 흐름은 다음과 같다. 기획 문서, Graph Map, 배치 맵은 서로 연결되지만 같은 산출물이 아니며, 어느 하나의 작성만으로 실제 Unity 배치나 에비던스 승격을 선언하지 않는다.
+
+```text
+주체 기반 확립(Actor·직접 대상의 권위·역할·저장 정체성)
+  → WI 하나의 Goal과 직접 행동·대상·결과
+  → 직접 결과 뒤 파생 작용 0~2 hop
+  → 필요한 경우에만 PlayableLoop 반복 검증 묶음
+  → 적용 가능한 행동의 오행 관계와 명상·회복 해석 경계
+  → 영향 분야 판정
+      ├─ 비공간: 필요한 논리·데이터·UI·Audio·서사 절차만 수행
+      └─ 공간: Graph Map(L1·L2·L3)
+               → 배치 맵(H 구성·상대 위치·통행·시야)
+               → Synty 후보와 필요한 경우에만 Blender 보완
+  → 적용 분야의 Presentation E4 후보 동결
+  → 개발 작업 명세와 실제 E5 권위 세계·공간 표현 결속
+  → E6 정제·E7 실제 입력 폐루프
+```
+
 다음은 **책임과 기획 범위를 보여주는 구조도**이며 모든 가지가 구현 완료됐다는 뜻은 아니다. 최신 완료·차단은 [개발 통합 상태판](docs/AI/개발통합상태판.md)에서 확인한다.
 
 ```text
@@ -42,7 +60,7 @@ Mirror 거울
       ※ 게임 진행 필수 아님 / 실제 수집·게시·구매 자동 실행 아님
 ```
 
-현재 대표 게임 개발은 Nature에서 생존 기반을 만들고 회복 방법을 배우는 플레이부터 시작한다. 플레이어는 도구를 얻고 자원을 모으며 거점·불·건설·Recipe·수면·위협 대응을 선택할 수 있다. Nature 정착은 의무가 아니며 이후 Farm·Hub·Town·City에서 각 영역의 독립적인 생활·업무 폐루프를 선택할 수 있게 확장한다.
+현재 대표 표본은 Nature의 생존·회복, 한스의 숲 경계 Farm 생활, 현실의 창고·상하차·운송을 비추는 Hub 물류다. 이들은 구현 순서가 아니라 독립 폐루프이며, Nature 정착이나 Farm 출하를 Hub·Town·City의 필수 선행 상태로 만들지 않는다. 플레이어는 직접 행동하거나 NPC에게 권한과 자원을 위임할 수 있지만, 실제 결과는 같은 Simulation 권위 규칙과 행위 기록으로 판정한다.
 
 Unity GameObject나 화면은 권위 상태를 직접 변경하지 않는다.
 
@@ -61,23 +79,28 @@ Unity GameObject나 화면은 권위 상태를 직접 변경하지 않는다.
 1. 이 README에서 제품과 게임 개발 구조를 파악한다.
 2. [AI 공용 프로젝트 컨텍스트](docs/ProjectOverview/GptProjectContext.md)에서 시스템별 책임과 현재 경계를 읽는다.
 3. [확정 결정](docs/AI/DECISIONS.md)과 [현재 작업](docs/AI/CURRENT_WORK.md)에서 최신 기준과 실제 검증 상태를 확인한다.
-4. 게임 작업이면 [현재 Codex PlayableLoop Goal](docs/AI/generated/codex-playable-loop-goals.md)에서 활성 폐루프·WI·차단·다음 의존성을 확인한다.
-5. [전체 문답 정리 상태판](docs/Architecture/PlayableLoops/PlanningSessions/문답정리상태판.md)과 [문답 기록 routing](docs/Architecture/PlayableLoops/PlanningSessions/README.md)에서 해당 주제의 질문·답변·남은 미정을 읽는다.
-6. 활성 Goal이 참조하는 `Approved` 기획서와 E7 작업 명세만 구현 입력으로 사용한다.
-7. 코드 위치는 [Simulation·Unity 코드 지도](docs/AI/generated/simulation-unity-code-map.md)에서 찾고, 완료 여부는 [현재 완료 원장](docs/AI/authority-maps/07_CURRENT_COMPLETION_LEDGER.md)에서 확인한다.
+4. [기획 목차](docs/AI/PLANNING.md)에서 이야기·인물·사건의 현행 기획을 찾는다. 괘·효는 [스토리 영감과 플레이 진행 분리](docs/Architecture/스토리영감과플레이진행분리.md)에 따라 선택적으로 참고하며 사건 수·제작 순서·플레이 순서를 강제하지 않는다.
+5. 게임 작업이면 [현재 Codex PlayableLoop Goal](docs/AI/generated/codex-playable-loop-goals.md)에서 활성 폐루프·WI·차단·다음 의존성을 확인한다.
+6. [전체 문답 정리 상태판](docs/Architecture/PlayableLoops/PlanningSessions/문답정리상태판.md)과 [문답 기록 routing](docs/Architecture/PlayableLoops/PlanningSessions/README.md)에서 해당 주제의 질문·답변·남은 미정을 읽는다.
+7. 활성 Goal이 참조하는 `Approved` 기획서와 E7 작업 명세만 구현 입력으로 사용한다.
+8. 코드 위치는 [Simulation·Unity 코드 지도](docs/AI/generated/simulation-unity-code-map.md)에서 찾고, 완료 여부는 [현재 완료 원장](docs/AI/authority-maps/07_CURRENT_COMPLETION_LEDGER.md)에서 확인한다.
 
 ## 문답에서 개발까지
 
 게임 기획은 한 번에 거대한 명세를 확정하지 않는다. D398부터 기본은 **지금·여기·나·너·이렇게의 상황에서 핵심 질문 하나를 깊게 검토하는 방식**이다. 기존 답변의 중복을 확인하고 추천·대가를 제시한 뒤 답변에 따라 다음 선택으로 이어간다. 묶음 질문은 사용자가 요청할 때만 사용하며 과거 묶음 승인은 보존한다. 추천은 승인 전까지 제안이고, 질문은 특정 성장 체계에만 치우치지 않도록 실제 플레이의 공백을 기준으로 고른다.
+
+여기서 `이렇게`는 지금·여기·나·너의 문맥과 현재 목적에 가장 적중하는 대표 행동이다. 다른 유효한 선택을 지우지 않으며, 승인된 기획은 `docs/AI/Planning/<분야>/<PLAN-ID>/README.md`를 향해 단계적으로 정본화한다. 권위 상태를 바꾸는 역할 객체의 행동은 적용 가능한 오행 관계를 E1~E4에서 설명해야 하지만, 오행을 다섯 칸 모두 채우거나 분류만으로 E5를 통과시키지 않는다.
 
 ```text
 기존 문답 검색·미정/중복 확인
   → 지금·여기·나·너·이렇게의 핵심 질문 하나 + 추천·대가
   → 사용자 답변·승인 또는 수정
   → 결과·다음 선택·실패·회복·귀환 정리
-  → WI·H·권위·표현·저장 영향 기록
-  → 승인된 답변을 플레이 폐루프 단위로 합성
-  → Approved 기획 revision + hash + 작업 명세
+  → 주체·WI·오행·H·권위·표현·저장 영향 기록
+  → 준비된 주체와 WI 하나의 직접 결과를 결속하고 필요한 경우에만 PlayableLoop 연결
+  → Approved 기획 revision + hash
+  → 공간 영향이 확인된 경우에만 Graph Map L1·L2·L3와 별도 배치 맵 영향 판정
+  → E4 후보·자산·가공 필요·fallback과 작업 명세 결속
   → 개발 스레드에 좁은 에비던스 상한으로 인계
   → 코드·시험·Runtime 증거 반환
   → 다음 질문 또는 가장 이른 E 단계 재개
@@ -101,9 +124,13 @@ Q 번호는 질문의 식별자이고, 개발 Queue는 승인·선행 의존성�
 
 | 체계 | 답하는 질문 | 핵심 경계 |
 | --- | --- | --- |
-| `PlayableLoop` | 플레이어가 어떤 상황에서 선택하고 성공·실패·회복·귀환하는가? | 여러 WI가 다음 선택으로 돌아오는 실제 플레이 단위 |
-| `WI` | 세계에서 한 번에 어떤 의미 있는 상태를 바꾸는가? | Preview·Confirm·Task·Effect와 단일 권위 책임 |
+| `Subject` | 누가 또는 무엇이 상태를 가지고 상호작용하는가? | 역할·권위·초기 해석·Save/Replay 정체성을 먼저 준비하며 Runtime 인스턴스 증거는 아님 |
+| `WI Goal` | 두 주체 사이에서 한 번에 어떤 의미 있는 상태를 바꾸는가? | Goal 하나가 WI 하나와 직접 결과를 소유 |
+| `PlayableLoop` | 여러 WI의 성공·실패·회복·귀환을 함께 반복 검증해야 하는가? | 필요한 경우에만 연결하는 선택적 검증 묶음 |
+| `오행 관계` | 주체가 무엇을 어떤 작용으로 대하는가? | WI 탐색 메타데이터이며 능력치·보상·E 승격을 자동 결정하지 않음 |
 | `H1~H5` | 행동 공간부터 세계 배치까지 무엇을 어떻게 포함하는가? | 공간 조립 깊이이며 에비던스 성숙도와 별개 |
+| `Graph Map` | 플레이 관계와 공간·코드 의존성이 어떻게 연결되는가? | L1 플레이 관계, L2 배치 제약, L3 코드·컴포넌트 결속 |
+| `배치 맵` | 실제 배치 전에 무엇을 어디에 어떤 제약으로 놓을 것인가? | H 구성·상대 위치·통행·시야·자산 후보를 판본화하며 Scene이 아님 |
 | `E1~E10` | 논리와 표현이 실제 증거로 어디까지 검증됐는가? | 통합 E는 Logic·Presentation 중 낮은 단계 |
 | `G1~G5` | 각 에비던스 구간을 어떤 관리 체계로 통과시키는가? | G 완료가 E 승격을 자동 의미하지 않음 |
 | `EvidencePackage` | 어떤 revision·환경·시험·화면이 무엇을 증명하는가? | 코드·시험·Runtime·Game View·운영 증거를 분리 |
@@ -135,7 +162,7 @@ H5 세계 배치 — AreaSet 인스턴스·물리 회랑
 | 수직 작업 명세 | 과거 `.e9-work-order.json` 및 E9 하향식 자료 | 새 PlayableUnit·Goal은 **E7까지**. E8 안정성·E9 영역 조화·E10 제한 운영은 별도 캠페인 |
 | 기존 증거 | 과거 모델에서 기록된 E8/E9 결과 | 이력·읽기 호환으로 보존. 현재 E8/E9로 자동 변환하거나 합산하지 않음 |
 
-E1~E7은 아래 표의 **현행 정의**로 읽는다. 특히 E4의 자산 후보·배치 의도 조사는 E5 실제 배치·상태 발현과 다르고, E3 시험 통과는 E7 실제 플레이 완료를 대신하지 않는다. 각 폐루프는 `Logic`과 `Presentation`을 따로 평가하며 통합 E는 두 값 중 낮은 단계다. 예를 들어 논리 E5·표현 E3이면 통합은 E3이다. 이는 설명용 예시이며 현재 프로젝트 달성 수치가 아니다.
+E1~E7은 아래 표의 **현행 정의**로 읽는다. 특히 E4의 자산 후보·배치 의도 조사는 E5 실제 배치·상태 발현과 다르고, E3 시험 통과는 E7 실제 플레이 완료를 대신하지 않는다. 각 WI Goal은 `Logic`과 `Presentation`을 따로 평가하며 통합 E는 두 값 중 낮은 단계다. 여러 WI의 반복 폐쇄성을 함께 검증해야 할 때만 PlayableLoop를 추가한다. 예를 들어 논리 E5·표현 E3이면 통합은 E3이다. 이는 설명용 예시이며 현재 프로젝트 달성 수치가 아니다.
 
 기준 정의는 [현행 설계와 호환성 안내](docs/Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md), 기계 판독 값은 [현재 단계 원장](eng/execution-ledgers/evidence-stages.json), 이전 정의는 [과거 r10 원장](eng/execution-ledgers/compatibility/evidence-stages.legacy-r10.json)에서 확인한다. **체계 설명이 갱신됐다는 사실은 기능의 E 승격을 뜻하지 않는다.** 실제 달성·차단은 [Goal 상태판](docs/AI/generated/codex-playable-loop-goals.md)과 [개발 통합 상태판](docs/AI/개발통합상태판.md)을 따른다.
 
@@ -154,11 +181,11 @@ E1~E7은 아래 표의 **현행 정의**로 읽는다. 특히 E4의 자산 후�
 | E9 | 같은 영역의 안정 Core 둘 이상이 논리·표현으로 조화롭고 사람이 승인했는가? |
 | E10 | 불변 후보가 제한 운영 관찰을 통과했는가? |
 
-각 PlayableUnit은 E7에서 E1로 영향을 내려 검토하고, 가장 낮은 미완료 의존성을 구현한 뒤 E1에서 E7로 다시 조립한다. 결함이 발견되면 같은 Goal에서 가장 이른 책임 단계로 돌아간다. E8~E10은 E7 뒤의 별도 수평 캠페인이다. 현재 기준은 [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](docs/Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md)다.
+각 WI Goal은 주체 기반을 먼저 확인하고 E7에서 E1로 영향을 내려 검토한 뒤, 가장 낮은 미완료 의존성을 구현하고 E1에서 E7로 다시 조립한다. 결함이 발견되면 같은 Goal에서 가장 이른 책임 단계로 돌아간다. E8~E10은 E7 뒤의 별도 수평 캠페인이다. 현재 기준은 [주체·상호작용 중심 개발 체계](docs/Architecture/주체상호작용중심개발체계.md)와 [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](docs/Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md)다.
 
 표현 제작도 별도 단계가 아니라 같은 Presentation E1~E7 안에서 관리한다. E1 요구 → E2 코드 → E3 자동시험 → E4 자산·필요 가공/배치 준비 → E5 실제 상태·장면 → E6 품질 정제 → E7 실제 입력·결과·귀환이다. [표현 최소 모듈 기준](docs/Architecture/플레이폐루프논리시각이중순환체계.md#단계별-최소-구현-책임-d-386)과 [필요 모듈·구현·증거 연결 상태판](docs/AI/generated/playable-loop-presentation-validation.md)에서 확인한다. 이전 검증 목록 중심 대장에 구현/시험 참조와 미연결 상태를 추가했으며, 과거 E와 게임 Logic·Save는 변경하지 않는다.
 
-E6까지의 주력 작업 방식은 [공식 준비·입증 절차](docs/Architecture/플레이폐루프논리시각이중순환체계.md#e6-focused-workflow)로 모은다. 작은 WI의 기획을 그래프 맵 레벨 1의 플레이·공간 관계와 레벨 2의 자산/패턴·배치 규칙으로 검토하고, E5 실제 연결 뒤 E6 의미·인과·표현 정제와 필요한 현실 근거를 확인한다. 그래프의 두 레벨은 H/E 단계가 아니고 자산 할당·자료 DB 저장·검사 통과도 실제 E 완료를 대신하지 않는다. 전체 월드맵 완성을 먼저 요구하지 않으며 E7 전체 플레이는 별도 범위다.
+E6까지의 주력 작업은 작은 WI의 기획을 Graph Map L1 플레이 관계·L2 배치 제약·L3 코드 결속으로 검토하고, 배치 맵과 표현 후보를 준비한 뒤 E5 연결·E6 정제를 확인한다. 레벨은 H/E 단계가 아니며 실제 완료는 해당 증거로 판정한다. [Graph Map 인계 기준](docs/Architecture/GraphMap기획인계순환체계.md)을 따른다.
 
 ### G 관리 체계
 
@@ -210,7 +237,7 @@ E6까지의 주력 작업 방식은 [공식 준비·입증 절차](docs/Architec
 
 > 현재 Unity 화면은 개발용 Simulation입니다. 실제 판매·결제·배차·수출·정산을 실행하지 않으며, 운영 상태의 최종 권위는 서버에 있습니다. 게임 Simulation Core는 Solo에서 Unity 내부 Local Runtime, Hosted Multiplayer에서만 Simulation 서버가 실행합니다.
 
-세계 구축은 공공데이터나 Synty 팩 이름에서 바로 시작하지 않습니다. 먼저 PlayableLoop가 요구하는 WI와 H 공간 능력을 정하고, 배치·실행 엔진이 이를 결정적인 세계 계획으로 조립합니다. 공공데이터는 필요한 현실 근거에만 결속하고, Synty 자산은 Simulation의 의미를 바꾸지 않는 표현 후보로 사용합니다.
+세계 구축은 준비된 주체 사이의 WI와 필요한 H 공간 능력에서 시작한다. 배치·실행 엔진은 이를 결정적인 세계 계획으로 조립하고, 공공데이터는 현실 근거, Synty 자산은 표현 후보로 사용한다.
 
 ```text
 공간 실행 파이프라인 — 접근·갱신·이탈·재진입을 함께 조율
@@ -290,6 +317,9 @@ Mirror의 Simulation·Unity 작업은 현재 목표와 증거 상태에서 시�
 - [플레이 폐루프와 증거 묶음 개발 체계](docs/Architecture/플레이폐루프와증거묶음개발체계.md): 여러 WI의 폐루프 E 판정, 실제 증거 범위·무효화와 협업 인계
 - [플레이 폐루프 엔진 상호작용 검증 체계](docs/Architecture/플레이폐루프엔진상호작용검증체계.md): WI 권위 실행과 LH·Sky·실내외 표현을 같은 명령·Revision으로 묶는 통합 관문
 - [플레이 폐루프 완결 로드맵](docs/Architecture/플레이폐루프완결로드맵.md): 영역별 Core 우선·Extension 후속과 영역·세계 집계. 영역 나열을 필수 이동 경로나 선행 의존성으로 해석하지 않음
+- [WI 괘성 분류 체계](docs/Architecture/WI괘성분류체계.md): 주체·행동·대상·보조의 오행 관계와 E5 진입 전 역할 객체 관문
+- [Graph Map 기획 인계 순환 체계](docs/Architecture/GraphMap기획인계순환체계.md): 승인 기획을 L1·L2·L3와 별도 배치 맵 영향으로 구조화하는 책임 경계
+- [Presentation E4 후보 풀](docs/AI/Planning/표현/PLAN-PRESENTATION-E4-POOL-001/README.md): 여러 표현 후보의 자산·가공·배치 준비와 E5 선택 경계
 - [게임 개발 업무 순서 기준](docs/Architecture/게임개발업무순서기준.md): 작업 선택부터 다음 판단까지의 실행 순서
 - [E1~E7 수직 폐루프와 E8~E10 수평 증거 체계](docs/Architecture/E1-E7수직폐루프와E8-E10수평증거체계.md): 단일 폐루프·영역 조화·사람 플레이테스트에서 Logic·Presentation 왕복과 제한 운영의 판정 주체·관문
 - [WorldTick과 실시간 실행 경계](docs/Architecture/WorldTick과실시간실행경계.md): Unity 표현 시간·권위 실시간 시계·WorldTick·BattleTick·WorldRevision의 책임 구분
@@ -315,13 +345,16 @@ Mirror의 Simulation·Unity 작업은 현재 목표와 증거 상태에서 시�
 
 ### 최근 변경을 찾는 곳
 
+커밋된 기능에는 한스 농장 울타리 복원, 이데아 맵·NPC 학습 중점, 캠페인 진행·실패 복원이 포함된다. 수뢰둔·산수몽 기획은 이 이야기들의 참고 맥락이며 전체 게임의 고정 진행표가 아니다. 코드·자동시험 범위와 남은 Unity 표현은 [현재 작업](docs/AI/CURRENT_WORK.md)에서 확인한다.
+
 ```text
 개발 통합 상태판 — 실제 성과와 남은 연결의 최신 기준
-├─ 공간: Farm 후보·배치/LH 소비·경계/겹침 정리
-├─ 동작: 벌목 입력·접촉·중단/복귀·낙하와 소리
-├─ 규칙: 방문자·자연회복·용기 내용물·수확 위임
-├─ 기반: 선택형 로컬 NPC 대화·현실 상품 자료 검토
-└─ 계획: 전체 문답 E5 연결·애니메이션/리깅 정밀화
+├─ 기획: PLAN 정본·원자 E1·문답과 미정
+├─ 구조: WI·오행·H·Graph Map L1·L2·L3
+├─ 배치·표현: 배치 맵·Synty/가공 후보·Presentation E4
+├─ 구현: Operations·Simulation·Unity의 독립 책임
+├─ 통합: 같은 Goal·Session·객체·Revision의 인계
+└─ 증거: 시험·Runtime·E5·Game View·Save/Replay의 분리 판정
 ```
 
 위 가지는 진행 중인 작업을 찾는 분류다. 코드·시험이 있어도 Session/Save·실제 입력·Game View가 남을 수 있다. [개발 통합 상태판](docs/AI/개발통합상태판.md), [전체 문답 E5 계획](docs/AI/전체문답-E5세계통합계획-2026-08-30.md), [애니메이션·리깅 계획](docs/Architecture/PlayableLoops/WI애니메이션-리깅정밀화계획.md)에서 구체 근거와 승인 범위를 확인한다. 후자의 신규 제작 순위는 검토안이며 구현 완료 목록이 아니다.
@@ -331,14 +364,17 @@ Mirror의 Simulation·Unity 작업은 현재 목표와 증거 상태에서 시�
 아래는 주요 실제 경로만 남긴 탐색 트리다. 세부 파일은 [생성 코드 지도](docs/AI/generated/simulation-unity-code-map.md)로 찾는다.
 
 ```text
-Hongdal/                         cheolwo/ssalddel 저장소
+Hongdal/                         cheolwo/mirror 저장소
 ├─ README.md                     전체 구조의 진입점
 ├─ docs/
 │  ├─ ProjectOverview/           프로젝트·화면 안내
 │  ├─ Architecture/              기준 설계
 │  │  └─ PlayableLoops/           주제 기획·전문 연구
-│  │     └─ PlanningSessions/     문답 원문·주제별 기록
+│  │     └─ PlanningSessions/     과거 문답·주제별 참조 기록
 │  ├─ AI/                        DECISIONS·CURRENT_WORK·개발 통합 상태판
+│  │  ├─ PLANNING.md             현행 기획 탐색·판본·관계
+│  │  ├─ Planning/               이야기·사건별 PLAN 정본
+│  │  │  └─ 스토리/              한스 농장·학습·캠페인, 괘·효 참고 이력
 │  │  └─ generated/              원장에서 생성한 Goal·WI·코드 지도
 │  ├─ Reports/                   검토·구현·검증 결과
 │  └─ Research/GameData/         현실 자료 조사·개발 인수 기록
@@ -380,6 +416,21 @@ cheolwo/unity
 ```
 
 Git push는 폴더가 아니라 커밋과 브랜치를 전송하므로 서로 다른 책임을 한 커밋에 섞지 않습니다. 작업 ID는 공유할 수 있지만 각 저장소에서 짧은 브랜치, 책임별 커밋과 검증으로 진행합니다. 세부 기준은 [운영·Simulation·Unity 작업 흐름 분리](docs/Architecture/OperationsSimulationUnity작업흐름분리.md), 기계 판독 기준은 [책임 작업 흐름 원장](eng/work-areas/responsibility-workstreams.json)에서 확인합니다.
+
+### 커밋을 읽고 묶는 기준
+
+커밋 수가 많을 때는 단순히 날짜나 파일 수로 합치지 않고 되돌릴 수 있는 책임 단위로 묶어 읽는다. 원장과 그 원장에서 생성한 문서는 같은 맥락에 두되, 기획 의미·Graph Map·배치/표현·Simulation·운영 자료·통합 검증은 서로 분리한다.
+
+| 권장 묶음 | 함께 둘 내용 | 분리할 내용 |
+| --- | --- | --- |
+| 기획 정본 | `PLAN-*` 본문, `PLANNING.md`, 직접 계보 | 코드 구현, Unity 실행 증거 |
+| 구조·Graph Map | 노드·엣지·제약, 인계 원장과 생성 결과 | Scene·Prefab 실제 배치 |
+| 배치·Presentation | 배치 맵, 자산 후보, 가공/fallback, E4 검사 | 권위 게임 규칙 |
+| Simulation | 계약·도메인·Session·Save/Replay·시험 | 운영 DB와 외부 자료 수집 |
+| Operations·자료 | 서버 업무, 검토된 공공자료, 영속 투영 | 게임 효과 자동 활성화 |
+| 통합·검증 | Adapter, 책임 지도, 상태 snapshot, 검증 보고 | 독립 기능의 큰 소스 변경 |
+
+이미 공유된 커밋은 책임별 변경으로 읽는다. 게시할 때는 README와 연결 문서를 같은 커밋 묶음에 포함하고 `eng/tests/readme-navigation.ps1 -Revision HEAD`로 커밋 내부의 탐색 경로를 확인한다.
 
 ## 개발
 
