@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "simulation-e7-vertical-work-order.v2",
+  "protocolRevision": "simulation-e7-vertical-implementation-protocol.r7",
+  "evidenceModelRevision": "horizontal-dual-cycle-evidence.r3",
+  "workOrderId": "E7-WO-HEXAGRAM-CAMPAIGN-RETRY",
+  "title": "괘 캠페인 실패·초효 복귀 Logic E3",
+  "playableUnitStableId": "playable-loop:hexagram-campaign-retry.v1",
+  "activeWorldInteractionId": "WI-STORY-HEXAGRAM-CAMPAIGN-RETRY",
+  "targetEvidenceStage": "E7",
+  "currentEvidenceStage": "E1",
+  "promotionEligible": false,
+  "planningGate": {
+    "statusCode": "Approved",
+    "designDocumentRef": "docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md",
+    "designRevision": "hexagram-campaign-reset.r1",
+    "designHashSha256": "3D22D758F736537CA1EE87DCBE1EE4F6D95E78D1A358BD0D8A3CFBFB2AEE15E3",
+    "approvalEvidenceRef": "docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md#승인-근거"
+  },
+  "deliveryCap": {
+    "currentDispatchTargetStage": "E3",
+    "promotionBeyondStageAllowed": false,
+    "reason": "괘 진행·실패·복원·저장재생의 권위 논리만 검증하며 Unity 표현은 별도 기획까지 차단한다."
+  },
+  "iterationState": {
+    "currentPass": "StableOrExplicitlyBlocked",
+    "nextReopenCondition": "괘 실패·복귀의 Unity 표현 기획이 승인되면 Presentation E4부터 다시 연다."
+  },
+  "trackPlans": {
+    "logic": {
+      "trackCode": "Logic",
+      "currentEvidenceStage": "E3",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력과 Game View는 범위 밖이다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "실제 표현과 애니메이션은 범위 밖이다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "Unity World 배치는 수행하지 않는다." },
+        { "code": "E4", "disposition": "Defined", "summary": "이번 WI는 공간 후보를 새로 만들지 않는 비공간 규칙이다." },
+        { "code": "E3", "disposition": "Affected", "summary": "실패 복원·재도전 seed·저장 우회 차단·육효 완료를 자동시험한다." },
+        { "code": "E2", "disposition": "Affected", "summary": "Simulation Core와 LocalProcess·RemoteHost API를 연결한다." },
+        { "code": "E1", "disposition": "Defined", "summary": "한 괘 육효 순서와 회복 가능·불가능 실패 경계를 정의한다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md"] },
+        { "code": "E2", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Contracts/UnityPackage/Runtime/SimulationHexagramCampaignContracts.cs", "Ssalddel.Simulation.Application/RuntimeCore/SimulationHexagramCampaignService.cs"] },
+        { "code": "E3", "status": "Passed", "evidenceRefs": ["Ssalddel.Simulation.Tests/SimulationHexagramCampaignTests.cs", "test:SimulationHexagramCampaignTests:8/8"] },
+        { "code": "E4", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    },
+    "presentation": {
+      "trackCode": "Presentation",
+      "currentEvidenceStage": "E1",
+      "downwardPlan": [
+        { "code": "E7", "disposition": "Blocked", "summary": "실제 입력 검증은 수행하지 않는다." },
+        { "code": "E6", "disposition": "Blocked", "summary": "애니메이션은 수행하지 않는다." },
+        { "code": "E5", "disposition": "Blocked", "summary": "실제 World 표현은 수행하지 않는다." },
+        { "code": "E4", "disposition": "Blocked", "summary": "시각 후보 조사는 별도 기획 후 연다." },
+        { "code": "E3", "disposition": "Blocked", "summary": "이번 범위에는 표현 시험이 없다." },
+        { "code": "E2", "disposition": "Blocked", "summary": "이번 범위에는 Unity 투영이 없다." },
+        { "code": "E1", "disposition": "Defined", "summary": "실패·복귀 표시는 후속 표현 약속으로 남긴다." }
+      ],
+      "upwardValidation": [
+        { "code": "E1", "status": "Passed", "evidenceRefs": ["docs/AI/Planning/스토리/PLAN-STORY-HEXAGRAM-CAMPAIGN-RESET-001/README.md"] },
+        { "code": "E2", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E3", "status": "NotStarted", "evidenceRefs": [] },
+        { "code": "E4", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E5", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E6", "status": "Blocked", "evidenceRefs": [] },
+        { "code": "E7", "status": "Blocked", "evidenceRefs": [] }
+      ]
+    }
+  },
+  "integratedGate": {
+    "currentEvidenceStage": "E1",
+    "status": "Blocked",
+    "candidateRevision": "hexagram-campaign-reset.logic-e3.r1",
+    "evidenceRefs": ["test:SimulationHexagramCampaignTests:8/8"],
+    "openFeedbackRefs": ["Presentation E4 이상과 실제 Unity 입력·Game View가 아직 없다."]
+  }
+}
